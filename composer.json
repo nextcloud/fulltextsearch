@@ -1,0 +1,5 @@
+{
+    "require": {
+        "solarium/solarium": "^3.6"
+    }
+}
