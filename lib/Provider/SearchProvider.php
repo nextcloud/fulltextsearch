@@ -71,6 +71,7 @@ class SearchProvider extends \OCP\Search\Provider
             
             if (sizeof($solrResult) > 0)
                 $topScore = $solrResult[0]['score'];
+            
             foreach ($solrResult as $data) {
                 
                 // This is not clean, but right now it is the only descent way I found to display result

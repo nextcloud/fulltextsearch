@@ -68,7 +68,7 @@ class SolrService
     /**
      * extract a simple text file.
      *
-     * @param string $path
+     * @param string $path            
      * @param int $docid            
      */
     public function extractSimpleTextFile($path, $docid)
@@ -92,6 +92,18 @@ class SolrService
         $query->setDocument($doc);
         
         return $client->extract($query);
+    }
+
+    public function removeDocument($docid)
+    {
+        $client = $this->solariumClient;
+        $update = $client->createUpdate();
+        
+        $update->addDeleteById($docid);
+        $update->addCommit();
+        
+        // this executes the query and returns the result
+        return $client->update($update);
     }
 
     public function ping()

@@ -28,20 +28,66 @@ namespace OCA\Nextant\Service;
 
 use OC\Files\Filesystem;
 use OC\Files\View;
+use OCP\Files\NotFoundException;
 
 class FileService
 {
 
     private $root;
 
-    public function __construct($root)
+    private $solrService;
+
+    private $miscService;
+
+    private $view;
+
+    public function __construct($root, $solrService, $miscService)
     {
         $this->root = $root;
+        $this->solrService = $solrService;
+        $this->miscService = $miscService;
+        
+        $this->view = Filesystem::getView();
     }
 
     public function getRoot()
     {
         return $this->root;
+    }
+
+    /**
+     * delete file or files if directory
+     *
+     * @param string $path            
+     */
+    public function deleteFiles($path)
+    {
+        $fileInfos = $this->view->getFileInfo($path);
+        if ($fileInfos->getMimeType() == 'httpd/unix-directory') {
+            $files = $this->view->getDirectoryContent($path);
+            foreach ($files as $file)
+                $this->deleteFiles($this->view->getPath($file->getId()));
+        } else {
+            $solrResult = $this->solrService->removeDocument($fileInfos->getId());
+        }
+    }
+
+    /**
+     * restore file or files if directory
+     * 
+     * @param string $path
+     */
+    public function restoreFiles($path)
+    {
+        $fileInfos = $this->view->getFileInfo($path);
+        if ($fileInfos->getMimeType() == 'httpd/unix-directory') {
+            $files = $this->view->getDirectoryContent($path);
+            foreach ($files as $file)
+                $this->restoreFiles($this->view->getPath($file->getId()));
+        } else {
+            $absolutePath = $this->getRoot() . $this->view->getAbsolutePath($path);
+            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType());
+        }
     }
 
     public static function getId($path)
@@ -62,7 +108,7 @@ class FileService
             else
                 return $view->getPath($id);
         } catch (NotFoundException $e) {
-            throw new NotFoundException('File with id ' . $id . ' not found');
+            return false;
         }
     }
 
@@ -74,10 +120,10 @@ class FileService
                 $path = $view->getPath($pathorid);
             else
                 $path = $pathorid;
-              
+            
             return $view->getFileInfo($path);
         } catch (NotFoundException $e) {
-            throw new NotFoundException('File with id ' . $pathorid . ' not found');
+            return false;
         }
     }
 

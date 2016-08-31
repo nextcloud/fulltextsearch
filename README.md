@@ -15,7 +15,6 @@ What it does right now and should not:
 - display results behind an element so it can't be clicked.
 
 What it should do in the future:
-- remove documents from the Solr Server when they are deleted from the cloud.
 - documents should be kept on the Solr Server while the original file is still in the trashbin.
 - testing your setup from the administration page
 - extract files with an ./occ command

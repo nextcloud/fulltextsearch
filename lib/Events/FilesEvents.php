@@ -55,6 +55,8 @@ class FilesEvents
      */
     public function onFileCreate($path)
     {
+//        $this->fileService->createFile($path);
+        
         $absolutePath = $this->fileService->getRoot() . FileService::getAbsolutePath($path);
         $fileInfos = FileService::getFileInfo($path);
         $this->miscService->log('>> ' . $fileInfos->getMimeType());
@@ -69,8 +71,8 @@ class FilesEvents
      */
     public function onFileUpdate($path)
     {
-        $absolutePath = $this->fileService->getRoot() . FileService::getAbsolutePath($path);        
-        $fileInfos = FileService::getFileInfo($path);         
+        $absolutePath = $this->fileService->getRoot() . FileService::getAbsolutePath($path);
+        $fileInfos = FileService::getFileInfo($path);
         
         $solrResult = $this->solrService->extractFile($absolutePath, FileService::getId($path), $fileInfos->getMimeType());
     }
@@ -78,11 +80,11 @@ class FilesEvents
     /**
      * onFileRename()
      *
-     * @param string $path            
+     * @param string $source
+     * @param string $target
      */
     public function onFileRename($source, $target)
-    {
-    }
+    {}
 
     /**
      * onFileDelete()
@@ -91,8 +93,7 @@ class FilesEvents
      */
     public function onFileDelete($path)
     {
-        // $path incorrect
-        $this->miscService->log('A file has been deleted: ' . FileService::getId($path), 2);
+        $this->fileService->deleteFiles($path);
     }
 
     /**
@@ -102,7 +103,7 @@ class FilesEvents
      */
     public function onFileRestore($path)
     {
-        $this->miscService->log('A file has been restored: ' . FileService::getId($path), 2);
+        $this->fileService->restoreFiles($path);
     }
 
     /**
