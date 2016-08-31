@@ -95,8 +95,10 @@ class SolrService
         $return = array();
         foreach ($resultset as $document) {
             array_push($return, array(
-                'id' => $document->id
+                'id' => $document->id,
+                'score' => $document->score
             ));
+//            $this->miscService->log(">> " . var_export($document, true), 2);
         }
         
         return $return;

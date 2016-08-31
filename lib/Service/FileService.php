@@ -66,6 +66,18 @@ class FileService
         }
     }
 
+    public static function getFileInfo($id)
+    {
+        try {
+            $view = Filesystem::getView();
+            $path = $view->getPath($id);
+            return $view->getFileInfo($path);
+        } catch (NotFoundException $e) {
+            throw new NotFoundException('File with id ' . $id . ' not found');
+        }        
+    }
+    
+    
     public static function getAbsolutePath($path, $root = false)
     {
         $view = Filesystem::getView();

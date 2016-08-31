@@ -131,11 +131,11 @@ class Application extends App
         // not working: post_unshare
         Util::connectHook('OC_Filesystem', 'post_create', '\OCA\Nextant\Hooks\FilesHooks', 'fileCreated');
         Util::connectHook('OC_Filesystem', 'post_update', '\OCA\Nextant\Hooks\FilesHooks', 'fileUpdated');
-     //   Util::connectHook('OC_Filesystem', 'post_rename', '\OCA\Nextant\Hooks\FilesHooks', 'fileRenamed');
+        // Util::connectHook('OC_Filesystem', 'post_rename', '\OCA\Nextant\Hooks\FilesHooks', 'fileRenamed');
         Util::connectHook('OC_Filesystem', 'post_delete', '\OCA\Nextant\Hooks\FilesHooks', 'fileDeleted');
         Util::connectHook('\OCA\Files_Trashbin\Trashbin', 'post_restore', '\OCA\Nextant\Hooks\FilesHooks', 'fileRestored');
-     //   Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
-     //   Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
+        // Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
+        // Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
         // Util::connectHook('\OC\Files\Cache\Scanner', 'scan_file', '\OCA\Nextant\Hooks\FilesHooks', 'fileScanned');
     }
 
@@ -170,7 +170,7 @@ class Application extends App
         });
         
         // Uncomment this to do a quick test on loading
-      //  $this->testExtract();
+        // $this->testExtract();
     }
 
     public function registerSettingsAdmin()

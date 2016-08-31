@@ -27,9 +27,12 @@
 namespace OCA\Nextant\Provider;
 
 use OCP\Search\Provider;
+use \OCA\Nextant\Service\FileService;
 
-class SearchProvider extends Provider
+class SearchProvider extends \OCP\Search\Provider
 {
+
+    private $orig;
 
     private $app;
 
@@ -66,12 +69,14 @@ class SearchProvider extends Provider
             
             $solrResult = $this->solrService->search($query);
             foreach ($solrResult as $data) {
-                $results[] = array(
-                    'id' => $data['id'],
-                    'name' => 'NAME' . $data['id'],
-                    'link' => 'LINK' . $data['id'],
-                    'type' => 'text'
-                );
+                
+                // This is not clean, but right now it is the only descent way I found to display result
+                $fileData = FileService::getFileInfo($data['id']);
+                $result = new \OC\Search\Result\File($fileData);
+                $result->type = 'nextant';
+                $result->name = $result->path . ' (Score: ' . round($data['score'] * 100, 1) . ') ';
+//                $this->miscService->log(">> " . var_export($result, true));
+                $results[] = $result;
             }
         }
         
