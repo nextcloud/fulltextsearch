@@ -7,16 +7,16 @@
 # Nextant
 
 What it does right now:
-- Extract text file (and only text file) _at creation_ to Solr server.
-- Add an owner filter to solr documents so each user search in its own library.
-- Solr documents are created and destroyed when the original file is uploaded/deleted. 
+- When uploaded to the cloud, text file are extracted to the Solr Server.
+- It add an owner filter to solr documents so each user search in its own library.
 - Use the Solr server when using the searchbox in the files App of your nextcloud.
 
 What it does right now and should not:
 - display results behind an element so it can't be clicked.
 
 What it should do in the future:
-- documents should be kept on the Solt while the original file is still in the trashbin.
+- remove documents from the Solr Server when they are deleted from the cloud.
+- documents should be kept on the Solr Server while the original file is still in the trashbin.
 - testing your setup from the administration page
 - extract files with an ./occ command
 - extract more format (docx, pdf, ...)
@@ -37,20 +37,27 @@ What it should do in the future:
 
 - install the solr on debian-like
 
-	# apt-get install solr-tomcat7
+	apt-get install solr-tomcat7
 
 - Verify the version you just installed (3.6.2 on Jessie)
 
-	# apt-cache showpkg solr-tomcat7 
+	apt-cache showpkg solr-tomcat7 
 
 - Download the plugins for your version, and finish the installation using this [documentation](https://wiki.debian.org/Solr)
-- Edit the config file and add those line inside the <fields></fields> stuff:
+- Edit the **schema.xml** config file and add those four (4) lines inside the **fields /fields**
 
-	   <field name="nextant_owner" type="text_general" indexed="true" stored="true"/>
-	   <field name="nextant_deleted" type="boolean" indexed="true" stored="true"/>
-	   <field name="nextant_shared" type="boolean" indexed="true" stored="true"/>
-	   <field name="nextant_sharing" type="text_general" indexed="true" stored="true" multiValued="true"/>
+```xml
+<fields>
+...
 
+   <field name="nextant_owner" type="text_general" indexed="true" stored="true"/>
+   <field name="nextant_deleted" type="boolean" indexed="true" stored="true"/>
+   <field name="nextant_shared" type="boolean" indexed="true" stored="true"/>
+   <field name="nextant_sharing" type="text_general" indexed="true" stored="true" multiValued="true"/>
+   
+...
+</fields>
+```
 
 ## Building the app
 
