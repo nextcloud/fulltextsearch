@@ -25,7 +25,8 @@
  */
 namespace OCA\Nextant\Service;
 
-// use Solarium\Solarium;
+use \OCA\Nextant\Service\FileService;
+
 class SolrService
 {
 
@@ -47,15 +48,33 @@ class SolrService
     }
 
     /**
-     * extract a simple text file.
-     * This function should only be use for testing.
+     * extract a file.
      *
      * @param string $path            
+     * @param int $docid            
+     * @param string $mimetype            
+     * @return result
+     */
+    public function extractFile($path, $docid, $mimetype)
+    {
+        switch (FileService::getBaseTypeFromMime($mimetype)) {
+            case 'text':
+                return $this->extractSimpleTextFile($path, $docid);
+        }
+        
+        return false;
+    }
+
+    /**
+     * extract a simple text file.
+     *
+     * @param string $path
+     * @param int $docid            
      */
     public function extractSimpleTextFile($path, $docid)
     {
         if ($this->owner == '')
-            return;
+            return false;
         
         $client = $this->solariumClient;
         
@@ -87,6 +106,7 @@ class SolrService
         
         $client = $this->solariumClient;
         $query = $client->createSelect();
+        
         $query->setQuery($string);
         $query->createFilterQuery('owner')->setQuery('nextant_owner:' . $this->owner);
         
@@ -98,7 +118,7 @@ class SolrService
                 'id' => $document->id,
                 'score' => $document->score
             ));
-//            $this->miscService->log(">> " . var_export($document, true), 2);
+            // $this->miscService->log(">> " . var_export($document, true), 2);
         }
         
         return $return;

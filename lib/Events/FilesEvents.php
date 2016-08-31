@@ -28,7 +28,6 @@ namespace OCA\Nextant\Events;
 
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\MiscService;
-use Solarium\Solarium;
 
 class FilesEvents
 {
@@ -57,10 +56,10 @@ class FilesEvents
     public function onFileCreate($path)
     {
         $absolutePath = $this->fileService->getRoot() . FileService::getAbsolutePath($path);
-        // $this->miscService->log('A file has been created: ' . $absolutePath . ' (' . FileService::getId($path) . ')', 2);
+        $fileInfos = FileService::getFileInfo($path);
+        $this->miscService->log('>> ' . $fileInfos->getMimeType());
         
-        $solrResult = $this->solrService->extractSimpleTextFile($absolutePath, FileService::getId($path));
-        // $this->miscService->log('Solr Status: ' . $solrResult->getStatus() . ', Time: ' . $solrResult->getQueryTime(), 2);
+        $solrResult = $this->solrService->extractFile($absolutePath, FileService::getId($path), $fileInfos->getMimeType());
     }
 
     /**
@@ -70,11 +69,10 @@ class FilesEvents
      */
     public function onFileUpdate($path)
     {
-        $absolutePath = $this->fileService->getRoot() . FileService::getAbsolutePath($path);
-        // $this->miscService->log('A file has been updated: ' . $absolutePath . ' (' . FileService::getId($path) . ')', 2);
+        $absolutePath = $this->fileService->getRoot() . FileService::getAbsolutePath($path);        
+        $fileInfos = FileService::getFileInfo($path);         
         
-        $solrResult = $this->solrService->extractSimpleTextFile($absolutePath, FileService::getId($path));
-        // $this->miscService->log('Solr Status: ' . $solrResult['status'] . ', Time: ' . $solrResult['time'], 2);
+        $solrResult = $this->solrService->extractFile($absolutePath, FileService::getId($path), $fileInfos->getMimeType());
     }
 
     /**
@@ -84,7 +82,6 @@ class FilesEvents
      */
     public function onFileRename($source, $target)
     {
-        // $this->miscService->log('A file has been renamed: ' . FileService::getId($target), 2);
     }
 
     /**

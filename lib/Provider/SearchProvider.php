@@ -68,14 +68,20 @@ class SearchProvider extends \OCP\Search\Provider
         if ($query !== null) {
             
             $solrResult = $this->solrService->search($query);
+            
+            if (sizeof($solrResult) > 0)
+                $topScore = $solrResult[0]['score'];
             foreach ($solrResult as $data) {
                 
                 // This is not clean, but right now it is the only descent way I found to display result
                 $fileData = FileService::getFileInfo($data['id']);
+                if ($fileData === false)
+                    continue;
+                
                 $result = new \OC\Search\Result\File($fileData);
                 $result->type = 'nextant';
-                $result->name = $result->path . ' (Score: ' . round($data['score'] * 100, 1) . ') ';
-//                $this->miscService->log(">> " . var_export($result, true));
+                // $result->name = $result->path . ' (Accuracy: ' . round($data['score'] * 100 / $topScore, 2) . '%) ';
+                $result->name = $result->path . ' (Accuracy: ' . (($data['score'] < 1) ? round($data['score'] * 100, 1) : 100) . '%) ';
                 $results[] = $result;
             }
         }

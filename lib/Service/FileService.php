@@ -66,21 +66,29 @@ class FileService
         }
     }
 
-    public static function getFileInfo($id)
+    public static function getFileInfo($pathorid)
     {
         try {
             $view = Filesystem::getView();
-            $path = $view->getPath($id);
+            if (intval($pathorid) != 0)
+                $path = $view->getPath($pathorid);
+            else
+                $path = $pathorid;
+              
             return $view->getFileInfo($path);
         } catch (NotFoundException $e) {
-            throw new NotFoundException('File with id ' . $id . ' not found');
-        }        
+            throw new NotFoundException('File with id ' . $pathorid . ' not found');
+        }
     }
-    
-    
+
     public static function getAbsolutePath($path, $root = false)
     {
         $view = Filesystem::getView();
         return $view->getAbsolutePath($path);
+    }
+
+    public static function getBaseTypeFromMime($mimetype)
+    {
+        return substr($mimetype, 0, strpos($mimetype, '/'));
     }
 }
