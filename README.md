@@ -7,18 +7,18 @@
 # Nextant
 
 What it does right now:
-- When uploaded to the cloud, text file are extracted to the Solr Server.
+- When uploaded to the cloud, text and pdf file are extracted to the Solr Server.
 - It add an owner filter to solr documents so each user search in its own library.
 - Use the Solr server when using the searchbox in the files App of your nextcloud.
+- You can also extract your current files using ./occ nextant:scan 
 
 What it does right now and should not:
 - display results behind an element so it can't be clicked.
 
 What it should do in the future:
-- documents should be kept on the Solr Server while the original file is still in the trashbin.
+- documents should be kept on the Solr Server while the original file is still in the trashbin so you can also search in the trashbin.
 - testing your setup from the administration page
-- extract files with an ./occ command
-- extract more format (docx, pdf, ...)
+- extract more format (docx, ...)
 - link to the right file when searching
 - have a better display and a better indexing of the results
 
