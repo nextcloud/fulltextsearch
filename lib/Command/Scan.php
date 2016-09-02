@@ -69,13 +69,13 @@ class Scan extends Base
         $usersTotal = sizeof($users);
         $usersCurrent = 0;
         foreach ($users as $user) {
-            $userCurrent ++;
+            $usersCurrent ++;
             
             if ($this->hasBeenInterrupted())
                 break;
             
             $userId = $user->getUID();
-            $output->writeln('Scanning files from <info>' . $userId . '</info> (' . $userCurrent . '/' . $usersTotal . ')');
+            $output->writeln('Scanning files from <info>' . $userId . '</info> (' . $usersCurrent . '/' . $usersTotal . ')');
             
             $this->solrService->setOwner($userId);
             $result = $this->scanFiles($userId, $output);

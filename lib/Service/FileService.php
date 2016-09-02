@@ -75,7 +75,7 @@ class FileService
             foreach ($files as $file)
                 $this->removeFiles($this->view->getPath($file->getId()), true);
         } else {
-            $this->miscService->log('[Nextant] Remove file ' . $fileInfos->getId());
+            // $this->miscService->log('[Nextant] Remove file ' . $fileInfos->getId());
             
             $solrResult = $this->solrService->removeDocument($fileInfos->getId());
         }
@@ -99,7 +99,7 @@ class FileService
                 $this->addFiles($this->view->getPath($file->getId()), true);
         } else {
             $absolutePath = $this->getRoot() . $this->view->getAbsolutePath($path);
-            $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
+            // $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
             
             $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType());
         }
