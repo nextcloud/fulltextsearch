@@ -26,7 +26,6 @@
  */
 namespace OCA\Nextant\Hooks;
 
-
 /**
  * init Files' Events
  */
@@ -103,7 +102,7 @@ class FilesHooks
      */
     public static function fileShared($params)
     {
-        self::getController()->onFileShare($params['itemTarget'], $params['fileTarget']);
+        self::getController()->onFileShare($params['fileSource'], $params['shareWith'], ($params['shareType'] == 1) ? true : false);
     }
 
     /**
@@ -113,7 +112,8 @@ class FilesHooks
      */
     public static function fileUnshared($params)
     {
-        self::getController()->onFileUnshare($params['path']);
+        if (in_array('fileSource', $params))
+            self::getController()->onFileUnshare($params['fileSource'], $params['shareWith'], ($params['shareType'] == 1) ? true : false);
     }
 
     /**

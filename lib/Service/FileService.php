@@ -107,6 +107,13 @@ class FileService
         return $solrResult;
     }
 
+    
+    public function shareDocument($path, $shareWith, $isGroup, $sharing)
+    {
+        
+        
+        
+    }
     public static function getId($path)
     {
         $fileId = 0;

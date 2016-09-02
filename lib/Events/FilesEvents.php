@@ -102,9 +102,9 @@ class FilesEvents
      *
      * @param string $path            
      */
-    public function onFileShare($item, $file)
+    public function onFileShare($path, $shareWith, $isGroup)
     {
-        $this->miscService->log('A file has been shared: ' . $item . ', ' . $file, 2);
+        $this->fileService->shareDocument($path, $shareWith, $isGroup, true);
     }
 
     /**
@@ -112,9 +112,9 @@ class FilesEvents
      *
      * @param string $path            
      */
-    public function onFileUnshare($path)
+    public function onFileUnshare($path, $shareWith, $isGroup)
     {
-        $this->miscService->log('A file has been unshared: ' . $path, 2);
+        $this->fileService->shareDocument($path, $shareWith, $isGroup, false);
     }
 
     /**
