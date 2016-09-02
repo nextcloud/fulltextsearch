@@ -103,6 +103,7 @@ class Scan extends Base
         
         $path = '/' . $userId . '/files/';
         
+        Filesystem::tearDown();
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
         
