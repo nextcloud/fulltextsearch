@@ -62,6 +62,17 @@ class SolrService
                 return $this->extractSimpleTextFile($path, $docid);
         }
         
+        switch ($mimetype) {
+   //         case 'application/vnd.oasis.opendocument.text':
+   //             return $this->extractSimpleTextFile($path, $docid);
+            
+   //         case 'application/epub+zip':
+   //             return $this->extractSimpleTextFile($path, $docid);
+            
+            case 'application/pdf':
+                return $this->extractSimpleTextFile($path, $docid);
+        }
+        
         return false;
     }
 
@@ -130,7 +141,6 @@ class SolrService
                 'id' => $document->id,
                 'score' => $document->score
             ));
-            // $this->miscService->log(">> " . var_export($document, true), 2);
         }
         
         return $return;
