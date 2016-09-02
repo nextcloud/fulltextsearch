@@ -55,39 +55,56 @@ class FileService
         return $this->root;
     }
 
+    public function setView($view)
+    {
+        $this->view = $view;
+    }
+
     /**
      * delete file or files if directory
      *
      * @param string $path            
      */
-    public function deleteFiles($path)
+    public function removeFiles($path, $recursive = false)
     {
+        $solrResult = false;
+        
         $fileInfos = $this->view->getFileInfo($path);
         if ($fileInfos->getMimeType() == 'httpd/unix-directory') {
             $files = $this->view->getDirectoryContent($path);
             foreach ($files as $file)
-                $this->deleteFiles($this->view->getPath($file->getId()));
+                $this->removeFiles($this->view->getPath($file->getId()), true);
         } else {
+            $this->miscService->log('[Nextant] Remove file ' . $fileInfos->getId());
+            
             $solrResult = $this->solrService->removeDocument($fileInfos->getId());
         }
+        
+        return $solrResult;
     }
 
     /**
      * restore file or files if directory
-     * 
-     * @param string $path
+     *
+     * @param string $path            
      */
-    public function restoreFiles($path)
+    public function addFiles($path, $recursive = false)
     {
+        $solrResult = false;
+        
         $fileInfos = $this->view->getFileInfo($path);
-        if ($fileInfos->getMimeType() == 'httpd/unix-directory') {
+        if ($fileInfos->getMimeType() == 'httpd/unix-directory' && $recursive) {
             $files = $this->view->getDirectoryContent($path);
             foreach ($files as $file)
-                $this->restoreFiles($this->view->getPath($file->getId()));
+                $this->addFiles($this->view->getPath($file->getId()), true);
         } else {
             $absolutePath = $this->getRoot() . $this->view->getAbsolutePath($path);
+            $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
+            
             $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType());
         }
+        
+        return $solrResult;
     }
 
     public static function getId($path)

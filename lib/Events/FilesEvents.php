@@ -55,13 +55,7 @@ class FilesEvents
      */
     public function onFileCreate($path)
     {
-//        $this->fileService->createFile($path);
-        
-        $absolutePath = $this->fileService->getRoot() . FileService::getAbsolutePath($path);
-        $fileInfos = FileService::getFileInfo($path);
-        $this->miscService->log('>> ' . $fileInfos->getMimeType());
-        
-        $solrResult = $this->solrService->extractFile($absolutePath, FileService::getId($path), $fileInfos->getMimeType());
+        $this->fileService->addFiles($path, true);
     }
 
     /**
@@ -71,17 +65,14 @@ class FilesEvents
      */
     public function onFileUpdate($path)
     {
-        $absolutePath = $this->fileService->getRoot() . FileService::getAbsolutePath($path);
-        $fileInfos = FileService::getFileInfo($path);
-        
-        $solrResult = $this->solrService->extractFile($absolutePath, FileService::getId($path), $fileInfos->getMimeType());
+        $this->fileService->addFiles($path, true);
     }
 
     /**
      * onFileRename()
      *
-     * @param string $source
-     * @param string $target
+     * @param string $source            
+     * @param string $target            
      */
     public function onFileRename($source, $target)
     {}
@@ -93,7 +84,7 @@ class FilesEvents
      */
     public function onFileDelete($path)
     {
-        $this->fileService->deleteFiles($path);
+        $this->fileService->removeFiles($path, true);
     }
 
     /**
@@ -103,7 +94,7 @@ class FilesEvents
      */
     public function onFileRestore($path)
     {
-        $this->fileService->restoreFiles($path);
+        $this->fileService->addFiles($path, true);
     }
 
     /**
@@ -132,8 +123,6 @@ class FilesEvents
      * @param string $path            
      */
     public function onFileScan($path)
-    {
-        $this->miscService->log('A file has been scanned: ' . $path, 2);
-    }
+    {}
 }
 

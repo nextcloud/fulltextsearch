@@ -24,4 +24,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-$application->add(new OCA\Nextant\Command\Scan());
+$app = new \OCA\Nextant\AppInfo\Application();
+$c = $app->getContainer();
+$app->registerSearchEngine();
+
+$application->add(new OCA\Nextant\Command\Scan(OC::$server->getUserManager(), $c->query('UserFolder'), $c->query('SolrService'), $c->query('FileService')));
+
+

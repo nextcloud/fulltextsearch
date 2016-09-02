@@ -118,6 +118,10 @@ class Application extends App
             return is_null($user) ? '' : $user->getUID();
         });
         
+        $container->registerService('UserFolder', function ($c) {
+            return \OC::$server->getUserFolder();
+        });
+        
         // \OC::$server->getSystemConfig()->getValue('datadirectory', OC::$SERVERROOT . '/data');
         // $container->query('MiscService')->log('root: ' . $root, 2);
         $container->registerService('Root', function ($c) {
@@ -136,7 +140,6 @@ class Application extends App
         Util::connectHook('\OCA\Files_Trashbin\Trashbin', 'post_restore', '\OCA\Nextant\Hooks\FilesHooks', 'fileRestored');
         // Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
         // Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
-        // Util::connectHook('\OC\Files\Cache\Scanner', 'scan_file', '\OCA\Nextant\Hooks\FilesHooks', 'fileScanned');
     }
 
     public function registerDatabase()
