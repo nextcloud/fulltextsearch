@@ -61,29 +61,6 @@ class FileService
     }
 
     /**
-     * delete file or files if directory
-     *
-     * @param string $path            
-     */
-    public function removeFiles($path, $recursive = false)
-    {
-        $solrResult = false;
-        
-        $fileInfos = $this->view->getFileInfo($path);
-        if ($fileInfos->getMimeType() == 'httpd/unix-directory') {
-            $files = $this->view->getDirectoryContent($path);
-            foreach ($files as $file)
-                $this->removeFiles($this->view->getPath($file->getId()), true);
-        } else {
-            // $this->miscService->log('[Nextant] Remove file ' . $fileInfos->getId());
-            
-            $solrResult = $this->solrService->removeDocument($fileInfos->getId());
-        }
-        
-        return $solrResult;
-    }
-
-    /**
      * restore file or files if directory
      *
      * @param string $path            
@@ -102,6 +79,29 @@ class FileService
             // $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
             
             $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType());
+        }
+        
+        return $solrResult;
+    }
+
+    /**
+     * delete file or files if directory
+     *
+     * @param string $path            
+     */
+    public function removeFiles($path, $recursive = false)
+    {
+        $solrResult = false;
+        
+        $fileInfos = $this->view->getFileInfo($path);
+        if ($fileInfos->getMimeType() == 'httpd/unix-directory' && $recursive) {
+            $files = $this->view->getDirectoryContent($path);
+            foreach ($files as $file)
+                $this->removeFiles($this->view->getPath($file->getId()), true);
+        } else {
+            // $this->miscService->log('[Nextant] Remove file ' . $fileInfos->getId());
+            
+            $solrResult = $this->solrService->removeDocument($fileInfos->getId());
         }
         
         return $solrResult;
