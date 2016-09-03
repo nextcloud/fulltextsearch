@@ -40,7 +40,6 @@ class FilesHooks
     static protected function getController()
     {
         $app = new \OCA\Nextant\AppInfo\Application();
-        $app->registerSearchEngine();
         return $app->getContainer()->query('FilesEvents');
     }
 
@@ -112,7 +111,7 @@ class FilesHooks
      */
     public static function fileUnshared($params)
     {
-        if (in_array('fileSource', $params))
+        if (key_exists('fileSource', $params))
             self::getController()->onFileUnshare($params['fileSource'], $params['shareWith'], ($params['shareType'] == 1) ? true : false);
     }
 

@@ -69,7 +69,7 @@ class Application extends App
         });
         
         $container->registerService('SolrService', function ($c) {
-            return new SolrService($c->query('SolariumClient'), $c->query('MiscService'));
+            return new SolrService($c->query('SolariumClient'), $c->query('ConfigService'), $c->query('MiscService'));
         });
         
         $container->registerService('IndexMapper', function ($c) {
@@ -89,7 +89,7 @@ class Application extends App
         // });
         
         $container->registerService('SettingsController', function ($c) {
-            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('UserId'));
+            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('MiscService'));
         });
         
         /**
@@ -123,10 +123,23 @@ class Application extends App
         });
         
         // \OC::$server->getSystemConfig()->getValue('datadirectory', OC::$SERVERROOT . '/data');
-        // $container->query('MiscService')->log('root: ' . $root, 2);
         $container->registerService('Root', function ($c) {
             return \OC::$server->getSystemConfig()
                 ->getValue('datadirectory', \OC::$SERVERROOT . '/data');
+        });
+        
+        /**
+         * Solr / Search Engines
+         */
+        \OC::$server->getSearch()->registerProvider('OCA\Nextant\Provider\SearchProvider', array(
+            'apps' => array(
+                'files'
+            )
+        ));
+        
+        $this->getContainer()->registerService('SolariumClient', function ($c) {
+            return new \Solarium\Client($c->query('ConfigService')
+                ->toSolarium());
         });
     }
 
@@ -140,40 +153,6 @@ class Application extends App
         Util::connectHook('\OCA\Files_Trashbin\Trashbin', 'post_restore', '\OCA\Nextant\Hooks\FilesHooks', 'fileRestored');
         Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
         Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
-    }
-
-    public function registerDatabase()
-    {
-        if ($this->registeredDatabase)
-            return;
-        
-        $this->registeredDatabase = true;
-    }
-
-    public function registerSearchEngine()
-    {
-        $this->registerDatabase();
-        
-        // Script is now useless
-        // \OCP\Util::addScript('nextant', 'navigate');
-        
-        // Old registration
-        // \OC::$server->getSearch()->registerProvider($this->getContainer()->query('SearchProvider'), array(
-        
-        // Because we don't register the SearchProvider, let's call it throw its direct path.
-        \OC::$server->getSearch()->registerProvider('OCA\Nextant\Provider\SearchProvider', array(
-            'apps' => array(
-                'files'
-            )
-        ));
-        
-        $this->getContainer()->registerService('SolariumClient', function ($c) {
-            return new \Solarium\Client($c->query('ConfigService')
-                ->toSolarium());
-        });
-        
-        // Uncomment this to do a quick test on loading
-        // $this->testExtract();
     }
 
     public function registerSettingsAdmin()

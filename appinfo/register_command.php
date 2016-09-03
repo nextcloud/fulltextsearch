@@ -26,7 +26,6 @@
  */
 $app = new \OCA\Nextant\AppInfo\Application();
 $c = $app->getContainer();
-$app->registerSearchEngine();
 
 $application->add(new OCA\Nextant\Command\Scan(OC::$server->getUserManager(), $c->query('UserFolder'), $c->query('SolrService'), $c->query('FileService')));
 

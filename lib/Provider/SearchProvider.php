@@ -46,7 +46,6 @@ class SearchProvider extends \OCP\Search\Provider
     {
         $app = new \OCA\Nextant\AppInfo\Application();
         $container = $app->getContainer();
-        $app->registerSearchEngine();
         
         $this->app = $app;
         $this->miscService = $container->query('MiscService');

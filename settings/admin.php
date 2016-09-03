@@ -27,8 +27,10 @@
 namespace OCA\Nextant\Settings;
 
 $app = new \OCA\Nextant\AppInfo\Application();
+$app->registerSettingsAdmin();
+
 $response = $app->getContainer()
-    ->query('\OCA\Nextant\Controller\SettingsController')
+    ->query('SettingsController')
     ->index();
 
 return $response->render();

@@ -31,7 +31,4 @@ require_once __DIR__ . '/autoload.php';
 $app = new \OCA\Nextant\AppInfo\Application();
 // $app->registerNavigation();
 $app->registerFilesHooks();
-$app->registerDatabase();
 $app->registerSettingsAdmin();
-
-$app->registerSearchEngine();
