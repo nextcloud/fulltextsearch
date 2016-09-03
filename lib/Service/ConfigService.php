@@ -76,9 +76,12 @@ class ConfigService
      *
      * @return array
      */
-    public function toSolarium()
+    public function toSolarium($config = null)
     {
-        $t = parse_url($this->getAppValue('solr_url'));              
+        if ($config == null || ! key_exists('solr_url', $config))
+            $config['solr_url'] = $this->getAppValue('solr_url');
+        
+        $t = parse_url($config['solr_url']);
         return array(
             'endpoint' => array(
                 'localhost' => array(

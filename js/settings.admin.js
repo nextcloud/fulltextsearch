@@ -23,30 +23,71 @@
  * 
  */
 $(document).ready(
-	function() {
+		function() {
 
-	    var nextantSettings = {
-		save : function() {
-		    $('#nextant_apply').attr('disabled', true);
-		    var data = {
-			solr_url : $('#solr_url').val()
-		    };
+			var nextantSettings = {
 
-		    OC.msg.startAction('#nextant-admin-msg', t('nextant',
-			    'Saving...'));
-		    $.post(
-			    OC
-				    .filePath('nextant', 'ajax/settings',
-					    'admin.php'), data,
-			    nextantSettings.saved);
+				save : function() {
+					$('#nextant_apply').attr('disabled', true);
+					$('#solr_url').prop('disable', true);
+					nextantSettings.test('ping');
+				},
 
-		},
-		saved : function(response) {
-		    $('#docs_apply').attr('disabled', false);
-		    OC.msg.finishedAction('#nextant-admin-msg', response);
-		}
+				test_standby : function(command) {
+					setTimeout(function() {
+						nextantSettings.test(command);
+					}, 400);
+				},
+				test : function(command) {
 
-	    };
+					var data = {
+						solr_url : $('#solr_url').val(),
+						command : command
+					}
 
-	    $('#nextant_apply').on('click', nextantSettings.save);
-	});
+					switch (command) {
+					case 'ping':
+						OC.msg.startAction('#nextant-admin-msg', t('nextant',
+								'Pinging Solr Server'));
+						break;
+
+					case 'save':
+						OC.msg.startAction('#nextant-admin-msg', t('nextant',
+								'Test OK - Saving'));
+						break;
+					}
+
+					$.post(
+							OC
+									.filePath('nextant', 'ajax/settings',
+											'admin.php'), data,
+							nextantSettings.tested);
+
+				},
+
+				tested : function(response) {
+
+					OC.msg.finishedAction('#nextant-admin-msg', response);
+					switch (response.command) {
+					case 'ping':
+						if (response.status == 'success')
+							nextantSettings.test_standby('save');
+						else
+							nextantSettings.reset();
+						break;
+
+					case 'save':
+						nextantSettings.reset();
+						break;
+					}
+
+				},
+
+				reset : function() {
+					$('#solr_url').prop('disable', false);
+					$('#nextant_apply').attr('disabled', false);
+				}
+			}
+
+			$('#nextant_apply').on('click', nextantSettings.save);
+		});

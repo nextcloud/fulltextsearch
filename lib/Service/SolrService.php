@@ -30,16 +30,29 @@ use \OCA\Nextant\Service\FileService;
 class SolrService
 {
 
+    const EXCEPTION_HTTPEXCEPTION = 19;
+
+    const EXCEPTION = 9;
+
     private $solariumClient;
+
+    private $configService;
 
     private $miscService;
 
     private $owner = '';
 
-    public function __construct($client, $miscService)
+    public function __construct($client, $configService, $miscService)
     {
         $this->solariumClient = $client;
+        $this->configService = $configService;
         $this->miscService = $miscService;
+    }
+    
+    // If $config == null, reset config to the one set in the admin
+    public function setClient($config)
+    {
+        $this->solariumClient = new \Solarium\Client($this->configService->toSolarium($config));
     }
 
     public function setOwner($owner)
@@ -63,11 +76,11 @@ class SolrService
         }
         
         switch ($mimetype) {
-   //         case 'application/vnd.oasis.opendocument.text':
-   //             return $this->extractSimpleTextFile($path, $docid);
+            // case 'application/vnd.oasis.opendocument.text':
+            // return $this->extractSimpleTextFile($path, $docid);
             
-   //         case 'application/epub+zip':
-   //             return $this->extractSimpleTextFile($path, $docid);
+            // case 'application/epub+zip':
+            // return $this->extractSimpleTextFile($path, $docid);
             
             case 'application/pdf':
                 return $this->extractSimpleTextFile($path, $docid);
@@ -117,9 +130,22 @@ class SolrService
         return $client->update($update);
     }
 
-    public function ping()
+    public function ping(&$error)
     {
-        // We should ping and test the new setup
+        $client = $this->solariumClient;
+        $ping = $client->createPing();
+        
+        try {
+            $result = $client->ping($ping);
+            $this->miscService->log('ping: ' . var_export($result->getData(), true));
+            return true;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        
+        return false;
     }
 
     public function search($string)

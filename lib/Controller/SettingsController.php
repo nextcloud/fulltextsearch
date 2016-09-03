@@ -34,15 +34,20 @@ use \OCA\Nextant\Service\ConfigService;
 class SettingsController extends Controller
 {
 
-    private $appConfig;
+    private $configService;
 
-    private $userId;
+    private $miscService;
 
-    public function __construct($appName, IRequest $request, ConfigService $appConfig, $userId)
+    private $solrService;
+
+    private $solr_url;
+
+    public function __construct($appName, IRequest $request, ConfigService $configService, $solrService, $miscService)
     {
         parent::__construct($appName, $request);
-        $this->userId = $userId;
-        $this->appConfig = $appConfig;
+        $this->configService = $configService;
+        $this->solrService = $solrService;
+        $this->miscService = $miscService;
     }
 
     /**
@@ -51,24 +56,67 @@ class SettingsController extends Controller
     public function index()
     {
         $params = [
-            'solr_url' => $this->appConfig->getAppValue('solr_url')
+            'solr_url' => $this->configService->getAppValue('solr_url')
         ];
         return new TemplateResponse($this->appName, 'settings.admin', $params, 'blank');
     }
 
-    public function setSettings($solr_url)
+    public function setSettings($solr_url, $command)
     {
-        if (! is_null($solr_url)) {
-            $this->appConfig->setAppValue('solr_url', $solr_url);
+        $this->solr_url = $solr_url;
+        
+        $tmpConfig = array(
+            'solr_url' => $solr_url
+        );
+        $this->solrService->setClient($tmpConfig);
+        
+        $message = '';
+        $result = false;
+        switch ($command) {
+            case 'ping':
+                $result = $this->test_ping($message);
+                break;
+            
+            case 'ping2':
+                $result = $this->test_ping($message);
+                break;
+            
+            case 'save':
+                $result = $this->save($message);
+                break;
         }
         
         $response = array(
-            'status' => 'success',
+            'command' => $command,
+            'status' => $result ? 'success' : 'failure',
             'data' => array(
-                'message' => 'Saved'
+                'message' => $message
             )
         );
         
         return $response;
+    }
+
+    // Wiki Error 9
+    private function test_ping(&$message)
+    {
+        if ($this->solrService->ping($error)) {
+            $message = 'Apache Solr is up, running and responding to our ping';
+            return true;
+        } else {
+            $message = 'Apache Solr is not responding to our ping (Error #' . $error . ')';
+            return false;
+        }
+    }
+
+    private function save(&$message)
+    {
+        if (! is_null($this->solr_url)) {
+            $this->configService->setAppValue('solr_url', $this->solr_url);
+            $message = "Your configuration has been saved";
+            return true;
+        }
+        $message = 'Configuration failed to be saved. Please reload this page.';
+        return false;
     }
 }
