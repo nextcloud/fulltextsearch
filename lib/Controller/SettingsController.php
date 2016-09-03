@@ -30,6 +30,7 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 use \OCA\Nextant\Service\ConfigService;
+use \OCA\Nextant\Service\SolrService;
 
 class SettingsController extends Controller
 {
@@ -82,6 +83,14 @@ class SettingsController extends Controller
                 $result = $this->test_extract($message);
                 break;
             
+            case 'search':
+                $result = $this->test_search($message);
+                break;
+            
+            case 'delete':
+                $result = $this->test_delete($message);
+                break;
+            
             case 'save':
                 $result = $this->save($message);
                 break;
@@ -104,10 +113,10 @@ class SettingsController extends Controller
         if ($this->solrService->ping($error)) {
             $message = 'Apache Solr is up, running and responding to our ping query';
             return true;
-        } else {
-            $message = 'Apache Solr is not responding to our ping query (Error #' . $error . ')';
-            return false;
         }
+        
+        $message = 'Apache Solr is not responding to our ping query (Error #' . $error . ')';
+        return false;
     }
 
     private function test_extract(&$message)
@@ -116,10 +125,46 @@ class SettingsController extends Controller
         if ($this->solrService->extractFile($testFile, '__nextant_test', 'text/plain', $error)) {
             $message = 'Text were successfully extracted';
             return true;
-        } else {
-            $message = 'Extract failed. Please check the configuration of your Solr server (Error #' . $error . ')';
+        }
+        
+        $message = 'Extract failed. Please check the configuration of your Solr server (Error #' . $error . ')';
+        return false;
+    }
+
+    private function test_search(&$message)
+    {
+        $keyword = 'LICENSE';
+        if ($result = $this->solrService->search($keyword, SolrService::SEARCH_OWNER, $error)) {
+            if (sizeof($result) > 0) {
+                
+                foreach ($result as $doc) {
+                    if ($doc['id'] == '__nextant_test') {
+                        $message = 'Found exactly what we were looking for';
+                        return true;
+                    }
+                }
+                
+                // CHECK ID DOCUMENT
+                $message = 'We found something, but not what we were expecting.';
+                return false;
+            }
+            $message = 'Canno\'t find any document';
             return false;
         }
+        
+        $message = 'Search failed. Please check the configuration of your Solr server (Error #' . $error . ')';
+        return false;
+    }
+
+    private function test_delete(&$message)
+    {
+        if ($toto = $this->solrService->removeDocument('__nextant_test')) {
+            $message = 'Test document deleted';
+            return true;
+        }
+        
+        $message = 'We could not delete our test document. Please check the configuration of your Solr server (Error #' . $error . ')';
+        return false;
     }
 
     private function save(&$message)
@@ -129,6 +174,7 @@ class SettingsController extends Controller
             $message = "Your configuration has been saved";
             return true;
         }
+        
         $message = 'Configuration failed to be saved. Please reload this page.';
         return false;
     }

@@ -59,6 +59,17 @@ $(document)
 										'Test simple text extract query'));
 								break;
 
+							case 'search':
+								OC.msg.startAction('#nextant-admin-msg', t(
+										'nextant', 'Test search query'));
+								break;
+
+							case 'delete':
+								OC.msg.startAction('#nextant-admin-msg',
+										t('nextant',
+												'Removing the test document'));
+								break;
+
 							case 'save':
 								OC.msg
 										.startAction(
@@ -86,6 +97,20 @@ $(document)
 								break;
 
 							case 'extract':
+								if (response.status == 'success')
+									nextantSettings.test_standby('search');
+								else
+									nextantSettings.reset();
+								break;
+
+							case 'search':
+								if (response.status == 'success')
+									nextantSettings.test_standby('delete');
+								else
+									nextantSettings.reset();
+								break;
+
+							case 'delete':
 								if (response.status == 'success')
 									nextantSettings.test_standby('save');
 								else

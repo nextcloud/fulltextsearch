@@ -32,6 +32,8 @@ class SolrService
     
     // Owner is not set - mostly a developper mistake
     const ERROR_OWNER_NOT_SET = 4;
+
+    const ERROR_TOOWIDE_SEARCH = 8;
     
     // can't reach http - tomcat running at the right place ?
     const EXCEPTION_HTTPEXCEPTION = 21;
@@ -41,6 +43,18 @@ class SolrService
     
     // can't extract - check solr configuration for the solr-cell plugin
     const EXCEPTION_EXTRACT_FAILED = 41;
+
+    const EXCEPTION_SEARCH_FAILED = 61;
+
+    const EXCEPTION_SEARCH_FAILED_OWNER = 64;
+
+    const EXCEPTION_REMOVE_FAILED = 81;
+
+    const SEARCH_OWNER = 1;
+
+    const SEARCH_SHARE = 2;
+
+    const SEARCH_SHAREGROUP = 4;
     
     // undocumented exception
     const EXCEPTION = 9;
@@ -138,19 +152,92 @@ class SolrService
         } catch (\Solarium\Exception $e) {
             $error = self::EXCEPTION;
         }
+        
         return false;
     }
 
-    public function removeDocument($docid)
+    public function removeDocument($docid, &$error = '')
     {
-        $client = $this->solariumClient;
-        $update = $client->createUpdate();
+        if ($this->owner == '') {
+            $error = self::ERROR_OWNER_NOT_SET;
+            return false;
+        }
         
-        $update->addDeleteById($docid);
-        $update->addCommit();
+        try {
+            $client = $this->solariumClient;
+            $update = $client->createUpdate();
+            
+            $update->addDeleteById($docid);
+            $update->addCommit();
+            
+            return $client->update($update);
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_REMOVE_FAILED;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
         
-        // this executes the query and returns the result
-        return $client->update($update);
+        return false;
+    }
+
+    public function searchAll($string, &$error = '')
+    {
+        return $this->search($string, self::SEARCH_OWNER, $error);
+    }
+
+    public function search($string, $type, &$error)
+    {
+        try {
+            $client = $this->solariumClient;
+            $query = $client->createSelect();
+            
+            $query->setQuery($string);
+            
+            switch ($type) {
+                case self::SEARCH_OWNER:
+                    if ($this->owner == '') {
+                        $error = self::ERROR_OWNER_NOT_SET;
+                        return false;
+                    }
+                    $query->createFilterQuery('owner')->setQuery('nextant_owner:' . $this->owner);
+                    break;
+                
+                default:
+                    $error = self::ERROR_TOOWIDE_SEARCH;
+                    return false;
+            }
+            
+            $resultset = $client->select($query);
+            
+            $return = array();
+            foreach ($resultset as $document) {
+                array_push($return, array(
+                    'id' => $document->id,
+                    'score' => $document->score
+                ));
+            }
+            
+            return $return;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK') {
+                switch ($type) {
+                    case self::SEARCH_OWNER:
+                        $error = self::EXCEPTION_SEARCH_FAILED_OWNER;
+                        break;
+                    default:
+                        $error = self::EXCEPTION_SEARCH_FAILED;
+                        break;
+                }
+            } else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        
+        return false;
     }
 
     public function ping(&$error)
@@ -171,30 +258,6 @@ class SolrService
         }
         
         return false;
-    }
-
-    public function search($string)
-    {
-        if ($this->owner == '')
-            return;
-        
-        $client = $this->solariumClient;
-        $query = $client->createSelect();
-        
-        $query->setQuery($string);
-        $query->createFilterQuery('owner')->setQuery('nextant_owner:' . $this->owner);
-        
-        $resultset = $client->select($query);
-        
-        $return = array();
-        foreach ($resultset as $document) {
-            array_push($return, array(
-                'id' => $document->id,
-                'score' => $document->score
-            ));
-        }
-        
-        return $return;
     }
 }
     

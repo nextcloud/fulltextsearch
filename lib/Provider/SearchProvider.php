@@ -66,7 +66,7 @@ class SearchProvider extends \OCP\Search\Provider
         $results = array();
         if ($query !== null) {
             
-            $solrResult = $this->solrService->search($query);
+            $solrResult = $this->solrService->searchAll($query);
             
             if (sizeof($solrResult) > 0)
                 $topScore = $solrResult[0]['score'];
