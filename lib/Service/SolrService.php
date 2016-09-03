@@ -29,9 +29,20 @@ use \OCA\Nextant\Service\FileService;
 
 class SolrService
 {
-
-    const EXCEPTION_HTTPEXCEPTION = 19;
-
+    
+    // Owner is not set - mostly a developper mistake
+    const ERROR_OWNER_NOT_SET = 4;
+    
+    // can't reach http - tomcat running at the right place ?
+    const EXCEPTION_HTTPEXCEPTION = 21;
+    
+    // can't reach solr - check uri
+    const EXCEPTION_SOLRURI = 24;
+    
+    // can't extract - check solr configuration for the solr-cell plugin
+    const EXCEPTION_EXTRACT_FAILED = 41;
+    
+    // undocumented exception
     const EXCEPTION = 9;
 
     private $solariumClient;
@@ -68,11 +79,11 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($path, $docid, $mimetype)
+    public function extractFile($path, $docid, $mimetype, &$error)
     {
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
-                return $this->extractSimpleTextFile($path, $docid);
+                return $this->extractSimpleTextFile($path, $docid, $error);
         }
         
         switch ($mimetype) {
@@ -83,7 +94,7 @@ class SolrService
             // return $this->extractSimpleTextFile($path, $docid);
             
             case 'application/pdf':
-                return $this->extractSimpleTextFile($path, $docid);
+                return $this->extractSimpleTextFile($path, $docid, $error);
         }
         
         return false;
@@ -95,27 +106,39 @@ class SolrService
      * @param string $path            
      * @param int $docid            
      */
-    public function extractSimpleTextFile($path, $docid)
+    public function extractSimpleTextFile($path, $docid, &$error)
     {
-        if ($this->owner == '')
+        if ($this->owner == '') {
+            $error = self::ERROR_OWNER_NOT_SET;
             return false;
+        }
         
-        $client = $this->solariumClient;
-        
-        $query = $client->createExtract();
-        $query->addFieldMapping('content', 'text');
-        $query->setUprefix('attr_');
-        $query->setFile($path);
-        $query->setCommit(true);
-        $query->setOmitHeader(false);
-        
-        // add document
-        $doc = $query->createDocument();
-        $doc->id = $docid;
-        $doc->nextant_owner = $this->owner;
-        $query->setDocument($doc);
-        
-        return $client->extract($query);
+        try {
+            $client = $this->solariumClient;
+            
+            $query = $client->createExtract();
+            $query->addFieldMapping('content', 'text');
+            $query->setUprefix('attr_');
+            $query->setFile($path);
+            $query->setCommit(true);
+            $query->setOmitHeader(false);
+            
+            // add document
+            $doc = $query->createDocument();
+            $doc->id = $docid;
+            $doc->nextant_owner = $this->owner;
+            $query->setDocument($doc);
+            
+            return $client->extract($query);
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_EXTRACT_FAILED;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        return false;
     }
 
     public function removeDocument($docid)
@@ -137,10 +160,12 @@ class SolrService
         
         try {
             $result = $client->ping($ping);
-            $this->miscService->log('ping: ' . var_export($result->getData(), true));
             return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
-            $error = self::EXCEPTION_HTTPEXCEPTION;
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_SOLRURI;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
             $error = self::EXCEPTION;
         }
