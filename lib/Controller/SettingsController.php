@@ -69,6 +69,7 @@ class SettingsController extends Controller
             'solr_url' => $solr_url
         );
         $this->solrService->setClient($tmpConfig);
+        $this->solrService->setOwner('__nextant_test_owner');
         
         $message = '';
         $result = false;
@@ -77,8 +78,8 @@ class SettingsController extends Controller
                 $result = $this->test_ping($message);
                 break;
             
-            case 'ping2':
-                $result = $this->test_ping($message);
+            case 'extract':
+                $result = $this->test_extract($message);
                 break;
             
             case 'save':
@@ -96,15 +97,27 @@ class SettingsController extends Controller
         
         return $response;
     }
-
+    
     // Wiki Error 9
     private function test_ping(&$message)
     {
         if ($this->solrService->ping($error)) {
-            $message = 'Apache Solr is up, running and responding to our ping';
+            $message = 'Apache Solr is up, running and responding to our ping query';
             return true;
         } else {
-            $message = 'Apache Solr is not responding to our ping (Error #' . $error . ')';
+            $message = 'Apache Solr is not responding to our ping query (Error #' . $error . ')';
+            return false;
+        }
+    }
+
+    private function test_extract(&$message)
+    {
+        $testFile = __DIR__ . '/../../LICENSE';
+        if ($this->solrService->extractFile($testFile, '__nextant_test', 'text/plain', $error)) {
+            $message = 'Text were successfully extracted';
+            return true;
+        } else {
+            $message = 'Extract failed. Please check the configuration of your Solr server (Error #' . $error . ')';
             return false;
         }
     }

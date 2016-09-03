@@ -22,72 +22,88 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-$(document).ready(
-		function() {
+$(document)
+		.ready(
+				function() {
 
-			var nextantSettings = {
+					var nextantSettings = {
 
-				save : function() {
-					$('#nextant_apply').attr('disabled', true);
-					$('#solr_url').prop('disable', true);
-					nextantSettings.test('ping');
-				},
+						save : function() {
+							$('#nextant_apply').attr('disabled', true);
+							$('#solr_url').prop('disable', true);
+							nextantSettings.test('ping');
+						},
 
-				test_standby : function(command) {
-					setTimeout(function() {
-						nextantSettings.test(command);
-					}, 400);
-				},
-				test : function(command) {
+						test_standby : function(command) {
+							setTimeout(function() {
+								nextantSettings.test(command);
+							}, 1200);
+						},
+						test : function(command) {
 
-					var data = {
-						solr_url : $('#solr_url').val(),
-						command : command
+							var data = {
+								solr_url : $('#solr_url').val(),
+								command : command
+							}
+
+							switch (command) {
+							case 'ping':
+								OC.msg.startAction('#nextant-admin-msg', t(
+										'nextant',
+										'Ping querying your Solr Server'));
+								break;
+
+							case 'extract':
+								OC.msg.startAction('#nextant-admin-msg', t(
+										'nextant',
+										'Test simple text extract query'));
+								break;
+
+							case 'save':
+								OC.msg
+										.startAction(
+												'#nextant-admin-msg',
+												t('nextant',
+														'All test went fine. Saving your configuration'));
+								break;
+							}
+
+							$.post(OC.filePath('nextant', 'ajax/settings',
+									'admin.php'), data, nextantSettings.tested);
+
+						},
+
+						tested : function(response) {
+
+							OC.msg.finishedAction('#nextant-admin-msg',
+									response);
+							switch (response.command) {
+							case 'ping':
+								if (response.status == 'success')
+									nextantSettings.test_standby('extract');
+								else
+									nextantSettings.reset();
+								break;
+
+							case 'extract':
+								if (response.status == 'success')
+									nextantSettings.test_standby('save');
+								else
+									nextantSettings.reset();
+								break;
+
+							case 'save':
+								nextantSettings.reset();
+								break;
+							}
+
+						},
+
+						reset : function() {
+							$('#solr_url').prop('disable', false);
+							$('#nextant_apply').attr('disabled', false);
+						}
 					}
 
-					switch (command) {
-					case 'ping':
-						OC.msg.startAction('#nextant-admin-msg', t('nextant',
-								'Pinging Solr Server'));
-						break;
-
-					case 'save':
-						OC.msg.startAction('#nextant-admin-msg', t('nextant',
-								'Test OK - Saving'));
-						break;
-					}
-
-					$.post(
-							OC
-									.filePath('nextant', 'ajax/settings',
-											'admin.php'), data,
-							nextantSettings.tested);
-
-				},
-
-				tested : function(response) {
-
-					OC.msg.finishedAction('#nextant-admin-msg', response);
-					switch (response.command) {
-					case 'ping':
-						if (response.status == 'success')
-							nextantSettings.test_standby('save');
-						else
-							nextantSettings.reset();
-						break;
-
-					case 'save':
-						nextantSettings.reset();
-						break;
-					}
-
-				},
-
-				reset : function() {
-					$('#solr_url').prop('disable', false);
-					$('#nextant_apply').attr('disabled', false);
-				}
-			}
-
-			$('#nextant_apply').on('click', nextantSettings.save);
-		});
+					$('#nextant_apply').on('click', nextantSettings.save);
+				});
