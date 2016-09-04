@@ -32,17 +32,21 @@ class ConfigService
 {
 
     private $defaults = [
-        'solr_url' => 'http://127.0.0.1:8080/solr/'
+        'solr_url' => 'http://127.0.0.1:8983/solr/',
+        'solr_core' => 'nextant'
     ];
 
     private $appName;
 
     private $config;
 
-    public function __construct($appName, IConfig $config)
+    private $miscService;
+
+    public function __construct($appName, IConfig $config, $miscService)
     {
         $this->appName = $appName;
         $this->config = $config;
+        $this->miscService = $miscService;
     }
 
     /**
@@ -81,13 +85,21 @@ class ConfigService
         if ($config == null || ! key_exists('solr_url', $config))
             $config['solr_url'] = $this->getAppValue('solr_url');
         
-        $t = parse_url($config['solr_url']);
+        if ($config == null || ! key_exists('solr_core', $config))
+            $config['solr_core'] = $this->getAppValue('solr_core');
+        
+        $url = $config['solr_url'] . '/' . $config['solr_core'];
+        $t = parse_url($url);
+        
+        if (! key_exists('host', $t) || ! key_exists('port', $t) || ! key_exists('path', $t))
+            return false;
+        
         return array(
             'endpoint' => array(
                 'localhost' => array(
                     'host' => $t['host'],
                     'port' => $t['port'],
-                    'path' => $t['path']
+                    'path' => str_replace('//', '/', $t['path'])
                 )
             )
         );

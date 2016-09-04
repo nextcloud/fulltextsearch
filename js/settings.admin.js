@@ -31,6 +31,7 @@ $(document)
 						save : function() {
 							$('#nextant_apply').attr('disabled', true);
 							$('#solr_url').prop('disable', true);
+							$('#solr_core').prop('disable', true);
 							nextantSettings.test('ping');
 						},
 
@@ -43,6 +44,7 @@ $(document)
 
 							var data = {
 								solr_url : $('#solr_url').val(),
+								solr_core : $('#solr_core').val(),
 								command : command
 							}
 
@@ -126,6 +128,7 @@ $(document)
 
 						reset : function() {
 							$('#solr_url').prop('disable', false);
+							$('#solr_core').prop('disable', false);
 							$('#nextant_apply').attr('disabled', false);
 						}
 					}

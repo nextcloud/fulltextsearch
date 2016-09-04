@@ -43,6 +43,8 @@ class SettingsController extends Controller
 
     private $solr_url;
 
+    private $solr_core;
+
     public function __construct($appName, IRequest $request, ConfigService $configService, $solrService, $miscService)
     {
         parent::__construct($appName, $request);
@@ -57,43 +59,51 @@ class SettingsController extends Controller
     public function index()
     {
         $params = [
-            'solr_url' => $this->configService->getAppValue('solr_url')
+            'solr_url' => $this->configService->getAppValue('solr_url'),
+            'solr_core' => $this->configService->getAppValue('solr_core')
         ];
         return new TemplateResponse($this->appName, 'settings.admin', $params, 'blank');
     }
 
-    public function setSettings($solr_url, $command)
+    public function setSettings($solr_url, $solr_core, $command)
     {
         $this->solr_url = $solr_url;
+        $this->solr_core = $solr_core;
         
         $tmpConfig = array(
-            'solr_url' => $solr_url
+            'solr_url' => $solr_url,
+            'solr_core' => $solr_core
         );
-        $this->solrService->setClient($tmpConfig);
-        $this->solrService->setOwner('__nextant_test_owner');
+        
+        $this->solrService->setOwner('nextant_test_owner');
         
         $message = '';
         $result = false;
-        switch ($command) {
-            case 'ping':
-                $result = $this->test_ping($message);
-                break;
+        if (! $this->solrService->setClient($tmpConfig))
+            $message = 'The format of your address is not correct';
+        else {
             
-            case 'extract':
-                $result = $this->test_extract($message);
-                break;
-            
-            case 'search':
-                $result = $this->test_search($message);
-                break;
-            
-            case 'delete':
-                $result = $this->test_delete($message);
-                break;
-            
-            case 'save':
-                $result = $this->save($message);
-                break;
+            switch ($command) {
+                case 'ping':
+                    $result = $this->test_ping($message);
+                    break;
+                
+                case 'extract':
+                    $result = $this->test_extract($message);
+                    break;
+                
+                case 'search':
+                    $result = $this->test_search($message);
+                    break;
+                
+                case 'delete':
+                    $result = $this->test_delete($message);
+                    break;
+                
+                case 'save':
+                    $result = $this->save($message);
+                    break;
+            }
         }
         
         $response = array(
@@ -169,8 +179,9 @@ class SettingsController extends Controller
 
     private function save(&$message)
     {
-        if (! is_null($this->solr_url)) {
+        if (! is_null($this->solr_url) && ! is_null($this->solr_core)) {
             $this->configService->setAppValue('solr_url', $this->solr_url);
+            $this->configService->setAppValue('solr_core', $this->solr_core);
             $message = "Your configuration has been saved";
             return true;
         }

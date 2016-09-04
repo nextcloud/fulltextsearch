@@ -27,12 +27,34 @@ script('nextant', 'settings.admin');
 ?>
 <div class="section" id="nextant">
 	<h2><?php p($l->t('Nextant (Solr)')) ?></h2>
-	<label for="wopi_url"><?php p($l->t('Apache Solr server :')) ?></label>
-	<input type="text" name="solr_url" id="solr_url"
-		value="<?php p($_['solr_url'])?>" style="width: 300px;"> <br /> <em><?php p($l->t('URL:port/path of the Apache Solr server.')) ?></em>
-	<br />
-	<button type="button" id="nextant_apply"><?php p($l->t('Apply')) ?></button>
-	<span id="nextant-admin-msg" class="msg"></span>
+
+	<table>
+		<tr>
+			<td colspan="2"><em><?php p($l->t('Specify the URL of your Solr servlet, and the name of the core to use')) ?></em></td>
+		</tr>
+		<tr>
+			<td style="width: 250px; text-align: right;"><label for="solr_url">
+	    <?php p($l->t('Address of your Solr Servlet :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+			<td><input type="text" name="solr_url" id="solr_url"
+				value="<?php p($_['solr_url'])?>" style="width: 360px;"></td>
+		</tr>
+		<tr>
+			<td style="text-align: right;"><label for="solr_core"><?php p($l->t('Core :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+			<td><input type="text" name="solr_core" id="solr_core"
+				value="<?php p($_['solr_core'])?>" style="width: 360px;"></td>
+		</tr>
+
+		<tr>
+			<td></td>
+			<td>
+				<button type="button" id="nextant_apply" style="width: 370px"><?php p($l->t('Test and Save')) ?></button>
+			</td>
+		</tr>
+		<tr style="height: 40px;">
+			<td colspan="2" style="text-align: center; width: 550px;"><span id="nextant-admin-msg" class="msg"></span></td>
+		</tr>
+	</table>
+
 </div>
 
 
