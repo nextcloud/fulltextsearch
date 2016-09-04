@@ -4,7 +4,15 @@
 	<id>nextant</id>
 	<name>Nextant</name>
 	<summary>Navigate through your cloud using Solr</summary>
-	<description>Navigate through your cloud using Solr</description>
+	<description>
+	One to enable a full text search within your cloud.
+
+- When uploaded to the cloud, text and pdf file are extracted to the Solr Server.
+- It add an owner filter to solr documents so each user search in its own library.
+- Use the Solr server when using the searchbox in the files App of your nextcloud.
+- You can also extract your current files using ./occ nextant:scan 
+
+    </description>
 	<version>0.1.0</version>
 	<licence>agpl</licence>
 	<author mail="maxence@pontapreta.net">Maxence Lange</author>
