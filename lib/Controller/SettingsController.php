@@ -75,7 +75,7 @@ class SettingsController extends Controller
             'solr_core' => $solr_core
         );
         
-        $this->solrService->setOwner('nextant_test_owner');
+        $this->solrService->setOwner('__nextant_test_owner');
         
         $message = '';
         $result = false;

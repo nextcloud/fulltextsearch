@@ -78,7 +78,7 @@ class FileService
             $absolutePath = $this->getRoot() . $this->view->getAbsolutePath($path);
             // $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
             
-            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType());
+            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType(), $error);
         }
         
         return $solrResult;
@@ -107,13 +107,9 @@ class FileService
         return $solrResult;
     }
 
-    
     public function shareDocument($path, $shareWith, $isGroup, $sharing)
-    {
-        
-        
-        
-    }
+    {}
+
     public static function getId($path)
     {
         $fileId = 0;

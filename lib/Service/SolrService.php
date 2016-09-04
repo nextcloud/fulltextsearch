@@ -101,7 +101,7 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($path, $docid, $mimetype, &$error)
+    public function extractFile($path, $docid, $mimetype, &$error = '')
     {
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
@@ -156,7 +156,8 @@ class SolrService
             $doc->nextant_owner = $this->owner;
             $query->setDocument($doc);
             
-            return $client->extract($query);
+            $ret = $client->extract($query);
+            return $ret;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_EXTRACT_FAILED;
@@ -203,6 +204,9 @@ class SolrService
 
     public function search($string, $type, &$error)
     {
+        if ($this->solariumClient == false)
+            return false;
+        
         try {
             $client = $this->solariumClient;
             $query = $client->createSelect();
@@ -224,17 +228,14 @@ class SolrService
             }
             
             $resultset = $client->select($query);
-            $this->miscService->log('__1');
             
             $return = array();
             foreach ($resultset as $document) {
-                $this->miscService->log('__2');
                 array_push($return, array(
                     'id' => $document->id,
                     'score' => $document->score
                 ));
             }
-            $this->miscService->log('__3');
             
             return $return;
         } catch (\Solarium\Exception\HttpException $ehe) {
