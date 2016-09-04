@@ -35,7 +35,10 @@ class SolrService
 
     const ERROR_TOOWIDE_SEARCH = 8;
     
-    // can't reach http - tomcat running at the right place ?
+    // Config is not well formed
+    const ERROR_SOLR_CONFIG = 19;
+    
+    // can't reach http - solr running at the right place ?
     const EXCEPTION_HTTPEXCEPTION = 21;
     
     // can't reach solr - check uri
@@ -49,15 +52,15 @@ class SolrService
     const EXCEPTION_SEARCH_FAILED_OWNER = 64;
 
     const EXCEPTION_REMOVE_FAILED = 81;
+    
+    // undocumented exception
+    const EXCEPTION = 9;
 
     const SEARCH_OWNER = 1;
 
     const SEARCH_SHARE = 2;
 
     const SEARCH_SHAREGROUP = 4;
-    
-    // undocumented exception
-    const EXCEPTION = 9;
 
     private $solariumClient;
 
@@ -77,7 +80,12 @@ class SolrService
     // If $config == null, reset config to the one set in the admin
     public function setClient($config)
     {
-        $this->solariumClient = new \Solarium\Client($this->configService->toSolarium($config));
+        $toS = $this->configService->toSolarium($config);
+        if (! $toS)
+            return false;
+        
+        $this->solariumClient = new \Solarium\Client($toS);
+        return true;
     }
 
     public function setOwner($owner)
@@ -124,6 +132,11 @@ class SolrService
     {
         if ($this->owner == '') {
             $error = self::ERROR_OWNER_NOT_SET;
+            return false;
+        }
+        
+        if (! $this->solariumClient) {
+            $error = self::ERROR_SOLR_CONFIG;
             return false;
         }
         
@@ -194,7 +207,7 @@ class SolrService
             $client = $this->solariumClient;
             $query = $client->createSelect();
             
-            $query->setQuery($string);
+            $query->setQuery('attr_text:' . $string);
             
             switch ($type) {
                 case self::SEARCH_OWNER:
@@ -211,14 +224,17 @@ class SolrService
             }
             
             $resultset = $client->select($query);
+            $this->miscService->log('__1');
             
             $return = array();
             foreach ($resultset as $document) {
+                $this->miscService->log('__2');
                 array_push($return, array(
                     'id' => $document->id,
                     'score' => $document->score
                 ));
             }
+            $this->miscService->log('__3');
             
             return $return;
         } catch (\Solarium\Exception\HttpException $ehe) {

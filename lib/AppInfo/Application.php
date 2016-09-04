@@ -61,7 +61,7 @@ class Application extends App
         });
         
         $container->registerService('ConfigService', function ($c) {
-            return new ConfigService($c->query('AppName'), $c->query('CoreConfig'));
+            return new ConfigService($c->query('AppName'), $c->query('CoreConfig'), $c->query('MiscService'));
         });
         
         $container->registerService('FileService', function ($c) {
@@ -138,8 +138,11 @@ class Application extends App
         ));
         
         $this->getContainer()->registerService('SolariumClient', function ($c) {
-            return new \Solarium\Client($c->query('ConfigService')
-                ->toSolarium());
+            $toS = $c->query('ConfigService')
+                ->toSolarium();
+            if (! $toS)
+                return false;
+            return new \Solarium\Client();
         });
     }
 
