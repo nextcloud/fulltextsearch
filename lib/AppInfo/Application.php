@@ -142,7 +142,7 @@ class Application extends App
                 ->toSolarium();
             if (! $toS)
                 return false;
-            return new \Solarium\Client();
+            return new \Solarium\Client($toS);
         });
     }
 
