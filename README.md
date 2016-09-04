@@ -24,7 +24,7 @@ What will it be doing in the future:
 
 ## Installation
 
-- [You first need to install an Apache Solr server](https://github.com/daita/nextant/wiki/Setup-your-local-standalone-Solr)
+- [You first need to install a Solr servlet](https://github.com/daita/nextant/wiki/Setup-your-local-standalone-Solr)
 - Download the .zip from the appstore, unzip and place this app in **nextcloud/apps/** (or clone the github and build the app yourself)
 - Enable the app in the app list,
 - Edit the settings in the administration page.

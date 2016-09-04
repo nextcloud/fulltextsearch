@@ -5,7 +5,7 @@
 	<name>Nextant</name>
 	<summary>Navigate through your cloud using Solr</summary>
 	<description>Navigate through your cloud using Solr</description>
-	<version>0.0.4</version>
+	<version>0.1.0</version>
 	<licence>agpl</licence>
 	<author mail="maxence@pontapreta.net">Maxence Lange</author>
 	<types>
@@ -14,7 +14,6 @@
 	<category>tools</category>
 	<category>files</category>
 	<dependencies>
-		<database>mysql</database>
 		<owncloud min-version="9.1" />
 		<nextcloud min-version="10" max-version="11" />
 	</dependencies>
