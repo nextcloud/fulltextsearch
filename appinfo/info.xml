@@ -13,7 +13,7 @@
 - You can also extract your current files using ./occ nextant:scan 
 
     </description>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 	<licence>agpl</licence>
 	<author mail="maxence@pontapreta.net">Maxence Lange</author>
 	<types>

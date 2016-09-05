@@ -109,11 +109,11 @@ class SolrService
         }
         
         switch ($mimetype) {
-            // case 'application/vnd.oasis.opendocument.text':
-            // return $this->extractSimpleTextFile($path, $docid);
+            case 'application/vnd.oasis.opendocument.text':
+            return $this->extractSimpleTextFile($path, $docid);
             
-            // case 'application/epub+zip':
-            // return $this->extractSimpleTextFile($path, $docid);
+            case 'application/epub+zip':
+            return $this->extractSimpleTextFile($path, $docid);
             
             case 'application/pdf':
                 return $this->extractSimpleTextFile($path, $docid, $error);
