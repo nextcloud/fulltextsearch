@@ -109,13 +109,24 @@ class SolrService
         }
         
         switch ($mimetype) {
-            case 'application/vnd.oasis.opendocument.text':
-            return $this->extractSimpleTextFile($path, $docid);
-            
             case 'application/epub+zip':
-            return $this->extractSimpleTextFile($path, $docid);
+                return $this->extractSimpleTextFile($path, $docid, $error);
             
             case 'application/pdf':
+                return $this->extractSimpleTextFile($path, $docid, $error);
+            
+            case 'application/rtf':
+                return $this->extractSimpleTextFile($path, $docid, $error);
+        }
+        
+        $acceptedMimeType = array(
+            'vnd' => array(
+                'application/vnd.oasis.opendocument'
+            )
+        );
+        
+        foreach ($acceptedMimeType['vnd'] as $mt) {
+            if (substr($mimetype, 0, strlen($mt)) == $mt)
                 return $this->extractSimpleTextFile($path, $docid, $error);
         }
         
