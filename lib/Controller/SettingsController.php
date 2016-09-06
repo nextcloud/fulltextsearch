@@ -58,7 +58,10 @@ class SettingsController extends Controller
      */
     public function index()
     {
+        $documentsCount = $this->solrService->count($error);
+        
         $params = [
+            'current_docs' => $documentsCount,
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core')
         ];
@@ -75,7 +78,10 @@ class SettingsController extends Controller
             'solr_core' => $solr_core
         );
         
-        $this->solrService->setOwner('__nextant_test_owner');
+        // testing with use __nextant_test_owner from the group __nextant_share_group
+        $this->solrService->setOwner('__nextant_test_owner', array(
+            '__nextant_share_group'
+        ));
         
         $message = '';
         $result = false;
@@ -93,7 +99,8 @@ class SettingsController extends Controller
                     break;
                 
                 case 'search':
-                    $result = $this->test_search($message);
+                    if ($this->test_search(SolrService::SEARCH_OWNER, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_SHARED, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_SHARED_GROUP, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_OWNER, SolrService::SEARCH_TRASHBIN_ONLY, $message))
+                        $result = true;
                     break;
                 
                 case 'delete':
@@ -132,7 +139,16 @@ class SettingsController extends Controller
     private function test_extract(&$message)
     {
         $testFile = __DIR__ . '/../../LICENSE';
-        if ($this->solrService->extractFile($testFile, '__nextant_test', 'text/plain', $error)) {
+        $shares = array(
+            'users' => array(
+                '__nextant_test_owner'
+            ),
+            'groups' => array(
+                '__nextant_share_group'
+            )
+        );
+        
+        if ($this->solrService->extractFile($testFile, '__nextant_test', 'text/plain', $shares, true, $error)) {
             $message = 'Text were successfully extracted';
             return true;
         }
@@ -141,10 +157,10 @@ class SettingsController extends Controller
         return false;
     }
 
-    private function test_search(&$message)
+    private function test_search($type, $deleted, &$message)
     {
         $keyword = 'LICENSE';
-        if ($result = $this->solrService->search($keyword, SolrService::SEARCH_OWNER, $error)) {
+        if ($result = $this->solrService->search($keyword, $type, $deleted, $error)) {
             if (sizeof($result) > 0) {
                 
                 foreach ($result as $doc) {
@@ -162,13 +178,13 @@ class SettingsController extends Controller
             return false;
         }
         
-        $message = 'Search failed. Please check the configuration of your Solr server (Error #' . $error . ')';
+        $message = 'Search failed. Please check the configuration of your Solr server (Error #' . $error . '.' . $type . '.' . $deleted . ')';
         return false;
     }
 
     private function test_delete(&$message)
     {
-        if ($toto = $this->solrService->removeDocument('__nextant_test')) {
+        if ($this->solrService->removeDocument('__nextant_test')) {
             $message = 'Test document deleted';
             return true;
         }

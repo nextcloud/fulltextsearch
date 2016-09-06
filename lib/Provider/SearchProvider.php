@@ -77,7 +77,7 @@ class SearchProvider extends \OCP\Search\Provider
         
         if ($query !== null) {
             
-            $solrResult = $this->solrService->searchAll($query);
+            $solrResult = $this->solrService->search($query);
             
             if ($solrResult == false)
                 return $results;

@@ -58,9 +58,17 @@ class SolrService
 
     const SEARCH_OWNER = 1;
 
-    const SEARCH_SHARE = 2;
+    const SEARCH_SHARED = 2;
 
-    const SEARCH_SHAREGROUP = 4;
+    const SEARCH_SHARED_GROUP = 4;
+
+    const SEARCH_ALL = 7;
+
+    const SEARCH_TRASHBIN_ALL = 1;
+
+    const SEARCH_TRASHBIN_ONLY = 2;
+
+    const SEARCH_TRASHBIN_NOT = 4;
 
     private $solariumClient;
 
@@ -104,22 +112,22 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($path, $docid, $mimetype, $shares, &$error = '')
+    public function extractFile($path, $docid, $mimetype, $shares, $deleted, &$error = '')
     {
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
-                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
         }
         
         switch ($mimetype) {
             case 'application/epub+zip':
-                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
             
             case 'application/pdf':
-                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
             
             case 'application/rtf':
-                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
         }
         
         $acceptedMimeType = array(
@@ -135,7 +143,7 @@ class SolrService
         
         foreach ($acceptedMimeType['vnd'] as $mt) {
             if (substr($mimetype, 0, strlen($mt)) == $mt)
-                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
         }
         
         return false;
@@ -147,7 +155,7 @@ class SolrService
      * @param string $path            
      * @param int $docid            
      */
-    public function extractSimpleTextFile($path, $docid, $shares, &$error)
+    public function extractSimpleTextFile($path, $docid, $shares, $deleted, &$error)
     {
         if ($this->owner == '') {
             $error = self::ERROR_OWNER_NOT_SET;
@@ -173,7 +181,9 @@ class SolrService
             $doc = $query->createDocument();
             $doc->id = $docid;
             $doc->nextant_owner = $this->owner;
+            
             $this->documentShares($doc, $shares);
+            $doc->nextant_deleted = ($deleted) ? 'true' : 'false';
             $query->setDocument($doc);
             
             $ret = $client->extract($query);
@@ -223,46 +233,65 @@ class SolrService
         $doc->nextant_sharegroup = $shares['groups'];
     }
 
-    public function searchAll($string, &$error = '')
+    private function generateOwnerQuery($type, &$error)
     {
-        return $this->search($string, self::SEARCH_OWNER, $error);
+        $ownerQuery = '';
+        if ($type & self::SEARCH_OWNER) {
+            if ($this->owner == '') {
+                $error = self::ERROR_OWNER_NOT_SET;
+                return false;
+            }
+            
+            $ownerQuery .= 'nextant_owner:"' . $this->owner . '" ';
+        }
+        
+        if ($type & self::SEARCH_SHARED) {
+            if ($this->owner == '') {
+                $error = self::ERROR_OWNER_NOT_SET;
+                return false;
+            }
+            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:"' . $this->owner . '" ';
+        }
+        
+        if ($type & self::SEARCH_SHARED_GROUP) {
+            $ownerGroups = '';
+            $groups = array();
+            foreach ($this->groups as $group)
+                array_push($groups, ' nextant_sharegroup:"' . $group . '"');
+            
+            if (sizeof($groups) > 0)
+                $ownerGroups = implode(' OR ', $groups);
+            
+            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . $ownerGroups;
+        }
+        
+        return $ownerQuery;
     }
 
-    public function search($string, $type, &$error)
+    public function search($string, $type = self::SEARCH_ALL, $deleted = self::SEARCH_TRASHBIN_ALL, &$error = '')
     {
         if ($this->solariumClient == false)
             return false;
+        
+        $ownerQuery = $this->generateOwnerQuery($type, $error);
+        if ($ownerQuery === false)
+            return false;
+        
+        if ($ownerQuery == '') {
+            $error = self::ERROR_TOOWIDE_SEARCH;
+            return false;
+        }
         
         try {
             $client = $this->solariumClient;
             $query = $client->createSelect();
             
             $query->setQuery('attr_text:' . $string);
-            
-            switch ($type) {
-                case self::SEARCH_OWNER:
-                    if ($this->owner == '') {
-                        $error = self::ERROR_OWNER_NOT_SET;
-                        return false;
-                    }
-                    
-                    $ownerGroups = '';
-                    $groups = array();
-                    foreach ($this->groups as $group)
-                        array_push($groups, ' nextant_sharegroup:"' . $group . '"');
-                    
-                    if (sizeof($groups) > 0)
-                        $ownerGroups = ' OR ' . implode(' OR ', $groups);
-                    
-                    $ownerQuery = 'nextant_owner:"' . $this->owner . '" OR nextant_share:"' . $this->owner . '"' . $ownerGroups;
-                    $this->miscService->log('ownerQuery: ' . $ownerQuery);
-                    $query->createFilterQuery('owner')->setQuery($ownerQuery);
-                    break;
-                
-                default:
-                    $error = self::ERROR_TOOWIDE_SEARCH;
-                    return false;
-            }
+            $query->createFilterQuery('owner')->setQuery($ownerQuery);
+            if ($deleted & self::SEARCH_TRASHBIN_ONLY)
+                $query->createFilterQuery('deleted')->setQuery('nextant_deleted:true');
+            if ($deleted & self::SEARCH_TRASHBIN_NOT)
+                $query->createFilterQuery('deleted')->setQuery('nextant_deleted:false');
             
             $resultset = $client->select($query);
             
