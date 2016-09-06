@@ -29,6 +29,7 @@ namespace OCA\Nextant\Service;
 use OC\Files\Filesystem;
 use OC\Files\View;
 use OCP\Files\NotFoundException;
+use OC\Share\Share;
 
 class FileService
 {
@@ -78,7 +79,7 @@ class FileService
             $absolutePath = $this->getRoot() . $this->view->getAbsolutePath($path);
             // $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
             
-            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType(), $error);
+            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType(), $this->getShares($fileInfos->getId()), $error);
         }
         
         return $solrResult;
@@ -107,8 +108,24 @@ class FileService
         return $solrResult;
     }
 
-    public function shareDocument($path, $shareWith, $isGroup, $sharing)
-    {}
+    public static function getShares($fileId)
+    {
+        $shares = array(
+            'users' => array(),
+            'groups' => array()
+        );
+        
+        $OCShares = Share::getAllSharesForFileId($fileId);
+        foreach ($OCShares as $share) {
+            
+            if ($share['share_type'] == '0')
+                array_push($shares['users'], $share['share_with']);
+            if ($share['share_type'] == '1')
+                array_push($shares['groups'], $share['share_with']);
+        }
+        
+        return $shares;
+    }
 
     public static function getId($path)
     {

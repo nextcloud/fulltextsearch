@@ -70,6 +70,8 @@ class SolrService
 
     private $owner = '';
 
+    private $groups = array();
+
     public function __construct($client, $configService, $miscService)
     {
         $this->solariumClient = $client;
@@ -88,9 +90,10 @@ class SolrService
         return true;
     }
 
-    public function setOwner($owner)
+    public function setOwner($owner, $groups = array())
     {
         $this->owner = $owner;
+        $this->groups = $groups;
     }
 
     /**
@@ -101,33 +104,38 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($path, $docid, $mimetype, &$error = '')
+    public function extractFile($path, $docid, $mimetype, $shares, &$error = '')
     {
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
         }
         
         switch ($mimetype) {
             case 'application/epub+zip':
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
             
             case 'application/pdf':
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
             
             case 'application/rtf':
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
         }
         
         $acceptedMimeType = array(
             'vnd' => array(
-                'application/vnd.oasis.opendocument'
+                'application/vnd.oasis.opendocument',
+                'application/vnd.sun.xml',
+                'application/vnd.openxmlformats-officedocument',
+                'application/vnd.ms-word',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.ms-excel'
             )
         );
         
         foreach ($acceptedMimeType['vnd'] as $mt) {
             if (substr($mimetype, 0, strlen($mt)) == $mt)
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $shares, $error);
         }
         
         return false;
@@ -139,7 +147,7 @@ class SolrService
      * @param string $path            
      * @param int $docid            
      */
-    public function extractSimpleTextFile($path, $docid, &$error)
+    public function extractSimpleTextFile($path, $docid, $shares, &$error)
     {
         if ($this->owner == '') {
             $error = self::ERROR_OWNER_NOT_SET;
@@ -165,6 +173,7 @@ class SolrService
             $doc = $query->createDocument();
             $doc->id = $docid;
             $doc->nextant_owner = $this->owner;
+            $this->documentShares($doc, $shares);
             $query->setDocument($doc);
             
             $ret = $client->extract($query);
@@ -208,6 +217,12 @@ class SolrService
         return false;
     }
 
+    private static function documentShares(&$doc, $shares)
+    {
+        $doc->nextant_share = $shares['users'];
+        $doc->nextant_sharegroup = $shares['groups'];
+    }
+
     public function searchAll($string, &$error = '')
     {
         return $this->search($string, self::SEARCH_OWNER, $error);
@@ -230,7 +245,18 @@ class SolrService
                         $error = self::ERROR_OWNER_NOT_SET;
                         return false;
                     }
-                    $query->createFilterQuery('owner')->setQuery('nextant_owner:' . $this->owner);
+                    
+                    $ownerGroups = '';
+                    $groups = array();
+                    foreach ($this->groups as $group)
+                        array_push($groups, ' nextant_sharegroup:"' . $group . '"');
+                    
+                    if (sizeof($groups) > 0)
+                        $ownerGroups = ' OR ' . implode(' OR ', $groups);
+                    
+                    $ownerQuery = 'nextant_owner:"' . $this->owner . '" OR nextant_share:"' . $this->owner . '"' . $ownerGroups;
+                    $this->miscService->log('ownerQuery: ' . $ownerQuery);
+                    $query->createFilterQuery('owner')->setQuery($ownerQuery);
                     break;
                 
                 default:
@@ -268,7 +294,7 @@ class SolrService
         return false;
     }
 
-    public function ping(&$error)
+    public function ping(&$error = '')
     {
         $client = $this->solariumClient;
         $ping = $client->createPing();
@@ -276,6 +302,29 @@ class SolrService
         try {
             $result = $client->ping($ping);
             return true;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_SOLRURI;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        
+        return false;
+    }
+
+    public function count(&$error = '')
+    {
+        $client = $this->solariumClient;
+        
+        try {
+            $query = $client->createSelect();
+            $query->setQuery('*:*');
+            $query->setRows(0);
+            $resultset = $client->execute($query);
+            
+            return $resultset->getNumFound();
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_SOLRURI;

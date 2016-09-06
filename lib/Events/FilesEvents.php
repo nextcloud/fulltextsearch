@@ -102,9 +102,9 @@ class FilesEvents
      *
      * @param string $path            
      */
-    public function onFileShare($path, $shareWith, $isGroup)
+    public function onFileShare($path)
     {
-        $this->fileService->shareDocument($path, $shareWith, $isGroup, true);
+        $this->fileService->addFiles($path, true);
     }
 
     /**
@@ -112,9 +112,9 @@ class FilesEvents
      *
      * @param string $path            
      */
-    public function onFileUnshare($path, $shareWith, $isGroup)
+    public function onFileUnshare($path)
     {
-        $this->fileService->shareDocument($path, $shareWith, $isGroup, false);
+        $this->fileService->addFiles($path, true);
     }
 
     /**

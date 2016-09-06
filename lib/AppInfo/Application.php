@@ -118,6 +118,14 @@ class Application extends App
             return is_null($user) ? '' : $user->getUID();
         });
         
+        $container->registerService('UserManager', function ($c) {
+            return \OC::$server->getUserManager();
+        });
+        
+        $container->registerService('GroupManager', function ($c) {
+            return \OC::$server->getGroupManager();
+        });
+        
         $container->registerService('UserFolder', function ($c) {
             return \OC::$server->getUserFolder();
         });
@@ -182,19 +190,5 @@ class Application extends App
     // ->t('Nextant')
     // ));
     // }
-    
-    /**
-     * This is alpha, and this is a simple test using the LICENSE file (because, why not)
-     */
-    public function testExtract()
-    {
-        $this->getContainer()
-            ->query('SolrService')
-            ->setOwner($this->getContainer()
-            ->query('UserId'));
-        $this->getContainer()
-            ->query('SolrService')
-            ->extractSimpleTextFile(__DIR__ . '/../../LICENSE', '__test');
-    }
 }
 

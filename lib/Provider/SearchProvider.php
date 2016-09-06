@@ -51,7 +51,14 @@ class SearchProvider extends \OCP\Search\Provider
         $this->miscService = $container->query('MiscService');
         $this->solrService = $container->query('SolrService');
         $this->userId = $container->query('UserId');
-        $this->solrService->setOwner($this->userId);
+        $this->groupManager = $container->query('GroupManager');
+        
+        // $groups
+        $groups = array_map(function ($value) {
+            return (string) $value;
+        }, array_keys($this->groupManager->getUserIdGroups($this->userId)));
+        
+        $this->solrService->setOwner($this->userId, $groups);
     }
 
     /**
