@@ -79,7 +79,7 @@ class FileService
             $absolutePath = $this->getRoot() . $this->view->getAbsolutePath($path);
             // $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
             
-            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType(), $this->getShares($fileInfos->getId()), $error);
+            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType(), $this->getShares($fileInfos->getId()), false, $error);
         }
         
         return $solrResult;
