@@ -74,8 +74,10 @@ class FilesEvents
      * @param string $source            
      * @param string $target            
      */
-    public function onFileRename($source, $target)
-    {}
+    public function onFileRename($target)
+    {
+        $this->fileService->updateFiles(FileService::getId($target), true);
+    }
 
     /**
      * onFileDelete()
