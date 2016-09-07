@@ -56,8 +56,10 @@ class FileService
         return $this->root;
     }
 
-    public function setView($view)
+    public function setView($view = null)
     {
+        if ($view == null)
+            $view = Filesystem::getView();
         $this->view = $view;
     }
 
@@ -77,7 +79,7 @@ class FileService
                 $this->addFiles($this->view->getPath($file->getId()), true, false);
         } else {
             $absolutePath = $this->getRoot() . $this->view->getAbsolutePath($path);
-//             $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
+            // $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
             
             $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType());
         }
@@ -94,7 +96,7 @@ class FileService
         if ($data == null)
             $isRoot = true;
         
-        $path = $this->getPath($fileId);
+        $path = $this->view->getPath($fileId);
         
         $fileInfos = $this->view->getFileInfo($path);
         $data = $this->getData($path);
@@ -149,6 +151,8 @@ class FileService
             $subpath .= '/' . $subdir;
             if ($subpath != '/') {
                 $subdirInfos = $this->view->getFileInfo($subpath);
+                if (! $subdirInfos)
+                    continue;
                 $this->getDataFromFileId($subdirInfos->getId(), $data);
             }
         }
