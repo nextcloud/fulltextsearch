@@ -226,22 +226,35 @@ class SolrService
                     if (sizeof($upd['share_users']) > 0) {
                         $doc->setField('nextant_share', $upd['share_users']);
                         $doc->setFieldModifier('nextant_share', 'set');
-                    } else
-                        $doc->setFieldModifier('nextant_share', 'remove');
+                    } else {
+                        $doc->setField('nextant_share', array(
+                            ''
+                        ));
+                        // not working
+                        // $doc->setFieldModifier('nextant_share', 'remove');
+                        $doc->setFieldModifier('nextant_share', 'set');
+                    }
                 }
                 
                 if (key_exists('share_groups', $upd)) {
                     if (sizeof($upd['share_groups']) > 0) {
                         $doc->setField('nextant_sharegroup', $upd['share_groups']);
                         $doc->setFieldModifier('nextant_sharegroup', 'set');
-                    } else
-                        $doc->setFieldModifier('nextant_share', 'remove');
+                    } else {
+                        $doc->setField('nextant_sharegroup', array(
+                            ''
+                        ));
+                        // not working
+                        // $doc->setFieldModifier('nextant_sharegroup', 'remove');
+                        $doc->setFieldModifier('nextant_sharegroup', 'set');
+                    }
                 }
                 
                 if (key_exists('deleted', $upd)) {
                     $doc->setField('nextant_deleted', ($upd['deleted']) ? 'true' : 'false');
                     $doc->setFieldModifier('nextant_deleted', 'set');
                 }
+                
                 array_push($docs, $doc);
             }
             
@@ -385,6 +398,30 @@ class SolrService
         
         try {
             $result = $client->ping($ping);
+            return true;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_SOLRURI;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        
+        return false;
+    }
+
+    public function clear(&$error = '')
+    {
+        $client = $this->solariumClient;
+        
+        try {
+            $update = $client->createUpdate();
+            
+            $update->addDeleteQuery('*:*');
+            $update->addCommit();
+            $result = $client->update($update);
+            
             return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
