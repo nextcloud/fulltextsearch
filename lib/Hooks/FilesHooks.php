@@ -101,9 +101,7 @@ class FilesHooks
      */
     public static function fileShared($params)
     {
-        // self::getController()->onFileShare($params['fileSource'], $params['shareWith'], ($params['shareType'] == 1) ? true : false);
-        // self::getController()->onFileShare($params['fileSource']);
-        self::getController()->onFileShare($params['fileTarget']);
+        self::getController()->onFileShare($params['itemSource']);
     }
 
     /**
@@ -113,9 +111,8 @@ class FilesHooks
      */
     public static function fileUnshared($params)
     {
-        if (key_exists('fileTarget', $params))
-            // self::getController()->onFileUnshare($params['fileSource'], $params['shareWith'], ($params['shareType'] == 1) ? true : false);
-            self::getController()->onFileUnshare($params['fileTarget']);
+        if (key_exists('itemSource', $params))
+            self::getController()->onFileUnshare($params['itemSource']);
     }
 
     /**

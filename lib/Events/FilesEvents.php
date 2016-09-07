@@ -55,7 +55,7 @@ class FilesEvents
      */
     public function onFileCreate($path)
     {
-        $this->fileService->addFiles($path, true);
+        $this->fileService->addFiles($path, true, true);
     }
 
     /**
@@ -65,7 +65,7 @@ class FilesEvents
      */
     public function onFileUpdate($path)
     {
-        $this->fileService->addFiles($path, true);
+        $this->fileService->addFiles($path, true, true);
     }
 
     /**
@@ -94,7 +94,7 @@ class FilesEvents
      */
     public function onFileRestore($path)
     {
-        $this->fileService->addFiles($path, true);
+        $this->fileService->addFiles($path, true, true);
     }
 
     /**
@@ -102,9 +102,9 @@ class FilesEvents
      *
      * @param string $path            
      */
-    public function onFileShare($path)
+    public function onFileShare($fileId)
     {
-        $this->fileService->addFiles($path, true);
+        $this->fileService->updateFiles($fileId, true);
     }
 
     /**
@@ -112,9 +112,9 @@ class FilesEvents
      *
      * @param string $path            
      */
-    public function onFileUnshare($path)
+    public function onFileUnshare($fileId)
     {
-        $this->fileService->addFiles($path, true);
+        $this->fileService->updateFiles($fileId, true);
     }
 
     /**
