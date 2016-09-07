@@ -60,11 +60,13 @@ class Scan extends Base
     protected function configure()
     {
         parent::configure();
-        $this->setName('nextant:scan')->setDescription('extract text files and generate solr documents');
+        $this->setName('nextant:scan')->setDescription('scan users\' files and generate Solr documents');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('This might take a while ...');
+        
         $users = $this->userManager->search('');
         $usersTotal = sizeof($users);
         $usersCurrent = 0;
