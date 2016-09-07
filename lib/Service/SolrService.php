@@ -47,9 +47,11 @@ class SolrService
     // can't extract - check solr configuration for the solr-cell plugin
     const EXCEPTION_EXTRACT_FAILED = 41;
 
-    const EXCEPTION_SEARCH_FAILED = 61;
+    const EXCEPTION_UPDATE_FIELD_FAILED = 61;
 
-    const EXCEPTION_SEARCH_FAILED_OWNER = 64;
+    const EXCEPTION_SEARCH_FAILED = 81;
+
+    const EXCEPTION_SEARCH_FAILED_OWNER = 84;
 
     const EXCEPTION_REMOVE_FAILED = 81;
     
@@ -58,9 +60,11 @@ class SolrService
 
     const SEARCH_OWNER = 1;
 
-    const SEARCH_SHARE = 2;
+    const SEARCH_SHARED = 2;
 
-    const SEARCH_SHAREGROUP = 4;
+    const SEARCH_SHARED_GROUP = 4;
+
+    const SEARCH_ALL = 7;
 
     private $solariumClient;
 
@@ -69,6 +73,8 @@ class SolrService
     private $miscService;
 
     private $owner = '';
+
+    private $groups = array();
 
     public function __construct($client, $configService, $miscService)
     {
@@ -88,9 +94,10 @@ class SolrService
         return true;
     }
 
-    public function setOwner($owner)
+    public function setOwner($owner, $groups = array())
     {
         $this->owner = $owner;
+        $this->groups = $groups;
     }
 
     /**
@@ -109,13 +116,29 @@ class SolrService
         }
         
         switch ($mimetype) {
-            // case 'application/vnd.oasis.opendocument.text':
-            // return $this->extractSimpleTextFile($path, $docid);
-            
-            // case 'application/epub+zip':
-            // return $this->extractSimpleTextFile($path, $docid);
+            case 'application/epub+zip':
+                return $this->extractSimpleTextFile($path, $docid, $error);
             
             case 'application/pdf':
+                return $this->extractSimpleTextFile($path, $docid, $error);
+            
+            case 'application/rtf':
+                return $this->extractSimpleTextFile($path, $docid, $error);
+        }
+        
+        $acceptedMimeType = array(
+            'vnd' => array(
+                'application/vnd.oasis.opendocument',
+                'application/vnd.sun.xml',
+                'application/vnd.openxmlformats-officedocument',
+                'application/vnd.ms-word',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.ms-excel'
+            )
+        );
+        
+        foreach ($acceptedMimeType['vnd'] as $mt) {
+            if (substr($mimetype, 0, strlen($mt)) == $mt)
                 return $this->extractSimpleTextFile($path, $docid, $error);
         }
         
@@ -154,13 +177,94 @@ class SolrService
             $doc = $query->createDocument();
             $doc->id = $docid;
             $doc->nextant_owner = $this->owner;
+            
             $query->setDocument($doc);
             
             $ret = $client->extract($query);
+            
             return $ret;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_EXTRACT_FAILED;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        
+        return false;
+    }
+
+    public function updateDocuments($data, &$error = '')
+    {
+        if ($this->owner == '') {
+            $error = self::ERROR_OWNER_NOT_SET;
+            return false;
+        }
+        
+        if (! $this->solariumClient) {
+            $error = self::ERROR_SOLR_CONFIG;
+            return false;
+        }
+        
+        try {
+            $client = $this->solariumClient;
+            
+            $query = $client->createUpdate();
+            
+            // add document
+            
+            $docs = array();
+            foreach ($data as $upd) {
+                // if (! key_exists('id', $upd))
+                // continue;
+                
+                $doc = $query->createDocument();
+                $doc->setKey('id', $upd['id']);
+                
+                if (key_exists('share_users', $upd)) {
+                    if (sizeof($upd['share_users']) > 0) {
+                        $doc->setField('nextant_share', $upd['share_users']);
+                        $doc->setFieldModifier('nextant_share', 'set');
+                    } else {
+                        $doc->setField('nextant_share', array(
+                            ''
+                        ));
+                        // not working
+                        // $doc->setFieldModifier('nextant_share', 'remove');
+                        $doc->setFieldModifier('nextant_share', 'set');
+                    }
+                }
+                
+                if (key_exists('share_groups', $upd)) {
+                    if (sizeof($upd['share_groups']) > 0) {
+                        $doc->setField('nextant_sharegroup', $upd['share_groups']);
+                        $doc->setFieldModifier('nextant_sharegroup', 'set');
+                    } else {
+                        $doc->setField('nextant_sharegroup', array(
+                            ''
+                        ));
+                        // not working
+                        // $doc->setFieldModifier('nextant_sharegroup', 'remove');
+                        $doc->setFieldModifier('nextant_sharegroup', 'set');
+                    }
+                }
+                
+                if (key_exists('deleted', $upd)) {
+                    $doc->setField('nextant_deleted', ($upd['deleted']) ? 'true' : 'false');
+                    $doc->setFieldModifier('nextant_deleted', 'set');
+                }
+                
+                array_push($docs, $doc);
+            }
+            
+            $query->addDocuments($docs)->addCommit();
+            $ret = $client->update($query);
+            
+            return $ret;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_UPDATE_FIELD_FAILED;
             else
                 $error = self::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
@@ -197,35 +301,65 @@ class SolrService
         return false;
     }
 
-    public function searchAll($string, &$error = '')
+    private function generateOwnerQuery($type, &$error)
     {
-        return $this->search($string, self::SEARCH_OWNER, $error);
+        $ownerQuery = '';
+        if ($type & self::SEARCH_OWNER) {
+            if ($this->owner == '') {
+                $error = self::ERROR_OWNER_NOT_SET;
+                return false;
+            }
+            
+            $ownerQuery .= 'nextant_owner:"' . $this->owner . '" ';
+        }
+        
+        if ($type & self::SEARCH_SHARED) {
+            if ($this->owner == '') {
+                $error = self::ERROR_OWNER_NOT_SET;
+                return false;
+            }
+            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:"' . $this->owner . '" ';
+        }
+        
+        if ($type & self::SEARCH_SHARED_GROUP) {
+            $ownerGroups = '';
+            $groups = array();
+            foreach ($this->groups as $group)
+                array_push($groups, ' nextant_sharegroup:"' . $group . '"');
+            
+            if (sizeof($groups) > 0)
+                $ownerGroups = implode(' OR ', $groups);
+            
+            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . $ownerGroups;
+        }
+        
+        return $ownerQuery;
     }
 
-    public function search($string, $type, &$error)
+    public function search($string, &$error = '')
     {
         if ($this->solariumClient == false)
             return false;
+        
+        $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $error);
+        if ($ownerQuery === false)
+            return false;
+        
+        if ($ownerQuery == '') {
+            $error = self::ERROR_TOOWIDE_SEARCH;
+            return false;
+        }
         
         try {
             $client = $this->solariumClient;
             $query = $client->createSelect();
             
             $query->setQuery('attr_text:' . $string);
-            
-            switch ($type) {
-                case self::SEARCH_OWNER:
-                    if ($this->owner == '') {
-                        $error = self::ERROR_OWNER_NOT_SET;
-                        return false;
-                    }
-                    $query->createFilterQuery('owner')->setQuery('nextant_owner:' . $this->owner);
-                    break;
-                
-                default:
-                    $error = self::ERROR_TOOWIDE_SEARCH;
-                    return false;
-            }
+            $query->createFilterQuery('owner')->setQuery($ownerQuery);
+            // if ($deleted & self::SEARCH_TRASHBIN_ONLY)
+            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:true');
+            // if ($deleted & self::SEARCH_TRASHBIN_NOT)
+            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:false');
             
             $resultset = $client->select($query);
             
@@ -257,7 +391,7 @@ class SolrService
         return false;
     }
 
-    public function ping(&$error)
+    public function ping(&$error = '')
     {
         $client = $this->solariumClient;
         $ping = $client->createPing();
@@ -265,6 +399,53 @@ class SolrService
         try {
             $result = $client->ping($ping);
             return true;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_SOLRURI;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        
+        return false;
+    }
+
+    public function clear(&$error = '')
+    {
+        $client = $this->solariumClient;
+        
+        try {
+            $update = $client->createUpdate();
+            
+            $update->addDeleteQuery('*:*');
+            $update->addCommit();
+            $result = $client->update($update);
+            
+            return true;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_SOLRURI;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        
+        return false;
+    }
+
+    public function count(&$error = '')
+    {
+        $client = $this->solariumClient;
+        
+        try {
+            $query = $client->createSelect();
+            $query->setQuery('*:*');
+            $query->setRows(0);
+            $resultset = $client->execute($query);
+            
+            return $resultset->getNumFound();
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_SOLRURI;

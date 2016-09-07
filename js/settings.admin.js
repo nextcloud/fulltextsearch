@@ -61,6 +61,12 @@ $(document)
 										'Test simple text extract query'));
 								break;
 
+							case 'update':
+								OC.msg.startAction('#nextant-admin-msg',
+										t('nextant',
+												'Test update document query'));
+								break;
+
 							case 'search':
 								OC.msg.startAction('#nextant-admin-msg', t(
 										'nextant', 'Test search query'));
@@ -99,6 +105,13 @@ $(document)
 								break;
 
 							case 'extract':
+								if (response.status == 'success')
+									nextantSettings.test_standby('update');
+								else
+									nextantSettings.reset();
+								break;
+
+							case 'update':
 								if (response.status == 'success')
 									nextantSettings.test_standby('search');
 								else

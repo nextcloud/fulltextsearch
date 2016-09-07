@@ -33,7 +33,16 @@ script('nextant', 'settings.admin');
 			<td colspan="2"><em><?php p($l->t('Specify the URL of your Solr servlet, and the name of the core to use')) ?></em></td>
 		</tr>
 		<tr>
-			<td style="width: 250px; text-align: right;"><label for="solr_url">
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="width: 250px; text-align: right;"><label>
+	    <?php p($l->t('Number of documents :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+			<td><?php ($_['current_docs'] == false) ? p('Solr Servlet is down') : p($_['current_docs']); ?></td>
+		</tr>
+
+		<tr>
+			<td style="text-align: right;"><label for="solr_url">
 	    <?php p($l->t('Address of your Solr Servlet :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
 			<td><input type="text" name="solr_url" id="solr_url"
 				value="<?php p($_['solr_url'])?>" style="width: 360px;"></td>
@@ -51,7 +60,8 @@ script('nextant', 'settings.admin');
 			</td>
 		</tr>
 		<tr style="height: 40px;">
-			<td colspan="2" style="text-align: center; width: 550px;"><span id="nextant-admin-msg" class="msg"></span></td>
+			<td colspan="2" style="text-align: center; width: 550px;"><span
+				id="nextant-admin-msg" class="msg"></span></td>
 		</tr>
 	</table>
 

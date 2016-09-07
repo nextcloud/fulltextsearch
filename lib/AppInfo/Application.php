@@ -118,6 +118,14 @@ class Application extends App
             return is_null($user) ? '' : $user->getUID();
         });
         
+        $container->registerService('UserManager', function ($c) {
+            return \OC::$server->getUserManager();
+        });
+        
+        $container->registerService('GroupManager', function ($c) {
+            return \OC::$server->getGroupManager();
+        });
+        
         $container->registerService('UserFolder', function ($c) {
             return \OC::$server->getUserFolder();
         });
@@ -151,7 +159,7 @@ class Application extends App
         // not working: post_unshare
         Util::connectHook('OC_Filesystem', 'post_create', '\OCA\Nextant\Hooks\FilesHooks', 'fileCreated');
         Util::connectHook('OC_Filesystem', 'post_update', '\OCA\Nextant\Hooks\FilesHooks', 'fileUpdated');
-        // Util::connectHook('OC_Filesystem', 'post_rename', '\OCA\Nextant\Hooks\FilesHooks', 'fileRenamed');
+        Util::connectHook('OC_Filesystem', 'post_rename', '\OCA\Nextant\Hooks\FilesHooks', 'fileRenamed');
         Util::connectHook('OC_Filesystem', 'delete', '\OCA\Nextant\Hooks\FilesHooks', 'fileDeleted');
         Util::connectHook('\OCA\Files_Trashbin\Trashbin', 'post_restore', '\OCA\Nextant\Hooks\FilesHooks', 'fileRestored');
         Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
@@ -182,19 +190,5 @@ class Application extends App
     // ->t('Nextant')
     // ));
     // }
-    
-    /**
-     * This is alpha, and this is a simple test using the LICENSE file (because, why not)
-     */
-    public function testExtract()
-    {
-        $this->getContainer()
-            ->query('SolrService')
-            ->setOwner($this->getContainer()
-            ->query('UserId'));
-        $this->getContainer()
-            ->query('SolrService')
-            ->extractSimpleTextFile(__DIR__ . '/../../LICENSE', '__test');
-    }
 }
 

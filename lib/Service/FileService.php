@@ -29,6 +29,7 @@ namespace OCA\Nextant\Service;
 use OC\Files\Filesystem;
 use OC\Files\View;
 use OCP\Files\NotFoundException;
+use OC\Share\Share;
 
 class FileService
 {
@@ -55,8 +56,10 @@ class FileService
         return $this->root;
     }
 
-    public function setView($view)
+    public function setView($view = null)
     {
+        if ($view == null)
+            $view = Filesystem::getView();
         $this->view = $view;
     }
 
@@ -65,7 +68,7 @@ class FileService
      *
      * @param string $path            
      */
-    public function addFiles($path, $recursive = false)
+    public function addFiles($path, $recursive = false, $isRoot = true)
     {
         $solrResult = false;
         
@@ -73,14 +76,47 @@ class FileService
         if ($fileInfos->getMimeType() == 'httpd/unix-directory' && $recursive) {
             $files = $this->view->getDirectoryContent($path);
             foreach ($files as $file)
-                $this->addFiles($this->view->getPath($file->getId()), true);
+                $this->addFiles($this->view->getPath($file->getId()), true, false);
         } else {
             $absolutePath = $this->getRoot() . $this->view->getAbsolutePath($path);
             // $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
             
-            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType(), $error);
+            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType());
         }
         
+        if ($isRoot && $solrResult)
+            $this->updateFiles($fileInfos->getId(), $recursive, null);
+        
+        return $solrResult;
+    }
+
+    public function updateFiles($fileId, $recursive = false, $data = null)
+    {
+        $isRoot = false;
+        if ($data == null)
+            $isRoot = true;
+        
+        $path = $this->view->getPath($fileId);
+        
+        $fileInfos = $this->view->getFileInfo($path);
+        $data = $this->getData($path);
+        
+        $pack = array();
+        if ($fileInfos->getMimeType() == 'httpd/unix-directory' && $recursive) {
+            $files = $this->view->getDirectoryContent($path);
+            foreach ($files as $file) {
+                $result = $this->updateFiles($file->getId(), true, $data);
+                $pack = array_merge($pack, $result);
+            }
+        } else {
+            $data['id'] = $fileId;
+            array_push($pack, $data);
+        }
+        
+        if (! $isRoot)
+            return $pack;
+        
+        $solrResult = $this->solrService->updateDocuments($pack);
         return $solrResult;
     }
 
@@ -99,16 +135,50 @@ class FileService
             foreach ($files as $file)
                 $this->removeFiles($this->view->getPath($file->getId()), true);
         } else {
-            // $this->miscService->log('[Nextant] Remove file ' . $fileInfos->getId());
-            
             $solrResult = $this->solrService->removeDocument($fileInfos->getId());
         }
         
         return $solrResult;
     }
 
-    public function shareDocument($path, $shareWith, $isGroup, $sharing)
-    {}
+    private function getData($path)
+    {
+        $data = array();
+        
+        $subpath = '';
+        $subdirs = explode('/', $path);
+        foreach ($subdirs as $subdir) {
+            $subpath .= '/' . $subdir;
+            if ($subpath != '/') {
+                $subdirInfos = $this->view->getFileInfo($subpath);
+                if (! $subdirInfos)
+                    continue;
+                $this->getDataFromFileId($subdirInfos->getId(), $data);
+            }
+        }
+        
+        return $data;
+    }
+
+    public static function getDataFromFileId($fileId, &$data)
+    {
+        if (! key_exists('share_users', $data))
+            $data['share_users'] = array();
+        if (! key_exists('share_groups', $data))
+            $data['share_groups'] = array();
+        if (! key_exists('deleted', $data))
+            $data['deleted'] = false;
+        
+        $OCShares = Share::getAllSharesForFileId($fileId);
+        foreach ($OCShares as $share) {
+            if ($share['share_type'] == '0')
+                array_push($data['share_users'], $share['share_with']);
+            if ($share['share_type'] == '1')
+                array_push($data['share_groups'], $share['share_with']);
+        }
+        
+        return true;
+    }
 
     public static function getId($path)
     {
