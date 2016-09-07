@@ -98,9 +98,13 @@ class SettingsController extends Controller
                     $result = $this->test_extract($message);
                     break;
                 
+                case 'update':
+                    $result = $this->test_update($message);
+                    break;
+                
                 case 'search':
-                    if ($this->test_search(SolrService::SEARCH_OWNER, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_SHARED, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_SHARED_GROUP, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_OWNER, SolrService::SEARCH_TRASHBIN_ONLY, $message))
-                        $result = true;
+                    // if ($this->test_search(SolrService::SEARCH_OWNER, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_SHARED, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_SHARED_GROUP, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_OWNER, SolrService::SEARCH_TRASHBIN_ONLY, $message))
+                    $result = $this->test_search($message);
                     break;
                 
                 case 'delete':
@@ -139,17 +143,9 @@ class SettingsController extends Controller
     private function test_extract(&$message)
     {
         $testFile = __DIR__ . '/../../LICENSE';
-        $shares = array(
-            'users' => array(
-                '__nextant_test_owner'
-            ),
-            'groups' => array(
-                '__nextant_share_group'
-            )
-        );
         
-        if ($this->solrService->extractFile($testFile, '__nextant_test', 'text/plain', $shares, true, $error)) {
-            $message = 'Text were successfully extracted';
+        if ($this->solrService->extractFile($testFile, '__nextant_test', 'text/plain', $error)) {
+            $message = 'Text successfully extracted';
             return true;
         }
         
@@ -157,10 +153,55 @@ class SettingsController extends Controller
         return false;
     }
 
-    private function test_search($type, $deleted, &$message)
+    private function test_update(&$message)
+    {
+        $testShareUsers = array(
+            'id' => '__nextant_test',
+            'share_users' => array(
+                '__nextant_test_owner'
+            )
+        );
+        $testShareGroups = array(
+            'id' => '__nextant_test',
+            'share_groups' => array(
+                '__nextant_share_group'
+            )
+        );
+        
+        $testDeleted = array(
+            'id' => '__nextant_test',
+            'deleted' => true
+        );
+        
+        if (! $this->solrService->updateDocuments(array(
+            $testShareUsers
+        ), $error)) {
+            $message = 'Error Updating user sharing flag (Error #' . $error . ')';
+            return false;
+        }
+        
+        if (! $this->solrService->updateDocuments(array(
+            $testShareGroups
+        ), $error)) {
+            $message = 'Updating group sharing (Error #' . $error . ')';
+            return false;
+        }
+        
+        if (! $this->solrService->updateDocuments(array(
+            $testDeleted
+        ), $error)) {
+            $message = 'Updating trashbin flag (Error #' . $error . ')';
+            return false;
+        }
+        
+        $message = 'Document successfully updated';
+        return true;
+    }
+
+    private function test_search(&$message)
     {
         $keyword = 'LICENSE';
-        if ($result = $this->solrService->search($keyword, $type, $deleted, $error)) {
+        if ($result = $this->solrService->search($keyword, $error)) {
             if (sizeof($result) > 0) {
                 
                 foreach ($result as $doc) {
@@ -178,7 +219,7 @@ class SettingsController extends Controller
             return false;
         }
         
-        $message = 'Search failed. Please check the configuration of your Solr server (Error #' . $error . '.' . $type . '.' . $deleted . ')';
+        $message = 'Search failed. Please check the configuration of your Solr server (Error #' . $error . ')';
         return false;
     }
 
