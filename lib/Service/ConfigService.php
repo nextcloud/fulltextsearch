@@ -88,7 +88,7 @@ class ConfigService
         if ($config == null || ! key_exists('solr_core', $config))
             $config['solr_core'] = $this->getAppValue('solr_core');
         
-        $url = $config['solr_url'] . '/' . $config['solr_core'];
+        $url = $config['solr_url'];
         $t = parse_url($url);
         
         if (! key_exists('host', $t) || ! key_exists('port', $t) || ! key_exists('path', $t))
@@ -99,6 +99,7 @@ class ConfigService
                 'localhost' => array(
                     'host' => $t['host'],
                     'port' => $t['port'],
+                    'core' => $config['solr_core'],
                     'path' => str_replace('//', '/', $t['path'])
                 )
             )
