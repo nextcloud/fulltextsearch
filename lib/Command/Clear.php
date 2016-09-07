@@ -24,11 +24,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-$app = new \OCA\Nextant\AppInfo\Application();
-$c = $app->getContainer();
+namespace OCA\Nextant\Command;
 
-$application->add(new OCA\Nextant\Command\Scan(OC::$server->getUserManager(), $c->query('UserFolder'), $c->query('SolrService'), $c->query('FileService')));
-$application->add(new OCA\Nextant\Command\Clear($c->query('SolrService')));
-$application->add(new OCA\Nextant\Command\Check($c->query('SolrService')));
+use OC\Core\Command\Base;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class Clear extends Base
+{
+
+    private $solrService;
+
+    public function __construct($solrService)
+    {
+        parent::__construct();
+        $this->solrService = $solrService;
+    }
+
+    protected function configure()
+    {
+        parent::configure();
+        $this->setName('nextant:clear')->setDescription('destroy all Solr documents');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->solrService->clear();
+    }
+}
+
 
 
