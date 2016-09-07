@@ -77,8 +77,7 @@ class SearchProvider extends \OCP\Search\Provider
         
         if ($query !== null) {
             
-            $solrResult = $this->solrService->search($query);
-            
+            $solrResult = $this->solrService->search($query);            
             if ($solrResult == false)
                 return $results;
             
@@ -95,7 +94,7 @@ class SearchProvider extends \OCP\Search\Provider
                 $result = new \OC\Search\Result\File($fileData);
                 $result->type = 'nextant';
                 // $result->name = $result->path . ' (Accuracy: ' . round($data['score'] * 100 / $topScore, 2) . '%) ';
-                $result->name = $result->path . ' (Accuracy: ' . (($data['score'] < 1) ? round($data['score'] * 100, 1) : 100) . '%) ';
+                $result->name = $result->path . ' (Score: ' . round($data['score'], 2) . ') ';
                 $results[] = $result;
             }
         }
