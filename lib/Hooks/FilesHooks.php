@@ -71,7 +71,7 @@ class FilesHooks
      */
     public static function fileRenamed($params)
     {
-        self::getController()->onFileRename($params['oldpath'], $params['newpath']);
+        self::getController()->onFileRename($params['newpath']);
     }
 
     /**
