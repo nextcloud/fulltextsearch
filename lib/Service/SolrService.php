@@ -47,9 +47,11 @@ class SolrService
     // can't extract - check solr configuration for the solr-cell plugin
     const EXCEPTION_EXTRACT_FAILED = 41;
 
-    const EXCEPTION_SEARCH_FAILED = 61;
+    const EXCEPTION_UPDATE_FIELD_FAILED = 61;
 
-    const EXCEPTION_SEARCH_FAILED_OWNER = 64;
+    const EXCEPTION_SEARCH_FAILED = 81;
+
+    const EXCEPTION_SEARCH_FAILED_OWNER = 84;
 
     const EXCEPTION_REMOVE_FAILED = 81;
     
@@ -63,12 +65,6 @@ class SolrService
     const SEARCH_SHARED_GROUP = 4;
 
     const SEARCH_ALL = 7;
-
-    const SEARCH_TRASHBIN_ALL = 1;
-
-    const SEARCH_TRASHBIN_ONLY = 2;
-
-    const SEARCH_TRASHBIN_NOT = 4;
 
     private $solariumClient;
 
@@ -112,22 +108,22 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($path, $docid, $mimetype, $shares, $deleted, &$error = '')
+    public function extractFile($path, $docid, $mimetype, &$error = '')
     {
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
-                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
+                return $this->extractSimpleTextFile($path, $docid, $error);
         }
         
         switch ($mimetype) {
             case 'application/epub+zip':
-                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
+                return $this->extractSimpleTextFile($path, $docid, $error);
             
             case 'application/pdf':
-                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
+                return $this->extractSimpleTextFile($path, $docid, $error);
             
             case 'application/rtf':
-                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
+                return $this->extractSimpleTextFile($path, $docid, $error);
         }
         
         $acceptedMimeType = array(
@@ -143,7 +139,7 @@ class SolrService
         
         foreach ($acceptedMimeType['vnd'] as $mt) {
             if (substr($mimetype, 0, strlen($mt)) == $mt)
-                return $this->extractSimpleTextFile($path, $docid, $shares, $deleted, $error);
+                return $this->extractSimpleTextFile($path, $docid, $error);
         }
         
         return false;
@@ -155,7 +151,7 @@ class SolrService
      * @param string $path            
      * @param int $docid            
      */
-    public function extractSimpleTextFile($path, $docid, $shares, $deleted, &$error)
+    public function extractSimpleTextFile($path, $docid, &$error)
     {
         if ($this->owner == '') {
             $error = self::ERROR_OWNER_NOT_SET;
@@ -182,15 +178,80 @@ class SolrService
             $doc->id = $docid;
             $doc->nextant_owner = $this->owner;
             
-            $this->documentShares($doc, $shares);
-            $doc->nextant_deleted = ($deleted) ? 'true' : 'false';
             $query->setDocument($doc);
             
             $ret = $client->extract($query);
+            
             return $ret;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_EXTRACT_FAILED;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        
+        return false;
+    }
+
+    public function updateDocuments($data, &$error = '')
+    {
+        if ($this->owner == '') {
+            $error = self::ERROR_OWNER_NOT_SET;
+            return false;
+        }
+        
+        if (! $this->solariumClient) {
+            $error = self::ERROR_SOLR_CONFIG;
+            return false;
+        }
+        
+        try {
+            $client = $this->solariumClient;
+            
+            $query = $client->createUpdate();
+            
+            // add document
+            
+            $docs = array();
+            foreach ($data as $upd) {
+                // if (! key_exists('id', $upd))
+                // continue;
+                
+                $doc = $query->createDocument();
+                $doc->setKey('id', $upd['id']);
+                
+                if (key_exists('share_users', $upd)) {
+                    if (sizeof($upd['share_users']) > 0) {
+                        $doc->setField('nextant_share', $upd['share_users']);
+                        $doc->setFieldModifier('nextant_share', 'set');
+                    } else
+                        $doc->setFieldModifier('nextant_share', 'remove');
+                }
+                
+                if (key_exists('share_groups', $upd)) {
+                    if (sizeof($upd['share_groups']) > 0) {
+                        $doc->setField('nextant_sharegroup', $upd['share_groups']);
+                        $doc->setFieldModifier('nextant_sharegroup', 'set');
+                    } else
+                        $doc->setFieldModifier('nextant_share', 'remove');
+                }
+                
+                if (key_exists('deleted', $upd)) {
+                    $doc->setField('nextant_deleted', ($upd['deleted']) ? 'true' : 'false');
+                    $doc->setFieldModifier('nextant_deleted', 'set');
+                }
+                array_push($docs, $doc);
+            }
+            
+            $query->addDocuments($docs)->addCommit();
+            $ret = $client->update($query);
+            
+            return $ret;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_UPDATE_FIELD_FAILED;
             else
                 $error = self::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
@@ -225,12 +286,6 @@ class SolrService
         }
         
         return false;
-    }
-
-    private static function documentShares(&$doc, $shares)
-    {
-        $doc->nextant_share = $shares['users'];
-        $doc->nextant_sharegroup = $shares['groups'];
     }
 
     private function generateOwnerQuery($type, &$error)
@@ -268,12 +323,12 @@ class SolrService
         return $ownerQuery;
     }
 
-    public function search($string, $type = self::SEARCH_ALL, $deleted = self::SEARCH_TRASHBIN_ALL, &$error = '')
+    public function search($string, &$error = '')
     {
         if ($this->solariumClient == false)
             return false;
         
-        $ownerQuery = $this->generateOwnerQuery($type, $error);
+        $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $error);
         if ($ownerQuery === false)
             return false;
         
@@ -288,10 +343,10 @@ class SolrService
             
             $query->setQuery('attr_text:' . $string);
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
-            if ($deleted & self::SEARCH_TRASHBIN_ONLY)
-                $query->createFilterQuery('deleted')->setQuery('nextant_deleted:true');
-            if ($deleted & self::SEARCH_TRASHBIN_NOT)
-                $query->createFilterQuery('deleted')->setQuery('nextant_deleted:false');
+            // if ($deleted & self::SEARCH_TRASHBIN_ONLY)
+            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:true');
+            // if ($deleted & self::SEARCH_TRASHBIN_NOT)
+            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:false');
             
             $resultset = $client->select($query);
             
