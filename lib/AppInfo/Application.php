@@ -35,6 +35,7 @@ use \OCA\Nextant\Service\ConfigService;
 use \OCA\Nextant\Service\MiscService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Service\SolrAdminService;
 use OCP\AppFramework\App;
 use OCP\Util;
 use Solarium\Solarium;
@@ -70,6 +71,10 @@ class Application extends App
         
         $container->registerService('SolrService', function ($c) {
             return new SolrService($c->query('SolariumClient'), $c->query('ConfigService'), $c->query('MiscService'));
+        });
+        
+        $container->registerService('SolrAdminService', function ($c) {
+            return new SolrAdminService($c->query('SolariumClient'), $c->query('ConfigService'), $c->query('MiscService'));
         });
         
         $container->registerService('IndexMapper', function ($c) {

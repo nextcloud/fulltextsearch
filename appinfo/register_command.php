@@ -27,8 +27,8 @@
 $app = new \OCA\Nextant\AppInfo\Application();
 $c = $app->getContainer();
 
-$application->add(new OCA\Nextant\Command\Scan(OC::$server->getUserManager(), $c->query('UserFolder'), $c->query('SolrService'), $c->query('FileService')));
+$application->add(new OCA\Nextant\Command\Check($c->query('SolrService'), $c->query('SolrAdminService')));
 $application->add(new OCA\Nextant\Command\Clear($c->query('SolrService')));
-$application->add(new OCA\Nextant\Command\Check($c->query('SolrService')));
+$application->add(new OCA\Nextant\Command\Scan(OC::$server->getUserManager(), $c->query('UserFolder'), $c->query('SolrService'), $c->query('FileService')));
 
 
