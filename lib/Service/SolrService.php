@@ -353,7 +353,6 @@ class SolrService
                 return false;
             }
             
-            $this->miscService->log('__' . $ownerQuery);
             $query->setQuery('attr_text:' . $helper->escapePhrase($string));
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             // if ($deleted & self::SEARCH_TRASHBIN_ONLY)
