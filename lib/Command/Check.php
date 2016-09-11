@@ -55,22 +55,21 @@ class Check extends Base
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->solrAdmin->setOutput($output);
-       
+        
         $output->write('Ping: ');
-        if ($this->solrClient->ping())
+        if ($this->solrAdmin->ping())
             $output->writeln('ok');
         else {
             $output->writeln('fail');
             return false;
         }
         
-        
-        if (! $this->solrAdmin->check(true, $error)) {
+        if (! $this->solrAdmin->checkSchema(true, $error)) {
             $output->writeln('Error: ' . $error);
             return false;
         }
         
-        $output->writeln('Your solr contains ' . $this->solrClient->count() . ' documents');
+        $output->writeln('Your solr contains ' . $this->solrAdmin->count() . ' documents');
     }
 }
 
