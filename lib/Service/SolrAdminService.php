@@ -25,7 +25,6 @@
  */
 namespace OCA\Nextant\Service;
 
-use \OCA\Nextant\Service\SolrService;
 use Solarium\Core\Client\Request;
 
 class SolrAdminService
@@ -54,7 +53,7 @@ class SolrAdminService
         $this->output = $output;
     }
 
-    public function check($fix = false)
+    public function checkSchema($fix = false, &$error = '')
     {
         $fields = array();
         array_push($fields, array(
@@ -102,15 +101,15 @@ class SolrAdminService
                             $this->modifyField($field);
                         else
                             $this->createField($field);
-                    }
+                    } else
+                        return false;
                 }
             }
             
             break;
         }
         
-        // if (! $fix)
-        // return false;
+        return true;
     }
 
     public function ping(&$error = '')
@@ -198,21 +197,31 @@ class SolrAdminService
 
     private function solariumPostSchemaRequest($data)
     {
-        $client = $this->solariumClient;
-        
-        $query = $client->createSelect();
-        $request = $client->createRequest($query);
-        
-        $request->setHandler('schema');
-        $request->setMethod(Request::METHOD_POST);
-        
-        $request->setRawData(json_encode($data));
-        $response = $client->executeRequest($request);
-        
-        if ($response->getStatusCode() != 200)
-            return false;
-        
-        return true;
+        try {
+            $client = $this->solariumClient;
+            
+            $query = $client->createSelect();
+            $request = $client->createRequest($query);
+            
+            $request->setHandler('schema');
+            $request->setMethod(Request::METHOD_POST);
+            
+            $request->setRawData(json_encode($data));
+            $response = $client->executeRequest($request);
+            
+            if ($response->getStatusCode() != 200)
+                return false;
+            
+            return true;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = SolrClient::EXCEPTION_SOLRURI;
+            else
+                $error = SolrClient::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = SolrClient::EXCEPTION;
+        }
+        return false;
     }
 
     public function clear(&$error = '')
