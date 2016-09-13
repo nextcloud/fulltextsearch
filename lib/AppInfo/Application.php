@@ -35,6 +35,7 @@ use \OCA\Nextant\Service\ConfigService;
 use \OCA\Nextant\Service\MiscService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Service\SolrAdminService;
 use OCP\AppFramework\App;
 use OCP\Util;
 use Solarium\Solarium;
@@ -72,6 +73,10 @@ class Application extends App
             return new SolrService($c->query('SolariumClient'), $c->query('ConfigService'), $c->query('MiscService'));
         });
         
+        $container->registerService('SolrAdminService', function ($c) {
+            return new SolrAdminService($c->query('SolariumClient'), $c->query('ConfigService'), $c->query('MiscService'));
+        });
+        
         $container->registerService('IndexMapper', function ($c) {
             return new IndexMapper($c->query('ServerContainer')
                 ->getDb());
@@ -89,7 +94,7 @@ class Application extends App
         // });
         
         $container->registerService('SettingsController', function ($c) {
-            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('MiscService'));
+            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrAdminService'), $c->query('MiscService'));
         });
         
         /**
@@ -136,15 +141,6 @@ class Application extends App
                 ->getValue('datadirectory', \OC::$SERVERROOT . '/data');
         });
         
-        /**
-         * Solr / Search Engines
-         */
-        \OC::$server->getSearch()->registerProvider('OCA\Nextant\Provider\SearchProvider', array(
-            'apps' => array(
-                'files'
-            )
-        ));
-        
         $this->getContainer()->registerService('SolariumClient', function ($c) {
             $toS = $c->query('ConfigService')
                 ->toSolarium();
@@ -164,6 +160,16 @@ class Application extends App
         Util::connectHook('\OCA\Files_Trashbin\Trashbin', 'post_restore', '\OCA\Nextant\Hooks\FilesHooks', 'fileRestored');
         Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
         Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
+    }
+
+    public function registerSearchProvider()
+    {
+        \OC::$server->getSearch()->registerProvider('\OCA\Nextant\Provider\SearchProvider', array(
+            'apps' => array(
+                'files'
+            )
+        )
+        );
     }
 
     public function registerSettingsAdmin()

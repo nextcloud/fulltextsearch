@@ -55,6 +55,12 @@ $(document)
 										'Ping querying your Solr Server'));
 								break;
 
+							case 'schema':
+								OC.msg.startAction('#nextant-admin-msg',
+										t('nextant',
+												'Verifying Schema integrity'));
+								break;
+
 							case 'extract':
 								OC.msg.startAction('#nextant-admin-msg', t(
 										'nextant',
@@ -98,6 +104,13 @@ $(document)
 									response);
 							switch (response.command) {
 							case 'ping':
+								if (response.status == 'success')
+									nextantSettings.test_standby('schema');
+								else
+									nextantSettings.reset();
+								break;
+
+							case 'schema':
 								if (response.status == 'success')
 									nextantSettings.test_standby('extract');
 								else

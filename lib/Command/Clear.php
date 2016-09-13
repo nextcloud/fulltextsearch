@@ -37,10 +37,13 @@ class Clear extends Base
 
     private $solrService;
 
-    public function __construct($solrService)
+    private $solrAdmin;
+
+    public function __construct($solrService, $solrAdmin)
     {
         parent::__construct();
         $this->solrService = $solrService;
+        $this->solrAdmin = $solrAdmin;
     }
 
     protected function configure()
@@ -51,7 +54,7 @@ class Clear extends Base
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->solrService->clear();
+        $this->solrAdmin->clear();
     }
 }
 

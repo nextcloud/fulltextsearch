@@ -17,7 +17,7 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * GNU Affero` General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -51,9 +51,7 @@ class SolrService
 
     const EXCEPTION_SEARCH_FAILED = 81;
 
-    const EXCEPTION_SEARCH_FAILED_OWNER = 84;
-
-    const EXCEPTION_REMOVE_FAILED = 81;
+    const EXCEPTION_REMOVE_FAILED = 101;
     
     // undocumented exception
     const EXCEPTION = 9;
@@ -301,7 +299,7 @@ class SolrService
         return false;
     }
 
-    private function generateOwnerQuery($type, &$error)
+    private function generateOwnerQuery($type, $helper, &$error)
     {
         $ownerQuery = '';
         if ($type & self::SEARCH_OWNER) {
@@ -310,7 +308,7 @@ class SolrService
                 return false;
             }
             
-            $ownerQuery .= 'nextant_owner:"' . $this->owner . '" ';
+            $ownerQuery .= 'nextant_owner:' . $helper->escapePhrase($this->owner) . ' ';
         }
         
         if ($type & self::SEARCH_SHARED) {
@@ -318,14 +316,14 @@ class SolrService
                 $error = self::ERROR_OWNER_NOT_SET;
                 return false;
             }
-            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:"' . $this->owner . '" ';
+            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:' . $helper->escapePhrase($this->owner) . ' ';
         }
         
         if ($type & self::SEARCH_SHARED_GROUP) {
             $ownerGroups = '';
             $groups = array();
             foreach ($this->groups as $group)
-                array_push($groups, ' nextant_sharegroup:"' . $group . '"');
+                array_push($groups, ' nextant_sharegroup:' . $helper->escapePhrase($group));
             
             if (sizeof($groups) > 0)
                 $ownerGroups = implode(' OR ', $groups);
@@ -341,20 +339,21 @@ class SolrService
         if ($this->solariumClient == false)
             return false;
         
-        $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $error);
-        if ($ownerQuery === false)
-            return false;
-        
-        if ($ownerQuery == '') {
-            $error = self::ERROR_TOOWIDE_SEARCH;
-            return false;
-        }
-        
         try {
             $client = $this->solariumClient;
             $query = $client->createSelect();
             
-            $query->setQuery('attr_text:' . $string);
+            $helper = $query->getHelper();            
+            $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $helper, $error);
+            if ($ownerQuery === false)
+                return false;
+            
+            if ($ownerQuery == '') {
+                $error = self::ERROR_TOOWIDE_SEARCH;
+                return false;
+            }
+            
+            $query->setQuery('attr_text:' . $helper->escapePhrase($string));
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             // if ($deleted & self::SEARCH_TRASHBIN_ONLY)
             // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:true');
@@ -373,82 +372,8 @@ class SolrService
             
             return $return;
         } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK') {
-                switch ($type) {
-                    case self::SEARCH_OWNER:
-                        $error = self::EXCEPTION_SEARCH_FAILED_OWNER;
-                        break;
-                    default:
-                        $error = self::EXCEPTION_SEARCH_FAILED;
-                        break;
-                }
-            } else
-                $error = self::EXCEPTION_HTTPEXCEPTION;
-        } catch (\Solarium\Exception $e) {
-            $error = self::EXCEPTION;
-        }
-        
-        return false;
-    }
-
-    public function ping(&$error = '')
-    {
-        $client = $this->solariumClient;
-        $ping = $client->createPing();
-        
-        try {
-            $result = $client->ping($ping);
-            return true;
-        } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_SOLRURI;
-            else
-                $error = self::EXCEPTION_HTTPEXCEPTION;
-        } catch (\Solarium\Exception $e) {
-            $error = self::EXCEPTION;
-        }
-        
-        return false;
-    }
-
-    public function clear(&$error = '')
-    {
-        $client = $this->solariumClient;
-        
-        try {
-            $update = $client->createUpdate();
-            
-            $update->addDeleteQuery('*:*');
-            $update->addCommit();
-            $result = $client->update($update);
-            
-            return true;
-        } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_SOLRURI;
-            else
-                $error = self::EXCEPTION_HTTPEXCEPTION;
-        } catch (\Solarium\Exception $e) {
-            $error = self::EXCEPTION;
-        }
-        
-        return false;
-    }
-
-    public function count(&$error = '')
-    {
-        $client = $this->solariumClient;
-        
-        try {
-            $query = $client->createSelect();
-            $query->setQuery('*:*');
-            $query->setRows(0);
-            $resultset = $client->execute($query);
-            
-            return $resultset->getNumFound();
-        } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_SOLRURI;
+                $error = self::EXCEPTION_SEARCH_FAILED;
             else
                 $error = self::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {

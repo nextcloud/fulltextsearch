@@ -35,30 +35,41 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Check extends Base
 {
 
-    private $solrService;
+    private $solrClient;
 
-    public function __construct($solrService)
+    private $solrAdmin;
+
+    public function __construct($solrClient, $solrAdmin)
     {
         parent::__construct();
-        $this->solrService = $solrService;
+        $this->solrClient = $solrClient;
+        $this->solrAdmin = $solrAdmin;
     }
 
     protected function configure()
     {
         parent::configure();
-        $this->setName('nextant:check')->setDescription('check your current Solr configuration');
+        $this->setName('nextant:check')->setDescription('check, fix and optimise your current Solr configuration');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->solrAdmin->setOutput($output);
+        
         $output->write('Ping: ');
-        if ($this->solrService->ping())
+        if ($this->solrAdmin->ping())
             $output->writeln('ok');
         else {
             $output->writeln('fail');
-            return false;}
-            
-        $output->writeln('Your solr contains ' . $this->solrService->count() . ' documents');
+            return false;
+        }
+        
+        if (! $this->solrAdmin->checkSchema(true, $error)) {
+            $output->writeln('Error: ' . $error);
+            return false;
+        }
+        
+        $output->writeln('Your solr contains ' . $this->solrAdmin->count() . ' documents');
     }
 }
 

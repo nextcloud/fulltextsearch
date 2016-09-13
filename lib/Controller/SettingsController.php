@@ -26,11 +26,11 @@
  */
 namespace OCA\Nextant\Controller;
 
+use \OCA\Nextant\Service\ConfigService;
+use \OCA\Nextant\Service\SolrService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
-use \OCA\Nextant\Service\ConfigService;
-use \OCA\Nextant\Service\SolrService;
 
 class SettingsController extends Controller
 {
@@ -41,15 +41,18 @@ class SettingsController extends Controller
 
     private $solrService;
 
+    private $solrAdmin;
+
     private $solr_url;
 
     private $solr_core;
 
-    public function __construct($appName, IRequest $request, ConfigService $configService, $solrService, $miscService)
+    public function __construct($appName, IRequest $request, ConfigService $configService, $solrService, $solrAdmin, $miscService)
     {
         parent::__construct($appName, $request);
         $this->configService = $configService;
         $this->solrService = $solrService;
+        $this->solrAdmin = $solrAdmin;
         $this->miscService = $miscService;
     }
 
@@ -58,7 +61,7 @@ class SettingsController extends Controller
      */
     public function index()
     {
-        $documentsCount = $this->solrService->count($error);
+        $documentsCount = $this->solrAdmin->count($error);
         
         $params = [
             'current_docs' => $documentsCount,
@@ -92,6 +95,10 @@ class SettingsController extends Controller
             switch ($command) {
                 case 'ping':
                     $result = $this->test_ping($message);
+                    break;
+                
+                case 'schema':
+                    $result = $this->test_schema($message);
                     break;
                 
                 case 'extract':
@@ -131,12 +138,23 @@ class SettingsController extends Controller
     // Wiki Error 9
     private function test_ping(&$message)
     {
-        if ($this->solrService->ping($error)) {
+        if ($this->solrAdmin->ping($error)) {
             $message = 'Apache Solr is up, running and responding to our ping query';
             return true;
         }
         
         $message = 'Apache Solr is not responding to our ping query (Error #' . $error . ')';
+        return false;
+    }
+
+    private function test_schema(&$message)
+    {
+        if ($this->solrAdmin->checkSchema(true, $error)) {
+            $message = 'Schema is fine';
+            return true;
+        }
+        
+        $message = 'Were not able to verify/fix your schema integrity (Error #' . $error . ')';
         return false;
     }
 
@@ -155,42 +173,21 @@ class SettingsController extends Controller
 
     private function test_update(&$message)
     {
-        $testShareUsers = array(
+        $testUpdate = array(
             'id' => '__nextant_test',
             'share_users' => array(
                 '__nextant_test_owner'
-            )
-        );
-        $testShareGroups = array(
-            'id' => '__nextant_test',
+            ),
             'share_groups' => array(
                 '__nextant_share_group'
-            )
-        );
-        
-        $testDeleted = array(
-            'id' => '__nextant_test',
-            'deleted' => true
+            ),
+            'deleted' => false
         );
         
         if (! $this->solrService->updateDocuments(array(
-            $testShareUsers
+            $testUpdate
         ), $error)) {
-            $message = 'Error Updating user sharing flag (Error #' . $error . ')';
-            return false;
-        }
-        
-        if (! $this->solrService->updateDocuments(array(
-            $testShareGroups
-        ), $error)) {
-            $message = 'Updating group sharing (Error #' . $error . ')';
-            return false;
-        }
-        
-        if (! $this->solrService->updateDocuments(array(
-            $testDeleted
-        ), $error)) {
-            $message = 'Updating trashbin flag (Error #' . $error . ')';
+            $message = 'Error Updating field (Error #' . $error . ')';
             return false;
         }
         
