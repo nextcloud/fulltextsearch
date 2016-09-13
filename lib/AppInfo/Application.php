@@ -141,15 +141,6 @@ class Application extends App
                 ->getValue('datadirectory', \OC::$SERVERROOT . '/data');
         });
         
-        /**
-         * Solr / Search Engines
-         */
-        \OC::$server->getSearch()->registerProvider('OCA\Nextant\Provider\SearchProvider', array(
-            'apps' => array(
-                'files'
-            )
-        ));
-        
         $this->getContainer()->registerService('SolariumClient', function ($c) {
             $toS = $c->query('ConfigService')
                 ->toSolarium();
@@ -169,6 +160,16 @@ class Application extends App
         Util::connectHook('\OCA\Files_Trashbin\Trashbin', 'post_restore', '\OCA\Nextant\Hooks\FilesHooks', 'fileRestored');
         Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
         Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
+    }
+
+    public function registerSearchProvider()
+    {
+        \OC::$server->getSearch()->registerProvider('\OCA\Nextant\Provider\SearchProvider', array(
+            'apps' => array(
+                'files'
+            )
+        )
+        );
     }
 
     public function registerSettingsAdmin()
