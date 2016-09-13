@@ -78,7 +78,7 @@ class FileService
             foreach ($files as $file)
                 $this->addFiles($this->view->getPath($file->getId()), true, false);
         } else {
-            $absolutePath = $this->getRoot() . $this->view->getAbsolutePath($path);
+            $absolutePath = $this->view->getLocalFile($path);
             // $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
             
             $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType());
