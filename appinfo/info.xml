@@ -5,12 +5,11 @@
 	<name>Nextant</name>
 	<summary>Navigate through your cloud using Solr</summary>
 	<description>
-	One to enable a full text search within your cloud.
+     One to enable a Full-Text Search within your cloud.
 
-  Index your own files and your shared documents to perform fast and precise search using a Solr Servlet.
+    Index your own files and your shared documents and perform fast and precise search using a Solr Servlet.
 
-  Recognized file format: text, rtf, pdf, html, openoffice, office, ... 
-
+    Recognized file format: text, rtf, pdf, html, openoffice, office, ... 
     </description>
 	<version>0.3.0</version>
 	<licence>agpl</licence>
