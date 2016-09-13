@@ -34,7 +34,7 @@ use OC\Share\Share;
 class FileService
 {
 
-    private $root;
+//    private $root;
 
     private $solrService;
 
@@ -42,19 +42,19 @@ class FileService
 
     private $view;
 
-    public function __construct($root, $solrService, $miscService)
+    public function __construct($solrService, $miscService)
     {
-        $this->root = $root;
+//        $this->root = $root;
         $this->solrService = $solrService;
         $this->miscService = $miscService;
         
         $this->view = Filesystem::getView();
     }
 
-    public function getRoot()
-    {
-        return $this->root;
-    }
+//     public function getRoot()
+//     {
+//         return $this->root;
+//     }
 
     public function setView($view = null)
     {
@@ -189,18 +189,18 @@ class FileService
         return $fileId;
     }
 
-    public static function getPath($id, $absolute = false)
-    {
-        try {
-            $view = Filesystem::getView();
-            if ($absolute)
-                return $view->getAbsolutePath($view->getPath($id));
-            else
-                return $view->getPath($id);
-        } catch (NotFoundException $e) {
-            return false;
-        }
-    }
+//     public static function getPath($id, $absolute = false)
+//     {
+//         try {
+//             $view = Filesystem::getView();
+//             if ($absolute)
+//                 return $view->getAbsolutePath($view->getPath($id));
+//             else
+//                 return $view->getPath($id);
+//         } catch (NotFoundException $e) {
+//             return false;
+//         }
+//     }
 
     public static function getFileInfo($pathorid)
     {
@@ -217,11 +217,11 @@ class FileService
         }
     }
 
-    public static function getAbsolutePath($path, $root = false)
-    {
-        $view = Filesystem::getView();
-        return $view->getAbsolutePath($path);
-    }
+//     public static function getAbsolutePath($path, $root = false)
+//     {
+//         $view = Filesystem::getView();
+//         return $view->getAbsolutePath($path);
+//     }
 
     public static function getBaseTypeFromMime($mimetype)
     {
