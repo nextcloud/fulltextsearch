@@ -35,14 +35,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Check extends Base
 {
 
-    private $solrClient;
+    private $solrService;
 
     private $solrAdmin;
 
-    public function __construct($solrClient, $solrAdmin)
+    public function __construct($solrService, $solrAdmin)
     {
         parent::__construct();
-        $this->solrClient = $solrClient;
+        $this->solrService = $solrService;
         $this->solrAdmin = $solrAdmin;
     }
 
@@ -53,7 +53,13 @@ class Check extends Base
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
-    {
+    {       
+        if (!$this->solrService->installed())
+        {
+            $output->writeln('Nextant is not yet configured');
+            return;            
+        }
+        
         $this->solrAdmin->setOutput($output);
         
         $output->write('Ping: ');

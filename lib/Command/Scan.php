@@ -65,6 +65,11 @@ class Scan extends Base
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (! $this->solrService->installed()) {
+            $output->writeln('Nextant is not yet configured');
+            return;
+        }
+        
         $output->writeln('This might take a while ...');
         
         $users = $this->userManager->search('');
@@ -100,7 +105,7 @@ class Scan extends Base
             
             $this->filesTotal ++;
             if ($this->fileService->addFiles($path, false) !== false)
-                $this->filesExtracted++;
+                $this->filesExtracted ++;
         });
         
         $path = '/' . $userId . '/files/';

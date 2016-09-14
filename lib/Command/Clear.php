@@ -54,7 +54,13 @@ class Clear extends Base
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (! $this->solrService->installed()) {
+            $output->writeln('Nextant is not yet configured');
+            return;
+        }
+        
         $this->solrAdmin->clear();
+        $output->writeln('Your Solr core is now empty');
     }
 }
 
