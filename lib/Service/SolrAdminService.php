@@ -93,6 +93,7 @@ class SolrAdminService
         
         $this->message('Checking Solr schema fields');
         
+        $changed = false;
         while (true) {
             foreach ($fields as $field) {
                 $this->message(' * field ' . $field['name'] . ': ', false);
@@ -102,6 +103,7 @@ class SolrAdminService
                     $this->message('fail. ');
                     
                     if ($fix) {
+                        $changed = true;
                         $this->message('   -> Fixing field ' . $field['name']);
                         if ($curr)
                             self::modifyField($client, $field);
@@ -115,6 +117,9 @@ class SolrAdminService
             break;
         }
         
+        if ($changed)
+            $this->configService->setAppValue('needed_index', '1');
+            
         $this->configService->setAppValue('configured', '1');
         return true;
     }
