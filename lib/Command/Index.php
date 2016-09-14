@@ -33,6 +33,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use OCP\IUserManager;
 use OC\Files\Filesystem;
+use OC\ForbiddenException;
 
 class Index extends Base
 {
@@ -119,7 +120,14 @@ class Index extends Base
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
         
-        $scanner->scan($path);
+        try {
+            $scanner->scan($path);
+        } catch (ForbiddenException $e) {
+            // Because we are using the Scanner from Files, let's catch some exception the same way :/
+            $output->writeln('<error>Home storage for user ' . $userId . ' not writable</error>');
+            $output->writeln('Make sure you are running the scan command only as the user the web server runs as');
+        }
+        
         return array(
             'extracted' => $this->filesExtracted,
             'total' => $this->filesTotal
