@@ -74,7 +74,7 @@ class SolrService
 
     private $groups = array();
 
-    private $installed = false;
+    private $configured = false;
 
     public function __construct($client, $configService, $miscService)
     {
@@ -83,14 +83,14 @@ class SolrService
         $this->miscService = $miscService;
     }
 
-    public function installed()
+    public function configured()
     {
-        if (! $this->installed) {
-            $isIt = $this->configService->getAppValue('installed');
+        if (! $this->configured) {
+            $isIt = $this->configService->getAppValue('configured');
             if ($isIt == '1')
-                $this->installed = true;
+                $this->configured = true;
         }
-        return $this->installed;
+        return $this->configured;
     }
     // If $config == null, reset config to the one set in the admin
     public function setClient($config)
@@ -101,9 +101,9 @@ class SolrService
         
         $this->solariumClient = new \Solarium\Client($toS);
         if ($config != null)
-            $this->installed = true;
+            $this->configured = true;
         else
-            $this->installed = false;
+            $this->configured = false;
         
         return true;
     }
@@ -129,7 +129,7 @@ class SolrService
      */
     public function extractFile($path, $docid, $mimetype, &$error = '')
     {
-        if (! $this->installed())
+        if (! $this->configured())
             return false;
         
         switch (FileService::getBaseTypeFromMime($mimetype)) {
@@ -175,7 +175,7 @@ class SolrService
      */
     public function extractSimpleTextFile($path, $docid, &$error)
     {
-        if (! $this->installed())
+        if (! $this->configured())
             return false;
         
         if ($this->owner == '') {
@@ -222,7 +222,7 @@ class SolrService
 
     public function updateDocuments($data, &$error = '')
     {
-        if (! $this->installed())
+        if (! $this->configured())
             return false;
         
         if ($this->owner == '') {
@@ -304,7 +304,7 @@ class SolrService
 
     public function removeDocument($docid, &$error = '')
     {
-        if (! $this->installed())
+        if (! $this->configured())
             return false;
         if ($this->getClient() == false)
             return false;
@@ -370,7 +370,7 @@ class SolrService
 
     public function search($string, &$error = '')
     {
-        if (! $this->installed())
+        if (! $this->configured())
             return false;
         
         if ($this->getClient() == false)

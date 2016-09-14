@@ -37,7 +37,7 @@ script('nextant', 'settings.admin');
 		</tr>
 		<?php
 
-if ($_['installed'] == '1') {
+if ($_['configured'] == '1') {
     ?>
 		<tr>
 			<td style="width: 250px; text-align: right;"><label>

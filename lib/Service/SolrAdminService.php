@@ -56,7 +56,7 @@ class SolrAdminService
 
     public function checkSchema($fix = false, &$error = '')
     {
-        if (! $this->solrService || ! $this->solrService->installed() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
         
         $client = $this->solrService->getClient();
@@ -115,12 +115,13 @@ class SolrAdminService
             break;
         }
         
+        $this->configService->setAppValue('configured', '1');
         return true;
     }
 
     public function ping(&$error = '')
     {
-        if (! $this->solrService || ! $this->solrService->installed() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
         
         $client = $this->solrService->getClient();
@@ -232,7 +233,7 @@ class SolrAdminService
 
     public function clear(&$error = '')
     {
-        if (! $this->solrService || ! $this->solrService->installed() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
         
         $client = $this->solrService->getClient();
@@ -259,7 +260,7 @@ class SolrAdminService
 
     public function count(&$error = '')
     {
-        if (! $this->solrService || ! $this->solrService->installed() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
         
         $client = $this->solrService->getClient();
