@@ -30,7 +30,7 @@ use Solarium\Core\Client\Request;
 class SolrAdminService
 {
 
-    private $solariumClient;
+    private $solrService;
 
     private $configService;
 
@@ -40,9 +40,10 @@ class SolrAdminService
 
     private $lastMessage;
 
-    public function __construct($solrClient, $configService, $miscService)
+    public function __construct($solrService, $configService, $miscService)
     {
-        $this->solariumClient = $solrClient;
+        // $this->solariumClient = $solrClient;
+        $this->solrService = $solrService;
         $this->configService = $configService;
         $this->miscService = $miscService;
         $this->output = null;
@@ -55,6 +56,11 @@ class SolrAdminService
 
     public function checkSchema($fix = false, &$error = '')
     {
+        if (! $this->solrService || ! $this->solrService->installed() || ! $this->solrService->getClient())
+            return false;
+        
+        $client = $this->solrService->getClient();
+        
         $fields = array();
         array_push($fields, array(
             'name' => 'nextant_owner',
@@ -90,7 +96,7 @@ class SolrAdminService
         while (true) {
             foreach ($fields as $field) {
                 $this->message(' * field ' . $field['name'] . ': ', false);
-                if ($this->checkFieldProperty($field, $curr))
+                if (self::checkFieldProperty($client, $field, $curr))
                     $this->message('ok.');
                 else {
                     $this->message('fail. ');
@@ -98,9 +104,9 @@ class SolrAdminService
                     if ($fix) {
                         $this->message('   -> Fixing field ' . $field['name']);
                         if ($curr)
-                            $this->modifyField($field);
+                            self::modifyField($client, $field);
                         else
-                            $this->createField($field);
+                            self::createField($client, $field);
                     } else
                         return false;
                 }
@@ -114,7 +120,10 @@ class SolrAdminService
 
     public function ping(&$error = '')
     {
-        $client = $this->solariumClient;
+        if (! $this->solrService || ! $this->solrService->installed() || ! $this->solrService->getClient())
+            return false;
+        
+        $client = $this->solrService->getClient();
         $ping = $client->createPing();
         
         try {
@@ -132,9 +141,9 @@ class SolrAdminService
         return false;
     }
 
-    private function checkFieldProperty($field, &$property)
+    private static function checkFieldProperty($client, $field, &$property)
     {
-        $property = $this->getFieldProperty($field['name']);
+        $property = self::getFieldProperty($client, $field['name']);
         if (! $property)
             return false;
         
@@ -147,10 +156,8 @@ class SolrAdminService
         return true;
     }
 
-    private function getFieldProperty($fieldName)
+    private static function getFieldProperty($client, $fieldName)
     {
-        $client = $this->solariumClient;
-        
         $query = $client->createSelect();
         $request = $client->createRequest($query);
         
@@ -169,36 +176,35 @@ class SolrAdminService
         return $property;
     }
 
-    private function createField($field)
+    private static function createField($client, $field)
     {
         $data = array(
             'add-field' => $field
         );
-        return $this->solariumPostSchemaRequest($data);
+        return self::solariumPostSchemaRequest($client, $data);
     }
 
-    private function modifyField($field)
+    private static function modifyField($client, $field)
     {
         $data = array(
             'replace-field' => $field
         );
-        return $this->solariumPostSchemaRequest($data);
+        return self::solariumPostSchemaRequest($client, $data);
     }
 
-    private function deleteField($fieldName)
+    private static function deleteField($client, $fieldName)
     {
         $data = array(
             'delete-field' => array(
                 'name' => $fieldName
             )
         );
-        return $this->solariumPostSchemaRequest($data);
+        return self::solariumPostSchemaRequest($client, $data);
     }
 
-    private function solariumPostSchemaRequest($data)
+    private static function solariumPostSchemaRequest($client, $data)
     {
         try {
-            $client = $this->solariumClient;
             
             $query = $client->createSelect();
             $request = $client->createRequest($query);
@@ -226,7 +232,10 @@ class SolrAdminService
 
     public function clear(&$error = '')
     {
-        $client = $this->solariumClient;
+        if (! $this->solrService || ! $this->solrService->installed() || ! $this->solrService->getClient())
+            return false;
+        
+        $client = $this->solrService->getClient();
         
         try {
             $update = $client->createUpdate();
@@ -250,7 +259,10 @@ class SolrAdminService
 
     public function count(&$error = '')
     {
-        $client = $this->solariumClient;
+        if (! $this->solrService || ! $this->solrService->installed() || ! $this->solrService->getClient())
+            return false;
+        
+        $client = $this->solrService->getClient();
         
         try {
             $query = $client->createSelect();

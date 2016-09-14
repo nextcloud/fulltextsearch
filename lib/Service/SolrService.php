@@ -74,13 +74,24 @@ class SolrService
 
     private $groups = array();
 
+    private $installed = false;
+
     public function __construct($client, $configService, $miscService)
     {
         $this->solariumClient = $client;
         $this->configService = $configService;
         $this->miscService = $miscService;
     }
-    
+
+    public function installed()
+    {
+        if (! $this->installed) {
+            $isIt = $this->configService->getAppValue('installed');
+            if ($isIt == '1')
+                $this->installed = true;
+        }
+        return $this->installed;
+    }
     // If $config == null, reset config to the one set in the admin
     public function setClient($config)
     {
@@ -89,7 +100,17 @@ class SolrService
             return false;
         
         $this->solariumClient = new \Solarium\Client($toS);
+        if ($config != null)
+            $this->installed = true;
+        else
+            $this->installed = false;
+        
         return true;
+    }
+
+    public function getClient()
+    {
+        return $this->solariumClient;
     }
 
     public function setOwner($owner, $groups = array())
@@ -108,6 +129,9 @@ class SolrService
      */
     public function extractFile($path, $docid, $mimetype, &$error = '')
     {
+        if (! $this->installed())
+            return false;
+        
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
                 return $this->extractSimpleTextFile($path, $docid, $error);
@@ -151,18 +175,21 @@ class SolrService
      */
     public function extractSimpleTextFile($path, $docid, &$error)
     {
+        if (! $this->installed())
+            return false;
+        
         if ($this->owner == '') {
             $error = self::ERROR_OWNER_NOT_SET;
             return false;
         }
         
-        if (! $this->solariumClient) {
+        if (! $this->getClient()) {
             $error = self::ERROR_SOLR_CONFIG;
             return false;
         }
         
         try {
-            $client = $this->solariumClient;
+            $client = $this->getClient();
             
             $query = $client->createExtract();
             $query->addFieldMapping('content', 'text');
@@ -195,18 +222,21 @@ class SolrService
 
     public function updateDocuments($data, &$error = '')
     {
+        if (! $this->installed())
+            return false;
+        
         if ($this->owner == '') {
             $error = self::ERROR_OWNER_NOT_SET;
             return false;
         }
         
-        if (! $this->solariumClient) {
+        if (! $this->getClient()) {
             $error = self::ERROR_SOLR_CONFIG;
             return false;
         }
         
         try {
-            $client = $this->solariumClient;
+            $client = $this->getClient();
             
             $query = $client->createUpdate();
             
@@ -274,13 +304,17 @@ class SolrService
 
     public function removeDocument($docid, &$error = '')
     {
+        if (! $this->installed())
+            return false;
+        if ($this->getClient() == false)
+            return false;
         if ($this->owner == '') {
             $error = self::ERROR_OWNER_NOT_SET;
             return false;
         }
         
         try {
-            $client = $this->solariumClient;
+            $client = $this->getClient();
             $update = $client->createUpdate();
             
             $update->addDeleteById($docid);
@@ -336,14 +370,17 @@ class SolrService
 
     public function search($string, &$error = '')
     {
-        if ($this->solariumClient == false)
+        if (! $this->installed())
+            return false;
+        
+        if ($this->getClient() == false)
             return false;
         
         try {
-            $client = $this->solariumClient;
+            $client = $this->getClient();
             $query = $client->createSelect();
             
-            $helper = $query->getHelper();            
+            $helper = $query->getHelper();
             $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $helper, $error);
             if ($ownerQuery === false)
                 return false;

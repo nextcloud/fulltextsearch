@@ -64,6 +64,7 @@ class SettingsController extends Controller
         $documentsCount = $this->solrAdmin->count($error);
         
         $params = [
+            'installed' => $this->configService->getAppValue('installed'),
             'current_docs' => $documentsCount,
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core')
@@ -236,6 +237,8 @@ class SettingsController extends Controller
         if (! is_null($this->solr_url) && ! is_null($this->solr_core)) {
             $this->configService->setAppValue('solr_url', $this->solr_url);
             $this->configService->setAppValue('solr_core', $this->solr_core);
+            $this->configService->setAppValue('installed', '1');
+            
             $message = "Your configuration has been saved";
             return true;
         }

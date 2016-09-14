@@ -32,6 +32,7 @@ class ConfigService
 {
 
     private $defaults = [
+        'installed' => 0,
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant'
     ];
