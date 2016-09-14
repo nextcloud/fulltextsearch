@@ -60,61 +60,21 @@ class Scan extends Base
     protected function configure()
     {
         parent::configure();
-        $this->setName('nextant:scan')->setDescription('scan users\' files and generate Solr documents');
+        $this->setName('nextant:scan')->setDescription('**deprecated** use nextant:index instead');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('This might take a while ...');
         
-        $users = $this->userManager->search('');
-        $usersTotal = sizeof($users);
-        $usersCurrent = 0;
-        foreach ($users as $user) {
-            $usersCurrent ++;
-            
-            if ($this->hasBeenInterrupted())
-                break;
-            
-            $userId = $user->getUID();
-            $output->writeln('Scanning files from <info>' . $userId . '</info> (' . $usersCurrent . '/' . $usersTotal . ')');
-            
-            $this->solrService->setOwner($userId);
-            $result = $this->scanFiles($userId, $output);
-            $output->writeln(' > extracted files: ' . $result['extracted'] . '/' . $result['total'] . '');
+        if (! $this->solrService->configured()) {
+            $output->writeln('Nextant is not yet configured');
+            return;
         }
+
+        $output->writeln('**deprecated** use nextant:index instead');
+        return;        
     }
 
-    private function scanFiles($userId, $output)
-    {
-        /**
-         * Right now, the easiest way to scan the files is using the Utils\Scanner ...
-         */
-        $scanner = new \OC\Files\Utils\Scanner($userId, \OC::$server->getDatabaseConnection(), \OC::$server->getLogger());
-        
-        $this->filesTotal = 0;
-        $this->filesExtracted = 0;
-        $scanner->listen('\OC\Files\Utils\Scanner', 'scanFile', function ($path) use ($output) {
-            if ($this->hasBeenInterrupted())
-                throw new \Exception('ctrl-c');
-            
-            $this->filesTotal ++;
-            if ($this->fileService->addFiles($path, false) !== false)
-                $this->filesExtracted++;
-        });
-        
-        $path = '/' . $userId . '/files/';
-        
-        Filesystem::tearDown();
-        Filesystem::init($userId, '');
-        $this->fileService->setView(Filesystem::getView());
-        
-        $scanner->scan($path);
-        return array(
-            'extracted' => $this->filesExtracted,
-            'total' => $this->filesTotal
-        );
-    }
 }
 
 

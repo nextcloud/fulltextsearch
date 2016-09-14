@@ -24,12 +24,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-$app = new \OCA\Nextant\AppInfo\Application();
-$c = $app->getContainer();
+namespace OCA\Nextant\Migration;
 
-$application->add(new OCA\Nextant\Command\Check($c->query('SolrService'), $c->query('SolrAdminService')));
-$application->add(new OCA\Nextant\Command\Clear($c->query('SolrService'), $c->query('SolrAdminService')));
-$application->add(new OCA\Nextant\Command\Scan(OC::$server->getUserManager(), $c->query('UserFolder'), $c->query('SolrService'), $c->query('FileService')));
-$application->add(new OCA\Nextant\Command\Index(OC::$server->getUserManager(), $c->query('UserFolder'), $c->query('SolrService'), $c->query('ConfigService'), $c->query('FileService')));
+use OCP\Migration\IOutput;
+use OCP\Migration\IRepairStep;
 
+class NextantUpgrade implements IRepairStep
+{
 
+    private $solrService;
+
+    private $solrAdmin;
+
+    public function __construct($solrService, $solrAdmin)
+    {
+        $this->solrService = $solrService;
+        $this->solrAdmin = $solrAdmin;
+    }
+
+    /**
+     * Returns the step's name
+     *
+     * @return string
+     * @since 9.1.0
+     */
+    public function getName()
+    {
+        return 'Check and update Solr schema';
+    }
+
+    /**
+     * Run repair step.
+     * Must throw exception on error.
+     *
+     * @since 9.1.0
+     * @param IOutput $output            
+     * @throws \Exception in case of failure
+     */
+    public function run(IOutput $output)
+    {
+        $this->solrAdmin->checkSchema(true, $error);
+    }
+}

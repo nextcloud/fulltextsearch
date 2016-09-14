@@ -24,12 +24,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-$app = new \OCA\Nextant\AppInfo\Application();
-$c = $app->getContainer();
+namespace OCA\Nextant\Cron;
 
-$application->add(new OCA\Nextant\Command\Check($c->query('SolrService'), $c->query('SolrAdminService')));
-$application->add(new OCA\Nextant\Command\Clear($c->query('SolrService'), $c->query('SolrAdminService')));
-$application->add(new OCA\Nextant\Command\Scan(OC::$server->getUserManager(), $c->query('UserFolder'), $c->query('SolrService'), $c->query('FileService')));
-$application->add(new OCA\Nextant\Command\Index(OC::$server->getUserManager(), $c->query('UserFolder'), $c->query('SolrService'), $c->query('ConfigService'), $c->query('FileService')));
+use OC\BackgroundJob\TimedJob;
+use \OCA\Nextant\AppInfo\Application;
 
+class Cache extends TimedJob
+{
 
+    public function __construct()
+    {
+        $this->setInterval(3600); // 1 hour
+    }
+
+    protected function run($argument)
+    {
+        // $app = new Application();
+        // $app->getContainer()
+        // ->query('MiscService')
+        // ->log('_CRON_CACHE_');
+    }
+}
