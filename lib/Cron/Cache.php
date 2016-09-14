@@ -27,7 +27,7 @@
 namespace OCA\Nextant\Cron;
 
 use OC\BackgroundJob\TimedJob;
-use OCA\Nextant\AppInfo\Application;
+use \OCA\Nextant\AppInfo\Application;
 
 class Cache extends TimedJob
 {
@@ -39,9 +39,9 @@ class Cache extends TimedJob
 
     protected function run($argument)
     {
-        $app = new Application();
-        $app->getContainer()
-            ->query('MiscService')
-            ->log('_CRON_CACHE_');
+        // $app = new Application();
+        // $app->getContainer()
+        // ->query('MiscService')
+        // ->log('_CRON_CACHE_');
     }
 }
