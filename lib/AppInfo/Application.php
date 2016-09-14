@@ -36,6 +36,7 @@ use \OCA\Nextant\Service\MiscService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\SolrAdminService;
+use \OCA\Nextant\Migration\NextantUpgrade;
 use OCP\AppFramework\App;
 use OCP\Util;
 use Solarium\Solarium;
@@ -66,7 +67,7 @@ class Application extends App
         });
         
         $container->registerService('FileService', function ($c) {
-            return new FileService( $c->query('SolrService'), $c->query('MiscService'));
+            return new FileService($c->query('SolrService'), $c->query('MiscService'));
         });
         
         $container->registerService('SolrService', function ($c) {
@@ -74,7 +75,7 @@ class Application extends App
         });
         
         $container->registerService('SolrAdminService', function ($c) {
-            return new SolrAdminService($c->query('SolariumClient'), $c->query('ConfigService'), $c->query('MiscService'));
+            return new SolrAdminService($c->query('SolrService'), $c->query('ConfigService'), $c->query('MiscService'));
         });
         
         $container->registerService('IndexMapper', function ($c) {
@@ -135,18 +136,19 @@ class Application extends App
             return \OC::$server->getUserFolder();
         });
         
-        // \OC::$server->getSystemConfig()->getValue('datadirectory', OC::$SERVERROOT . '/data');
-//         $container->registerService('Root', function ($c) {
-//             return \OC::$server->getSystemConfig()
-//                 ->getValue('datadirectory', \OC::$SERVERROOT . '/data');
-//         });
-        
-        $this->getContainer()->registerService('SolariumClient', function ($c) {
+        $container->registerService('SolariumClient', function ($c) {
             $toS = $c->query('ConfigService')
                 ->toSolarium();
             if (! $toS)
                 return false;
             return new \Solarium\Client($toS);
+        });
+        
+        /**
+         * Migration scripts
+         */
+        $container->registerService('OCA\Nextant\Migration\NextantUpgrade', function ($c) {
+            return new NextantUpgrade($c->query('SolrService'), $c->query('SolrAdminService'));
         });
     }
 
@@ -168,8 +170,7 @@ class Application extends App
             'apps' => array(
                 'files'
             )
-        )
-        );
+        ));
     }
 
     public function registerSettingsAdmin()

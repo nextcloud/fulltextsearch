@@ -24,18 +24,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-namespace OCA\Nextant\Install;
-
+namespace OCA\Nextant\Migration;
 
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
 
-class AnnouncementsGroupsLinks implements IRepairStep {
+class NextantUpgrade implements IRepairStep
+{
 
-    /**
-     * @param IDBConnection $connection
-     */
-    public function __construct() {
+    private $solrService;
+
+    private $solrAdmin;
+
+    public function __construct($solrService, $solrAdmin)
+    {
+        $this->solrService = $solrService;
+        $this->solrAdmin = $solrAdmin;
     }
 
     /**
@@ -44,7 +48,8 @@ class AnnouncementsGroupsLinks implements IRepairStep {
      * @return string
      * @since 9.1.0
      */
-    public function getName() {
+    public function getName()
+    {
         return 'Check and update Solr schema';
     }
 
@@ -53,15 +58,11 @@ class AnnouncementsGroupsLinks implements IRepairStep {
      * Must throw exception on error.
      *
      * @since 9.1.0
-     * @param IOutput $output
+     * @param IOutput $output            
      * @throws \Exception in case of failure
      */
-    public function run(IOutput $output) {
-            
-            
-            
-        
-        
+    public function run(IOutput $output)
+    {
+        $this->solrAdmin->checkSchema(true, $error);
     }
-
 }
