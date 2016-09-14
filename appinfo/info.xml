@@ -10,10 +10,12 @@
  **Index your own files and your shared documents and perform fast and precise search** using a Solr Servlet.
 
 _Recognized file format: text, rtf, pdf, html, openoffice, office, ..._
+
+
 	</description>
-	<version>0.4.0</version>
+	<version>0.3.1</version>
 	<licence>agpl</licence>
-	<author mail="maxence@pontapreta.net">Maxence Lange</author>
+	<author>Maxence Lange</author>
 	<types>
 		<filesystem />
 	</types>
