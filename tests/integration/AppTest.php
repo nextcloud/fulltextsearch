@@ -44,7 +44,7 @@ class AppTest extends TestCase
         $this->container = $app->getContainer();
     }
 
-    public function testAppInstalled()
+    public function testAppconfigured()
     {
         $appManager = $this->container->query('OCP\App\IAppManager');
         $this->assertTrue($appManager->isInstalled('nextant'));

@@ -35,12 +35,16 @@ script('nextant', 'settings.admin');
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
+		<?php
+
+if ($_['configured'] == '1') {
+    ?>
 		<tr>
 			<td style="width: 250px; text-align: right;"><label>
 	    <?php p($l->t('Number of documents :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
 			<td><?php ($_['current_docs'] == false) ? p('Solr Servlet is down') : p($_['current_docs']); ?></td>
 		</tr>
-
+<?php } ?>
 		<tr>
 			<td style="text-align: right;"><label for="solr_url">
 	    <?php p($l->t('Address of your Solr Servlet :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
