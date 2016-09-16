@@ -81,9 +81,6 @@ class SearchProvider extends \OCP\Search\Provider
             if ($solrResult == false)
                 return $results;
             
-            if (sizeof($solrResult) > 0)
-                $topScore = $solrResult[0]['score'];
-            
             foreach ($solrResult as $data) {
                 
                 // This is not clean, but right now it is the only descent way I found to display result
@@ -94,7 +91,14 @@ class SearchProvider extends \OCP\Search\Provider
                 $result = new \OC\Search\Result\File($fileData);
                 $result->type = 'nextant';
                 // $result->name = $result->path . ' (Accuracy: ' . round($data['score'] * 100 / $topScore, 2) . '%) ';
-                $result->name = $result->path . ' (Score: ' . round($data['score'], 2) . ') ';
+                
+                $name = '';
+                $name .= ($data['owner'] != $this->userId) ? '[shared] ' : '';
+                $name .= ($data['deleted']) ? '[trashbin] ' : '';
+                $name .= $result->path;
+                $name .= ' (Score: ' . round($data['score'], 2) . ') ';
+                
+                $result->name = $name;
                 $results[] = $result;
             }
         }
