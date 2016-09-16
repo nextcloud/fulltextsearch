@@ -63,39 +63,64 @@ class SolrAdminService
         
         $fields = array();
         array_push($fields, array(
-            'name' => 'nextant_owner',
-            'type' => 'string',
-            'indexed' => true,
-            'stored' => true,
-            'multiValued' => false
+            'type' => 'dynamic-field',
+            'data' => array(
+                'name' => 'nextant_attr_*',
+                'type' => 'text_general',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => true
+            )
         ));
         array_push($fields, array(
-            'name' => 'nextant_mtime',
-            'type' => 'int',
-            'indexed' => true,
-            'stored' => true,
-            'multiValued' => false
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_owner',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
         ));
         array_push($fields, array(
-            'name' => 'nextant_share',
-            'type' => 'string',
-            'indexed' => true,
-            'stored' => true,
-            'multiValued' => true
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_mtime',
+                'type' => 'int',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
         ));
         array_push($fields, array(
-            'name' => 'nextant_sharegroup',
-            'type' => 'string',
-            'indexed' => true,
-            'stored' => true,
-            'multiValued' => true
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_share',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => true
+            )
         ));
         array_push($fields, array(
-            'name' => 'nextant_deleted',
-            'type' => 'boolean',
-            'indexed' => true,
-            'stored' => false,
-            'multiValued' => false
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_sharegroup',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => true
+            )
+        ));
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_deleted',
+                'type' => 'boolean',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
         ));
         
         $this->message('Checking Solr schema fields');
@@ -103,7 +128,7 @@ class SolrAdminService
         $changed = false;
         while (true) {
             foreach ($fields as $field) {
-                $this->message(' * field ' . $field['name'] . ': ', false);
+                $this->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\': ', false);
                 if (self::checkFieldProperty($client, $field, $curr))
                     $this->message('ok.');
                 else {
@@ -111,7 +136,7 @@ class SolrAdminService
                     
                     if ($fix) {
                         $changed = true;
-                        $this->message('   -> Fixing field ' . $field['name']);
+                        $this->message('   -> Fixing ' . $field['type'] . ' \'' . $field['data']['name'] . '\'');
                         if ($curr)
                             self::modifyField($client, $field);
                         else
@@ -126,7 +151,7 @@ class SolrAdminService
         
         if ($changed)
             $this->configService->setAppValue('needed_index', '1');
-            
+        
         $this->configService->setAppValue('configured', '1');
         return true;
     }
@@ -156,25 +181,33 @@ class SolrAdminService
 
     private static function checkFieldProperty($client, $field, &$property)
     {
-        $property = self::getFieldProperty($client, $field['name']);
+        $property = self::getFieldProperty($client, $field['type'], $field['data']['name']);
         if (! $property)
             return false;
         
-        $k = array_keys($field);
+        $k = array_keys($field['data']);
         foreach ($k as $key) {
-            if ($field[$key] != $property[$key])
+            if ($field['data'][$key] != $property[$key])
                 return false;
         }
         
         return true;
     }
 
-    private static function getFieldProperty($client, $fieldName)
+    private static function getFieldProperty($client, $fieldType, $fieldName)
     {
+        $url = '';
+        if ($fieldType == 'field')
+            $url = 'schema/fields/';
+        if ($fieldType == 'dynamic-field')
+            $url = 'schema/dynamicfields/';
+        if ($url == '')
+            return false;
+        
         $query = $client->createSelect();
         $request = $client->createRequest($query);
         
-        $request->setHandler('schema/fields/' . $fieldName);
+        $request->setHandler($url . $fieldName);
         
         $response = $client->executeRequest($request);
         if ($response->getStatusCode() != 200)
@@ -192,7 +225,7 @@ class SolrAdminService
     private static function createField($client, $field)
     {
         $data = array(
-            'add-field' => $field
+            'add-' . $field['type'] => $field['data']
         );
         return self::solariumPostSchemaRequest($client, $data);
     }
@@ -200,16 +233,16 @@ class SolrAdminService
     private static function modifyField($client, $field)
     {
         $data = array(
-            'replace-field' => $field
+            'replace-' . $field['type'] => $field['data']
         );
         return self::solariumPostSchemaRequest($client, $data);
     }
 
-    private static function deleteField($client, $fieldName)
+    private static function deleteField($client, $field)
     {
         $data = array(
-            'delete-field' => array(
-                'name' => $fieldName
+            'delete-' . $field['type'] => array(
+                'name' => $field['data']['name']
             )
         );
         return self::solariumPostSchemaRequest($client, $data);
