@@ -54,11 +54,6 @@ class SolrToolsService
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
         
-        if ($this->owner == '') {
-            $error = self::ERROR_OWNER_NOT_SET;
-            return false;
-        }
-        
         try {
             $client = $this->solrService->getClient();
             $update = $client->createUpdate();
