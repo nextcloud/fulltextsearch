@@ -33,7 +33,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use OCP\IUserManager;
 use OC\Files\Filesystem;
-use OC\ForbiddenException;
 
 class Index extends Base
 {

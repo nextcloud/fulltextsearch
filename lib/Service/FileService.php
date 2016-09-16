@@ -53,11 +53,6 @@ class FileService
         $this->view = Filesystem::getView();
     }
 
-//     public function getRoot()
-//     {
-//         return $this->root;
-//     }
-
     public function setView($view = null)
     {
         if ($view == null)
@@ -65,31 +60,16 @@ class FileService
         $this->view = $view;
     }
 
-    /**
-     * restore file or files if directory
-     *
-     * @param string $path            
-     */
-    public function addFiles($path, $recursive = false, $isRoot = true)
+    public function addFileFromPath($path, $forceExtract = false, &$status = 0)
     {
-        $solrResult = false;
+        if (! $this->view || $this->view == NULL)
+            return false;
         
-        $fileInfos = $this->view->getFileInfo($path);
-        if ($fileInfos->getMimeType() == 'httpd/unix-directory' && $recursive) {
-            $files = $this->view->getDirectoryContent($path);
-            foreach ($files as $file)
-                $this->addFiles($this->view->getPath($file->getId()), true, false);
-        } else {
-            $absolutePath = $this->view->getLocalFile($path);
-            // $this->miscService->log('[Nextant] Add file ' . $absolutePath . ' (' . $fileInfos->getId() . ', ' . $fileInfos->getMimeType() . ')');
-            
-            $solrResult = $this->solrService->extractFile($absolutePath, $fileInfos->getId(), $fileInfos->getMimeType());
-        }
+        $fileInfo = $this->view->getFileInfo($path);
+        if ($fileInfo == null)
+            return false;
         
-        if ($isRoot && $solrResult)
-            $this->updateFiles($fileInfos->getId(), $recursive, null);
-        
-        return $solrResult;
+        return $this->addFile($fileInfo, $forceExtract, $status);
     }
 
     public function addFile($fileInfo, $forceExtract = false, &$status = 0)
@@ -100,27 +80,7 @@ class FileService
         $status = 1;
         return $this->solrService->extractFile($this->view->getLocalFile($fileInfo->getPath()), $fileInfo->getId(), $fileInfo->getMTime(), $fileInfo->getMimeType());
     }
-    
-    // public function updateFiles($fileIds)
-    // {
-    // if (! $this->view || $this->view == NULL)
-    // return false;
-    
-    // if (! is_array($fileIds))
-    // $fileIds = array(
-    // $fileIds
-    // );
-    
-    // $pack = array();
-    // foreach ($fileIds as $fileId) {
-    // $this->miscService->log('___' . $fileId);
-    // $this->view->getPath($fileId);
-    // //array_push($pack, $this->updateFilesFromPath());
-    // }
-    
-    // $solrResult = $this->solrService->updateDocuments($pack);
-    // return $solrResult;
-    // }
+
     public function updateFiles($files, $data = null)
     {
         if (! $this->view || $this->view == NULL)
@@ -229,19 +189,7 @@ class FileService
             $fileId = (int) $info['fileid'];
         return $fileId;
     }
-    
-    // public static function getPath($id, $absolute = false)
-    // {
-    // try {
-    // $view = Filesystem::getView();
-    // if ($absolute)
-    // return $view->getAbsolutePath($view->getPath($id));
-    // else
-    // return $view->getPath($id);
-    // } catch (NotFoundException $e) {
-    // return false;
-    // }
-    // }
+
     public static function getFileInfo($pathorid)
     {
         try {
