@@ -143,6 +143,7 @@ class FileService
     {
         $data = array();
         
+        $data['owner'] = $this->view->getOwner($path);
         $subpath = '';
         $subdirs = explode('/', $path);
         foreach ($subdirs as $subdir) {

@@ -252,6 +252,11 @@ class SolrService
                 $doc = $query->createDocument();
                 $doc->setKey('id', $upd['id']);
                 
+                if (key_exists('owner', $upd)) {
+                    $doc->setField('nextant_owner', $upd['owner']);
+                    $doc->setFieldModifier('nextant_owner', 'set');
+                }
+                
                 if (key_exists('share_users', $upd)) {
                     if (sizeof($upd['share_users']) > 0) {
                         $doc->setField('nextant_share', $upd['share_users']);
