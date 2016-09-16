@@ -331,18 +331,19 @@ class SolrService
                 return false;
             }
             
+            $query->setRows(25);
             $query->setQuery('nextant_attr_text:' . $helper->escapePhrase($string));
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
-            // if ($deleted & self::SEARCH_TRASHBIN_ONLY)
-            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:true');
-            // if ($deleted & self::SEARCH_TRASHBIN_NOT)
-            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:false');
+            // $query->createFilterquery('trashbin')->setQuery('nextant_deleted:false');
             
             $resultset = $client->select($query);
+            
             $return = array();
             foreach ($resultset as $document) {
                 array_push($return, array(
                     'id' => $document->id,
+                    'deleted' => $document->nextant_deleted,
+                    'owner' => $document->nextant_owner,
                     'score' => $document->score
                 ));
             }

@@ -55,9 +55,8 @@ class FilesEvents
      */
     public function onFileCreate($path)
     {
-        // $this->fileService->addFiles($path, true, true);
         $this->fileService->addFileFromPath($path, true);
-        $this->fileService->updateFiles($path);        
+        $this->fileService->updateFiles(FileService::getId($path));
     }
 
     /**
@@ -67,9 +66,8 @@ class FilesEvents
      */
     public function onFileUpdate($path)
     {
-        // $this->fileService->addFiles($path, true, true);
         $this->fileService->addFileFromPath($path, true);
-        $this->fileService->updateFiles($path);        
+        $this->fileService->updateFiles(FileService::getId($path));
     }
 
     /**
@@ -84,13 +82,33 @@ class FilesEvents
     }
 
     /**
+     * onFileTrash()
+     *
+     * @param string $path            
+     */
+    public function onFileTrash($path)
+    {
+        if (\OCP\App::isEnabled('files_trashbin')) {
+            $this->fileService->updateFiles(FileService::getId($path), array(
+                'deleted' => true
+            ));
+        } else {
+            $this->fileService->removeFiles($path);
+        }
+        // $this->fileService->removeFiles($path, true);
+    }
+
+    /**
      * onFileDelete()
      *
      * @param string $path            
      */
     public function onFileDelete($path)
     {
-        $this->fileService->removeFiles($path, true);
+        // fast way to bypass files_trashbin/
+        $this->fileService->setView(new \OC\Files\View('/' . $this->userId));
+        $this->miscService->log('onFileDelete');
+        $this->fileService->removeFiles($path);
     }
 
     /**
@@ -100,7 +118,12 @@ class FilesEvents
      */
     public function onFileRestore($path)
     {
-        $this->fileService->addFiles($path, true, true);
+        $this->miscService->log('onFileRestore');
+        $this->fileService->updateFiles(FileService::getId($path), array(
+            'deleted' => false
+        ));
+        
+        // $this->fileService->addFileFromPath($path);
     }
 
     /**
@@ -122,13 +145,5 @@ class FilesEvents
     {
         $this->fileService->updateFiles($fileId);
     }
-
-    /**
-     * onFileScan
-     *
-     * @param string $path            
-     */
-    public function onFileScan($path)
-    {}
 }
 

@@ -76,14 +76,10 @@ class FileService
         return $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime(), $fileInfo->getMimeType());
     }
 
-    public function updateFiles($files, $data = null)
+    public function updateFiles($files, $options = array(), $isRoot = true)
     {
         if (! $this->view || $this->view == NULL)
             return false;
-        
-        $isRoot = false;
-        if ($data == null)
-            $isRoot = true;
         
         if (! is_array($files))
             $files = array(
@@ -102,12 +98,12 @@ class FileService
             if ($fileInfo->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
                 $subfiles = $this->view->getDirectoryContent($file['path']);
                 foreach ($subfiles as $subfile) {
-                    $result = $this->updateFiles($subfile->getId(), $data);
+                    $result = $this->updateFiles($subfile->getId(), $options, false);
                     $pack = array_merge($pack, $result);
                 }
             } else {
                 $data['id'] = $file['fileid'];
-                array_push($pack, $data);
+                array_push($pack, array_merge($data, $options));
             }
         }
         
@@ -123,17 +119,17 @@ class FileService
      *
      * @param string $path            
      */
-    public function removeFiles($path, $recursive = false)
+    public function removeFiles($path)
     {
         $solrResult = false;
         
-        $fileInfos = $this->view->getFileInfo($path);
-        if ($fileInfos->getMimeType() == 'httpd/unix-directory' && $recursive) {
+        $fileInfo = $this->view->getFileInfo($path);
+        if ($fileInfo->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
             $files = $this->view->getDirectoryContent($path);
             foreach ($files as $file)
                 $this->removeFiles($this->view->getPath($file->getId()), true);
         } else {
-            $solrResult = $this->solrTools->removeDocument($fileInfos->getId());
+            $solrResult = $this->solrTools->removeDocument($fileInfo->getId());
         }
         
         return $solrResult;
@@ -142,8 +138,8 @@ class FileService
     private function getData($path)
     {
         $data = array();
-        
         $data['owner'] = $this->view->getOwner($path);
+        
         $subpath = '';
         $subdirs = explode('/', $path);
         foreach ($subdirs as $subdir) {
