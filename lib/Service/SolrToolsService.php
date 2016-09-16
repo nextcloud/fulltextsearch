@@ -49,6 +49,36 @@ class SolrToolsService
         $this->output = null;
     }
 
+    public function removeDocument($docid, &$error = '')
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+            return false;
+        
+        if ($this->owner == '') {
+            $error = self::ERROR_OWNER_NOT_SET;
+            return false;
+        }
+        
+        try {
+            $client = $this->solrService->getClient();
+            $update = $client->createUpdate();
+            
+            $update->addDeleteById($docid);
+            $update->addCommit();
+            
+            return $client->update($update);
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = SolrClient::EXCEPTION_REMOVE_FAILED;
+            else
+                $error = SolrClient::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = SolrClient::EXCEPTION;
+        }
+        
+        return false;
+    }
+
     public function isDocumentUpToDate($docid, $mtime, &$error = '')
     {
         if (intval($docid) == 0)
@@ -64,7 +94,7 @@ class SolrToolsService
             $query->setQuery('id:' . $docid);
             
             $resultset = $client->select($query);
-                      
+            
             if ($resultset->getNumFound() != 1)
                 return false;
             
@@ -72,14 +102,13 @@ class SolrToolsService
                 if ($mtime == $document->nextant_mtime)
                     return true;
             }
-            
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_SEARCH_FAILED;
+                $error = SolrClient::EXCEPTION_SEARCH_FAILED;
             else
-                $error = self::EXCEPTION_HTTPEXCEPTION;
+                $error = SolrClient::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
-            $error = self::EXCEPTION;
+            $error = SolrClient::EXCEPTION;
         }
         
         return false;

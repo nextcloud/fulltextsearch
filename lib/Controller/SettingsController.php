@@ -41,17 +41,19 @@ class SettingsController extends Controller
 
     private $solrService;
 
+    private $solrTools;
     private $solrAdmin;
 
     private $solr_url;
 
     private $solr_core;
 
-    public function __construct($appName, IRequest $request, ConfigService $configService, $solrService, $solrAdmin, $miscService)
+    public function __construct($appName, IRequest $request, ConfigService $configService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
         parent::__construct($appName, $request);
         $this->configService = $configService;
         $this->solrService = $solrService;
+        $this->solrTools = $solrTools;
         $this->solrAdmin = $solrAdmin;
         $this->miscService = $miscService;
     }
@@ -223,7 +225,7 @@ class SettingsController extends Controller
 
     private function test_delete(&$message)
     {
-        if ($this->solrService->removeDocument('__nextant_test')) {
+        if ($this->solrTools->removeDocument('__nextant_test')) {
             $message = 'Test document deleted';
             return true;
         }

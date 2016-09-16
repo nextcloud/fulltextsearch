@@ -28,8 +28,8 @@ namespace OCA\Nextant\Service;
 
 use OC\Files\Filesystem;
 use OC\Files\View;
-use OCP\Files\NotFoundException;
 use OC\Share\Share;
+use OCP\Files\NotFoundException;
 
 class FileService
 {
@@ -37,17 +37,17 @@ class FileService
     // private $root;
     private $solrService;
 
-    private $solrToolsService;
+    private $solrTools;
 
     private $miscService;
 
     private $view;
 
-    public function __construct($solrService, $solrToolsService, $miscService)
+    public function __construct($solrService, $solrTools, $miscService)
     {
         // $this->root = $root;
         $this->solrService = $solrService;
-        $this->solrToolsService = $solrToolsService;
+        $this->solrTools = $solrTools;
         $this->miscService = $miscService;
         
         $this->view = Filesystem::getView();
@@ -69,16 +69,11 @@ class FileService
         if ($fileInfo == null)
             return false;
         
-        return $this->addFile($fileInfo, $forceExtract, $status);
-    }
-
-    public function addFile($fileInfo, $forceExtract = false, &$status = 0)
-    {
-        if (! $forceExtract && $this->solrToolsService->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime()))
+        if (! $forceExtract && $this->solrTools->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime()))
             return true;
         
         $status = 1;
-        return $this->solrService->extractFile($this->view->getLocalFile($fileInfo->getPath()), $fileInfo->getId(), $fileInfo->getMTime(), $fileInfo->getMimeType());
+        return $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime(), $fileInfo->getMimeType());
     }
 
     public function updateFiles($files, $data = null)
@@ -92,8 +87,10 @@ class FileService
         
         if (! is_array($files))
             $files = array(
-                'fileid' => $files,
-                'path' => $this->view->getPath($files)
+                0 => array(
+                    'fileid' => $files,
+                    'path' => $this->view->getPath($files)
+                )
             );
         
         $pack = array();
@@ -136,7 +133,7 @@ class FileService
             foreach ($files as $file)
                 $this->removeFiles($this->view->getPath($file->getId()), true);
         } else {
-            $solrResult = $this->solrService->removeDocument($fileInfos->getId());
+            $solrResult = $this->solrTools->removeDocument($fileInfos->getId());
         }
         
         return $solrResult;
@@ -187,6 +184,7 @@ class FileService
         $info = Filesystem::getFileInfo($path);
         if ($info !== false)
             $fileId = (int) $info['fileid'];
+        
         return $fileId;
     }
 
