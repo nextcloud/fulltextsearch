@@ -136,6 +136,11 @@ class Application extends App
             return \OC::$server->getUserFolder();
         });
         
+        $container->registerService('RootFolder', function ($c) {
+            return $c->getServer()
+                ->getRootFolder();
+        });
+        
         $container->registerService('SolariumClient', function ($c) {
             $toS = $c->query('ConfigService')
                 ->toSolarium();
@@ -154,7 +159,6 @@ class Application extends App
 
     public function registerFilesHooks()
     {
-        // not working: post_unshare
         Util::connectHook('OC_Filesystem', 'post_create', '\OCA\Nextant\Hooks\FilesHooks', 'fileCreated');
         Util::connectHook('OC_Filesystem', 'post_update', '\OCA\Nextant\Hooks\FilesHooks', 'fileUpdated');
         Util::connectHook('OC_Filesystem', 'post_rename', '\OCA\Nextant\Hooks\FilesHooks', 'fileRenamed');

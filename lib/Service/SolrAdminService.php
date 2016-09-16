@@ -70,6 +70,13 @@ class SolrAdminService
             'multiValued' => false
         ));
         array_push($fields, array(
+            'name' => 'nextant_mtime',
+            'type' => 'int',
+            'indexed' => true,
+            'stored' => true,
+            'multiValued' => false
+        ));
+        array_push($fields, array(
             'name' => 'nextant_share',
             'type' => 'string',
             'indexed' => true,

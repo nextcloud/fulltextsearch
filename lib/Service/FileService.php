@@ -33,19 +33,21 @@ use OC\Share\Share;
 
 class FileService
 {
-
-//    private $root;
-
+    
+    // private $root;
     private $solrService;
+
+    private $solrToolsService;
 
     private $miscService;
 
     private $view;
 
-    public function __construct($solrService, $miscService)
+    public function __construct($solrService, $solrToolsService, $miscService)
     {
-//        $this->root = $root;
+        // $this->root = $root;
         $this->solrService = $solrService;
+        $this->solrToolsService = $solrToolsService;
         $this->miscService = $miscService;
         
         $this->view = Filesystem::getView();
@@ -90,27 +92,66 @@ class FileService
         return $solrResult;
     }
 
-    public function updateFiles($fileId, $recursive = false, $data = null)
+    public function addFile($fileInfo, $forceExtract = false, &$status = 0)
     {
+        if (! $forceExtract && $this->solrToolsService->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime()))
+            return true;
+        
+        $status = 1;
+        return $this->solrService->extractFile($this->view->getLocalFile($fileInfo->getPath()), $fileInfo->getId(), $fileInfo->getMTime(), $fileInfo->getMimeType());
+    }
+    
+    // public function updateFiles($fileIds)
+    // {
+    // if (! $this->view || $this->view == NULL)
+    // return false;
+    
+    // if (! is_array($fileIds))
+    // $fileIds = array(
+    // $fileIds
+    // );
+    
+    // $pack = array();
+    // foreach ($fileIds as $fileId) {
+    // $this->miscService->log('___' . $fileId);
+    // $this->view->getPath($fileId);
+    // //array_push($pack, $this->updateFilesFromPath());
+    // }
+    
+    // $solrResult = $this->solrService->updateDocuments($pack);
+    // return $solrResult;
+    // }
+    public function updateFiles($files, $data = null)
+    {
+        if (! $this->view || $this->view == NULL)
+            return false;
+        
         $isRoot = false;
         if ($data == null)
             $isRoot = true;
         
-        $path = $this->view->getPath($fileId);
-        
-        $fileInfos = $this->view->getFileInfo($path);
-        $data = $this->getData($path);
+        if (! is_array($files))
+            $files = array(
+                'fileid' => $files,
+                'path' => $this->view->getPath($files)
+            );
         
         $pack = array();
-        if ($fileInfos->getMimeType() == 'httpd/unix-directory' && $recursive) {
-            $files = $this->view->getDirectoryContent($path);
-            foreach ($files as $file) {
-                $result = $this->updateFiles($file->getId(), true, $data);
-                $pack = array_merge($pack, $result);
+        foreach ($files as $file) {
+            
+            $fileInfo = $this->view->getFileInfo($file['path']);
+            $data = $this->getData($file['path']);
+            
+            if ($fileInfo->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
+                $subfiles = $this->view->getDirectoryContent($file['path']);
+                foreach ($subfiles as $subfile) {
+                    $result = $this->updateFiles($subfile->getId(), $data);
+                    $pack = array_merge($pack, $result);
+                }
+            } else {
+                $data['id'] = $file['fileid'];
+                array_push($pack, $data);
             }
-        } else {
-            $data['id'] = $fileId;
-            array_push($pack, $data);
         }
         
         if (! $isRoot)
@@ -188,20 +229,19 @@ class FileService
             $fileId = (int) $info['fileid'];
         return $fileId;
     }
-
-//     public static function getPath($id, $absolute = false)
-//     {
-//         try {
-//             $view = Filesystem::getView();
-//             if ($absolute)
-//                 return $view->getAbsolutePath($view->getPath($id));
-//             else
-//                 return $view->getPath($id);
-//         } catch (NotFoundException $e) {
-//             return false;
-//         }
-//     }
-
+    
+    // public static function getPath($id, $absolute = false)
+    // {
+    // try {
+    // $view = Filesystem::getView();
+    // if ($absolute)
+    // return $view->getAbsolutePath($view->getPath($id));
+    // else
+    // return $view->getPath($id);
+    // } catch (NotFoundException $e) {
+    // return false;
+    // }
+    // }
     public static function getFileInfo($pathorid)
     {
         try {
@@ -216,13 +256,12 @@ class FileService
             return false;
         }
     }
-
-//     public static function getAbsolutePath($path, $root = false)
-//     {
-//         $view = Filesystem::getView();
-//         return $view->getAbsolutePath($path);
-//     }
-
+    
+    // public static function getAbsolutePath($path, $root = false)
+    // {
+    // $view = Filesystem::getView();
+    // return $view->getAbsolutePath($path);
+    // }
     public static function getBaseTypeFromMime($mimetype)
     {
         return substr($mimetype, 0, strpos($mimetype, '/'));

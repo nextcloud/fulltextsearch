@@ -127,25 +127,25 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($path, $docid, $mimetype, &$error = '')
+    public function extractFile($path, $docid, $mtime, $mimetype, &$error = '')
     {
         if (! $this->configured())
             return false;
         
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
         }
         
         switch ($mimetype) {
             case 'application/epub+zip':
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
             
             case 'application/pdf':
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
             
             case 'application/rtf':
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
         }
         
         $acceptedMimeType = array(
@@ -161,7 +161,7 @@ class SolrService
         
         foreach ($acceptedMimeType['vnd'] as $mt) {
             if (substr($mimetype, 0, strlen($mt)) == $mt)
-                return $this->extractSimpleTextFile($path, $docid, $error);
+                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
         }
         
         return false;
@@ -173,7 +173,7 @@ class SolrService
      * @param string $path            
      * @param int $docid            
      */
-    public function extractSimpleTextFile($path, $docid, &$error)
+    public function extractSimpleTextFile($path, $docid, $mtime, &$error)
     {
         if (! $this->configured())
             return false;
@@ -202,6 +202,7 @@ class SolrService
             $doc = $query->createDocument();
             $doc->id = $docid;
             $doc->nextant_owner = $this->owner;
+            $doc->nextant_mtime = $mtime;
             
             $query->setDocument($doc);
             
