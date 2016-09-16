@@ -80,7 +80,7 @@ class FilesEvents
      */
     public function onFileRename($target)
     {
-        $this->fileService->updateFiles(FileService::getId($target), true);
+        $this->fileService->updateFiles(FileService::getId($target));
     }
 
     /**

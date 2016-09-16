@@ -36,6 +36,7 @@ use \OCA\Nextant\Service\MiscService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\SolrAdminService;
+use \OCA\Nextant\Service\SolrToolsService;
 use \OCA\Nextant\Migration\NextantUpgrade;
 use OCP\AppFramework\App;
 use OCP\Util;
@@ -67,7 +68,7 @@ class Application extends App
         });
         
         $container->registerService('FileService', function ($c) {
-            return new FileService($c->query('SolrService'), $c->query('MiscService'));
+            return new FileService($c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
         });
         
         $container->registerService('SolrService', function ($c) {
@@ -76,6 +77,10 @@ class Application extends App
         
         $container->registerService('SolrAdminService', function ($c) {
             return new SolrAdminService($c->query('SolrService'), $c->query('ConfigService'), $c->query('MiscService'));
+        });
+        
+        $container->registerService('SolrToolsService', function ($c) {
+            return new SolrToolsService($c->query('SolrService'), $c->query('ConfigService'), $c->query('MiscService'));
         });
         
         $container->registerService('IndexMapper', function ($c) {
