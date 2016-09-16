@@ -36,6 +36,7 @@ use \OCA\Nextant\Service\MiscService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\SolrAdminService;
+use \OCA\Nextant\Service\SolrToolsService;
 use \OCA\Nextant\Migration\NextantUpgrade;
 use OCP\AppFramework\App;
 use OCP\Util;
@@ -67,7 +68,7 @@ class Application extends App
         });
         
         $container->registerService('FileService', function ($c) {
-            return new FileService($c->query('SolrService'), $c->query('MiscService'));
+            return new FileService($c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
         });
         
         $container->registerService('SolrService', function ($c) {
@@ -76,6 +77,10 @@ class Application extends App
         
         $container->registerService('SolrAdminService', function ($c) {
             return new SolrAdminService($c->query('SolrService'), $c->query('ConfigService'), $c->query('MiscService'));
+        });
+        
+        $container->registerService('SolrToolsService', function ($c) {
+            return new SolrToolsService($c->query('SolrService'), $c->query('ConfigService'), $c->query('MiscService'));
         });
         
         $container->registerService('IndexMapper', function ($c) {
@@ -95,7 +100,7 @@ class Application extends App
         // });
         
         $container->registerService('SettingsController', function ($c) {
-            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrAdminService'), $c->query('MiscService'));
+            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
         });
         
         /**
@@ -136,6 +141,11 @@ class Application extends App
             return \OC::$server->getUserFolder();
         });
         
+        $container->registerService('RootFolder', function ($c) {
+            return $c->getServer()
+                ->getRootFolder();
+        });
+        
         $container->registerService('SolariumClient', function ($c) {
             $toS = $c->query('ConfigService')
                 ->toSolarium();
@@ -154,12 +164,12 @@ class Application extends App
 
     public function registerFilesHooks()
     {
-        // not working: post_unshare
         Util::connectHook('OC_Filesystem', 'post_create', '\OCA\Nextant\Hooks\FilesHooks', 'fileCreated');
         Util::connectHook('OC_Filesystem', 'post_update', '\OCA\Nextant\Hooks\FilesHooks', 'fileUpdated');
         Util::connectHook('OC_Filesystem', 'post_rename', '\OCA\Nextant\Hooks\FilesHooks', 'fileRenamed');
-        Util::connectHook('OC_Filesystem', 'delete', '\OCA\Nextant\Hooks\FilesHooks', 'fileDeleted');
+        Util::connectHook('OC_Filesystem', 'delete', '\OCA\Nextant\Hooks\FilesHooks', 'fileTrashed');
         Util::connectHook('\OCA\Files_Trashbin\Trashbin', 'post_restore', '\OCA\Nextant\Hooks\FilesHooks', 'fileRestored');
+        Util::connectHook('\OCP\Trashbin', 'delete', '\OCA\Nextant\Hooks\FilesHooks', 'fileDeleted');
         Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
         Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
     }

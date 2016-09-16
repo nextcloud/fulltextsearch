@@ -26,6 +26,7 @@
  */
 namespace OCA\Nextant\Command;
 
+use \OCA\Nextant\Service\SolrService;
 use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,30 +34,26 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use OCP\IUserManager;
 use OC\Files\Filesystem;
-use OC\ForbiddenException;
 
 class Index extends Base
 {
 
     private $userManager;
-    
-    // private $userFolder;
+
+    private $rootFolder;
+
     private $solrService;
 
     private $configService;
 
     private $fileService;
 
-    private $filesExtracted;
-
-    private $filesTotal;
-
-    public function __construct(IUserManager $userManager, $userFolder, $solrService, $configService, $fileService)
+    public function __construct(IUserManager $userManager, $rootFolder, $solrService, $configService, $fileService)
     {
         parent::__construct();
         $this->userManager = $userManager;
+        $this->rootFolder = $rootFolder;
         $this->solrService = $solrService;
-        // $this->userFolder = $userFolder;
         $this->configService = $configService;
         $this->fileService = $fileService;
     }
@@ -74,11 +71,15 @@ class Index extends Base
             return;
         }
         
-        $output->writeln('This might take a while ...');
+        $this->solrService->setOutput($output);
+        
+        // extract files
+        $output->writeln('* Extracting new files to Solr:');
         
         $users = $this->userManager->search('');
         $usersTotal = sizeof($users);
         $usersCurrent = 0;
+        $extractedDocuments = array();
         foreach ($users as $user) {
             $usersCurrent ++;
             
@@ -86,52 +87,119 @@ class Index extends Base
                 break;
             
             $userId = $user->getUID();
-            $output->writeln('Indexing files from <info>' . $userId . '</info> (' . $usersCurrent . '/' . $usersTotal . ')');
-            
             $this->solrService->setOwner($userId);
-            $result = $this->indexFiles($userId, $output);
-            $output->writeln(' > extracted files: ' . $result['extracted'] . '/' . $result['total'] . '');
+            
+            $output->write('[' . $usersCurrent . '/' . $usersTotal . '] <info>' . $userId . '</info>: ');
+            
+            $result = $this->browseUserDirectory($userId, $output);
+            
+            if ($result['total'] > 0) {
+                $output->writeln('  (processed: ' . $result['processed'] . ' - extracted: ' . $result['extracted'] . '/' . $result['total'] . ')');
+                
+                array_push($extractedDocuments, array(
+                    'userid' => $userId,
+                    'files' => $result['files']
+                ));
+            } else
+                $output->writeln(' empty folder');
         }
+        
+        // update Documents
+        $output->writeln('');
+        $output->writeln('* Updating documents status');
+        $usersTotal = sizeof($extractedDocuments);
+        $usersCurrent = 0;
+        foreach ($extractedDocuments as $doc) {
+            $usersCurrent ++;
+            
+            $fileIds = $doc['files'];
+            $userId = $doc['userid'];
+            $this->solrService->setOwner($userId);
+            
+            $output->write('[' . $usersCurrent . '/' . $usersTotal . '] <info>' . $userId . '</info>: ');
+            
+            if ($this->updateUserDocuments($userId, $fileIds))
+                $output->writeln(' ok');
+            else
+                $output->writeln(' fail');
+            
+            $usersCurrent ++;
+        }
+        
+        Filesystem::tearDown();
         
         $this->configService->setAppValue('needed_index', '0');
     }
 
-    private function indexFiles($userId, $output)
+    private function browseUserDirectory($userId, $output)
     {
-        /**
-         * Right now, the easiest way to scan the files is using the Utils\Scanner ...
-         */
-        $scanner = new \OC\Files\Utils\Scanner($userId, \OC::$server->getDatabaseConnection(), \OC::$server->getLogger());
-        
-        $this->filesTotal = 0;
-        $this->filesExtracted = 0;
-        $scanner->listen('\OC\Files\Utils\Scanner', 'scanFile', function ($path) use ($output) {
-            if ($this->hasBeenInterrupted())
-                throw new \Exception('ctrl-c');
-            
-            $this->filesTotal ++;
-            if ($this->fileService->addFiles($path, false) !== false)
-                $this->filesExtracted ++;
-        });
-        
-        $path = '/' . $userId . '/files/';
-        
         Filesystem::tearDown();
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
         
-        try {
-            $scanner->scan($path);
-        } catch (ForbiddenException $e) {
-            // Because we are using the Scanner from Files, let's catch some exception the same way :/
-            $output->writeln('<error>Home storage for user ' . $userId . ' not writable</error>');
-            $output->writeln('Make sure you are running the scan command only as the user the web server runs as');
+        $userFolder = $this->rootFolder->getUserFolder($userId);
+        
+        $folder = $userFolder->get('/');
+        $files = $folder->search('');
+        
+        $nb_tick = 30;
+        $t = floor(sizeof($files) / $nb_tick);
+        $size_tick = ($t > 0) ? $t : 1;
+        
+        $i = 0;
+        
+        $filesProcessed = 0;
+        $fileIds = array();
+        foreach ($files as $file) {
+            if ($this->hasBeenInterrupted()) {
+                $output->writeln('');
+                $output->writeln('processed: ' . $filesProcessed . ' (' . sizeof($fileIds). '/' . sizeof($files) . ')');
+                
+                throw new \Exception('ctrl-c');
+            }
+            
+            $i ++;
+            if ($i % $size_tick == 0) {
+                $output->write('.');
+            }
+            if (! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) {
+                $forceExtract = false;
+                $status = 0;
+                if ($this->fileService->addFileFromPath($file->getPath(), $forceExtract, $status)) {
+                    array_push($fileIds, array(
+                        'fileid' => $file->getId(),
+                        'path' => $file->getPath()
+                    ));
+                    $filesProcessed += $status;
+                }
+            }
+            
+            if ((($filesProcessed + 1) % SolrService::EXTRACT_CHUNK_SIZE) == 0) {
+                $output->write('s');
+                sleep(5);
+            }
         }
         
         return array(
-            'extracted' => $this->filesExtracted,
-            'total' => $this->filesTotal
+            'extracted' => sizeof($fileIds),
+            'processed' => $filesProcessed,
+            'total' => sizeof($files),
+            'files' => $fileIds
         );
+    }
+
+    private function updateUserDocuments($userId, $fileIds)
+    {
+        Filesystem::tearDown();
+        Filesystem::init($userId, '');
+        $this->fileService->setView(Filesystem::getView());
+        
+        $result = $this->fileService->updateFiles($fileIds);
+        
+        if (! $result)
+            return false;
+        
+        return true;
     }
 }
 

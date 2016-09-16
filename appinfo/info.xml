@@ -7,13 +7,13 @@
 	<description>
 	One to enable a Full-Text Search within your cloud.
 
- **Index your own files and your shared documents and perform fast and precise search** using a Solr Servlet.
+ Index your own files and your shared documents and perform fast and precise search using a Solr Servlet.
 
 _Recognized file format: text, rtf, pdf, html, openoffice, office, ..._
 
 
 	</description>
-	<version>0.3.1</version>
+	<version>0.3.2</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<types>

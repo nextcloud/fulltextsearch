@@ -75,6 +75,16 @@ class FilesHooks
     }
 
     /**
+     * hook event: file is sent to trashbin
+     *
+     * @param array $params            
+     */
+    public static function fileTrashed($params)
+    {
+        self::getController()->onFileTrash($params['path']);
+    }
+
+    /**
      * hook event: file is deleted
      *
      * @param array $params            
