@@ -193,7 +193,8 @@ class SolrService
             
             $query = $client->createExtract();
             $query->addFieldMapping('content', 'text');
-            $query->setUprefix('attr_');
+            $query->setUprefix('nextant_attr_');
+            
             $query->setFile($path);
             $query->setCommit(true);
             $query->setOmitHeader(false);
@@ -303,28 +304,48 @@ class SolrService
         return false;
     }
 
-    public function removeDocument($docid, &$error = '')
+    public function search($string, &$error = '')
     {
         if (! $this->configured())
             return false;
+        
         if ($this->getClient() == false)
             return false;
-        if ($this->owner == '') {
-            $error = self::ERROR_OWNER_NOT_SET;
-            return false;
-        }
         
         try {
             $client = $this->getClient();
-            $update = $client->createUpdate();
+            $query = $client->createSelect();
             
-            $update->addDeleteById($docid);
-            $update->addCommit();
+            $helper = $query->getHelper();
+            $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $helper, $error);
+            if ($ownerQuery === false)
+                return false;
             
-            return $client->update($update);
+            if ($ownerQuery == '') {
+                $error = self::ERROR_TOOWIDE_SEARCH;
+                return false;
+            }
+            
+            $query->setQuery('nextant_attr_text:' . $helper->escapePhrase($string));
+            $query->createFilterQuery('owner')->setQuery($ownerQuery);
+            // if ($deleted & self::SEARCH_TRASHBIN_ONLY)
+            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:true');
+            // if ($deleted & self::SEARCH_TRASHBIN_NOT)
+            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:false');
+            
+            $resultset = $client->select($query);
+            $return = array();
+            foreach ($resultset as $document) {
+                array_push($return, array(
+                    'id' => $document->id,
+                    'score' => $document->score
+                ));
+            }
+            
+            return $return;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_REMOVE_FAILED;
+                $error = self::EXCEPTION_SEARCH_FAILED;
             else
                 $error = self::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
@@ -367,58 +388,6 @@ class SolrService
         }
         
         return $ownerQuery;
-    }
-
-    public function search($string, &$error = '')
-    {
-        if (! $this->configured())
-            return false;
-        
-        if ($this->getClient() == false)
-            return false;
-        
-        try {
-            $client = $this->getClient();
-            $query = $client->createSelect();
-            
-            $helper = $query->getHelper();
-            $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $helper, $error);
-            if ($ownerQuery === false)
-                return false;
-            
-            if ($ownerQuery == '') {
-                $error = self::ERROR_TOOWIDE_SEARCH;
-                return false;
-            }
-            
-            $query->setQuery('attr_text:' . $helper->escapePhrase($string));
-            $query->createFilterQuery('owner')->setQuery($ownerQuery);
-            // if ($deleted & self::SEARCH_TRASHBIN_ONLY)
-            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:true');
-            // if ($deleted & self::SEARCH_TRASHBIN_NOT)
-            // $query->createFilterQuery('deleted')->setQuery('nextant_deleted:false');
-            
-            $resultset = $client->select($query);
-            
-            $return = array();
-            foreach ($resultset as $document) {
-                array_push($return, array(
-                    'id' => $document->id,
-                    'score' => $document->score
-                ));
-            }
-            
-            return $return;
-        } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_SEARCH_FAILED;
-            else
-                $error = self::EXCEPTION_HTTPEXCEPTION;
-        } catch (\Solarium\Exception $e) {
-            $error = self::EXCEPTION;
-        }
-        
-        return false;
     }
 }
     
