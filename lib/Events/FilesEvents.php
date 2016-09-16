@@ -107,7 +107,6 @@ class FilesEvents
     {
         // fast way to bypass files_trashbin/
         $this->fileService->setView(new \OC\Files\View('/' . $this->userId));
-        $this->miscService->log('onFileDelete');
         $this->fileService->removeFiles($path);
     }
 
@@ -118,7 +117,6 @@ class FilesEvents
      */
     public function onFileRestore($path)
     {
-        $this->miscService->log('onFileRestore');
         $this->fileService->updateFiles(FileService::getId($path), array(
             'deleted' => false
         ));

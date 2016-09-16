@@ -26,6 +26,7 @@
  */
 namespace OCA\Nextant\Command;
 
+use \OCA\Nextant\Service\SolrService;
 use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -69,6 +70,8 @@ class Index extends Base
             $output->writeln('Nextant is not yet configured');
             return;
         }
+        
+        $this->solrService->setOutput($output);
         
         // extract files
         $output->writeln('* Extracting new files to Solr:');
@@ -115,10 +118,12 @@ class Index extends Base
             
             $output->write('[' . $usersCurrent . '/' . $usersTotal . '] <info>' . $userId . '</info>: ');
             
-            $this->updateUserDocuments($userId, $fileIds);
-            $usersCurrent ++;
+            if ($this->updateUserDocuments($userId, $fileIds))
+                $output->writeln(' ok');
+            else
+                $output->writeln(' fail');
             
-            $output->writeln('');
+            $usersCurrent ++;
         }
         
         Filesystem::tearDown();
@@ -143,20 +148,23 @@ class Index extends Base
         
         $i = 0;
         
-        $filesTotal = 0;
         $filesProcessed = 0;
         $fileIds = array();
         foreach ($files as $file) {
-            if ($this->hasBeenInterrupted())
+            if ($this->hasBeenInterrupted()) {
+                $output->writeln('');
+                $output->writeln('processed: ' . $filesProcessed . ' (' . sizeof($fileIds). '/' . sizeof($files) . ')');
+                
                 throw new \Exception('ctrl-c');
+            }
             
             $i ++;
             if ($i % $size_tick == 0) {
                 $output->write('.');
             }
-            $filesTotal ++;
             if (! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) {
                 $forceExtract = false;
+                $status = 0;
                 if ($this->fileService->addFileFromPath($file->getPath(), $forceExtract, $status)) {
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
@@ -165,12 +173,17 @@ class Index extends Base
                     $filesProcessed += $status;
                 }
             }
+            
+            if ((($filesProcessed + 1) % SolrService::EXTRACT_CHUNK_SIZE) == 0) {
+                $output->write('s');
+                sleep(5);
+            }
         }
         
         return array(
             'extracted' => sizeof($fileIds),
             'processed' => $filesProcessed,
-            'total' => $filesTotal,
+            'total' => sizeof($files),
             'files' => $fileIds
         );
     }
@@ -182,6 +195,11 @@ class Index extends Base
         $this->fileService->setView(Filesystem::getView());
         
         $result = $this->fileService->updateFiles($fileIds);
+        
+        if (! $result)
+            return false;
+        
+        return true;
     }
 }
 

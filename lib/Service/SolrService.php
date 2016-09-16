@@ -29,6 +29,10 @@ use \OCA\Nextant\Service\FileService;
 
 class SolrService
 {
+
+    const EXTRACT_CHUNK_SIZE = 1000;
+
+    const UPDATE_CHUNK_SIZE = 1000;
     
     // Owner is not set - mostly a developper mistake
     const ERROR_OWNER_NOT_SET = 4;
@@ -76,11 +80,18 @@ class SolrService
 
     private $configured = false;
 
+    private $output = null;
+
     public function __construct($client, $configService, $miscService)
     {
         $this->solariumClient = $client;
         $this->configService = $configService;
         $this->miscService = $miscService;
+    }
+
+    public function setOutput(&$output)
+    {
+        $this->output = $output;
     }
 
     public function configured()
@@ -238,65 +249,73 @@ class SolrService
         }
         
         try {
+            
             $client = $this->getClient();
             
-            $query = $client->createUpdate();
-            
-            // add document
-            
-            $docs = array();
-            foreach ($data as $upd) {
-                // if (! key_exists('id', $upd))
-                // continue;
+            $cycle = array_chunk($data, self::UPDATE_CHUNK_SIZE);
+            foreach ($cycle as $batch) {
                 
-                $doc = $query->createDocument();
-                $doc->setKey('id', $upd['id']);
+                $query = $client->createUpdate();
                 
-                if (key_exists('owner', $upd)) {
-                    $doc->setField('nextant_owner', $upd['owner']);
-                    $doc->setFieldModifier('nextant_owner', 'set');
-                }
+                // add document
                 
-                if (key_exists('share_users', $upd)) {
-                    if (sizeof($upd['share_users']) > 0) {
-                        $doc->setField('nextant_share', $upd['share_users']);
-                        $doc->setFieldModifier('nextant_share', 'set');
-                    } else {
-                        $doc->setField('nextant_share', array(
-                            ''
-                        ));
-                        // not working
-                        // $doc->setFieldModifier('nextant_share', 'remove');
-                        $doc->setFieldModifier('nextant_share', 'set');
+                $docs = array();
+                foreach ($batch as $upd) {
+                    // if (! key_exists('id', $upd))
+                    // continue;
+                    
+                    $doc = $query->createDocument();
+                    $doc->setKey('id', $upd['id']);
+                    
+                    if (key_exists('owner', $upd)) {
+                        $doc->setField('nextant_owner', $upd['owner']);
+                        $doc->setFieldModifier('nextant_owner', 'set');
                     }
-                }
-                
-                if (key_exists('share_groups', $upd)) {
-                    if (sizeof($upd['share_groups']) > 0) {
-                        $doc->setField('nextant_sharegroup', $upd['share_groups']);
-                        $doc->setFieldModifier('nextant_sharegroup', 'set');
-                    } else {
-                        $doc->setField('nextant_sharegroup', array(
-                            ''
-                        ));
-                        // not working
-                        // $doc->setFieldModifier('nextant_sharegroup', 'remove');
-                        $doc->setFieldModifier('nextant_sharegroup', 'set');
+                    
+                    if (key_exists('share_users', $upd)) {
+                        if (sizeof($upd['share_users']) > 0) {
+                            $doc->setField('nextant_share', $upd['share_users']);
+                            $doc->setFieldModifier('nextant_share', 'set');
+                        } else {
+                            $doc->setField('nextant_share', array(
+                                ''
+                            ));
+                            // not working
+                            // $doc->setFieldModifier('nextant_share', 'remove');
+                            $doc->setFieldModifier('nextant_share', 'set');
+                        }
                     }
+                    
+                    if (key_exists('share_groups', $upd)) {
+                        if (sizeof($upd['share_groups']) > 0) {
+                            $doc->setField('nextant_sharegroup', $upd['share_groups']);
+                            $doc->setFieldModifier('nextant_sharegroup', 'set');
+                        } else {
+                            $doc->setField('nextant_sharegroup', array(
+                                ''
+                            ));
+                            // not working
+                            // $doc->setFieldModifier('nextant_sharegroup', 'remove');
+                            $doc->setFieldModifier('nextant_sharegroup', 'set');
+                        }
+                    }
+                    
+                    if (key_exists('deleted', $upd)) {
+                        $doc->setField('nextant_deleted', ($upd['deleted']) ? 'true' : 'false');
+                        $doc->setFieldModifier('nextant_deleted', 'set');
+                    }
+                    
+                    array_push($docs, $doc);
                 }
                 
-                if (key_exists('deleted', $upd)) {
-                    $doc->setField('nextant_deleted', ($upd['deleted']) ? 'true' : 'false');
-                    $doc->setFieldModifier('nextant_deleted', 'set');
-                }
+                $this->message('.', false);
                 
-                array_push($docs, $doc);
+                $query->addDocuments($docs)->addCommit();
+                if (! $client->update($query))
+                    return false;
             }
             
-            $query->addDocuments($docs)->addCommit();
-            $ret = $client->update($query);
-            
-            return $ret;
+            return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_UPDATE_FIELD_FAILED;
@@ -394,6 +413,17 @@ class SolrService
         }
         
         return $ownerQuery;
+    }
+
+    public function message($line, $newline = true)
+    {
+        if ($this->output != null) {
+            if ($newline)
+                $this->output->writeln($line);
+            else
+                $this->output->write($line);
+        } else
+            $this->lastMessage = $line;
     }
 }
     

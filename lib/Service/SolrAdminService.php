@@ -36,8 +36,6 @@ class SolrAdminService
 
     private $miscService;
 
-    private $output;
-
     private $lastMessage;
 
     public function __construct($solrService, $configService, $miscService)
@@ -46,12 +44,6 @@ class SolrAdminService
         $this->solrService = $solrService;
         $this->configService = $configService;
         $this->miscService = $miscService;
-        $this->output = null;
-    }
-
-    public function setOutput(&$output)
-    {
-        $this->output = $output;
     }
 
     public function checkSchema($fix = false, &$error = '')
@@ -123,20 +115,20 @@ class SolrAdminService
             )
         ));
         
-        $this->message('Checking Solr schema fields');
+        $this->solrService->message('Checking Solr schema fields');
         
         $changed = false;
         while (true) {
             foreach ($fields as $field) {
-                $this->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\': ', false);
+                $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\': ', false);
                 if (self::checkFieldProperty($client, $field, $curr))
-                    $this->message('ok.');
+                    $this->solrService->message('ok.');
                 else {
-                    $this->message('fail. ');
+                    $this->solrService->message('fail. ');
                     
                     if ($fix) {
                         $changed = true;
-                        $this->message('   -> Fixing ' . $field['type'] . ' \'' . $field['data']['name'] . '\'');
+                        $this->solrService->message('   -> Fixing ' . $field['type'] . ' \'' . $field['data']['name'] . '\'');
                         if ($curr)
                             self::modifyField($client, $field);
                         else
@@ -327,17 +319,6 @@ class SolrAdminService
         }
         
         return false;
-    }
-
-    private function message($line, $newline = true)
-    {
-        if ($this->output != null) {
-            if ($newline)
-                $this->output->writeln($line);
-            else
-                $this->output->write($line);
-        } else
-            $this->lastMessage = $line;
     }
 }
     
