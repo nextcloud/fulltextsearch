@@ -25,6 +25,7 @@
  */
 namespace OCA\Nextant\Service;
 
+use \OCA\Nextant\Service\SolrService;
 use Solarium\Core\Client\Request;
 
 class SolrToolsService
@@ -64,11 +65,11 @@ class SolrToolsService
             return $client->update($update);
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrClient::EXCEPTION_REMOVE_FAILED;
+                $error = SolrService::EXCEPTION_REMOVE_FAILED;
             else
-                $error = SolrClient::EXCEPTION_HTTPEXCEPTION;
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
-            $error = SolrClient::EXCEPTION;
+            $error = SolrService::EXCEPTION;
         }
         
         return false;
@@ -99,11 +100,11 @@ class SolrToolsService
             }
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrClient::EXCEPTION_SEARCH_FAILED;
+                $error = SolrService::EXCEPTION_SEARCH_FAILED;
             else
-                $error = SolrClient::EXCEPTION_HTTPEXCEPTION;
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
-            $error = SolrClient::EXCEPTION;
+            $error = SolrService::EXCEPTION;
         }
         
         return false;
