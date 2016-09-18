@@ -124,6 +124,18 @@ class SolrService
         return $this->solariumClient;
     }
 
+    public function getAdminClient()
+    {
+        if (! $this->solariumClient)
+            return false;
+        if (! $this->configured)
+            return false;
+        
+        $options = $this->solariumClient->getOptions();
+        unset($options['endpoint']['localhost']['core']);
+        return new \Solarium\Client($options);
+    }
+
     public function setOwner($owner, $groups = array())
     {
         $this->owner = $owner;
