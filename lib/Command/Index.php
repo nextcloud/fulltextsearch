@@ -67,9 +67,8 @@ class Index extends Base
     protected function configure()
     {
         parent::configure();
-        $this->setName('nextant:index')
-            ->setDescription('scan users\' files, generate and index Solr documents')
-            ->addOption('debug', 'd', InputOption::VALUE_REQUIRED, 'Generate a complete log file named nextant.txt at the root of your cloud. You will need to specify a userId (ie. --debug=admin)');
+        $this->setName('nextant:index')->setDescription('scan users\' files, generate and index Solr documents');
+        // ->addOption('debug', 'd', InputOption::VALUE_REQUIRED, 'Generate a complete log file named nextant.txt at the root of your cloud. You will need to specify a userId (ie. --debug=admin)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -161,18 +160,15 @@ class Index extends Base
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
         
-        // $view = Filesystem::getView();
-        // $view->file_put_contents('/test_999.txt', 'tototo');
         $userFolder = $this->rootFolder->getUserFolder($userId);
-        
         $folder = $userFolder->get('/');
         $files = $folder->search('');
         
         $progress = new ProgressBar($output, sizeof($files));
         $progress->setMessage('[' . $info['usersCurrent'] . '/' . $info['usersTotal'] . '] <info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
-        $progress->setMessage('loading', 'infos');
-        $progress->setFormat(' %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% - Solr memory: %jvm:-18s% (%infos%)   ');
+        $progress->setMessage('(loading)', 'infos');
+        $progress->setFormat(' %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% - Solr memory: %jvm:-18s% %infos:-12s%');
         $progress->start();
         
         $filesProcessed = 0;
@@ -199,31 +195,19 @@ class Index extends Base
                     ));
                     $filesProcessed += $status;
                     if ($status > 0) {
-                        $progress->setMessage('extracting', 'infos');
+                        $progress->setMessage('(extracting)', 'infos');
                         $progress->display();
                     } else {
-                        $progress->setMessage('scanning', 'infos');
+                        $progress->setMessage('(scanning)', 'infos');
                         $progress->display();
                     }
                 } else {
-                    $progress->setMessage('scanning', 'infos');
+                    $progress->setMessage('(scanning)', 'infos');
                     $progress->display();
                 }
             }
             
             $progress->advance();
-            if ((($i + 1) % SolrService::EXTRACT_CHUNK_SIZE) == 0) {
-                // $infoSystem = $this->solrService->getInfoSystem();
-                // $progress->setMessage($infoSystem->jvm->memory->used, 'jvm');
-                // $progress->setMessage('sleeping', 'infos');
-                // $progress->display();
-                // sleep(5);
-                // $infoSystem = $this->solrService->getInfoSystem();
-                // $progress->setMessage($infoSystem->jvm->memory->used, 'jvm');
-                // $progress->setMessage('extracting', 'infos');
-                // $progress->display();
-            }
-            
             $i ++;
         }
         
@@ -253,12 +237,13 @@ class Index extends Base
         $progress->setMessage('', 'jvm');
         $progress->start();
         
+        $i = 0;
         foreach ($cycle as $batch) {
             if ($this->hasBeenInterrupted()) {
                 throw new \Exception('ctrl-c');
             }
             
-           $result = $this->fileService->updateFiles($batch, $error);
+            $result = $this->fileService->updateFiles($batch, $error);
             
             $infoSystem = $this->solrTools->getInfoSystem();
             $progress->setMessage($infoSystem->jvm->memory->used, 'jvm');
@@ -267,6 +252,11 @@ class Index extends Base
             if (! $result) {
                 $output->writeln('  fail ' . $error);
                 return false;
+            }
+            
+            $i ++;
+            if (($i % 10) == 0) {
+                sleep(3);
             }
         }
         
