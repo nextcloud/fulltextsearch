@@ -88,6 +88,9 @@ class SolrToolsService
         try {
             $query = $client->createSelect();
             $query->setQuery('id:' . $docid);
+            $query->setFields(array(
+                'nextant_mtime'
+            ));
             
             $resultset = $client->select($query);
             
