@@ -30,8 +30,6 @@ use \OCA\Nextant\Service\FileService;
 class SolrService
 {
 
-    const EXTRACT_CHUNK_SIZE = 100;
-
     const UPDATE_CHUNK_SIZE = 100;
     
     // Owner is not set - mostly a developper mistake
