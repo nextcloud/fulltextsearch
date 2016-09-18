@@ -30,9 +30,9 @@ use \OCA\Nextant\Service\FileService;
 class SolrService
 {
 
-    const EXTRACT_CHUNK_SIZE = 1000;
+    const EXTRACT_CHUNK_SIZE = 100;
 
-    const UPDATE_CHUNK_SIZE = 1000;
+    const UPDATE_CHUNK_SIZE = 100;
     
     // Owner is not set - mostly a developper mistake
     const ERROR_OWNER_NOT_SET = 4;
@@ -320,9 +320,8 @@ class SolrService
                     array_push($docs, $doc);
                 }
                 
-                $this->message('.', false);
-                
                 $query->addDocuments($docs)->addCommit();
+                
                 if (! $client->update($query))
                     return false;
             }
@@ -438,4 +437,4 @@ class SolrService
             $this->lastMessage = $line;
     }
 }
-    
+
