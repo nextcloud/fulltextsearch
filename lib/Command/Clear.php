@@ -31,6 +31,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class Clear extends Base
 {
@@ -56,6 +57,13 @@ class Clear extends Base
     {
         if (! $this->solrService->configured()) {
             $output->writeln('Nextant is not yet configured');
+            return;
+        }
+        
+        $helper = $this->getHelper('question');
+        $question = new ConfirmationQuestion('<question>This will remove all indexes on your Solr. Continue with this action? (y/N) </question> ', false);
+        
+        if (! $helper->ask($input, $output, $question)) {
             return;
         }
         
