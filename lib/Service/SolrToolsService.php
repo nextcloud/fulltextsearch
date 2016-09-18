@@ -112,5 +112,26 @@ class SolrToolsService
         
         return false;
     }
+
+    public function getInfoSystem(&$error = '')
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+            return false;
+        
+        $client = $this->solrService->getAdminClient();
+        
+        $query = $client->createSelect();
+        $request = $client->createRequest($query);
+        
+        $request->setHandler('admin/info/system');
+        
+        $response = $client->executeRequest($request);
+        if ($response->getStatusCode() != 200)
+            return false;
+        
+        $result = json_decode($response->getBody());
+        
+        return $result;
+    }
 }
     
