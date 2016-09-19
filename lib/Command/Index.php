@@ -26,7 +26,7 @@
  */
 namespace OCA\Nextant\Command;
 
-use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Service\SolrToolsService;
 use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,7 +39,7 @@ use OC\Files\Filesystem;
 class Index extends Base
 {
 
-    const REFRESH_INFO_SYSTEM = 25;
+    const REFRESH_INFO_SYSTEM = 100;
 
     private $userManager;
 
@@ -167,7 +167,7 @@ class Index extends Base
         $progress = new ProgressBar($output, sizeof($files));
         $progress->setMessage('[' . $info['usersCurrent'] . '/' . $info['usersTotal'] . '] <info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
-        $progress->setMessage('(loading)', 'infos');
+        $progress->setMessage('(scanning)', 'infos');
         $progress->setFormat(' %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% - Solr memory: %jvm:-18s% %infos:-12s%');
         $progress->start();
         
@@ -188,6 +188,7 @@ class Index extends Base
                 
                 $forceExtract = false;
                 $status = 0;
+                $progress->setMessage('(scanning)', 'infos');
                 if ($this->fileService->addFileFromPath($file->getPath(), $forceExtract, $status)) {
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
@@ -195,22 +196,20 @@ class Index extends Base
                     ));
                     $filesProcessed += $status;
                     if ($status > 0) {
+                        $i += 5;
                         $progress->setMessage('(extracting)', 'infos');
-                        $progress->display();
-                    } else {
-                        $progress->setMessage('(scanning)', 'infos');
-                        $progress->display();
                     }
-                } else {
-                    $progress->setMessage('(scanning)', 'infos');
-                    $progress->display();
                 }
+                
+                $progress->display();
+                $i ++;
             }
             
             $progress->advance();
-            $i ++;
         }
         
+        $progress->setMessage('', 'jvm');
+        $progress->setMessage('', 'infos');
         $progress->finish();
         
         return array(
@@ -229,7 +228,7 @@ class Index extends Base
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
         
-        $cycle = array_chunk($fileIds, SolrService::UPDATE_CHUNK_SIZE);
+        $cycle = array_chunk($fileIds, SolrToolsService::UPDATE_CHUNK_SIZE);
         
         $progress = new ProgressBar($output, sizeof($fileIds));
         $progress->setFormat(' %message:-30s% [%bar%] %percent:3s%% - Solr memory: %jvm:-10s%  ');
@@ -247,16 +246,16 @@ class Index extends Base
             
             $infoSystem = $this->solrTools->getInfoSystem();
             $progress->setMessage($infoSystem->jvm->memory->used, 'jvm');
-            $progress->advance(SolrService::UPDATE_CHUNK_SIZE);
+            $progress->advance(SolrToolsService::UPDATE_CHUNK_SIZE);
             
-            if (! $result) {
-                $output->writeln('  fail ' . $error);
+            if (! $result)
                 return false;
-            }
             
             $i ++;
-            if (($i % 10) == 0) {
-                sleep(3);
+            
+            // let's take a break every 1000 files
+            if (($i * SolrToolsService::UPDATE_CHUNK_SIZE) % 1000) {
+                sleep(8);
             }
         }
         
