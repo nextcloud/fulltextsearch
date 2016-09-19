@@ -110,7 +110,7 @@ class FileService
         if (! $isRoot)
             return $pack;
         
-        $solrResult = $this->solrService->updateDocuments($pack);
+        $solrResult = $this->solrTools->updateDocuments($pack);
         return $solrResult;
     }
 

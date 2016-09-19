@@ -187,7 +187,7 @@ class SettingsController extends Controller
             'deleted' => false
         );
         
-        if (! $this->solrService->updateDocuments(array(
+        if (! $this->solrTools->updateDocuments(array(
             $testUpdate
         ), $error)) {
             $message = 'Error Updating field (Error #' . $error . ')';
