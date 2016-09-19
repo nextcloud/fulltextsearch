@@ -29,8 +29,6 @@ use \OCA\Nextant\Service\FileService;
 
 class SolrService
 {
-
-    const UPDATE_CHUNK_SIZE = 100;
     
     // Owner is not set - mostly a developper mistake
     const ERROR_OWNER_NOT_SET = 4;
@@ -50,6 +48,8 @@ class SolrService
     const EXCEPTION_EXTRACT_FAILED = 41;
 
     const EXCEPTION_UPDATE_FIELD_FAILED = 61;
+
+    const EXCEPTION_UPDATE_MAXIMUM_REACHED = 63;
 
     const EXCEPTION_SEARCH_FAILED = 81;
 
@@ -234,100 +234,6 @@ class SolrService
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_EXTRACT_FAILED;
-            else
-                $error = self::EXCEPTION_HTTPEXCEPTION;
-        } catch (\Solarium\Exception $e) {
-            $error = self::EXCEPTION;
-        }
-        
-        return false;
-    }
-
-    public function updateDocuments($data, &$error = '')
-    {
-        if (! $this->configured())
-            return false;
-        
-        if ($this->owner == '') {
-            $error = self::ERROR_OWNER_NOT_SET;
-            return false;
-        }
-        
-        if (! $this->getClient()) {
-            $error = self::ERROR_SOLR_CONFIG;
-            return false;
-        }
-        
-        try {
-            
-            $client = $this->getClient();
-            
-            $cycle = array_chunk($data, self::UPDATE_CHUNK_SIZE);
-            foreach ($cycle as $batch) {
-                
-                $query = $client->createUpdate();
-                
-                // add document
-                
-                $docs = array();
-                foreach ($batch as $upd) {
-                    // if (! key_exists('id', $upd))
-                    // continue;
-                    
-                    $doc = $query->createDocument();
-                    $doc->setKey('id', $upd['id']);
-                    
-                    if (key_exists('owner', $upd)) {
-                        $doc->setField('nextant_owner', $upd['owner']);
-                        $doc->setFieldModifier('nextant_owner', 'set');
-                    }
-                    
-                    if (key_exists('share_users', $upd)) {
-                        if (sizeof($upd['share_users']) > 0) {
-                            $doc->setField('nextant_share', $upd['share_users']);
-                            $doc->setFieldModifier('nextant_share', 'set');
-                        } else {
-                            $doc->setField('nextant_share', array(
-                                ''
-                            ));
-                            // not working
-                            // $doc->setFieldModifier('nextant_share', 'remove');
-                            $doc->setFieldModifier('nextant_share', 'set');
-                        }
-                    }
-                    
-                    if (key_exists('share_groups', $upd)) {
-                        if (sizeof($upd['share_groups']) > 0) {
-                            $doc->setField('nextant_sharegroup', $upd['share_groups']);
-                            $doc->setFieldModifier('nextant_sharegroup', 'set');
-                        } else {
-                            $doc->setField('nextant_sharegroup', array(
-                                ''
-                            ));
-                            // not working
-                            // $doc->setFieldModifier('nextant_sharegroup', 'remove');
-                            $doc->setFieldModifier('nextant_sharegroup', 'set');
-                        }
-                    }
-                    
-                    if (key_exists('deleted', $upd)) {
-                        $doc->setField('nextant_deleted', ($upd['deleted']) ? 'true' : 'false');
-                        $doc->setFieldModifier('nextant_deleted', 'set');
-                    }
-                    
-                    array_push($docs, $doc);
-                }
-                
-                $query->addDocuments($docs)->addCommit();
-                
-                if (! $client->update($query))
-                    return false;
-            }
-            
-            return true;
-        } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_UPDATE_FIELD_FAILED;
             else
                 $error = self::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {

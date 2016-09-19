@@ -26,10 +26,15 @@
 namespace OCA\Nextant\Service;
 
 use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Service\MiscService;
 use Solarium\Core\Client\Request;
 
 class SolrToolsService
 {
+
+    const UPDATE_MAXIMUM_SIZE = 60;
+
+    const UPDATE_CHUNK_SIZE = 20;
 
     private $solrService;
 
@@ -48,6 +53,177 @@ class SolrToolsService
         $this->configService = $configService;
         $this->miscService = $miscService;
         $this->output = null;
+    }
+
+    public function updateDocuments($data, &$error = '')
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+            return false;
+        
+        try {
+            $client = $this->solrService->getClient();
+            
+            $documentProcessed = 0;
+            $cycle = array_chunk($data, self::UPDATE_CHUNK_SIZE);
+            foreach ($cycle as $batch) {
+                
+                // get documents status per ids
+                $docIds = array();
+                foreach ($batch as $entry)
+                    array_push($docIds, $entry['id']);
+                
+                $currentStatus = $this->getDocumentsStatus($docIds, $error);
+                if (! $currentStatus || sizeof($currentStatus) == 0)
+                    continue;
+                
+                $this->miscService->log('status: ' . sizeof($currentStatus));
+                
+                // create query to update those in needs.
+                $query = $client->createUpdate();
+                $docs = array();
+                
+                foreach ($batch as $upd) {
+                    if ($upd == null || ! is_array($upd))
+                        continue;
+                    
+                    if (! key_exists($upd['id'], $currentStatus))
+                        continue;
+                    
+                    $doc = $query->createDocument();
+                    $doc->setKey('id', $upd['id']);
+                    
+                    $docStatus = $currentStatus[$upd['id']];
+                    $edited = false;
+                    if (key_exists('owner', $upd) && $upd['owner'] != $docStatus['nextant_owner']) {
+                        $doc->setField('nextant_owner', $upd['owner']);
+                        $doc->setFieldModifier('nextant_owner', 'set');
+                        $edited = true;
+                    }
+                    
+                    if (key_exists('share_users', $upd) && ! MiscService::arraysIdentical($upd['share_users'], $docStatus['nextant_share'])) {
+                        if (sizeof($upd['share_users']) > 0) {
+                            $doc->setField('nextant_share', $upd['share_users']);
+                            $doc->setFieldModifier('nextant_share', 'set');
+                        } else {
+                            $doc->setField('nextant_share', array(
+                                ''
+                            ));
+                            $doc->setFieldModifier('nextant_share', 'set');
+                        }
+                        $edited = true;
+                    }
+                    
+                    if (key_exists('share_groups', $upd) && ! MiscService::arraysIdentical($upd['share_groups'], $docStatus['nextant_sharegroup'])) {
+                        if (sizeof($upd['share_groups']) > 0) {
+                            $doc->setField('nextant_sharegroup', $upd['share_groups']);
+                            $doc->setFieldModifier('nextant_sharegroup', 'set');
+                        } else {
+                            $doc->setField('nextant_sharegroup', array(
+                                ''
+                            ));
+                            $doc->setFieldModifier('nextant_sharegroup', 'set');
+                        }
+                        $edited = true;
+                    }
+                    
+                    if (key_exists('deleted', $upd) && $upd['deleted'] != $docStatus['nextant_deleted']) {
+                        $doc->setField('nextant_deleted', ($upd['deleted']) ? 'true' : 'false');
+                        $doc->setFieldModifier('nextant_deleted', 'set');
+                        $edited = true;
+                    }
+                    
+                    if ($edited)
+                        array_push($docs, $doc);
+                }
+                
+                $this->miscService->log('> ' . sizeof($docs));
+                if (sizeof($docs) == 0)
+                    continue;
+                
+                $query->addDocuments($docs)->addCommit();
+                if (! $client->update($query))
+                    return false;
+                
+                $documentProcessed += sizeof($docs);
+                if ($documentProcessed >= self::UPDATE_MAXIMUM_SIZE) {
+                    $this->miscService->log('maximum reached');
+                    $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;
+                    return false;
+                }
+                
+                $this->miscService->log('& 2');
+            }
+            
+            return true;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = SolrService::EXCEPTION_UPDATE_FIELD_FAILED;
+            else
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+            $this->miscService->log($ehe->$ehe->getStatusMessage());
+        } catch (\Solarium\Exception $e) {
+            $error = SolrService::EXCEPTION;
+        }
+        
+        $this->miscService->log('__ FAIL 2 #' . $error . ' ____ ' . sizeof($data) . ' ' . sizeof($cycle));
+        
+        return false;
+    }
+
+    private function getDocumentsStatus($docs, &$error = '')
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+            return false;
+        
+        $client = $this->solrService->getClient();
+        
+        if (! is_array($docs))
+            $docs = array(
+                $docs
+            );
+        
+        $this->miscService->log('__' . sizeof($docs));
+        if (sizeof($docs) > self::UPDATE_CHUNK_SIZE) {
+            $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;
+            return false;
+        }
+        
+        $result = array();
+        
+        try {
+            $query = $client->createSelect();
+            $query->setQuery('id:' . implode(' ', $docs));
+            $query->setRows(sizeof($docs));
+            $query->setFields(array(
+                'id',
+                'nextant_owner',
+                'nextant_share',
+                'nextant_sharegroup',
+                'nextant_deleted'
+            ));
+            
+            $resultset = $client->select($query);
+            
+            foreach ($resultset as $document) {
+                $result[$document->id] = array(
+                    'nextant_owner' => $document->nextant_owner,
+                    'nextant_share' => $document->nextant_share,
+                    'nextant_sharegroup' => $document->nextant_sharegroup,
+                    'nextant_deleted' => $document->nextant_deleted
+                );
+            }
+            
+            return $result;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = SolrService::EXCEPTION_SEARCH_FAILED;
+            else
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = SolrService::EXCEPTION;
+        }
+        
+        return false;
     }
 
     public function removeDocument($docid, &$error = '')
