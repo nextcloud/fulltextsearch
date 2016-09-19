@@ -337,13 +337,16 @@ class SolrService
         return false;
     }
 
-    public function search($string, &$error = '')
+    public function search($string, $options = array(), &$error = '')
     {
         if (! $this->configured())
             return false;
         
         if ($this->getClient() == false)
             return false;
+        
+        if ($options == null)
+            $options = array();
         
         try {
             $client = $this->getClient();
@@ -359,8 +362,13 @@ class SolrService
                 return false;
             }
             
+            $query->setFields(array(
+                'id',
+                'nextant_deleted',
+                'nextant_owner'
+            ));
             $query->setRows(25);
-            $query->setQuery('nextant_attr_text:' . $helper->escapePhrase($string));
+            $query->setQuery('nextant_attr_text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             // $query->createFilterquery('trashbin')->setQuery('nextant_deleted:false');
             

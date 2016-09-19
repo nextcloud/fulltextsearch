@@ -201,7 +201,7 @@ class SettingsController extends Controller
     private function test_search(&$message)
     {
         $keyword = 'LICENSE';
-        if ($result = $this->solrService->search($keyword, $error)) {
+        if ($result = $this->solrService->search($keyword, null, $error)) {
             if (sizeof($result) > 0) {
                 
                 foreach ($result as $doc) {
