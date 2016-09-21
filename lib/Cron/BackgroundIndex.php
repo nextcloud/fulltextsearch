@@ -26,22 +26,44 @@
  */
 namespace OCA\Nextant\Cron;
 
-use OC\BackgroundJob\TimedJob;
 use \OCA\Nextant\AppInfo\Application;
 
-class Cache extends TimedJob
+class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 {
+
+    private $configService;
+
+    private $miscService;
 
     public function __construct()
     {
-        $this->setInterval(3600); // 1 hour
+        $this->setInterval(60 * 60 * 24); // 1 minute
     }
 
     protected function run($argument)
     {
-        // $app = new Application();
-        // $app->getContainer()
-        // ->query('MiscService')
-        // ->log('_CRON_CACHE_');
+        return;
+        $logger = \OC::$server->getLogger();
+        
+        $app = new Application();
+        $c = $app->getContainer();
+        
+        $this->configService = $c->query('ConfigService');
+        $this->miscService = $c->query('MiscService');
+        
+        $solr_locked = $this->configService->getAppValue('solr_lock');
+        
+        $this->miscService->log('@1 solr_locked: ' . $solr_locked);
+        if ($solr_locked > 0)
+            return;
+        
+        $this->configService->setAppValue('solr_lock', time());
+        $this->extractDocuments();
+        $this->configService->setAppValue('solr_lock', '0');
+    }
+
+    private function extractDocuments()
+    {
+        $this->miscService->log('@2 cache_execute');
     }
 }
