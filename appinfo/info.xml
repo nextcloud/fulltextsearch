@@ -33,7 +33,6 @@ _Recognized file format: text, rtf, pdf, html, openoffice, office, ..._
 		<nextcloud min-version="9" max-version="11" />
 	</dependencies>
 	<background-jobs>
-		<job>OCA\Nextant\Cron\Cache</job>
 		<job>OCA\Nextant\Cron\BackgroundIndex</job>
 	</background-jobs>
 	<repair-steps>
