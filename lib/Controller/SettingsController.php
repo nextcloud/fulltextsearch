@@ -240,7 +240,6 @@ class SettingsController extends Controller
 
     private function save($live_extract, $live_docupdate, &$message)
     {
-        $this->miscService->log('__' . (($live_extract) ? '1' : '0') . ' _ ' . (($live_docupdate) ? '1' : '0'));
         if (! is_null($this->solr_url) && ! is_null($this->solr_core)) {
             $this->configService->setAppValue('solr_url', $this->solr_url);
             $this->configService->setAppValue('solr_core', $this->solr_core);
