@@ -42,6 +42,7 @@ class SettingsController extends Controller
     private $solrService;
 
     private $solrTools;
+
     private $solrAdmin;
 
     private $solr_url;
@@ -69,7 +70,8 @@ class SettingsController extends Controller
             'configured' => $this->configService->getAppValue('configured'),
             'current_docs' => $documentsCount,
             'solr_url' => $this->configService->getAppValue('solr_url'),
-            'solr_core' => $this->configService->getAppValue('solr_core')
+            'solr_core' => $this->configService->getAppValue('solr_core'),
+            'solr_lock' => $this->configService->getAppValue('solr_lock')
         ];
         return new TemplateResponse($this->appName, 'settings.admin', $params, 'blank');
     }
@@ -165,7 +167,7 @@ class SettingsController extends Controller
     {
         $testFile = __DIR__ . '/../../LICENSE';
         
-        if ($this->solrService->extractFile($testFile, '__nextant_test', 1234567890, 'text/plain', $error)) {
+        if ($this->solrService->extractFile($testFile, '__nextant_test', 1234567890, $error)) {
             $message = 'Text successfully extracted';
             return true;
         }
@@ -187,7 +189,7 @@ class SettingsController extends Controller
             'deleted' => false
         );
         
-        if (! $this->solrService->updateDocuments(array(
+        if (! $this->solrTools->updateDocuments(array(
             $testUpdate
         ), $error)) {
             $message = 'Error Updating field (Error #' . $error . ')';
@@ -201,7 +203,7 @@ class SettingsController extends Controller
     private function test_search(&$message)
     {
         $keyword = 'LICENSE';
-        if ($result = $this->solrService->search($keyword, $error)) {
+        if ($result = $this->solrService->search($keyword, null, $error)) {
             if (sizeof($result) > 0) {
                 
                 foreach ($result as $doc) {

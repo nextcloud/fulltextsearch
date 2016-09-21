@@ -26,6 +26,8 @@
  */
 namespace OCA\Nextant\Service;
 
+use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Service\SolrToolsService;
 use OC\Files\Filesystem;
 use OC\Files\View;
 use OC\Share\Share;
@@ -33,6 +35,8 @@ use OCP\Files\NotFoundException;
 
 class FileService
 {
+
+    const UPDATE_MAXIMUM_FILES = 1000;
     
     // private $root;
     private $solrService;
@@ -69,11 +73,14 @@ class FileService
         if ($fileInfo == null)
             return false;
         
+        if (! SolrService::extractableFile($fileInfo->getMimeType()))
+            return false;
+        
         if (! $forceExtract && $this->solrTools->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime()))
             return true;
         
         $status = 1;
-        return $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime(), $fileInfo->getMimeType());
+        return $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime());
     }
 
     public function updateFiles($files, $options = array(), $isRoot = true)
@@ -99,18 +106,28 @@ class FileService
                 $subfiles = $this->view->getDirectoryContent($file['path']);
                 foreach ($subfiles as $subfile) {
                     $result = $this->updateFiles($subfile->getId(), $options, false);
+                    if ($result == false)
+                        return false;
                     $pack = array_merge($pack, $result);
+                    
+                    // we stop to cycle files after a thousand
+                    if (sizeof($pack) > self::UPDATE_MAXIMUM_FILES) {
+                        $this->miscService->log('We reached the limit of files to update (' . self::UPDATE_MAXIMUM_FILES . '), we won\'t go any further.', 2);
+                        return false;
+                    }
                 }
             } else {
+                // if (SolrService::extractableFile($fileInfo->getMimeType())) {
                 $data['id'] = $file['fileid'];
                 array_push($pack, array_merge($data, $options));
+                // }
             }
         }
         
         if (! $isRoot)
             return $pack;
         
-        $solrResult = $this->solrService->updateDocuments($pack);
+        $solrResult = $this->solrTools->updateDocuments($pack);
         return $solrResult;
     }
 

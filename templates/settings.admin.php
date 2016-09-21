@@ -30,7 +30,10 @@ script('nextant', 'settings.admin');
 
 	<table>
 		<tr>
-			<td colspan="2"><em><?php p($l->t('Specify the URL of your Solr servlet, and the name of the core to use')) ?></em></td>
+			<td colspan="2"><em><?php p($l->t('Specify the URL of your Solr servlet, and the name of the core to use.')); ?>
+			<br />If you do not have a Solr servlet running, you can <a
+					href="https://github.com/daita/nextant/wiki" target="_blank">find few guides on how
+						to install one on the Wiki</a></em></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>

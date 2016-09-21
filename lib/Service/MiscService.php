@@ -50,4 +50,19 @@ class MiscService
         
         $this->logger->log($level, $message, $data);
     }
+
+    public static function arraysIdentical($a, $b)
+    {
+        if ($a == null)
+            $a = array();
+        if ($b == null)
+            $b = array();
+        if (! is_array($a) || ! is_array($b))
+            return true;
+        
+        sort($a);
+        sort($b);
+        
+        return ($a == $b);
+    }
 }

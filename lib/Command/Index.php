@@ -26,17 +26,20 @@
  */
 namespace OCA\Nextant\Command;
 
-use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Service\SolrToolsService;
 use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use OCP\IUserManager;
 use OC\Files\Filesystem;
 
 class Index extends Base
 {
+
+    const REFRESH_INFO_SYSTEM = 100;
 
     private $userManager;
 
@@ -44,16 +47,19 @@ class Index extends Base
 
     private $solrService;
 
+    private $solrTools;
+
     private $configService;
 
     private $fileService;
 
-    public function __construct(IUserManager $userManager, $rootFolder, $solrService, $configService, $fileService)
+    public function __construct(IUserManager $userManager, $rootFolder, $solrService, $solrTools, $configService, $fileService)
     {
         parent::__construct();
         $this->userManager = $userManager;
         $this->rootFolder = $rootFolder;
         $this->solrService = $solrService;
+        $this->solrTools = $solrTools;
         $this->configService = $configService;
         $this->fileService = $fileService;
     }
@@ -62,10 +68,14 @@ class Index extends Base
     {
         parent::configure();
         $this->setName('nextant:index')->setDescription('scan users\' files, generate and index Solr documents');
+        // ->addOption('debug', 'd', InputOption::VALUE_REQUIRED, 'Generate a complete log file named nextant.txt at the root of your cloud. You will need to specify a userId (ie. --debug=admin)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('> <comment>This is an alpha release, please report any issue to </comment>');
+        $output->writeln('   <comment> https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954/ </comment>');
+        $output->writeln('');
         if (! $this->solrService->configured()) {
             $output->writeln('Nextant is not yet configured');
             return;
@@ -73,13 +83,17 @@ class Index extends Base
         
         $this->solrService->setOutput($output);
         
+        //
         // extract files
+        $output->writeln('');
         $output->writeln('* Extracting new files to Solr:');
         
         $users = $this->userManager->search('');
         $usersTotal = sizeof($users);
         $usersCurrent = 0;
         $extractedDocuments = array();
+        $extractedTotal = 0;
+        $processedTotal = 0;
         foreach ($users as $user) {
             $usersCurrent ++;
             
@@ -89,21 +103,25 @@ class Index extends Base
             $userId = $user->getUID();
             $this->solrService->setOwner($userId);
             
-            $output->write('[' . $usersCurrent . '/' . $usersTotal . '] <info>' . $userId . '</info>: ');
-            
             $result = $this->browseUserDirectory($userId, $output);
             
             if ($result['total'] > 0) {
-                $output->writeln('  (processed: ' . $result['processed'] . ' - extracted: ' . $result['extracted'] . '/' . $result['total'] . ')');
                 
                 array_push($extractedDocuments, array(
                     'userid' => $userId,
                     'files' => $result['files']
                 ));
-            } else
-                $output->writeln(' empty folder');
+                
+                $extractedTotal += sizeof($result['files']);
+                $processedTotal += $result['processed'];
+            }
+            
+            $output->writeln('');
         }
         
+        $output->writeln('       ' . $processedTotal . ' file(s) processed ; ' . $extractedTotal . ' extracted documents');
+        
+        //
         // update Documents
         $output->writeln('');
         $output->writeln('* Updating documents status');
@@ -116,14 +134,10 @@ class Index extends Base
             $userId = $doc['userid'];
             $this->solrService->setOwner($userId);
             
-            $output->write('[' . $usersCurrent . '/' . $usersTotal . '] <info>' . $userId . '</info>: ');
+            if (! $this->updateUserDocuments($userId, $fileIds, $output))
+                $output->writeln('  fail ');
             
-            if ($this->updateUserDocuments($userId, $fileIds))
-                $output->writeln(' ok');
-            else
-                $output->writeln(' fail');
-            
-            $usersCurrent ++;
+            $output->writeln('');
         }
         
         Filesystem::tearDown();
@@ -138,47 +152,56 @@ class Index extends Base
         $this->fileService->setView(Filesystem::getView());
         
         $userFolder = $this->rootFolder->getUserFolder($userId);
-        
         $folder = $userFolder->get('/');
         $files = $folder->search('');
         
-        $nb_tick = 30;
-        $t = floor(sizeof($files) / $nb_tick);
-        $size_tick = ($t > 0) ? $t : 1;
-        
-        $i = 0;
+        $progress = new ProgressBar($output, sizeof($files));
+        $progress->setMessage('<info>' . $userId . '</info>: ');
+        $progress->setMessage('', 'jvm');
+        $progress->setMessage('[scanning] - ', 'infos');
+        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+        $progress->start();
         
         $filesProcessed = 0;
         $fileIds = array();
+        $i = 0;
         foreach ($files as $file) {
             if ($this->hasBeenInterrupted()) {
-                $output->writeln('');
-                $output->writeln('processed: ' . $filesProcessed . ' (' . sizeof($fileIds). '/' . sizeof($files) . ')');
-                
                 throw new \Exception('ctrl-c');
             }
             
-            $i ++;
-            if ($i % $size_tick == 0) {
-                $output->write('.');
+            if (($i % self::REFRESH_INFO_SYSTEM) == 0) {
+                $infoSystem = $this->solrTools->getInfoSystem();
+                $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
             }
+            
             if (! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) {
+                
                 $forceExtract = false;
                 $status = 0;
+                $progress->setMessage('[scanning] - ', 'infos');
                 if ($this->fileService->addFileFromPath($file->getPath(), $forceExtract, $status)) {
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
                         'path' => $file->getPath()
                     ));
                     $filesProcessed += $status;
+                    if ($status > 0) {
+                        $i += 5;
+                        $progress->setMessage('[extracting] - ', 'infos');
+                    }
                 }
+                
+                $progress->display();
+                $i ++;
             }
             
-            if ((($filesProcessed + 1) % SolrService::EXTRACT_CHUNK_SIZE) == 0) {
-                $output->write('s');
-                sleep(5);
-            }
+            $progress->advance();
         }
+        
+        $progress->setMessage('', 'jvm');
+        $progress->setMessage('', 'infos');
+        $progress->finish();
         
         return array(
             'extracted' => sizeof($fileIds),
@@ -188,16 +211,44 @@ class Index extends Base
         );
     }
 
-    private function updateUserDocuments($userId, $fileIds)
+    private function updateUserDocuments($userId, $fileIds, $output)
     {
         Filesystem::tearDown();
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
         
-        $result = $this->fileService->updateFiles($fileIds);
+        $cycle = array_chunk($fileIds, SolrToolsService::UPDATE_CHUNK_SIZE);
         
-        if (! $result)
-            return false;
+        $progress = new ProgressBar($output, sizeof($fileIds));
+        $progress->setFormat(" %message:-30s% [%bar%] %percent:3s%% \n    %jvm:30s%      ");
+        $progress->setMessage('<info>' . $userId . '</info>: ');
+        $progress->setMessage('', 'jvm');
+        $progress->start();
+        
+        $i = 0;
+        foreach ($cycle as $batch) {
+            if ($this->hasBeenInterrupted()) {
+                throw new \Exception('ctrl-c');
+            }
+            
+            $result = $this->fileService->updateFiles($batch, $error);
+            
+            $infoSystem = $this->solrTools->getInfoSystem();
+            $progress->setMessage($infoSystem->jvm->memory->used, 'jvm');
+            $progress->advance(SolrToolsService::UPDATE_CHUNK_SIZE);
+            
+            if (! $result)
+                return false;
+            
+            $i ++;
+            
+            // let's take a break every 1000 files
+            if (($i * SolrToolsService::UPDATE_CHUNK_SIZE) % 1000) {
+                sleep(8);
+            }
+        }
+        
+        $progress->finish();
         
         return true;
     }

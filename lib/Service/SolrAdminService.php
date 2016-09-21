@@ -25,6 +25,7 @@
  */
 namespace OCA\Nextant\Service;
 
+use \OCA\Nextant\Service\SolrService;
 use Solarium\Core\Client\Request;
 
 class SolrAdminService
@@ -161,11 +162,11 @@ class SolrAdminService
             return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrClient::EXCEPTION_SOLRURI;
+                $error = SolrService::EXCEPTION_SOLRURI;
             else
-                $error = SolrClient::EXCEPTION_HTTPEXCEPTION;
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
-            $error = SolrClient::EXCEPTION;
+            $error = SolrService::EXCEPTION;
         }
         
         return false;
@@ -259,11 +260,11 @@ class SolrAdminService
             return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrClient::EXCEPTION_SOLRURI;
+                $error = SolrService::EXCEPTION_SOLRURI;
             else
-                $error = SolrClient::EXCEPTION_HTTPEXCEPTION;
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
-            $error = SolrClient::EXCEPTION;
+            $error = SolrService::EXCEPTION;
         }
         return false;
     }
@@ -285,11 +286,11 @@ class SolrAdminService
             return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrClient::EXCEPTION_SOLRURI;
+                $error = SolrService::EXCEPTION_SOLRURI;
             else
-                $error = SolrClient::EXCEPTION_HTTPEXCEPTION;
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
-            $error = SolrClient::EXCEPTION;
+            $error = SolrService::EXCEPTION;
         }
         
         return false;
@@ -311,11 +312,11 @@ class SolrAdminService
             return $resultset->getNumFound();
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrClient::EXCEPTION_SOLRURI;
+                $error = SolrService::EXCEPTION_SOLRURI;
             else
-                $error = SolrClient::EXCEPTION_HTTPEXCEPTION;
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
-            $error = SolrClient::EXCEPTION;
+            $error = SolrService::EXCEPTION;
         }
         
         return false;

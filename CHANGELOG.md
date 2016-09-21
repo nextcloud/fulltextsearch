@@ -1,3 +1,10 @@
+**v0.3.4**
+* halt long update process
+
+**v0.3.3**
+* Exception issue in SolrAdmin/SolrTools
+* rework on the indexing process
+
 **v0.3.2**
 * better script to index your current documents
 * better managment of all file operations (move, shares, trash, ...)

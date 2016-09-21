@@ -13,7 +13,7 @@ _Recognized file format: text, rtf, pdf, html, openoffice, office, ..._
 
 
 	</description>
-	<version>0.3.2</version>
+	<version>0.3.4</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<types>
@@ -33,11 +33,11 @@ _Recognized file format: text, rtf, pdf, html, openoffice, office, ..._
 		<nextcloud min-version="9" max-version="11" />
 	</dependencies>
 	<background-jobs>
-		<job>OCA\Nextant\Cron\Cache</job>
+		<job>OCA\Nextant\Cron\BackgroundIndex</job>
 	</background-jobs>
 	<repair-steps>
 		<post-migration>
 			<step>OCA\Nextant\Migration\NextantUpgrade</step>
-		</post-migration>		
+		</post-migration>
 	</repair-steps>
 </info>
