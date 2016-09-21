@@ -1,3 +1,6 @@
+**v0.3.4**
+* halt long update process
+
 **v0.3.3**
 * Exception issue in SolrAdmin/SolrTools
 * rework on the indexing process
