@@ -57,6 +57,9 @@ class SolrToolsService
         $this->output = null;
     }
 
+    public function optimizeSolrIndex()
+    {}
+
     public function updateDocuments($data, &$error = '')
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
@@ -137,7 +140,6 @@ class SolrToolsService
                         array_push($docs, $doc);
                 }
                 
-                $this->miscService->log('> ' . sizeof($docs));
                 if (sizeof($docs) == 0)
                     continue;
                 
@@ -152,7 +154,6 @@ class SolrToolsService
                 }
                 
                 $documentProcessed += sizeof($docs);
-                $this->miscService->log('__' . $documentProcessed);
                 if ($documentProcessed >= self::UPDATE_MAXIMUM_FILEPROCESS) {
                     $this->miscService->log('Maximum number of processed files (' . self::UPDATE_MAXIMUM_FILEPROCESS . ') reached, we won\'t go any further.', 2);
                     $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;

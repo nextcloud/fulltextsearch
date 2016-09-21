@@ -220,7 +220,7 @@ class Index extends Base
         $cycle = array_chunk($fileIds, SolrToolsService::UPDATE_CHUNK_SIZE);
         
         $progress = new ProgressBar($output, sizeof($fileIds));
-        $progress->setFormat(" %message:-30s% [%bar%] %percent:3s%% \n    %infos:12s% - %jvm:30s%      ");
+        $progress->setFormat(" %message:-30s% [%bar%] %percent:3s%% \n    %jvm:30s%      ");
         $progress->setMessage('<info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
         $progress->start();

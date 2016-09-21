@@ -92,10 +92,8 @@ class FilesEvents
             $this->fileService->updateFiles(FileService::getId($path), array(
                 'deleted' => true
             ));
-        } else {
+        } else
             $this->fileService->removeFiles($path);
-        }
-        // $this->fileService->removeFiles($path, true);
     }
 
     /**
