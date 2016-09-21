@@ -42,6 +42,7 @@ class SettingsController extends Controller
     private $solrService;
 
     private $solrTools;
+
     private $solrAdmin;
 
     private $solr_url;
@@ -165,7 +166,7 @@ class SettingsController extends Controller
     {
         $testFile = __DIR__ . '/../../LICENSE';
         
-        if ($this->solrService->extractFile($testFile, '__nextant_test', 1234567890, 'text/plain', $error)) {
+        if ($this->solrService->extractFile($testFile, '__nextant_test', 1234567890, $error)) {
             $message = 'Text successfully extracted';
             return true;
         }

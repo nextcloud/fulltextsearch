@@ -140,33 +140,22 @@ class SolrService
         $this->groups = $groups;
     }
 
-    /**
-     * extract a file.
-     *
-     * @param string $path            
-     * @param int $docid            
-     * @param string $mimetype            
-     * @return result
-     */
-    public function extractFile($path, $docid, $mtime, $mimetype, &$error = '')
+    public static function extractableFile($mimetype)
     {
-        if (! $this->configured())
-            return false;
-        
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
-                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
+                return true;
         }
         
         switch ($mimetype) {
             case 'application/epub+zip':
-                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
+                return true;
             
             case 'application/pdf':
-                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
+                return true;
             
             case 'application/rtf':
-                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
+                return true;
         }
         
         $acceptedMimeType = array(
@@ -182,19 +171,21 @@ class SolrService
         
         foreach ($acceptedMimeType['vnd'] as $mt) {
             if (substr($mimetype, 0, strlen($mt)) == $mt)
-                return $this->extractSimpleTextFile($path, $docid, $mtime, $error);
+                return true;
         }
         
         return false;
     }
 
     /**
-     * extract a simple text file.
+     * extract a file.
      *
      * @param string $path            
      * @param int $docid            
+     * @param string $mimetype            
+     * @return result
      */
-    public function extractSimpleTextFile($path, $docid, $mtime, &$error)
+    public function extractFile($path, $docid, $mtime, &$error = '')
     {
         if (! $this->configured())
             return false;
