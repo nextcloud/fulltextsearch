@@ -321,9 +321,7 @@ class SolrService
                 array_push($groups, ' nextant_sharegroup:' . $helper->escapePhrase($group));
             
             if (sizeof($groups) > 0)
-                $ownerGroups = implode(' OR ', $groups);
-            
-            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . $ownerGroups;
+                $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . implode(' OR ', $groups);
         }
         
         return $ownerQuery;
