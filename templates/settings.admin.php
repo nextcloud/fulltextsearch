@@ -32,8 +32,8 @@ script('nextant', 'settings.admin');
 		<tr>
 			<td colspan="2"><em><?php p($l->t('Specify the URL of your Solr servlet, and the name of the core to use.')); ?>
 			<br />If you do not have a Solr servlet running, you can <a
-					href="https://github.com/daita/nextant/wiki" target="_blank">find few guides on how
-						to install one on the Wiki</a></em></td>
+					href="https://github.com/daita/nextant/wiki" target="_blank">find
+						few guides on how to install one on the Wiki</a></em></td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
@@ -48,15 +48,36 @@ if ($_['configured'] == '1') {
 			<td><?php ($_['current_docs'] == false) ? p('Solr Servlet is down') : p($_['current_docs']); ?></td>
 		</tr>
 <?php } ?>
+	   <tr>
+			<td style="text-align: right;"><label>
+	    <?php p($l->t('Live Extract :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+			<td><input type="checkbox" name="solr_live_extract"
+				id="solr_live_extract" value="1"
+				<?php if ($_['live_extract'] == '1') { p('CHECKED'); } ?>
+				style="margin: 10px;"> (<a
+				href="https://github.com/daita/nextant/wiki/Extracting-&-Live-Update"
+				target="_blank">help</a>)</td>
+		</tr>
+
 		<tr>
-			<td style="text-align: right;"><label for="solr_url">
+			<td style="text-align: right;"><label>
+	    <?php p($l->t('Live Document Update :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+			<td><input type="checkbox" name="solr_live_docupdate"
+				id="solr_live_docupdate" value="1"
+				<?php if ($_['live_docupdate'] == '1') { p('CHECKED'); } ?>
+				style="margin: 10px;"></td>
+		</tr>
+
+		<tr>
+			<td style="text-align: right;"><label>
 	    <?php p($l->t('Address of your Solr Servlet :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
 			<td><input type="text" name="solr_url" id="solr_url"
 				value="<?php p($_['solr_url'])?>" style="width: 360px;"></td>
 		</tr>
+
 		<tr>
-			<td style="text-align: right;"><label for="solr_core"><?php p($l->t('Core :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
-			<td><input type="text" name="solr_core" id="solr_core"
+			<td style="text-align: right;"><label><?php p($l->t('Core :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+			<td><input type="text" id="solr_core"
 				value="<?php p($_['solr_core'])?>" style="width: 360px;"></td>
 		</tr>
 
@@ -66,6 +87,7 @@ if ($_['configured'] == '1') {
 				<button type="button" id="nextant_apply" style="width: 370px"><?php p($l->t('Test and Save')) ?></button>
 			</td>
 		</tr>
+
 		<tr style="height: 40px;">
 			<td colspan="2" style="text-align: center; width: 550px;"><span
 				id="nextant-admin-msg" class="msg"></span></td>
