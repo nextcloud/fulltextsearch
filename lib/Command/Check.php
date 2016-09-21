@@ -60,7 +60,7 @@ class Check extends Base
             return;            
         }
         
-        $this->solrAdmin->setOutput($output);
+        $this->solrService->setOutput($output);
         
         $output->write('Ping: ');
         if ($this->solrAdmin->ping())
