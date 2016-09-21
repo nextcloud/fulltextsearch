@@ -70,7 +70,8 @@ class SettingsController extends Controller
             'configured' => $this->configService->getAppValue('configured'),
             'current_docs' => $documentsCount,
             'solr_url' => $this->configService->getAppValue('solr_url'),
-            'solr_core' => $this->configService->getAppValue('solr_core')
+            'solr_core' => $this->configService->getAppValue('solr_core'),
+            'solr_lock' => $this->configService->getAppValue('solr_lock')
         ];
         return new TemplateResponse($this->appName, 'settings.admin', $params, 'blank');
     }
