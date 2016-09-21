@@ -32,9 +32,11 @@ use Solarium\Core\Client\Request;
 class SolrToolsService
 {
 
-    const UPDATE_MAXIMUM_SIZE = 60;
+    const UPDATE_MAXIMUM_QUERYTIME = 2000;
 
-    const UPDATE_CHUNK_SIZE = 20;
+    const UPDATE_MAXIMUM_FILEPROCESS = 30;
+
+    const UPDATE_CHUNK_SIZE = 15;
 
     private $solrService;
 
@@ -75,10 +77,8 @@ class SolrToolsService
                 $currentStatus = $this->getDocumentsStatus($docIds, $error);
                 if (! $currentStatus || sizeof($currentStatus) == 0)
                     continue;
-                
-                $this->miscService->log('status: ' . sizeof($currentStatus));
-                
-                // create query to update those in needs.
+                    
+                    // create query to update those in needs.
                 $query = $client->createUpdate();
                 $docs = array();
                 
@@ -127,6 +127,7 @@ class SolrToolsService
                     }
                     
                     if (key_exists('deleted', $upd) && $upd['deleted'] != $docStatus['nextant_deleted']) {
+                        
                         $doc->setField('nextant_deleted', ($upd['deleted']) ? 'true' : 'false');
                         $doc->setFieldModifier('nextant_deleted', 'set');
                         $edited = true;
@@ -141,17 +142,22 @@ class SolrToolsService
                     continue;
                 
                 $query->addDocuments($docs)->addCommit();
-                if (! $client->update($query))
+                
+                if (! $request = $client->update($query))
                     return false;
                 
-                $documentProcessed += sizeof($docs);
-                if ($documentProcessed >= self::UPDATE_MAXIMUM_SIZE) {
-                    $this->miscService->log('maximum reached');
-                    $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;
+                if ($request->getQueryTime() > self::UPDATE_MAXIMUM_QUERYTIME) {
+                    $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, we won\'t go any further.', 2);
                     return false;
                 }
                 
-                $this->miscService->log('& 2');
+                $documentProcessed += sizeof($docs);
+                $this->miscService->log('__' . $documentProcessed);
+                if ($documentProcessed >= self::UPDATE_MAXIMUM_FILEPROCESS) {
+                    $this->miscService->log('Maximum number of processed files (' . self::UPDATE_MAXIMUM_FILEPROCESS . ') reached, we won\'t go any further.', 2);
+                    $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;
+                    return false;
+                }
             }
             
             return true;
@@ -160,12 +166,9 @@ class SolrToolsService
                 $error = SolrService::EXCEPTION_UPDATE_FIELD_FAILED;
             else
                 $error = SolrService::EXCEPTION_HTTPEXCEPTION;
-            $this->miscService->log($ehe->$ehe->getStatusMessage());
         } catch (\Solarium\Exception $e) {
             $error = SolrService::EXCEPTION;
         }
-        
-        $this->miscService->log('__ FAIL 2 #' . $error . ' ____ ' . sizeof($data) . ' ' . sizeof($cycle));
         
         return false;
     }
@@ -182,7 +185,6 @@ class SolrToolsService
                 $docs
             );
         
-        $this->miscService->log('__' . sizeof($docs));
         if (sizeof($docs) > self::UPDATE_CHUNK_SIZE) {
             $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;
             return false;
