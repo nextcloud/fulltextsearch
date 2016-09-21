@@ -103,11 +103,7 @@ class Index extends Base
             $userId = $user->getUID();
             $this->solrService->setOwner($userId);
             
-            $result = $this->browseUserDirectory(array(
-                'userid' => $userId,
-                'usersCurrent' => $usersCurrent,
-                'usersTotal' => $usersTotal
-            ), $output);
+            $result = $this->browseUserDirectory($userId, $output);
             
             if ($result['total'] > 0) {
                 
@@ -138,11 +134,7 @@ class Index extends Base
             $userId = $doc['userid'];
             $this->solrService->setOwner($userId);
             
-            if (! $this->updateUserDocuments(array(
-                'userid' => $userId,
-                'usersCurrent' => $usersCurrent,
-                'usersTotal' => $usersTotal
-            ), $fileIds, $output))
+            if (! $this->updateUserDocuments($userId, $fileIds, $output))
                 $output->writeln('  fail ');
             
             $output->writeln('');
@@ -153,9 +145,8 @@ class Index extends Base
         $this->configService->setAppValue('needed_index', '0');
     }
 
-    private function browseUserDirectory($info, $output)
+    private function browseUserDirectory($userId, $output)
     {
-        $userId = $info['userid'];
         Filesystem::tearDown();
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
@@ -165,10 +156,10 @@ class Index extends Base
         $files = $folder->search('');
         
         $progress = new ProgressBar($output, sizeof($files));
-        $progress->setMessage('[' . $info['usersCurrent'] . '/' . $info['usersTotal'] . '] <info>' . $userId . '</info>: ');
+        $progress->setMessage('<info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
-        $progress->setMessage('(scanning)', 'infos');
-        $progress->setFormat(' %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% - Solr memory: %jvm:-18s% %infos:-12s%');
+        $progress->setMessage('[scanning] - ', 'infos');
+        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
         $progress->start();
         
         $filesProcessed = 0;
@@ -181,14 +172,14 @@ class Index extends Base
             
             if (($i % self::REFRESH_INFO_SYSTEM) == 0) {
                 $infoSystem = $this->solrTools->getInfoSystem();
-                $progress->setMessage($infoSystem->jvm->memory->used, 'jvm');
+                $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
             }
             
             if (! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) {
                 
                 $forceExtract = false;
                 $status = 0;
-                $progress->setMessage('(scanning)', 'infos');
+                $progress->setMessage('[scanning] - ', 'infos');
                 if ($this->fileService->addFileFromPath($file->getPath(), $forceExtract, $status)) {
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
@@ -197,7 +188,7 @@ class Index extends Base
                     $filesProcessed += $status;
                     if ($status > 0) {
                         $i += 5;
-                        $progress->setMessage('(extracting)', 'infos');
+                        $progress->setMessage('[extracting] - ', 'infos');
                     }
                 }
                 
@@ -220,10 +211,8 @@ class Index extends Base
         );
     }
 
-    private function updateUserDocuments($info, $fileIds, $output)
+    private function updateUserDocuments($userId, $fileIds, $output)
     {
-        $userId = $info['userid'];
-        
         Filesystem::tearDown();
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
@@ -231,8 +220,8 @@ class Index extends Base
         $cycle = array_chunk($fileIds, SolrToolsService::UPDATE_CHUNK_SIZE);
         
         $progress = new ProgressBar($output, sizeof($fileIds));
-        $progress->setFormat(' %message:-30s% [%bar%] %percent:3s%% - Solr memory: %jvm:-10s%  ');
-        $progress->setMessage('[' . $info['usersCurrent'] . '/' . $info['usersTotal'] . '] <info>' . $userId . '</info>: ');
+        $progress->setFormat(" %message:-30s% [%bar%] %percent:3s%% \n    %infos:12s% - %jvm:30s%      ");
+        $progress->setMessage('<info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
         $progress->start();
         
