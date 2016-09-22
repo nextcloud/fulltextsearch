@@ -67,8 +67,10 @@ class Optimize extends Base
             return;
         }
         
-        $result = $this->solrTools->optimizeSolrIndex();
-        $output->writeln('Your index has been optimized (' . $result->getQueryTime() . 'ms)');
+        if (! $result = $this->solrTools->optimizeSolrIndex())
+            $output->writeln('Optimization failed');
+        else
+            $output->writeln('Your index has been optimized (' . $result->getQueryTime() . 'ms)');
     }
 }
 
