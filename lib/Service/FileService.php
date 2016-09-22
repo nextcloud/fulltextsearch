@@ -57,6 +57,11 @@ class FileService
         $this->view = Filesystem::getView();
     }
 
+    public function setDebug($debug)
+    {
+        $this->miscService->setDebug($debug);
+    }
+
     public function setView($view = null)
     {
         if ($view == null)
@@ -66,6 +71,8 @@ class FileService
 
     public function addFileFromPath($path, $forceExtract = false, &$status = 0)
     {
+        $this->miscService->debug('Add file from path ' . $path);
+        
         if (! $this->view || $this->view == NULL)
             return false;
         
@@ -76,25 +83,42 @@ class FileService
         if (! SolrService::extractableFile($fileInfo->getMimeType()))
             return false;
         
-        if (! $forceExtract && $this->solrTools->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime()))
+        if (! $forceExtract && $this->solrTools->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime())) {
+            $this->miscService->debug('File is already known ' . $path);
             return true;
+        }
+        
+        $this->miscService->debug('Extracting file ' . $path);
         
         $status = 1;
-        return $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime());
+        $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime());
+        
+        if (! $result)
+            $this->configService->setAppValue('needed_index', '1');
+        
+        return $result;
     }
 
-    public function updateFiles($files, $options = array(), $isRoot = true)
+    public function updateFiles($files, $options = null, $isRoot = true)
     {
         if (! $this->view || $this->view == NULL)
             return false;
         
-        if (! is_array($files))
-            $files = array(
-                0 => array(
-                    'fileid' => $files,
-                    'path' => $this->view->getPath($files)
-                )
-            );
+        $this->miscService->debug('updating Files ' . var_export($files, true));
+        try {
+            if (! is_array($files))
+                $files = array(
+                    0 => array(
+                        'fileid' => $files,
+                        'path' => $this->view->getPath($files)
+                    )
+                );
+        } catch (NotFoundException $e) {
+            return false;
+        }
+        
+        if ($options == null)
+            $options = array();
         
         $pack = array();
         foreach ($files as $file) {
@@ -128,6 +152,10 @@ class FileService
             return $pack;
         
         $solrResult = $this->solrTools->updateDocuments($pack);
+        
+        if (! $solrResult)
+            $this->configService->setAppValue('needed_index', '1');
+        
         return $solrResult;
     }
 
@@ -140,16 +168,28 @@ class FileService
     {
         $solrResult = false;
         
-        $fileInfo = $this->view->getFileInfo($path);
-        if ($fileInfo->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
-            $files = $this->view->getDirectoryContent($path);
-            foreach ($files as $file)
-                $this->removeFiles($this->view->getPath($file->getId()), true);
-        } else {
-            $solrResult = $this->solrTools->removeDocument($fileInfo->getId());
-        }
+        try {
+            
+            $fileInfo = $this->view->getFileInfo($path);
+            if (! $fileInfo || $fileInfo == null)
+                return false;
+            
+            if ($fileInfo->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
+                $files = $this->view->getDirectoryContent($path);
+                
+                foreach ($files as $file) {
+                    if ($file == null)
+                        continue;
+                    $this->removeFiles($this->view->getPath($file->getId()));
+                }
+            } else {
+                $solrResult = $this->solrTools->removeDocument($fileInfo->getId());
+            }
+            
+            return $solrResult;
+        } catch (NotFoundException $e) {}
         
-        return $solrResult;
+        return false;
     }
 
     private function getData($path)

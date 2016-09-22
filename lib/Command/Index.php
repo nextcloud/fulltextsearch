@@ -39,7 +39,7 @@ use OC\Files\Filesystem;
 class Index extends Base
 {
 
-    const REFRESH_INFO_SYSTEM = 100;
+    const REFRESH_INFO_SYSTEM = 3;
 
     private $userManager;
 
@@ -53,7 +53,9 @@ class Index extends Base
 
     private $fileService;
 
-    public function __construct(IUserManager $userManager, $rootFolder, $solrService, $solrTools, $configService, $fileService)
+    private $miscService;
+
+    public function __construct(IUserManager $userManager, $rootFolder, $solrService, $solrTools, $configService, $fileService, $miscService)
     {
         parent::__construct();
         $this->userManager = $userManager;
@@ -62,13 +64,17 @@ class Index extends Base
         $this->solrTools = $solrTools;
         $this->configService = $configService;
         $this->fileService = $fileService;
+        $this->miscService = $miscService;
     }
 
     protected function configure()
     {
         parent::configure();
-        $this->setName('nextant:index')->setDescription('scan users\' files, generate and index Solr documents');
-        // ->addOption('debug', 'd', InputOption::VALUE_REQUIRED, 'Generate a complete log file named nextant.txt at the root of your cloud. You will need to specify a userId (ie. --debug=admin)');
+        $this->setName('nextant:index')
+            ->setDescription('scan users\' files, generate and index Solr documents')
+            ->addOption('debug', 'd', InputOption::VALUE_NONE, 'flood the log of debug messages')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'force the lock on Solr')
+            ->addOption('background', 'bg', InputOption::VALUE_NONE, 'force index as a background process');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -81,7 +87,25 @@ class Index extends Base
             return;
         }
         
+        $this->miscService->setDebug($input->getOption('debug'));
+        $this->fileService->setDebug($input->getOption('debug'));
+        
         $this->solrService->setOutput($output);
+        
+        if ($input->getOption('background')) {
+            $this->configService->setAppValue('needed_index', '1');
+            $this->configService->setAppValue('solr_lock', '0');
+            return;
+        }
+        
+        $solr_locked = $this->configService->getAppValue('solr_lock');
+        if (! $input->getOption('force') && $solr_locked > 0) {
+            $output->writeln('Your solr is locked by a running script like an index command or background jobs (cron)');
+            $output->writeln('You can still use the --force');
+            return;
+        }
+        
+        $this->configService->setAppValue('solr_lock', time());
         
         //
         // extract files
@@ -103,6 +127,7 @@ class Index extends Base
             $userId = $user->getUID();
             $this->solrService->setOwner($userId);
             
+            $this->miscService->debug('Init Extracting new files for user ' . $userId);
             $result = $this->browseUserDirectory($userId, $output);
             
             if ($result['total'] > 0) {
@@ -134,8 +159,12 @@ class Index extends Base
             $userId = $doc['userid'];
             $this->solrService->setOwner($userId);
             
-            if (! $this->updateUserDocuments($userId, $fileIds, $output))
+            $this->miscService->debug('Init Updating documents for user ' . $userId);
+            
+            if (! $this->updateUserDocuments($userId, $fileIds, $output)) {
                 $output->writeln('  fail ');
+                return;
+            }
             
             $output->writeln('');
         }
@@ -143,6 +172,7 @@ class Index extends Base
         Filesystem::tearDown();
         
         $this->configService->setAppValue('needed_index', '0');
+        $this->configService->setAppValue('solr_lock', '0');
     }
 
     private function browseUserDirectory($userId, $output)
@@ -150,36 +180,49 @@ class Index extends Base
         Filesystem::tearDown();
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
+        $this->miscService->debug('(' . $userId . ') - Init Filesystem');
         
         $userFolder = $this->rootFolder->getUserFolder($userId);
         $folder = $userFolder->get('/');
+        $this->miscService->debug('(' . $userId . ') - Get root folder');
+        
         $files = $folder->search('');
+        $this->miscService->debug('(' . $userId . ') - found ' . sizeof($files) . ' files');
         
         $progress = new ProgressBar($output, sizeof($files));
         $progress->setMessage('<info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
-        $progress->setMessage('[scanning] - ', 'infos');
+        $progress->setMessage('[preparing]', 'infos');
         $progress->setFormat(" %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
         $progress->start();
         
+        sleep(5);
+        
         $filesProcessed = 0;
         $fileIds = array();
-        $i = 0;
+        $lastProgressTick = 0;
         foreach ($files as $file) {
+            
+            $this->miscService->debug('(' . $userId . ') - scaning file #' . $file->getId() . ' (' . $file->getMimeType() . ') ' . $file->getPath());
+            
             if ($this->hasBeenInterrupted()) {
+                $this->configService->setAppValue('solr_lock', '0');
                 throw new \Exception('ctrl-c');
             }
             
-            if (($i % self::REFRESH_INFO_SYSTEM) == 0) {
+            $progress->setMessage('[scanning] -', 'infos');
+            
+            if ((time() - self::REFRESH_INFO_SYSTEM) > $lastProgressTick) {
                 $infoSystem = $this->solrTools->getInfoSystem();
                 $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
+                $lastProgressTick = time();
             }
             
             if (! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) {
                 
                 $forceExtract = false;
                 $status = 0;
-                $progress->setMessage('[scanning] - ', 'infos');
+                
                 if ($this->fileService->addFileFromPath($file->getPath(), $forceExtract, $status)) {
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
@@ -187,13 +230,9 @@ class Index extends Base
                     ));
                     $filesProcessed += $status;
                     if ($status > 0) {
-                        $i += 5;
-                        $progress->setMessage('[extracting] - ', 'infos');
+                        $progress->setMessage('[extracting] -', 'infos');
                     }
                 }
-                
-                $progress->display();
-                $i ++;
             }
             
             $progress->advance();
@@ -216,26 +255,45 @@ class Index extends Base
         Filesystem::tearDown();
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
+        $this->miscService->debug('Init filesystem for user ' . $userId);
         
-        $cycle = array_chunk($fileIds, SolrToolsService::UPDATE_CHUNK_SIZE);
+        // $cycle = array_chunk($fileIds, 5);
         
         $progress = new ProgressBar($output, sizeof($fileIds));
-        $progress->setFormat(" %message:-30s% [%bar%] %percent:3s%% \n    %jvm:30s%      ");
+        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
         $progress->setMessage('<info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
+        $progress->setMessage('[preparing]', 'infos');
         $progress->start();
         
+        $this->miscService->debug('(' . $userId . ') - found ' . sizeof($fileIds) . ' files');
+        
+        sleep(5);
         $i = 0;
-        foreach ($cycle as $batch) {
+        $lastProgressTick = 0;
+        foreach ($fileIds as $file) {
             if ($this->hasBeenInterrupted()) {
+                $this->configService->setAppValue('solr_lock', '0');
                 throw new \Exception('ctrl-c');
             }
             
-            $result = $this->fileService->updateFiles($batch, $error);
+            $result = $this->fileService->updateFiles(array(
+                $file
+            ));
             
-            $infoSystem = $this->solrTools->getInfoSystem();
-            $progress->setMessage($infoSystem->jvm->memory->used, 'jvm');
-            $progress->advance(SolrToolsService::UPDATE_CHUNK_SIZE);
+            if ($result)
+                $this->miscService->debug('(' . $userId . ' update done');
+            else
+                $this->miscService->debug('(' . $userId . ' update failed');
+            
+            $progress->setMessage('[updating] -', 'infos');
+            if ((time() - self::REFRESH_INFO_SYSTEM) > $lastProgressTick) {
+                $infoSystem = $this->solrTools->getInfoSystem();
+                $progress->setMessage($infoSystem->jvm->memory->used, 'jvm');
+                $lastProgressTick = time();
+            }
+            
+            $progress->advance();
             
             if (! $result)
                 return false;
@@ -243,8 +301,10 @@ class Index extends Base
             $i ++;
             
             // let's take a break every 1000 files
-            if (($i * SolrToolsService::UPDATE_CHUNK_SIZE) % 1000) {
-                sleep(8);
+            if (($i % 500) == 0) {
+                $progress->setMessage('[standby] -', 'infos');
+                $progress->display();
+                sleep(2);
             }
         }
         

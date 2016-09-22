@@ -35,10 +35,23 @@ class MiscService
 
     private $appName;
 
+    private $debug;
+
     public function __construct(ILogger $logger, $appName)
     {
         $this->logger = $logger;
         $this->appName = $appName;
+    }
+
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
+    }
+
+    public function debug($msg)
+    {
+        if ($this->debug)
+            $this->log($msg, 1);
     }
 
     public function log($message, $level = 2)

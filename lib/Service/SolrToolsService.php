@@ -46,8 +46,6 @@ class SolrToolsService
 
     private $output;
 
-    private $lastMessage;
-
     public function __construct($solrService, $configService, $miscService)
     {
         // $this->solariumClient = $solrClient;
@@ -57,8 +55,29 @@ class SolrToolsService
         $this->output = null;
     }
 
-    public function optimizeSolrIndex()
-    {}
+    public function optimizeSolrIndex(&$error = '')
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+            return false;
+        
+        try {
+            $client = $this->solrService->getClient();
+            
+            $update = $client->createUpdate();
+            $update->addOptimize(true, true, 5);
+            $result = $client->update($update);
+            
+            return $result;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = SolrService::EXCEPTION_OPTIMIZE_FAILED;
+            else
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = SolrService::EXCEPTION;
+        }
+        return false;
+    }
 
     public function updateDocuments($data, &$error = '')
     {
@@ -149,8 +168,9 @@ class SolrToolsService
                     return false;
                 
                 if ($request->getQueryTime() > self::UPDATE_MAXIMUM_QUERYTIME) {
-                    $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, we won\'t go any further.', 2);
-                    return false;
+                    $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, standby.', 1);
+                    // //return true;
+                    sleep(2);
                 }
                 
                 $documentProcessed += sizeof($docs);
@@ -193,8 +213,12 @@ class SolrToolsService
         
         $result = array();
         
+        if (sizeof($docs) == 0)
+            return $result;
+        
         try {
             $query = $client->createSelect();
+            
             $query->setQuery('id:' . implode(' ', $docs));
             $query->setRows(sizeof($docs));
             $query->setFields(array(

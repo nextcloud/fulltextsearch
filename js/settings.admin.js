@@ -30,8 +30,10 @@ $(document)
 
 						save : function() {
 							$('#nextant_apply').attr('disabled', true);
-							$('#solr_url').prop('disable', true);
-							$('#solr_core').prop('disable', true);
+							$('#solr_url').attr('disabled', true);
+							$('#solr_core').attr('disabled', true);
+							$('#solr_live_extract').attr('disabled', true);
+							$('#solr_live_docupdate').attr('disabled', true);
 							nextantSettings.test('ping');
 						},
 
@@ -45,6 +47,8 @@ $(document)
 							var data = {
 								solr_url : $('#solr_url').val(),
 								solr_core : $('#solr_core').val(),
+								live_extract : $('#solr_live_extract').prop('checked'),
+								live_docupdate : $('#solr_live_docupdate').prop('checked'),
 								command : command
 							}
 
@@ -153,8 +157,10 @@ $(document)
 						},
 
 						reset : function() {
-							$('#solr_url').prop('disable', false);
-							$('#solr_core').prop('disable', false);
+							$('#solr_url').attr('disabled', false);
+							$('#solr_core').attr('disabled', false);
+							$('#solr_live_extract').attr('disabled', false);
+							$('#solr_live_docupdate').attr('disabled', false);
 							$('#nextant_apply').attr('disabled', false);
 						}
 					}

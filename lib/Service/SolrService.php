@@ -54,6 +54,8 @@ class SolrService
     const EXCEPTION_SEARCH_FAILED = 81;
 
     const EXCEPTION_REMOVE_FAILED = 101;
+
+    const EXCEPTION_OPTIMIZE_FAILED = 121;
     
     // undocumented exception
     const EXCEPTION = 9;
@@ -321,9 +323,7 @@ class SolrService
                 array_push($groups, ' nextant_sharegroup:' . $helper->escapePhrase($group));
             
             if (sizeof($groups) > 0)
-                $ownerGroups = implode(' OR ', $groups);
-            
-            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . $ownerGroups;
+                $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . implode(' OR ', $groups);
         }
         
         return $ownerQuery;

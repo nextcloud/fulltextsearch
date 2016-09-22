@@ -31,11 +31,17 @@ use OCP\IConfig;
 class ConfigService
 {
 
+    const ACTION_LIVE_EXTRACT = 'live_extract';
+
+    const ACTION_LIVE_DOCUPDATE = 'live_docupdate';
+
     private $defaults = [
-        'configured' => '1',
-        'needed_index' => '1',
+        'configured' => '0',
+        'needed_index' => '0',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
+        'live_extract' => '1',
+        'live_docupdate' => '1',
         'solr_lock' => 0
     ];
 
@@ -76,6 +82,25 @@ class ConfigService
     public function setAppValue($key, $value)
     {
         return $this->config->setAppValue($this->appName, $key, $value);
+    }
+
+    /**
+     * return if config allow to perform action
+     *
+     * @param string $action            
+     * @return boolean
+     */
+    public function shoudIContinue($action)
+    {
+        switch ($action) {
+            case self::ACTION_LIVE_EXTRACT:
+                return ($this->getAppValue($action) == '1');
+            
+            case self::ACTION_LIVE_DOCUPDATE:
+                if ($this->getAppValue(self::ACTION_LIVE_EXTRACT) != '1')
+                    return false;
+                return ($this->getAppValue($action) == '1');
+        }
     }
 
     /**

@@ -71,12 +71,14 @@ class SettingsController extends Controller
             'current_docs' => $documentsCount,
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core'),
+            'live_extract' => $this->configService->getAppValue('live_extract'),
+            'live_docupdate' => $this->configService->getAppValue('live_docupdate'),
             'solr_lock' => $this->configService->getAppValue('solr_lock')
         ];
         return new TemplateResponse($this->appName, 'settings.admin', $params, 'blank');
     }
 
-    public function setSettings($solr_url, $solr_core, $command)
+    public function setSettings($solr_url, $solr_core, $live_extract, $live_docupdate, $command)
     {
         $this->solr_url = $solr_url;
         $this->solr_core = $solr_core;
@@ -124,7 +126,7 @@ class SettingsController extends Controller
                     break;
                 
                 case 'save':
-                    $result = $this->save($message);
+                    $result = $this->save($live_extract, $live_docupdate, $message);
                     break;
             }
         }
@@ -236,11 +238,13 @@ class SettingsController extends Controller
         return false;
     }
 
-    private function save(&$message)
+    private function save($live_extract, $live_docupdate, &$message)
     {
         if (! is_null($this->solr_url) && ! is_null($this->solr_core)) {
             $this->configService->setAppValue('solr_url', $this->solr_url);
             $this->configService->setAppValue('solr_core', $this->solr_core);
+            $this->configService->setAppValue('live_extract', (($live_extract) ? '1' : '0'));
+            $this->configService->setAppValue('live_docupdate', (($live_docupdate) ? '1' : '0'));
             $this->configService->setAppValue('configured', '1');
             
             $message = "Your configuration has been saved";
