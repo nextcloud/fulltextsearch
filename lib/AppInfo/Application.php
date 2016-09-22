@@ -169,7 +169,7 @@ class Application extends App
         Util::connectHook('OC_Filesystem', 'post_rename', '\OCA\Nextant\Hooks\FilesHooks', 'fileRenamed');
         Util::connectHook('OC_Filesystem', 'delete', '\OCA\Nextant\Hooks\FilesHooks', 'fileTrashed');
         Util::connectHook('\OCA\Files_Trashbin\Trashbin', 'post_restore', '\OCA\Nextant\Hooks\FilesHooks', 'fileRestored');
-        Util::connectHook('\OCP\Trashbin', 'delete', '\OCA\Nextant\Hooks\FilesHooks', 'fileDeleted');
+        Util::connectHook('\OCP\Trashbin', 'preDelete', '\OCA\Nextant\Hooks\FilesHooks', 'fileDeleted');
         Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
         Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
     }

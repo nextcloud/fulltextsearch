@@ -155,16 +155,28 @@ class FileService
     {
         $solrResult = false;
         
-        $fileInfo = $this->view->getFileInfo($path);
-        if ($fileInfo->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
-            $files = $this->view->getDirectoryContent($path);
-            foreach ($files as $file)
-                $this->removeFiles($this->view->getPath($file->getId()), true);
-        } else {
-            $solrResult = $this->solrTools->removeDocument($fileInfo->getId());
-        }
+        try {
+            
+            $fileInfo = $this->view->getFileInfo($path);
+            if (! $fileInfo || $fileInfo == null)
+                return false;
+            
+            if ($fileInfo->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
+                $files = $this->view->getDirectoryContent($path);
+                
+                foreach ($files as $file) {
+                    if ($file == null)
+                        continue;
+                    $this->removeFiles($this->view->getPath($file->getId()));
+                }
+            } else {
+                $solrResult = $this->solrTools->removeDocument($fileInfo->getId());
+            }
+            
+            return $solrResult;
+        } catch (NotFoundException $e) {}
         
-        return $solrResult;
+        return false;
     }
 
     private function getData($path)
