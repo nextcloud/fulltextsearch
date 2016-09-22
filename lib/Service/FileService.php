@@ -83,11 +83,20 @@ class FileService
         if (! SolrService::extractableFile($fileInfo->getMimeType()))
             return false;
         
-        if (! $forceExtract && $this->solrTools->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime()))
+        if (! $forceExtract && $this->solrTools->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime())) {
+            $this->miscService->debug('File is already known ' . $path);
             return true;
+        }
+        
+        $this->miscService->debug('Extracting file ' . $path);
         
         $status = 1;
-        return $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime());
+        $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime());
+        
+        if (! $result)
+            $this->configService->setAppValue('needed_index', '1');
+        
+        return $result;
     }
 
     public function updateFiles($files, $options = null, $isRoot = true)
@@ -143,6 +152,10 @@ class FileService
             return $pack;
         
         $solrResult = $this->solrTools->updateDocuments($pack);
+        
+        if (! $solrResult)
+            $this->configService->setAppValue('needed_index', '1');
+        
         return $solrResult;
     }
 

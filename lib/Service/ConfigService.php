@@ -36,8 +36,8 @@ class ConfigService
     const ACTION_LIVE_DOCUPDATE = 'live_docupdate';
 
     private $defaults = [
-        'configured' => '1',
-        'needed_index' => '1',
+        'configured' => '0',
+        'needed_index' => '0',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
         'live_extract' => '1',

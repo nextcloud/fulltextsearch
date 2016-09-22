@@ -51,7 +51,7 @@ class MiscService
     public function debug($msg)
     {
         if ($this->debug)
-            $this->log('[Nextant] ' . $msg, 1);
+            $this->log($msg, 1);
     }
 
     public function log($message, $level = 2)

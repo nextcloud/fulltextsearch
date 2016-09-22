@@ -168,8 +168,9 @@ class SolrToolsService
                     return false;
                 
                 if ($request->getQueryTime() > self::UPDATE_MAXIMUM_QUERYTIME) {
-                    $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, we won\'t go any further.', 2);
-                    return false;
+                    $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, standby.', 1);
+                    // //return true;
+                    sleep(2);
                 }
                 
                 $documentProcessed += sizeof($docs);
@@ -212,8 +213,12 @@ class SolrToolsService
         
         $result = array();
         
+        if (sizeof($docs) == 0)
+            return $result;
+        
         try {
             $query = $client->createSelect();
+            
             $query->setQuery('id:' . implode(' ', $docs));
             $query->setRows(sizeof($docs));
             $query->setFields(array(

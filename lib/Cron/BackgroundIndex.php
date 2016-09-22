@@ -27,6 +27,7 @@
 namespace OCA\Nextant\Cron;
 
 use \OCA\Nextant\AppInfo\Application;
+use OC\Files\Filesystem;
 
 class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 {
@@ -37,12 +38,11 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 
     public function __construct()
     {
-        $this->setInterval(60 * 60 * 24); // 1 minute
+        $this->setInterval(60 * 60 * 6); // 6 hours
     }
 
     protected function run($argument)
     {
-        return;
         $logger = \OC::$server->getLogger();
         
         $app = new Application();
@@ -50,20 +50,109 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         $this->configService = $c->query('ConfigService');
         $this->miscService = $c->query('MiscService');
+        $this->userManager = $c->query('UserManager');
+        $this->solrService = $c->query('SolrService');
+        $this->fileService = $c->query('FileService');
+        $this->rootFolder = $c->query('RootFolder');
+        
+        $this->setDebug(true);
+        
+        if ($this->configService->getAppValue('needed_index') != '1') {
+            $this->miscService->debug('Looks like there is no need to index');
+            return;
+        }
         
         $solr_locked = $this->configService->getAppValue('solr_lock');
-        
-        $this->miscService->log('@1 solr_locked: ' . $solr_locked);
-        if ($solr_locked > 0)
+        if ($solr_locked > 0) {
+            $this->miscService->log('The background index detected that your solr is locked by a running script. If it is not the case, you should start indexing manually using ./occ nextant:index --force');
             return;
+        }
+        
+        $this->miscService->debug('Cron - Init');
         
         $this->configService->setAppValue('solr_lock', time());
-        $this->extractDocuments();
+        if ($this->scanUsers())
+            $this->configService->setAppValue('needed_index', '0');
         $this->configService->setAppValue('solr_lock', '0');
+        
+        $this->miscService->debug('Cron - End');
     }
 
-    private function extractDocuments()
+    public function setDebug($debug)
     {
-        $this->miscService->log('@2 cache_execute');
+        $this->miscService->setDebug($debug);
+        $this->fileService->setDebug($debug);
+    }
+
+    private function scanUsers()
+    {
+        $users = $this->userManager->search('');
+        $extractedDocuments = array();
+        foreach ($users as $user) {
+            
+            $userId = $user->getUID();
+            $this->solrService->setOwner($userId);
+            
+            $result = $this->browseUserDirectory($userId);
+            if (! $result) {
+                $this->miscService->debug('Background index quits unexpectedly');
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    private function browseUserDirectory($userId)
+    {
+        Filesystem::tearDown();
+        Filesystem::init($userId, '');
+        
+        $this->fileService->setView(Filesystem::getView());
+        
+        $userFolder = $this->rootFolder->getUserFolder($userId);
+        $folder = $userFolder->get('/');
+        
+        $files = $folder->search('');
+        
+        sleep(5);
+        
+        $fileIds = array();
+        $i = 0;
+        
+        foreach ($files as $file) {
+            
+            $this->miscService->debug('Cron - extract #' . $file->getId());
+            if ((! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) && ($this->fileService->addFileFromPath($file->getPath(), false))) {
+                array_push($fileIds, array(
+                    'fileid' => $file->getId(),
+                    'path' => $file->getPath()
+                ));
+            }
+            
+            $i ++;
+        }
+        
+        sleep(5);
+        $i = 0;
+        foreach ($fileIds as $file) {
+            
+            $this->miscService->debug('Cron update - file #' . $file['fileid']);
+            $result = $this->fileService->updateFiles(array(
+                $file
+            ));
+            
+            if (! $result) {
+                $this->miscService->log("Failed to update files flag during background jobs", 3);
+                return false;
+            }
+            
+            $i ++;
+            if (($i % 1000) == 0) {
+                sleep(10);
+            }
+        }
+        
+        return true;
     }
 }
