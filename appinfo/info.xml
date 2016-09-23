@@ -13,7 +13,7 @@ _Recognized file format: text, rtf, pdf, html, openoffice, office, ..._
 
 
 	</description>
-	<version>0.3.9</version>
+	<version>0.3.10</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<types>

@@ -55,8 +55,8 @@ class FilesEvents
      */
     public function onFileCreate($path)
     {
-        $this->fileService->addFileFromPath($path, true);
-        $this->fileService->updateFiles(FileService::getId($path));
+        if ($this->fileService->addFileFromPath($path, true))
+            $this->fileService->updateFiles(FileService::getId($path));
     }
 
     /**
@@ -66,8 +66,8 @@ class FilesEvents
      */
     public function onFileUpdate($path)
     {
-        $this->fileService->addFileFromPath($path, true);
-        $this->fileService->updateFiles(FileService::getId($path));
+        if ($this->fileService->addFileFromPath($path, true))
+            $this->fileService->updateFiles(FileService::getId($path));
     }
 
     /**

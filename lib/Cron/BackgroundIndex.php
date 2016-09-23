@@ -26,6 +26,7 @@
  */
 namespace OCA\Nextant\Cron;
 
+use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\AppInfo\Application;
 use OC\Files\Filesystem;
 
@@ -110,7 +111,10 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         $this->fileService->setView(Filesystem::getView());
         
-        $userFolder = $this->rootFolder->getUserFolder($userId);
+        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, '/files');
+        if ($userFolder == null | ! $userFolder)
+            return true;
+        
         $folder = $userFolder->get('/');
         
         $files = $folder->search('');

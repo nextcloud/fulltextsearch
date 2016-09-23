@@ -256,6 +256,19 @@ class FileService
             return false;
         }
     }
+
+    public static function getUserFolder($rootFolder, $userId, $path)
+    {
+        \OC\Files\Filesystem::initMountPoints($userId);
+        $dir = '/' . $userId;
+        $folder = null;
+        
+        try {
+            return $rootFolder->get($dir)->get($path);
+        } catch (NotFoundException $e) {}
+        
+        return false;
+    }
     
     // public static function getAbsolutePath($path, $root = false)
     // {

@@ -27,6 +27,7 @@
 namespace OCA\Nextant\Command;
 
 use \OCA\Nextant\Service\SolrToolsService;
+use \OCA\Nextant\Service\FileService;
 use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -111,6 +112,7 @@ class Index extends Base
         // extract files
         $output->writeln('');
         $output->writeln('* Extracting new files to Solr:');
+        $output->writeln('');
         
         $users = $this->userManager->search('');
         $usersTotal = sizeof($users);
@@ -182,11 +184,15 @@ class Index extends Base
         $this->fileService->setView(Filesystem::getView());
         $this->miscService->debug('(' . $userId . ') - Init Filesystem');
         
-        $userFolder = $this->rootFolder->getUserFolder($userId);
-        $folder = $userFolder->get('/');
-        $this->miscService->debug('(' . $userId . ') - Get root folder');
+        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, '/files');
+        if ($userFolder != null && $userFolder) {
+            $folder = $userFolder->get('/');
+            
+            $this->miscService->debug('(' . $userId . ') - found root folder');
+            $files = $folder->search('');
+        } else
+            $files = array();
         
-        $files = $folder->search('');
         $this->miscService->debug('(' . $userId . ') - found ' . sizeof($files) . ' files');
         
         $progress = new ProgressBar($output, sizeof($files));
@@ -196,7 +202,8 @@ class Index extends Base
         $progress->setFormat(" %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
         $progress->start();
         
-        sleep(5);
+        if (sizeof($files) > 10)
+            sleep(5);
         
         $filesProcessed = 0;
         $fileIds = array();
