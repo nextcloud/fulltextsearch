@@ -56,7 +56,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         $this->setDebug(true);
         
-        if ($this->configService->getAppValue('needed_index') != '1') {
+        if (! $this->configService->neededIndex()) {
             $this->miscService->debug('Looks like there is no need to index');
             return;
         }
@@ -71,7 +71,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         $this->configService->setAppValue('solr_lock', time());
         if ($this->scanUsers())
-            $this->configService->setAppValue('needed_index', '0');
+            $this->configService->needIndex(false);
         $this->configService->setAppValue('solr_lock', '0');
         
         $this->miscService->debug('Cron - End');

@@ -97,7 +97,7 @@ class FileService
         $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime());
         
         if (! $result)
-            $this->configService->setAppValue('needed_index', '1');
+            $this->configService->needIndex();
         
         return $result;
     }
@@ -157,7 +157,7 @@ class FileService
         $solrResult = $this->solrTools->updateDocuments($pack);
         
         if (! $solrResult)
-            $this->configService->setAppValue('needed_index', '1');
+            $this->configService->needIndex(true);
         
         return $solrResult;
     }

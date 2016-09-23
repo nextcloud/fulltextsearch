@@ -94,7 +94,7 @@ class Index extends Base
         $this->solrService->setOutput($output);
         
         if ($input->getOption('background')) {
-            $this->configService->setAppValue('needed_index', '1');
+            $this->configService->needIndex(true);
             $this->configService->setAppValue('solr_lock', '0');
             return;
         }
@@ -173,7 +173,7 @@ class Index extends Base
         
         Filesystem::tearDown();
         
-        $this->configService->setAppValue('needed_index', '0');
+        $this->configService->needIndex(false);
         $this->configService->setAppValue('solr_lock', '0');
     }
 
