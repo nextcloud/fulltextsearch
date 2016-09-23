@@ -89,7 +89,7 @@ class Application extends App
         });
         
         $container->registerService('FilesEvents', function ($c) {
-            return new FilesEvents($c->query('UserId'), $c->query('FileService'), $c->query('SolrService'), $c->query('MiscService'));
+            return new FilesEvents($c->query('ConfigService'), $c->query('UserId'), $c->query('FileService'), $c->query('SolrService'), $c->query('MiscService'));
         });
         
         // $container->query('IndexMapper')->insert(new IndexEntity(array(userid => 2, 'path' => '/toto', 'clef' => 'CLEFCLEF')));
