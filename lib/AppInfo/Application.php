@@ -68,7 +68,7 @@ class Application extends App
         });
         
         $container->registerService('FileService', function ($c) {
-            return new FileService($c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+            return new FileService($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
         });
         
         $container->registerService('SolrService', function ($c) {

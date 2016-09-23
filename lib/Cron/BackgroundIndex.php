@@ -44,8 +44,6 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 
     protected function run($argument)
     {
-        $logger = \OC::$server->getLogger();
-        
         $app = new Application();
         $c = $app->getContainer();
         

@@ -39,6 +39,8 @@ class FileService
     const UPDATE_MAXIMUM_FILES = 1000;
     
     // private $root;
+    private $configService;
+
     private $solrService;
 
     private $solrTools;
@@ -47,9 +49,10 @@ class FileService
 
     private $view;
 
-    public function __construct($solrService, $solrTools, $miscService)
+    public function __construct($configService, $solrService, $solrTools, $miscService)
     {
         // $this->root = $root;
+        $this->configService = $configService;
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->miscService = $miscService;
