@@ -110,7 +110,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->fileService->setView(Filesystem::getView());
         
         $userFolder = FileService::getUserFolder($this->rootFolder, $userId, '/files');
-        if ($userFolder == null | ! $userFolder)
+        if ($userFolder == null || ! $userFolder)
             return true;
         
         $folder = $userFolder->get('/');
