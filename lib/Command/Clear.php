@@ -72,7 +72,7 @@ class Clear extends Base
         
         if ($this->solrAdmin->clear()) {
             $output->writeln('Your Solr core is now empty');
-            $this->configService->stopUpdate();
+            $this->configService->stopIndex();
         }
     }
 }
