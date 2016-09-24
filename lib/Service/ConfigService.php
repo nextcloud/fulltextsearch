@@ -37,7 +37,7 @@ class ConfigService
 
     private $defaults = [
         'configured' => '0',
-        'needed_index' => '0',
+        'needed_index' => '2',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
         'live_extract' => '1',
@@ -56,6 +56,25 @@ class ConfigService
         $this->appName = $appName;
         $this->config = $config;
         $this->miscService = $miscService;
+    }
+
+    public function needIndex($need)
+    {
+        if (! $need)
+            $this->setAppValue('needed_index', '0');
+        else 
+            if ($this->getAppValue('needed_index') == '0')
+                $this->setAppValue('needed_index', '1');
+    }
+
+    public function neededIndex()
+    {
+        return ($this->getAppValue('needed_index') == '1');
+    }
+
+    public function stopIndex()
+    {
+        $this->setAppValue('needed_index', '2');
     }
 
     /**

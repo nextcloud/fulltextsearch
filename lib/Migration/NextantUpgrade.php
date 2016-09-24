@@ -36,10 +36,13 @@ class NextantUpgrade implements IRepairStep
 
     private $solrAdmin;
 
-    public function __construct($solrService, $solrAdmin)
+    private $configService;
+
+    public function __construct($configService, $solrService, $solrAdmin)
     {
         $this->solrService = $solrService;
         $this->solrAdmin = $solrAdmin;
+        $this->configService = $configService;
     }
 
     /**
@@ -54,15 +57,10 @@ class NextantUpgrade implements IRepairStep
     }
 
     /**
-     * Run repair step.
-     * Must throw exception on error.
-     *
-     * @since 9.1.0
-     * @param IOutput $output            
-     * @throws \Exception in case of failure
      */
     public function run(IOutput $output)
     {
         $this->solrAdmin->checkSchema(true, $error);
+        // $this->configService->stopUpdate();
     }
 }

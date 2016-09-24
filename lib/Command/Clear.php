@@ -36,13 +36,16 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class Clear extends Base
 {
 
+    private $configService;
+
     private $solrService;
 
     private $solrAdmin;
 
-    public function __construct($solrService, $solrAdmin)
+    public function __construct($configService, $solrService, $solrAdmin)
     {
         parent::__construct();
+        $this->configService = $configService;
         $this->solrService = $solrService;
         $this->solrAdmin = $solrAdmin;
     }
@@ -67,8 +70,10 @@ class Clear extends Base
             return;
         }
         
-        $this->solrAdmin->clear();
-        $output->writeln('Your Solr core is now empty');
+        if ($this->solrAdmin->clear()) {
+            $output->writeln('Your Solr core is now empty');
+            $this->configService->stopUpdate();
+        }
     }
 }
 

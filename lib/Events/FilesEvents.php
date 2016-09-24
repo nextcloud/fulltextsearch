@@ -32,15 +32,20 @@ use \OCA\Nextant\Service\MiscService;
 class FilesEvents
 {
 
+    private $configService;
+
+    private $userId;
+
     private $fileService;
 
     private $solrService;
 
     private $miscService;
 
-    public function __construct($userId, $fileService, $solrService, $miscService)
+    public function __construct($configService, $userId, $fileService, $solrService, $miscService)
     {
         $this->userId = $userId;
+        $this->configService = $configService;
         $this->fileService = $fileService;
         $this->solrService = $solrService;
         $this->miscService = $miscService;
@@ -55,8 +60,11 @@ class FilesEvents
      */
     public function onFileCreate($path)
     {
-        $this->fileService->addFileFromPath($path, true);
-        $this->fileService->updateFiles(FileService::getId($path));
+        if ($this->configService->getAppValue('live_extract') == '1') {
+            if ($this->fileService->addFileFromPath($path, true))
+                $this->fileService->updateFiles(FileService::getId($path));
+        } else
+            $this->configService->needIndex(true);
     }
 
     /**
@@ -66,8 +74,11 @@ class FilesEvents
      */
     public function onFileUpdate($path)
     {
-        $this->fileService->addFileFromPath($path, true);
-        $this->fileService->updateFiles(FileService::getId($path));
+        if ($this->configService->getAppValue('live_extract') == '1') {
+            if ($this->fileService->addFileFromPath($path, true))
+                $this->fileService->updateFiles(FileService::getId($path));
+        } else
+            $this->configService->needIndex(true);
     }
 
     /**
@@ -78,7 +89,10 @@ class FilesEvents
      */
     public function onFileRename($target)
     {
-        $this->fileService->updateFiles(FileService::getId($target));
+        if ($this->configService->getAppValue('live_docupdate') == '1')
+            $this->fileService->updateFiles(FileService::getId($target));
+        else
+            $this->configService->needIndex(true);
     }
 
     /**
@@ -88,12 +102,15 @@ class FilesEvents
      */
     public function onFileTrash($path)
     {
-        if (\OCP\App::isEnabled('files_trashbin')) {
-            $this->fileService->updateFiles(FileService::getId($path), array(
-                'deleted' => true
-            ));
+        if ($this->configService->getAppValue('live_docupdate') == '1') {
+            if (\OCP\App::isEnabled('files_trashbin')) {
+                $this->fileService->updateFiles(FileService::getId($path), array(
+                    'deleted' => true
+                ));
+            } else
+                $this->fileService->removeFiles($path);
         } else
-            $this->fileService->removeFiles($path);
+            $this->configService->needIndex(true);
     }
 
     /**
@@ -104,8 +121,11 @@ class FilesEvents
     public function onFileDelete($path)
     {
         // fast way to bypass files_trashbin/
-        $this->fileService->setView(new \OC\Files\View('/' . $this->userId));
-        $this->fileService->removeFiles($path);
+        if ($this->configService->getAppValue('live_docupdate') == '1') {
+            $this->fileService->setView(new \OC\Files\View('/' . $this->userId));
+            $this->fileService->removeFiles($path);
+        } else
+            $this->configService->needIndex(true);
     }
 
     /**
@@ -115,11 +135,12 @@ class FilesEvents
      */
     public function onFileRestore($path)
     {
-        $this->fileService->updateFiles(FileService::getId($path), array(
-            'deleted' => false
-        ));
-        
-        // $this->fileService->addFileFromPath($path);
+        if ($this->configService->getAppValue('live_docupdate') == '1') {
+            $this->fileService->updateFiles(FileService::getId($path), array(
+                'deleted' => false
+            ));
+        } else
+            $this->configService->needIndex(true);
     }
 
     /**
@@ -129,7 +150,10 @@ class FilesEvents
      */
     public function onFileShare($fileId)
     {
-        $this->fileService->updateFiles($fileId);
+        if ($this->configService->getAppValue('live_docupdate') == '1')
+            $this->fileService->updateFiles($fileId);
+        else
+            $this->configService->needIndex(true);
     }
 
     /**
@@ -139,7 +163,10 @@ class FilesEvents
      */
     public function onFileUnshare($fileId)
     {
-        $this->fileService->updateFiles($fileId);
+        if ($this->configService->getAppValue('live_docupdate') == '1')
+            $this->fileService->updateFiles($fileId);
+        else
+            $this->configService->needIndex(true);
     }
 }
 

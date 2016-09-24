@@ -27,6 +27,7 @@
 namespace OCA\Nextant\Command;
 
 use \OCA\Nextant\Service\SolrToolsService;
+use \OCA\Nextant\Service\FileService;
 use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -93,7 +94,7 @@ class Index extends Base
         $this->solrService->setOutput($output);
         
         if ($input->getOption('background')) {
-            $this->configService->setAppValue('needed_index', '1');
+            $this->configService->needIndex(true);
             $this->configService->setAppValue('solr_lock', '0');
             return;
         }
@@ -111,6 +112,7 @@ class Index extends Base
         // extract files
         $output->writeln('');
         $output->writeln('* Extracting new files to Solr:');
+        $output->writeln('');
         
         $users = $this->userManager->search('');
         $usersTotal = sizeof($users);
@@ -171,7 +173,7 @@ class Index extends Base
         
         Filesystem::tearDown();
         
-        $this->configService->setAppValue('needed_index', '0');
+        $this->configService->needIndex(false);
         $this->configService->setAppValue('solr_lock', '0');
     }
 
@@ -182,11 +184,15 @@ class Index extends Base
         $this->fileService->setView(Filesystem::getView());
         $this->miscService->debug('(' . $userId . ') - Init Filesystem');
         
-        $userFolder = $this->rootFolder->getUserFolder($userId);
-        $folder = $userFolder->get('/');
-        $this->miscService->debug('(' . $userId . ') - Get root folder');
+        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, '/files');
+        if ($userFolder != null && $userFolder) {
+            $folder = $userFolder->get('/');
+            
+            $this->miscService->debug('(' . $userId . ') - found root folder');
+            $files = $folder->search('');
+        } else
+            $files = array();
         
-        $files = $folder->search('');
         $this->miscService->debug('(' . $userId . ') - found ' . sizeof($files) . ' files');
         
         $progress = new ProgressBar($output, sizeof($files));
@@ -196,7 +202,8 @@ class Index extends Base
         $progress->setFormat(" %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
         $progress->start();
         
-        sleep(5);
+        if (sizeof($files) > 10)
+            sleep(5);
         
         $filesProcessed = 0;
         $fileIds = array();
@@ -260,9 +267,10 @@ class Index extends Base
         // $cycle = array_chunk($fileIds, 5);
         
         $progress = new ProgressBar($output, sizeof($fileIds));
-        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s% %failures:1s%     ");
         $progress->setMessage('<info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
+        $progress->setMessage('', 'failures');        
         $progress->setMessage('[preparing]', 'infos');
         $progress->start();
         
@@ -271,6 +279,7 @@ class Index extends Base
         sleep(5);
         $i = 0;
         $lastProgressTick = 0;
+        $failure = 0;
         foreach ($fileIds as $file) {
             if ($this->hasBeenInterrupted()) {
                 $this->configService->setAppValue('solr_lock', '0');
@@ -280,11 +289,15 @@ class Index extends Base
             $result = $this->fileService->updateFiles(array(
                 $file
             ));
+            $progress->setMessage('failure(s): ' . $failure, 'failures');
             
             if ($result)
-                $this->miscService->debug('(' . $userId . ' update done');
-            else
-                $this->miscService->debug('(' . $userId . ' update failed');
+                $this->miscService->debug('' . $userId . ' update done');
+            else {
+                $failure ++;
+                $progress->setMessage('failure(s): ' . $failure, 'failures');                
+                $this->miscService->debug('' . $userId . ' update failed');
+            }
             
             $progress->setMessage('[updating] -', 'infos');
             if ((time() - self::REFRESH_INFO_SYSTEM) > $lastProgressTick) {
@@ -295,8 +308,8 @@ class Index extends Base
             
             $progress->advance();
             
-            if (! $result)
-                return false;
+            // if (! $result)
+            // return false;
             
             $i ++;
             

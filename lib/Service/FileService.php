@@ -39,6 +39,8 @@ class FileService
     const UPDATE_MAXIMUM_FILES = 1000;
     
     // private $root;
+    private $configService;
+
     private $solrService;
 
     private $solrTools;
@@ -47,9 +49,10 @@ class FileService
 
     private $view;
 
-    public function __construct($solrService, $solrTools, $miscService)
+    public function __construct($configService, $solrService, $solrTools, $miscService)
     {
         // $this->root = $root;
+        $this->configService = $configService;
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->miscService = $miscService;
@@ -60,6 +63,8 @@ class FileService
     public function setDebug($debug)
     {
         $this->miscService->setDebug($debug);
+        $this->solrService->setDebug($debug);
+        $this->solrTools->setDebug($debug);
     }
 
     public function setView($view = null)
@@ -94,12 +99,12 @@ class FileService
         $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime());
         
         if (! $result)
-            $this->configService->setAppValue('needed_index', '1');
+            $this->configService->needIndex(true);
         
         return $result;
     }
 
-    public function updateFiles($files, $options = null, $isRoot = true)
+    public function updateFiles($files, $options = null, $isRoot = true, $error = '')
     {
         if (! $this->view || $this->view == NULL)
             return false;
@@ -151,10 +156,10 @@ class FileService
         if (! $isRoot)
             return $pack;
         
-        $solrResult = $this->solrTools->updateDocuments($pack);
+        $solrResult = $this->solrTools->updateDocuments($pack, $error);
         
         if (! $solrResult)
-            $this->configService->setAppValue('needed_index', '1');
+            $this->configService->needIndex(true);
         
         return $solrResult;
     }
@@ -255,6 +260,19 @@ class FileService
         } catch (NotFoundException $e) {
             return false;
         }
+    }
+
+    public static function getUserFolder($rootFolder, $userId, $path)
+    {
+        \OC\Files\Filesystem::initMountPoints($userId);
+        $dir = '/' . $userId;
+        $folder = null;
+        
+        try {
+            return $rootFolder->get($dir)->get($path);
+        } catch (NotFoundException $e) {}
+        
+        return false;
     }
     
     // public static function getAbsolutePath($path, $root = false)
