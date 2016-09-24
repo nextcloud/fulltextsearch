@@ -34,7 +34,7 @@ class SolrToolsService
 
     const UPDATE_MAXIMUM_QUERYTIME = 2000;
 
-    const UPDATE_MAXIMUM_FILEPROCESS = 30;
+    const UPDATE_MAXIMUM_FILEPROCESS = 15;
 
     const UPDATE_CHUNK_SIZE = 15;
 
@@ -53,6 +53,11 @@ class SolrToolsService
         $this->configService = $configService;
         $this->miscService = $miscService;
         $this->output = null;
+    }
+
+    public function setDebug($debug)
+    {
+        $this->miscService->setDebug($debug);
     }
 
     public function optimizeSolrIndex(&$error = '')
@@ -149,7 +154,6 @@ class SolrToolsService
                     }
                     
                     if (key_exists('deleted', $upd) && $upd['deleted'] != $docStatus['nextant_deleted']) {
-                        
                         $doc->setField('nextant_deleted', ($upd['deleted']) ? 'true' : 'false');
                         $doc->setFieldModifier('nextant_deleted', 'set');
                         $edited = true;
@@ -164,13 +168,16 @@ class SolrToolsService
                 
                 $query->addDocuments($docs)->addCommit();
                 
-                if (! $request = $client->update($query))
+                if (! $request = $client->update($query)) {
+                    $this->miscService->log('updateDocument update query failed');
+                    $error = SolrService::EXCEPTION_UPDATE_QUERY_FAILED;                    
                     return false;
+                }
                 
                 if ($request->getQueryTime() > self::UPDATE_MAXIMUM_QUERYTIME) {
                     $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, standby.', 1);
-                    // //return true;
-                    sleep(2);
+                    return false;
+//                    sleep(10);
                 }
                 
                 $documentProcessed += sizeof($docs);
@@ -190,6 +197,8 @@ class SolrToolsService
         } catch (\Solarium\Exception $e) {
             $error = SolrService::EXCEPTION;
         }
+        
+        $this->miscService->debug('updateDocument error #' . $error);
         
         return false;
     }

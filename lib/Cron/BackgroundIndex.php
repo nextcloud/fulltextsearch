@@ -39,7 +39,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 
     public function __construct()
     {
-        $this->setInterval(60 * 60 * 6); // 6 hours
+        $this->setInterval(60 * 60 * 2); // 2 hours
     }
 
     protected function run($argument)
@@ -54,7 +54,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->fileService = $c->query('FileService');
         $this->rootFolder = $c->query('RootFolder');
         
-        $this->setDebug(true);
+        // $this->setDebug(true);
         
         if (! $this->configService->neededIndex()) {
             $this->miscService->debug('Looks like there is no need to index');
@@ -87,6 +87,8 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
     {
         $users = $this->userManager->search('');
         $extractedDocuments = array();
+        
+        $noFailure = true;
         foreach ($users as $user) {
             
             $userId = $user->getUID();
@@ -94,12 +96,12 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             
             $result = $this->browseUserDirectory($userId);
             if (! $result) {
-                $this->miscService->debug('Background index quits unexpectedly');
-                return false;
+                $this->miscService->log('Background index had some issue', 2);
+                $noFailure = false;
             }
         }
         
-        return true;
+        return $noFailure;
     }
 
     private function browseUserDirectory($userId)
@@ -119,25 +121,26 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         sleep(5);
         
+        $noFailure = true;
         $fileIds = array();
-        $i = 0;
-        
         foreach ($files as $file) {
             
             $this->miscService->debug('Cron - extract #' . $file->getId());
-            if ((! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) && ($this->fileService->addFileFromPath($file->getPath(), false))) {
-                array_push($fileIds, array(
-                    'fileid' => $file->getId(),
-                    'path' => $file->getPath()
-                ));
+            if (! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) {
+                if (($this->fileService->addFileFromPath($file->getPath(), false))) {
+                    
+                    array_push($fileIds, array(
+                        'fileid' => $file->getId(),
+                        'path' => $file->getPath()
+                    ));
+                }
             }
-            
-            $i ++;
         }
         
         sleep(5);
         $i = 0;
         foreach ($fileIds as $file) {
+            $i ++;
             
             $this->miscService->debug('Cron update - file #' . $file['fileid']);
             $result = $this->fileService->updateFiles(array(
@@ -145,16 +148,16 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             ));
             
             if (! $result) {
-                $this->miscService->log("Failed to update files flag during background jobs", 3);
-                return false;
+                $this->miscService->log('Failed to update files flag during background jobs (file #' . $file['fileid'] . ')', 3);
+                $noFailure = false;
+                sleep(10);
             }
             
-            $i ++;
             if (($i % 1000) == 0) {
                 sleep(10);
             }
         }
         
-        return true;
+        return $noFailure;
     }
 }

@@ -63,6 +63,8 @@ class FileService
     public function setDebug($debug)
     {
         $this->miscService->setDebug($debug);
+        $this->solrService->setDebug($debug);
+        $this->solrTools->setDebug($debug);
     }
 
     public function setView($view = null)
@@ -97,12 +99,12 @@ class FileService
         $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime());
         
         if (! $result)
-            $this->configService->needIndex();
+            $this->configService->needIndex(true);
         
         return $result;
     }
 
-    public function updateFiles($files, $options = null, $isRoot = true)
+    public function updateFiles($files, $options = null, $isRoot = true, $error = '')
     {
         if (! $this->view || $this->view == NULL)
             return false;
@@ -154,7 +156,7 @@ class FileService
         if (! $isRoot)
             return $pack;
         
-        $solrResult = $this->solrTools->updateDocuments($pack);
+        $solrResult = $this->solrTools->updateDocuments($pack, $error);
         
         if (! $solrResult)
             $this->configService->needIndex(true);

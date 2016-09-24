@@ -49,6 +49,8 @@ class SolrService
 
     const EXCEPTION_UPDATE_FIELD_FAILED = 61;
 
+    const EXCEPTION_UPDATE_QUERY_FAILED = 71;
+
     const EXCEPTION_UPDATE_MAXIMUM_REACHED = 63;
 
     const EXCEPTION_SEARCH_FAILED = 81;
@@ -87,6 +89,11 @@ class SolrService
         $this->solariumClient = $client;
         $this->configService = $configService;
         $this->miscService = $miscService;
+    }
+
+    public function setDebug($debug)
+    {
+        $this->miscService->setDebug($debug);
     }
 
     public function setOutput(&$output)

@@ -267,9 +267,10 @@ class Index extends Base
         // $cycle = array_chunk($fileIds, 5);
         
         $progress = new ProgressBar($output, sizeof($fileIds));
-        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s% %failures:1s%     ");
         $progress->setMessage('<info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
+        $progress->setMessage('', 'failures');        
         $progress->setMessage('[preparing]', 'infos');
         $progress->start();
         
@@ -278,6 +279,7 @@ class Index extends Base
         sleep(5);
         $i = 0;
         $lastProgressTick = 0;
+        $failure = 0;
         foreach ($fileIds as $file) {
             if ($this->hasBeenInterrupted()) {
                 $this->configService->setAppValue('solr_lock', '0');
@@ -287,11 +289,15 @@ class Index extends Base
             $result = $this->fileService->updateFiles(array(
                 $file
             ));
+            $progress->setMessage('failure(s): ' . $failure, 'failures');
             
             if ($result)
-                $this->miscService->debug('(' . $userId . ' update done');
-            else
-                $this->miscService->debug('(' . $userId . ' update failed');
+                $this->miscService->debug('' . $userId . ' update done');
+            else {
+                $failure ++;
+                $progress->setMessage('failure(s): ' . $failure, 'failures');                
+                $this->miscService->debug('' . $userId . ' update failed');
+            }
             
             $progress->setMessage('[updating] -', 'infos');
             if ((time() - self::REFRESH_INFO_SYSTEM) > $lastProgressTick) {
@@ -302,8 +308,8 @@ class Index extends Base
             
             $progress->advance();
             
-            if (! $result)
-                return false;
+            // if (! $result)
+            // return false;
             
             $i ++;
             
