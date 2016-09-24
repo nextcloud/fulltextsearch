@@ -142,7 +142,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         foreach ($fileIds as $file) {
             $i ++;
             
-            $this->miscService->debug('Cron update - file #' . $file['fileid']);
+            $this->miscService->debug('Cron update ' . $i . ' - file #' . $file['fileid']);
             $result = $this->fileService->updateFiles(array(
                 $file
             ));
