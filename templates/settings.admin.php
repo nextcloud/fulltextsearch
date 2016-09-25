@@ -61,8 +61,11 @@ if ($_['configured'] == '1') {
 			          <button type="button" id="nextant_force_index"
 					style="width: 170px"><?php p($l->t('Force re-index')) ?></button>
 			          <?php
-        } else
-            p('index scheduled');
+        } else 
+            if ($_['needed_index'] == 2) {
+                ?>            <b>execute <i>./occ nextant:index</i></b> <?php
+            } else
+                p('index scheduled');
     } else
         p('never');
     ?></td>
