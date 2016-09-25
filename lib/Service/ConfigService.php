@@ -41,7 +41,7 @@ class ConfigService
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
         'live_extract' => '1',
-        'live_docupdate' => '1',
+        'live_docupdate' => '0',
         'solr_lock' => 0
     ];
 
