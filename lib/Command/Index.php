@@ -94,7 +94,7 @@ class Index extends Base
         $this->solrService->setOutput($output);
         
         if ($input->getOption('background')) {
-            $this->configService->needIndex(true, true);
+            $this->configService->needIndex(true, ($input->getOption('force')));
             $this->configService->setAppValue('solr_lock', '0');
             return;
         }
