@@ -158,7 +158,7 @@ class Application extends App
          * Migration scripts
          */
         $container->registerService('OCA\Nextant\Migration\NextantUpgrade', function ($c) {
-            return new NextantUpgrade($c->query('SolrService'), $c->query('SolrAdminService'));
+            return new NextantUpgrade($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrAdminService'));
         });
     }
 
