@@ -289,6 +289,7 @@ class SolrService
             // $hl->setSimplePostfix('</b>');
             $hl->setSimplePrefix('');
             $hl->setSimplePostfix('');
+            $hl->setSnippets(3);
             
             $resultset = $client->select($query);
             $highlighting = $resultset->getHighlighting();
@@ -298,11 +299,7 @@ class SolrService
                 
                 // highlight
                 $hlDoc = $highlighting->getResult($document->id);
-                $hlString = '';
-                if ($hlDoc) {
-                    foreach ($hlDoc as $field => $highlight)
-                        $hlString .= implode(' (...) ', $highlight);
-                }
+                $hlString = implode(' (...) ', $hlDoc->getField('nextant_attr_text'));
                 
                 array_push($return, array(
                     'id' => $document->id,
