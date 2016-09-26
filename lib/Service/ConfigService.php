@@ -41,7 +41,7 @@ class ConfigService
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
         'live_extract' => '1',
-        'live_docupdate' => '1',
+        'live_docupdate' => '0',
         'solr_lock' => 0
     ];
 
@@ -58,12 +58,12 @@ class ConfigService
         $this->miscService = $miscService;
     }
 
-    public function needIndex($need)
+    public function needIndex($need, $force = false)
     {
         if (! $need)
             $this->setAppValue('needed_index', '0');
         else 
-            if ($this->getAppValue('needed_index') == '0')
+            if ($force || $this->getAppValue('needed_index') == '0')
                 $this->setAppValue('needed_index', '1');
     }
 

@@ -45,7 +45,30 @@ if ($_['configured'] == '1') {
 		<tr>
 			<td style="width: 250px; text-align: right;"><label>
 	    <?php p($l->t('Number of documents :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
-			<td><?php ($_['current_docs'] == false) ? p('Solr Servlet is down') : p($_['current_docs']); ?></td>
+			<td><?php ($_['current_docs'] === false) ? p('Solr Servlet is down') : p($_['current_docs']); ?></td>
+		</tr>
+		<tr>
+			<td style="width: 250px; text-align: right;"><label>
+	    <?php p($l->t('Last index:')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+			<td><?php
+    
+    if ($_['last_index'] > 0) {
+        p(date('r', $_['last_index']));
+        ?></td>
+			<td><?php
+        if ($_['needed_index'] == 0) {
+            ?>
+			          <button type="button" id="nextant_force_index"
+					style="width: 170px"><?php p($l->t('Force re-index')) ?></button>
+			          <?php
+        } else 
+            if ($_['needed_index'] == 2) {
+                ?>            <b>execute <i>./occ nextant:index</i></b> <?php
+            } else
+                p('index scheduled');
+    } else
+        p('never');
+    ?></td>
 		</tr>
 <?php } ?>
 	   <tr>

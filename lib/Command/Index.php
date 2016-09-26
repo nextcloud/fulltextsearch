@@ -94,7 +94,7 @@ class Index extends Base
         $this->solrService->setOutput($output);
         
         if ($input->getOption('background')) {
-            $this->configService->needIndex(true);
+            $this->configService->needIndex(true, ($input->getOption('force')));
             $this->configService->setAppValue('solr_lock', '0');
             return;
         }
@@ -152,6 +152,7 @@ class Index extends Base
         // update Documents
         $output->writeln('');
         $output->writeln('* Updating documents status');
+        $noFailure = true;
         $usersTotal = sizeof($extractedDocuments);
         $usersCurrent = 0;
         foreach ($extractedDocuments as $doc) {
@@ -163,17 +164,20 @@ class Index extends Base
             
             $this->miscService->debug('Init Updating documents for user ' . $userId);
             
-            if (! $this->updateUserDocuments($userId, $fileIds, $output)) {
-                $output->writeln('  fail ');
-                return;
-            }
+            if (! $this->updateUserDocuments($userId, $fileIds, $output))
+                $noFailure = false;
             
             $output->writeln('');
         }
         
         Filesystem::tearDown();
-        
         $this->configService->needIndex(false);
+        
+        if ($noFailure)
+            $this->configService->setAppValue('last_index', time());
+        else
+            $this->configService->needIndex(true);
+        
         $this->configService->setAppValue('solr_lock', '0');
     }
 
@@ -270,7 +274,7 @@ class Index extends Base
         $progress->setFormat(" %message:-30s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s% %failures:1s%     ");
         $progress->setMessage('<info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
-        $progress->setMessage('', 'failures');        
+        $progress->setMessage('', 'failures');
         $progress->setMessage('[preparing]', 'infos');
         $progress->start();
         
@@ -295,7 +299,7 @@ class Index extends Base
                 $this->miscService->debug('' . $userId . ' update done');
             else {
                 $failure ++;
-                $progress->setMessage('failure(s): ' . $failure, 'failures');                
+                $progress->setMessage('failure(s): ' . $failure, 'failures');
                 $this->miscService->debug('' . $userId . ' update failed');
             }
             
@@ -323,7 +327,7 @@ class Index extends Base
         
         $progress->finish();
         
-        return true;
+        return ($failure == 0);
     }
 }
 

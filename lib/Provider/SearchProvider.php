@@ -91,13 +91,16 @@ class SearchProvider extends \OCP\Search\Provider
                     continue;
                 
                 $result = new \OC\Search\Result\File($fileData);
-                $result->type = 'nextant';
+                // $result->type = 'nextant';
                 // $result->name = $result->path . ' (Accuracy: ' . round($data['score'] * 100 / $topScore, 2) . '%) ';
                 
                 $name = '';
                 $name .= ($data['owner'] != $this->userId) ? '[shared] ' : '';
                 $name .= ($data['deleted']) ? '[trashbin] ' : '';
-                $name .= $result->path;
+                if ($data['highlight'])
+                    $name .= '... ' . $data['highlight'] . ' ...';
+                else
+                    $name .= $result->path;
                 $name .= ' (Score: ' . round($data['score'], 2) . ') ';
                 
                 $result->name = $name;

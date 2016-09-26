@@ -84,7 +84,6 @@ class FilesEvents
     /**
      * onFileRename()
      *
-     * @param string $source            
      * @param string $target            
      */
     public function onFileRename($target)
@@ -102,15 +101,19 @@ class FilesEvents
      */
     public function onFileTrash($path)
     {
-        if ($this->configService->getAppValue('live_docupdate') == '1') {
-            if (\OCP\App::isEnabled('files_trashbin')) {
+        if (\OCP\App::isEnabled('files_trashbin')) {
+            if ($this->configService->getAppValue('live_docupdate') == '1')
                 $this->fileService->updateFiles(FileService::getId($path), array(
                     'deleted' => true
                 ));
-            } else
+            else
+                $this->configService->needIndex(true);
+        } else {
+            if ($this->configService->getAppValue('live_extract') == '1')
                 $this->fileService->removeFiles($path);
-        } else
-            $this->configService->needIndex(true);
+            else
+                $this->configService->needIndex(true);
+        }
     }
 
     /**
@@ -135,11 +138,11 @@ class FilesEvents
      */
     public function onFileRestore($path)
     {
-        if ($this->configService->getAppValue('live_docupdate') == '1') {
+        if ($this->configService->getAppValue('live_docupdate') == '1')
             $this->fileService->updateFiles(FileService::getId($path), array(
                 'deleted' => false
             ));
-        } else
+        else
             $this->configService->needIndex(true);
     }
 

@@ -36,7 +36,7 @@ class SolrToolsService
 
     const UPDATE_MAXIMUM_FILEPROCESS = 15;
 
-    const UPDATE_CHUNK_SIZE = 15;
+    const UPDATE_CHUNK_SIZE = 5;
 
     private $solrService;
 

@@ -69,6 +69,8 @@ class SettingsController extends Controller
         $params = [
             'configured' => $this->configService->getAppValue('configured'),
             'current_docs' => $documentsCount,
+            'last_index' => $this->configService->getAppValue('last_index'),
+            'needed_index' => $this->configService->getAppValue('needed_index'),
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core'),
             'live_extract' => $this->configService->getAppValue('live_extract'),
@@ -76,6 +78,11 @@ class SettingsController extends Controller
             'solr_lock' => $this->configService->getAppValue('solr_lock')
         ];
         return new TemplateResponse($this->appName, 'settings.admin', $params, 'blank');
+    }
+
+    public function forceIndex()
+    {
+        $this->configService->needIndex(true);
     }
 
     public function setSettings($solr_url, $solr_core, $live_extract, $live_docupdate, $command)

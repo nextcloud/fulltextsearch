@@ -29,7 +29,12 @@ return [
             'name' => 'settings#setSettings',
             'url' => 'ajax/settings/admin.php',
             'verb' => 'POST'
-        ]
+        ],
+        [
+        'name' => 'settings#forceIndex',
+        'url' => 'ajax/settings/forceindex.php',
+        'verb' => 'POST'
+            ]
     ]
 ];
 

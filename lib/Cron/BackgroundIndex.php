@@ -70,8 +70,10 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->miscService->debug('Cron - Init');
         
         $this->configService->setAppValue('solr_lock', time());
-        if ($this->scanUsers())
+        if ($this->scanUsers()) {
             $this->configService->needIndex(false);
+            $this->configService->setAppValue('last_index', time());
+        }
         $this->configService->setAppValue('solr_lock', '0');
         
         $this->miscService->debug('Cron - End');
