@@ -5,32 +5,20 @@
 
 # Nextant
 
-What does it do right now:
-- When uploaded to the cloud, text and pdf file are extracted to the Solr Server.
-- It add an owner filter to solr documents so each user search in its own library.
-- Use the Solr server when using the searchbox in the files App of your nextcloud.
-- You can also extract your current files using ./occ nextant:scan 
+      One to enable a full text search within your cloud.
 
-What does it do right now that it should not :
-- results can be displayed behind an element so it can't be clicked.
-
-What will it be doing in the future:
-- search within shared file.
-- search within deleted file.
-- extract more format (docx, ...)
-- have a better display and a better indexing of the results
-
+Index your own files and your shared documents and perform fast and precise search using a Solr Servlet.
+Recognized file format: text, rtf, pdf, html, openoffice, office, ... 
 
 
 ## Installation
 
-- [You first need to install a Solr servlet](https://github.com/daita/nextant/wiki/Setup-your-local-standalone-Solr)
+- [You first need to install a Solr servlet](https://github.com/daita/nextant/wiki)
 - Download the .zip from the appstore, unzip and place this app in **nextcloud/apps/** (or clone the github and build the app yourself)
 - Enable the app in the app list,
 - Edit the settings in the administration page.
-- (Optionnal) Extract the current files from your cloud using the **./occ nextant:scan** command 
-
-
+- Extract the current files from your cloud using the **./occ nextant:index** command 
+- Have a look to this [explanation on how Nextant works](https://github.com/daita/nextant/wiki/Extracting-&-Live-Update)
 
 
 ## Building the app
