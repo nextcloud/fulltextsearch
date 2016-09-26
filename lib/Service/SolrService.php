@@ -274,18 +274,41 @@ class SolrService
                 'nextant_owner'
             ));
             $query->setRows(25);
-            $query->setQuery('nextant_attr_text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
+            
+            $options = array(
+                'complete_words'
+            );
+            $query->setQuery('nextant_attr_text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase('*' . $string));
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
-            // $query->createFilterquery('trashbin')->setQuery('nextant_deleted:false');
+            
+            $hl = $query->getHighlighting();
+            $hl->setFields(array(
+                'nextant_attr_text'
+            ));
+            // $hl->setSimplePrefix('<b>');
+            // $hl->setSimplePostfix('</b>');
+            $hl->setSimplePrefix('');
+            $hl->setSimplePostfix('');
             
             $resultset = $client->select($query);
+            $highlighting = $resultset->getHighlighting();
             
             $return = array();
             foreach ($resultset as $document) {
+                
+                // highlight
+                $hlDoc = $highlighting->getResult($document->id);
+                $hlString = '';
+                if ($hlDoc) {
+                    foreach ($hlDoc as $field => $highlight)
+                        $hlString .= implode(' (...) ', $highlight);
+                }
+                
                 array_push($return, array(
                     'id' => $document->id,
                     'deleted' => $document->nextant_deleted,
                     'owner' => $document->nextant_owner,
+                    'highlight' => $hlString,
                     'score' => $document->score
                 ));
             }
