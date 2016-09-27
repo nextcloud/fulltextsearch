@@ -8,6 +8,7 @@
       One to enable a full text search within your cloud.
 
 Index your own files and your shared documents and perform fast and precise search using a Solr Servlet.
+
 Recognized file format: text, rtf, pdf, html, openoffice, office, ... 
 
 
