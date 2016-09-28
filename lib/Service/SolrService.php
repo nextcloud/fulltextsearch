@@ -275,11 +275,12 @@ class SolrService
             ));
             $query->setRows(25);
             
-            $options = array(
-                'complete_words'
-            );
+            $options['complete_words'] = 1;
             $query->setQuery('nextant_attr_text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase('*' . $string));
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
+                   
+            if (key_exists('current_directory', $options))
+                $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
             
             $hl = $query->getHighlighting();
             $hl->setFields(array(
