@@ -1,9 +1,18 @@
+**v0.4.0**
+- index safe guard
+- new options on nextant:index
+- better display of search results: highlighting result & icons.
+- lot of bugfixes
+
+
 **v0.3.4**
 * halt long update process
+
 
 **v0.3.3**
 * Exception issue in SolrAdmin/SolrTools
 * rework on the indexing process
+
 
 **v0.3.2**
 * better script to index your current documents
