@@ -268,17 +268,17 @@ class SolrService
                 return false;
             }
             
+            $query->setRows(25);
             $query->setFields(array(
                 'id',
                 'nextant_deleted',
                 'nextant_owner'
             ));
-            $query->setRows(25);
             
-            $options['complete_words'] = 1;
-            $query->setQuery('nextant_attr_text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase('*' . $string));
+            array_push($options, 'complete_words');
+            $query->setQuery('nextant_attr_text:' . $helper->escapePhrase(((! in_array('complete_words', $options)) ? '*' : '') . $string));
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
-                   
+            
             if (key_exists('current_directory', $options))
                 $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
             
