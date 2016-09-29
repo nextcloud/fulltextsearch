@@ -26,8 +26,18 @@
 namespace OCA\Nextant\Service;
 
 use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Service\ConfigService;
+use \OCA\Nextant\Service\MiscService;
 use Solarium\Core\Client\Request;
+use Solarium\Solarium;
 
+/**
+ *
+ * Admin Tools to manage Solr Core
+ *
+ * @author Maxence Lange
+ *        
+ */
 class SolrAdminService
 {
 
@@ -39,15 +49,27 @@ class SolrAdminService
 
     private $lastMessage;
 
-    public function __construct($solrService, $configService, $miscService)
+    /**
+     *
+     * @param SolrService $solrService            
+     * @param ConfigService $configService            
+     * @param MiscService $miscService            
+     */
+    public function __construct(SolrService $solrService, ConfigService $configService, MiscService $miscService)
     {
-        // $this->solariumClient = $solrClient;
         $this->solrService = $solrService;
         $this->configService = $configService;
         $this->miscService = $miscService;
     }
 
-    public function checkSchema($fix = false, &$error = '')
+    /**
+     * Check the Schema of the Solr Core.
+     *
+     * @param boolean $fix            
+     * @param number $error            
+     * @return boolean
+     */
+    public function checkSchema($fix = false, &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -159,7 +181,13 @@ class SolrAdminService
         return true;
     }
 
-    public function ping(&$error = '')
+    /**
+     * Ping and test connection to the Solr Core
+     *
+     * @param number $error            
+     * @return boolean
+     */
+    public function ping(&$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -182,7 +210,15 @@ class SolrAdminService
         return false;
     }
 
-    private static function checkFieldProperty($client, $field, &$property)
+    /**
+     * Check a field property from a Solr core using Solarium Client
+     *
+     * @param \Solarium\Client $client            
+     * @param array $field            
+     * @param array $property            
+     * @return boolean
+     */
+    private static function checkFieldProperty(\Solarium\Client $client, $field, &$property)
     {
         $property = self::getFieldProperty($client, $field['type'], $field['data']['name']);
         if (! $property)
@@ -197,7 +233,15 @@ class SolrAdminService
         return true;
     }
 
-    private static function getFieldProperty($client, $fieldType, $fieldName)
+    /**
+     * Get properties on a field based on its type and name
+     *
+     * @param \Solarium\Client $client            
+     * @param string $fieldType            
+     * @param string $fieldName            
+     * @return boolean|mixed
+     */
+    private static function getFieldProperty(\Solarium\Client $client, $fieldType, $fieldName)
     {
         $url = '';
         if ($fieldType == 'field')
@@ -225,7 +269,13 @@ class SolrAdminService
         return $property;
     }
 
-    private static function createField($client, $field)
+    /**
+     * create field on the Solr Core
+     *
+     * @param \Solarium\Client $client            
+     * @param array $field            
+     */
+    private static function createField(\Solarium\Client $client, $field)
     {
         $data = array(
             'add-' . $field['type'] => $field['data']
@@ -233,7 +283,13 @@ class SolrAdminService
         return self::solariumPostSchemaRequest($client, $data);
     }
 
-    private static function modifyField($client, $field)
+    /**
+     * modify field on the Solr Core
+     *
+     * @param \Solarium\Client $client            
+     * @param array $field            
+     */
+    private static function modifyField(\Solarium\Client $client, $field)
     {
         $data = array(
             'replace-' . $field['type'] => $field['data']
@@ -241,7 +297,13 @@ class SolrAdminService
         return self::solariumPostSchemaRequest($client, $data);
     }
 
-    private static function deleteField($client, $field)
+    /**
+     * delete field on the Solr Core
+     *
+     * @param \Solarium\Client $client            
+     * @param array $field            
+     */
+    private static function deleteField(\Solarium\Client $client, $field)
     {
         $data = array(
             'delete-' . $field['type'] => array(
@@ -251,7 +313,14 @@ class SolrAdminService
         return self::solariumPostSchemaRequest($client, $data);
     }
 
-    private static function solariumPostSchemaRequest($client, $data)
+    /**
+     * send post request to the Solr core
+     *
+     * @param \Solarium\Client $client            
+     * @param array $data            
+     * @return boolean
+     */
+    private static function solariumPostSchemaRequest(\Solarium\Client $client, $data)
     {
         try {
             
@@ -279,7 +348,13 @@ class SolrAdminService
         return false;
     }
 
-    public function clear(&$error = '')
+    /**
+     * reset Solr Core
+     *
+     * @param number $error            
+     * @return boolean
+     */
+    public function clear(&$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -306,7 +381,13 @@ class SolrAdminService
         return false;
     }
 
-    public function count(&$error = '')
+    /**
+     * Count document on Solr Core
+     *
+     * @param number $error            
+     * @return boolean
+     */
+    public function count(&$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
