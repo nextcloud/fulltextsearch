@@ -21,3 +21,10 @@ DIV.nextant_display_text {
 	position: absolute;
 	font-style: italic;
 }
+
+TD.nextant_admin_left {
+	width: 250px;
+	text-align: right;
+	font-weight: bold;
+	padding-right: 15px;
+}

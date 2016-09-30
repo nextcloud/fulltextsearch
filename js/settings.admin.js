@@ -30,6 +30,62 @@ $(document)
 
 						init : function() {
 							nextantSettings.statusclearall(true);
+							nextantSettings.checksuboptions(true);
+						},
+
+						checksuboptions : function(instant) {
+							$.post(OC.filePath('nextant', 'ajax/settings',
+									'updateSubOptions.php'), {
+								instant : instant
+							}, nextantSettings.updatesuboptions);
+						},
+
+						updatesuboptions : function(response) {
+							var delay = 600;
+							if (response.instant == 'true')
+								delay = 0;
+
+							if (response.configured == 1) {
+								$("#nextant_suboptions :input").attr(
+										"disabled", false);
+								$('#nextant_help_link').unbind('click');
+								$('#nextant_suboptions').fadeTo(delay, 1);
+							} else {
+								$("#nextant_suboptions :input").attr(
+										"disabled", true);
+								$('#nextant_help_link').bind('click',
+										function(e) {
+											e.preventDefault();
+										})
+								$('#nextant_suboptions').fadeTo(delay, 0.4);
+							}
+
+							$('#solr_live_extract').prop('checked',
+									(response.live_extract == 1));
+							$('#solr_live_docupdate').prop('checked',
+									(response.live_docupdate == 1));
+
+							if (response.last_index > 0)
+								$('#solr_last_index').text(
+										response.last_index_format);
+							else
+								$('#solr_last_index').text('never');
+
+							if (response.configured == 0) {
+								$('#solr_current_docs').text(
+										'Nextant is not configured yet');
+								$('#nextant_force_index').hide(delay);
+							} else if (response.solr_ping == 'false')
+								$('#solr_current_docs').text(
+										'Solr Core is down');
+							else {
+								$('#nextant_force_index').show(delay);
+								if (response.current_docs > 0)
+									$('#solr_current_docs').text(
+											response.current_docs);
+								else
+									$('#solr_current_docs').text('none');
+							}
 						},
 
 						statusclearall : function(instant) {
@@ -79,8 +135,6 @@ $(document)
 							$('#nextant_apply').attr('disabled', true);
 							$('#solr_url').attr('disabled', true);
 							$('#solr_core').attr('disabled', true);
-							$('#solr_live_extract').attr('disabled', true);
-							$('#solr_live_docupdate').attr('disabled', true);
 							nextantSettings.test('ping');
 						},
 
@@ -95,10 +149,6 @@ $(document)
 							var data = {
 								solr_url : $('#solr_url').val(),
 								solr_core : $('#solr_core').val(),
-								live_extract : $('#solr_live_extract').prop(
-										'checked'),
-								live_docupdate : $('#solr_live_docupdate')
-										.prop('checked'),
 								command : command
 							}
 
@@ -142,24 +192,24 @@ $(document)
 												'#save',
 												'All test went fine. Saving your configuration',
 												0);
+								nextantSettings.checksuboptions(false);
 								break;
 							}
 
 							$.post(OC.filePath('nextant', 'ajax/settings',
 									'admin.php'), data,
 									nextantSettings.tested_standby);
-
 						},
 
 						tested_standby : function(response) {
-						//	setTimeout(function() {
-								nextantSettings.tested(response);
-						//	}, 200);
+							// setTimeout(function() {
+							nextantSettings.tested(response);
+							// }, 200);
 						},
 
 						tested : function(response) {
 							nextantSettings.status('#' + response.command,
-									response.data.message,
+									response.message,
 									(response.status == 'success') ? 1 : 2);
 
 							switch (response.command) {
@@ -215,8 +265,6 @@ $(document)
 						reset : function() {
 							$('#solr_url').attr('disabled', false);
 							$('#solr_core').attr('disabled', false);
-							$('#solr_live_extract').attr('disabled', false);
-							$('#solr_live_docupdate').attr('disabled', false);
 							$('#nextant_apply').attr('disabled', false);
 						},
 

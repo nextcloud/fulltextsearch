@@ -44,14 +44,14 @@ style('nextant', 'admin');
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td style="text-align: right;"><label>
-	    <?php p($l->t('Address of your Solr Servlet :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Address of your Solr Servlet :')) ?></td>
 						<td><input type="text" name="solr_url" id="solr_url"
 							value="<?php p($_['solr_url'])?>" style="width: 250px;"></td>
 					</tr>
 
 					<tr>
-						<td style="text-align: right;"><label><?php p($l->t('Core :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+						<td class="nextant_admin_left"><?php p($l->t('Core :')) ?></td>
 						<td><input type="text" id="solr_core"
 							value="<?php p($_['solr_core'])?>" style="width: 250px;"></td>
 					</tr>
@@ -62,6 +62,8 @@ style('nextant', 'admin');
 							<button type="button" id="nextant_apply" style="width: 270px"><?php p($l->t('Test and Save')) ?></button>
 						</td>
 					</tr>
+				</table>
+				<table id="nextant_suboptions">
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
@@ -70,66 +72,51 @@ style('nextant', 'admin');
 							id="nextant-admin-msg" class="msg"></span></td>
 					</tr>
 							-->
-		<?php
 
-if ($_['configured'] == '1') {
-    ?>
-		
 					<tr style="height: 30px;">
-						<td style="text-align: right;"><label>
-	    <?php p($l->t('Live Extract :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+						<td class="nextant_admin_left">					
+	    <?php p($l->t('Live Extract :')); ?>
+						</td>
 						<td><input type="checkbox" name="solr_live_extract"
-							id="solr_live_extract" value="1"
-							<?php if ($_['live_extract'] == '1') { p('CHECKED'); } ?>
-							style="margin: 10px;"> (<a
+							id="solr_live_extract" value="1" style="margin: 10px;"> (<a
+							id="nextant_help_link"
 							href="https://github.com/daita/nextant/wiki/Extracting-&-Live-Update"
 							target="_blank">help</a>)</td>
 					</tr>
 
 					<tr style="height: 30px;">
-						<td style="text-align: right;"><label>
-	    <?php p($l->t('Live Document Update :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Live Document Update :')) ?></td>
 						<td><input type="checkbox" name="solr_live_docupdate"
-							id="solr_live_docupdate" value="1"
-							<?php if ($_['live_docupdate'] == '1') { p('CHECKED'); } ?>
-							style="margin: 10px;"></td>
+							id="solr_live_docupdate" value="1" style="margin: 10px;"></td>
 					</tr>
-					<tr style="height: 20px;">
-						<td style="width: 250px; text-align: right;"><label>
-	    <?php p($l->t('Last index:')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
-						<td><?php
-    
-    if ($_['last_index'] > 0) {
-        p(date('r', $_['last_index']));
-        ?></td>
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Last index :')) ?></td>
+						<td><div id="solr_last_index"></div></td>
 
 					</tr>
-					<tr style="height: 20px;">
-						<td style="width: 250px; text-align: right;"><label>
-	    <?php p($l->t('Number of documents :')) ?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label></td>
-						<td><?php ($_['current_docs'] === false) ? p('Solr Servlet is down') : p($_['current_docs']); ?></td>
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Number of documents :')) ?></td>
+						<td><div id="solr_current_docs"></div></td>
 					</tr>
 
-					<tr>
+					<tr style="height: 30px;">
 						<td></td>
 
-						<td><?php
-        if ($_['needed_index'] == 0) {
-            ?>
-			          <button type="button" id="nextant_force_index"
+						<td>
+							<button type="button" id="nextant_force_index"
 								style="width: 270px"><?php p($l->t('Force re-index')) ?></button>
-			          <?php
-        } else 
-            if ($_['needed_index'] == 2) {
-                ?>            <b>execute <i>./occ nextant:index</i></b> <?php
-            } else
-                p('index scheduled');
-    } else
-        p('never');
-    ?></td>
+<?php
+// if ($_['needed_index'] == 2) {
+// <b>execute <i>./occ nextant:index</i></b>
+// } else
+// p('index scheduled');
+?></td>
 					</tr>
-						<?php } ?>
-					
+
+
 				</table>
 			</td>
 			<td style="padding-left: 40px;">

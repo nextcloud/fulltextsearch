@@ -42,6 +42,7 @@ class ConfigService
         'solr_core' => 'nextant',
         'live_extract' => '1',
         'live_docupdate' => '0',
+        'last_index' => 0,        
         'solr_lock' => 0
     ];
 

@@ -31,12 +31,23 @@ return [
             'verb' => 'POST'
         ],
         [
-        'name' => 'settings#forceIndex',
-        'url' => 'ajax/settings/forceindex.php',
-        'verb' => 'POST'
-            ]
+            'name' => 'settings#setOption',
+            'url' => 'ajax/settings/option.php',
+            'verb' => 'POST'
+        ],
+        [
+            'name' => 'settings#forceIndex',
+            'url' => 'ajax/settings/forceindex.php',
+            'verb' => 'POST'
+        ],
+        [
+            'name' => 'settings#updateSubOptions',
+            'url' => 'ajax/settings/updateSubOptions.php',
+            'verb' => 'POST'
+        ]
     ]
-];
+]
+;
 
 /*
  * This route is now useless. It was used with navigate.js + SearchController
