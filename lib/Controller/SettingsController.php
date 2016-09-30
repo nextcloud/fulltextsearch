@@ -96,11 +96,13 @@ class SettingsController extends Controller
         return $response;
     }
 
-    public function setOption($live_extract, $live_docupdate, $max_size)
+    public function setOption($live_extract, $live_docupdate, $max_size, $needed_index)
     {
         $this->configService->setAppValue('live_extract', $live_extract);
         $this->configService->setAppValue('live_docupdate', $live_docupdate);
         $this->configService->setAppValue('max_size', $max_size);
+        if ($needed_index == 1)
+            $this->configService->needIndex(true, true);
         
         return $this->updateSubOptions(false);
     }

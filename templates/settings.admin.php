@@ -67,11 +67,6 @@ style('nextant', 'admin');
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
-					<!--  					<tr style="height: 40px;">
-						<td colspan="2" style="text-align: center; width: 300px;"><span
-							id="nextant-admin-msg" class="msg"></span></td>
-					</tr>
-							-->
 
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">					
@@ -90,14 +85,13 @@ style('nextant', 'admin');
 						<td><input type="checkbox" name="solr_live_docupdate"
 							id="solr_live_docupdate" value="1" style="margin: 10px;"></td>
 					</tr>
-					
+
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Maximum File Size (Mb) :')) ?></td>
-						<td><input type="text" id="solr_max_size"
-							style="width: 100px;"></td>
+						<td><input type="text" id="solr_max_size" style="width: 100px;"></td>
 					</tr>
-					
+
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Last index :')) ?></td>
@@ -115,15 +109,10 @@ style('nextant', 'admin');
 
 						<td>
 							<button type="button" id="nextant_force_index"
-								style="width: 270px"><?php p($l->t('Force re-index')) ?></button>
-<?php
-// if ($_['needed_index'] == 2) {
-// <b>execute <i>./occ nextant:index</i></b>
-// } else
-// p('index scheduled');
-?></td>
+								style="width: 270px"><?php p($l->t('Force index')) ?></button>
+							<div id="nextant_index_scheduled">Index is scheduled</div>
+						</td>
 					</tr>
-
 
 				</table>
 			</td>

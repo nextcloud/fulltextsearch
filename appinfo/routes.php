@@ -34,12 +34,7 @@ return [
             'name' => 'settings#setOption',
             'url' => 'ajax/settings/option.php',
             'verb' => 'POST'
-        ],
-        [
-            'name' => 'settings#forceIndex',
-            'url' => 'ajax/settings/forceindex.php',
-            'verb' => 'POST'
-        ],
+        ],      
         [
             'name' => 'settings#updateSubOptions',
             'url' => 'ajax/settings/updateSubOptions.php',
