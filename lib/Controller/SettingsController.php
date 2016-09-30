@@ -87,6 +87,7 @@ class SettingsController extends Controller
             'last_index' => $this->configService->getAppValue('last_index'),
             'last_index_format' => date('r', $this->configService->getAppValue('last_index')),
             'needed_index' => $this->configService->getAppValue('needed_index'),
+            'max_size' => $this->configService->getAppValue('max_size'),
             'live_extract' => $this->configService->getAppValue('live_extract'),
             'live_docupdate' => $this->configService->getAppValue('live_docupdate'),
             'solr_lock' => $this->configService->getAppValue('solr_lock')

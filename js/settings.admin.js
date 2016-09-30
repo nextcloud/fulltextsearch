@@ -71,6 +71,8 @@ $(document)
 							else
 								$('#solr_last_index').text('never');
 
+							$('#solr_max_size').val(response.max_size);
+
 							if (response.configured == 0) {
 								$('#solr_current_docs').text(
 										'Nextant is not configured yet');

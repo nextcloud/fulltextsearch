@@ -90,6 +90,14 @@ style('nextant', 'admin');
 						<td><input type="checkbox" name="solr_live_docupdate"
 							id="solr_live_docupdate" value="1" style="margin: 10px;"></td>
 					</tr>
+					
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Maximum File Size (Mb) :')) ?></td>
+						<td><input type="text" id="solr_max_size"
+							style="width: 100px;"></td>
+					</tr>
+					
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Last index :')) ?></td>
