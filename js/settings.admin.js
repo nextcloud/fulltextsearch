@@ -31,6 +31,32 @@ $(document)
 						init : function() {
 							nextantSettings.statusclearall(true);
 							nextantSettings.checksuboptions(true);
+							setInterval(function() {
+								nextantSettings.checksuboptions(false)
+							}, 60000);
+
+						},
+
+						savesuboptions : function(switched) {
+
+							var data = {
+								live_extract : ($('#solr_live_extract')
+										.is(":checked")) ? 1 : 0,
+								live_docupdate : ($('#solr_live_docupdate')
+										.is(":checked")) ? 1 : 0,
+								max_size : $('#solr_max_size').val()
+							}
+
+							if (switched == 'live_extract')
+								data.live_extract = (data.live_extract == 1) ? 0
+										: 1;
+							if (switched == 'live_docupdate')
+								data.live_docupdate = (data.live_docupdate == 1) ? 0
+										: 1;
+
+							$.post(OC.filePath('nextant', 'ajax/settings',
+									'option.php'), data,
+									nextantSettings.updatesuboptions);
 						},
 
 						checksuboptions : function(instant) {
@@ -286,5 +312,15 @@ $(document)
 					$('#nextant_force_index').on('click',
 							nextantSettings.forceindex);
 
+					$('#solr_live_extract').mousedown(function() {
+						nextantSettings.savesuboptions('live_extract');
+					})
+					$('#solr_live_docupdate').mousedown(function() {
+						nextantSettings.savesuboptions('live_docupdate');
+					})
+					$('#solr_max_size').on('input', function(e) {
+						nextantSettings.savesuboptions();
+					});
 					nextantSettings.init();
+
 				});

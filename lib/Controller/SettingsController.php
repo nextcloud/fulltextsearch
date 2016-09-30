@@ -96,9 +96,13 @@ class SettingsController extends Controller
         return $response;
     }
 
-    public function setOption($option, $value)
+    public function setOption($live_extract, $live_docupdate, $max_size)
     {
-        $this->configService->setAppValue($option, $value);
+        $this->configService->setAppValue('live_extract', $live_extract);
+        $this->configService->setAppValue('live_docupdate', $live_docupdate);
+        $this->configService->setAppValue('max_size', $max_size);
+        
+        return $this->updateSubOptions(false);
     }
 
     public function setSettings($solr_url, $solr_core, $command)
