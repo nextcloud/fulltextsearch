@@ -28,6 +28,53 @@ $(document)
 
 					var nextantSettings = {
 
+						init : function() {
+							nextantSettings.statusclearall(true);
+						},
+
+						statusclearall : function(instant) {
+							nextantSettings.statusclear('#ping', instant);
+							nextantSettings.statusclear('#schema', instant);
+							nextantSettings.statusclear('#extract', instant);
+							nextantSettings.statusclear('#update', instant);
+							nextantSettings.statusclear('#search', instant);
+							nextantSettings.statusclear('#delete', instant);
+							nextantSettings.statusclear('#save', instant);
+						},
+
+						statusclear : function(vid, instant) {
+							var delay = 200;
+							if (instant)
+								delay = 0;
+
+							$('#nextant-display').children(vid).children(
+									'#icon_fail').fadeTo(delay, 0);
+							$('#nextant-display').children(vid).children(
+									'#icon_check').fadeTo(delay, 0);
+							$('#nextant-display').children(vid).children(
+									'#text').fadeTo(delay, 0);
+						},
+
+						status : function(vid, text, level) {
+							$('#nextant-display').children(vid).children(
+									'#text').text(text).fadeTo(200, 1);
+							var src = '';
+							if (level == 1) {
+								$('#nextant-display').children(vid).children(
+										'#icon_check').fadeTo(200, 1);
+								$('#nextant-display').children(vid).children(
+										'#icon_fail').fadeTo(200, 0);
+							}
+
+							if (level == 2) {
+								$('#nextant-display').children(vid).children(
+										'#icon_check').fadeTo(200, 0);
+								$('#nextant-display').children(vid).children(
+										'#icon_fail').fadeTo(200, 1);
+
+							}
+						},
+
 						save : function() {
 							$('#nextant_apply').attr('disabled', true);
 							$('#solr_url').attr('disabled', true);
@@ -38,10 +85,11 @@ $(document)
 						},
 
 						test_standby : function(command) {
-							setTimeout(function() {
-								nextantSettings.test(command);
-							}, 1200);
+							// setTimeout(function() {
+							nextantSettings.test(command);
+							// }, 400);
 						},
+
 						test : function(command) {
 
 							var data = {
@@ -56,58 +104,64 @@ $(document)
 
 							switch (command) {
 							case 'ping':
-								OC.msg.startAction('#nextant-admin-msg', t(
-										'nextant',
-										'Ping querying your Solr Server'));
+								if ($('#nextant-display').children('#ping')
+										.children('#text').text() != '')
+									nextantSettings.statusclearall(false);
+								nextantSettings.status('#ping',
+										'Ping querying your Solr Server', 0);
 								break;
 
 							case 'schema':
-								OC.msg.startAction('#nextant-admin-msg',
-										t('nextant',
-												'Verifying Schema integrity'));
+								nextantSettings.status('#schema',
+										'Verifying Schema integrity', 0);
 								break;
 
 							case 'extract':
-								OC.msg.startAction('#nextant-admin-msg', t(
-										'nextant',
-										'Test simple text extract query'));
+								nextantSettings.status('#extract',
+										'Test simple text extract query', 0);
 								break;
 
 							case 'update':
-								OC.msg.startAction('#nextant-admin-msg',
-										t('nextant',
-												'Test update document query'));
+								nextantSettings.status('#update',
+										'Test update document query', 0);
 								break;
 
 							case 'search':
-								OC.msg.startAction('#nextant-admin-msg', t(
-										'nextant', 'Test search query'));
+								nextantSettings.status('#search',
+										'Test search query', 0);
 								break;
 
 							case 'delete':
-								OC.msg.startAction('#nextant-admin-msg',
-										t('nextant',
-												'Removing the test document'));
+								nextantSettings.status('#delete',
+										'Removing the test document', 0);
 								break;
 
 							case 'save':
-								OC.msg
-										.startAction(
-												'#nextant-admin-msg',
-												t('nextant',
-														'All test went fine. Saving your configuration'));
+								nextantSettings
+										.status(
+												'#save',
+												'All test went fine. Saving your configuration',
+												0);
 								break;
 							}
 
 							$.post(OC.filePath('nextant', 'ajax/settings',
-									'admin.php'), data, nextantSettings.tested);
+									'admin.php'), data,
+									nextantSettings.tested_standby);
 
 						},
 
-						tested : function(response) {
+						tested_standby : function(response) {
+						//	setTimeout(function() {
+								nextantSettings.tested(response);
+						//	}, 200);
+						},
 
-							OC.msg.finishedAction('#nextant-admin-msg',
-									response);
+						tested : function(response) {
+							nextantSettings.status('#' + response.command,
+									response.data.message,
+									(response.status == 'success') ? 1 : 2);
+
 							switch (response.command) {
 							case 'ping':
 								if (response.status == 'success')
@@ -182,4 +236,5 @@ $(document)
 					$('#nextant_force_index').on('click',
 							nextantSettings.forceindex);
 
+					nextantSettings.init();
 				});

@@ -77,6 +77,7 @@ class SettingsController extends Controller
             'live_docupdate' => $this->configService->getAppValue('live_docupdate'),
             'solr_lock' => $this->configService->getAppValue('solr_lock')
         ];
+        
         return new TemplateResponse($this->appName, 'settings.admin', $params, 'blank');
     }
 
