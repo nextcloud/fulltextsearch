@@ -24,40 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+namespace OCA\Nextant\Settings;
 
-/**
- * ***
- * This Controller is now useless
- * **
- */
-namespace OCA\Nextant\Controller;
+$app = new \OCA\Nextant\AppInfo\Application();
+$app->registerSettingsAdmin();
 
-use OCP\AppFramework\Controller;
-use OCP\IRequest;
+$response = $app->getContainer()
+    ->query('SearchController')
+    ->index();
 
-class SearchController extends Controller
-{
-
-    private $miscService;
-
-    public function __construct($appName, IRequest $request, $miscService)
-    {
-        parent::__construct($appName, $request);
-        $this->miscService = $miscService;
-    }
-
-    public function searchRequest($search, $current_dir)
-    {
-        $this->miscService->log('searchString() - ' . $search . ' ' . $current_dir);
-        
-        $result = array();
-        
-        $response = array(
-            'status' => 'success',
-            'message' => 'OK_OK',
-            'data' => $result
-        );
-        
-        return $response;
-    }
-}
+return $response->render();

@@ -95,10 +95,9 @@ class Application extends App
         
         // $container->query('IndexMapper')->insert(new IndexEntity(array(userid => 2, 'path' => '/toto', 'clef' => 'CLEFCLEF')));
         
-        // SearchController is now useless
-        // $container->registerService('SearchController', function ($c) {
-        // return new SearchController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('UserId'), $c->query('MiscService'));
-        // });
+        $container->registerService('SearchController', function ($c) {
+            return new SearchController($c->query('AppName'), $c->query('Request'), $c->query('MiscService'));
+        });
         
         $container->registerService('SettingsController', function ($c) {
             return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));

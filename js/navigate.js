@@ -23,55 +23,75 @@
  * 
  */
 
-/*******************************************************************************
- * This script is now Useless - It is not even loaded.
- ******************************************************************************/
-$(document).ready(
-	function() {
+$(document)
+		.ready(
+				function() {
 
-	    var nextantCurrentSearch = '';
-	    var nextant = {
-		init : function() {
-		    console.log('nextant/init');
-		    $('#searchbox').bind('input', function() {
-			setTimeout(function() {
-			    nextant.search($('#searchbox').val());
-			}, 1000);
-		    });
-		},
+					var nextantCurrentSearch = '';
+					var nextant = {
 
-		search : function(string) {
+						init : function() {
+							$('#searchbox').on('input', function(e) {
+								nextant.search($('#searchbox').val());
+							});
+						},
 
-		    if (string == nextantCurrentSearch)
-			return;
-		    nextantCurrentSearch = string;
+						search : function(string) {
+							if (string == nextantCurrentSearch)
+								return;
+							nextantCurrentSearch = string;
 
-		    request = {
-			search : string
-		    }
+							request = {
+								search : string,
+								current_dir : nextant.get('dir')
+							}
 
-		    console.log('nextant/search: ' + request.search);
-		    nextant.searchRequest(request);
-		},
+							nextant.searchRequest(request);
+						},
 
-		searchRequest : function(request) {
-		    console.log('nextant/searchRequest: ' + request.search)
-		    $.post(OC.filePath('nextant', 'ajax', 'search.php'),
-			    request, nextant.searchResult);
-		},
+						searchRequest : function(request) {
+							// window.alert('nextant/searchRequest: '
+							// + request.current_dir);
+							$.post(
+									OC
+											.filePath('nextant', 'ajax',
+													'search.php'), request,
+									nextant.searchResult);
+						},
 
-		searchResult : function(response) {
-		    console.log('nextant/searchResult: ' + response.message
-			    + ' size: ' + response.data.length);
+						searchResult : function(response) {
+//							window.alert('nextant/searchResult: '
+//									+ response.message + ' size: '
+//									+ response.data.length);
 
-		    // OC.search.resultTypes.lucene = t('search_lucene', 'In');
+							// OC.search.resultTypes.lucene = t('search_lucene',
+							// 'In');
 
-		    // OC.search.customResults.lucene = function ($row, item){
-		    // $row.find('td.result .text').text(t('search_lucene',
-		    // 'Score: {score}', {score:
-		    // Math.round(item.score*100)/100}));
-		}
-	    };
+							// OC.search.customResults.lucene = function ($row,
+							// item){
+							// $row.find('td.result
+							// .text').text(t('search_lucene',
+							// 'Score: {score}', {score:
+							// Math.round(item.score*100)/100}));
+						},
 
-	    nextant.init();
-	});
+						get : function(name, url) {
+							if (!url)
+								url = window.location.href;
+							name = name.replace(/[\[\]]/g, "\\$&");
+							var regex = new RegExp("[?&]" + name
+									+ "(=([^&#]*)|&|#|$)"), results = regex
+									.exec(url);
+							if (!results)
+								return null;
+							if (!results[2])
+								return '';
+							return decodeURIComponent(results[2].replace(/\+/g,
+									" "));
+						}
+
+					}
+
+					nextant.init();
+
+				});
