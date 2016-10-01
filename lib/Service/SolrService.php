@@ -218,7 +218,8 @@ class SolrService
             
             $query->setFile($path);
             $query->setCommit(true);
-            $query->setOmitHeader(false);
+            $query->setOmitHeader(true);
+            // $query->setCaptureAttr(false);
             
             // add document
             $doc = $query->createDocument();
