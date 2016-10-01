@@ -34,3 +34,5 @@ $app = new \OCA\Nextant\AppInfo\Application();
 $app->registerFilesHooks();
 $app->registerSettingsAdmin();
 $app->registerSearchProvider();
+
+

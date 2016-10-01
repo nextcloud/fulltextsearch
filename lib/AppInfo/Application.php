@@ -27,6 +27,7 @@
 namespace OCA\Nextant\AppInfo;
 
 use \OCA\Nextant\Controller\SettingsController;
+use \OCA\Nextant\Controller\SearchController;
 use \OCA\Nextant\Db\IndexMapper;
 use \OCA\Nextant\Events\FilesEvents;
 use \OCA\Nextant\Hooks\FilesHooks;
@@ -176,16 +177,31 @@ class Application extends App
 
     public function registerSearchProvider()
     {
-        \OC::$server->getSearch()->registerProvider('\OCA\Nextant\Provider\SearchProvider', array(
-            'apps' => array(
-                'files'
-            )
-        ));
+        $config = $this->getContainer()->query('ConfigService');
+        if ($config->getAppValue('configured') != 1)
+            return;
+        
+        switch ($config->getAppValue('search_display')) {
+            
+            case ConfigService::SEARCH_DISPLAY_NEXTANT:
+                \OC::$server->getEventDispatcher()->addListener('OCA\Files::loadAdditionalScripts', function () {
+                    \OCP\Util::addScript('nextant', 'navigate');
+                });
+                break;
+            
+            case ConfigService::SEARCH_DISPLAY_FILES:
+                \OC::$server->getSearch()->registerProvider('\OCA\Nextant\Provider\SearchProvider', array(
+                    'apps' => array(
+                        'files'
+                    )
+                ));
+                break;
+        }
     }
 
     public function registerSettingsAdmin()
     {
-        \OCP\App::registerAdmin($this->getContainer()->query('AppName'), 'settings/admin');
+        \OCP\App::registerAdmin($this->getContainer()->query('AppName'), 'lib/admin');
     }
     
     // public function registerNavigation()

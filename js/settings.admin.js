@@ -47,6 +47,8 @@ $(document)
 								live_docupdate : ($('#solr_live_docupdate')
 										.is(":checked")) ? 1 : 0,
 								max_size : $('#solr_max_size').val(),
+								display_result : $('#solr_display_result')
+										.val(),
 								needed_index : needed_index
 							}
 
@@ -101,6 +103,11 @@ $(document)
 								$('#solr_last_index').text('never');
 
 							$('#solr_max_size').val(response.max_size);
+
+							$(
+									'#solr_display_result option[value="'
+											+ response.display_result + '"]')
+									.prop('selected', true);
 
 							if (response.configured == 0) {
 								$('#solr_current_docs').text(
@@ -321,6 +328,10 @@ $(document)
 					$('#nextant_force_index').on('click', function() {
 						nextantSettings.savesuboptions('force_index');
 					});
+					$('#solr_display_result').on('change', function() {
+						nextantSettings.savesuboptions();
+					});
+
 					nextantSettings.init();
 
 				});

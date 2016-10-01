@@ -31,6 +31,10 @@ use OCP\IConfig;
 class ConfigService
 {
 
+    const SEARCH_DISPLAY_NEXTANT = 1;
+
+    const SEARCH_DISPLAY_FILES = 2;
+
     const ACTION_LIVE_EXTRACT = 'live_extract';
 
     const ACTION_LIVE_DOCUPDATE = 'live_docupdate';
@@ -43,6 +47,7 @@ class ConfigService
         'live_extract' => '1',
         'live_docupdate' => '0',
         'last_index' => 0,
+        'search_display' => 2,
         'solr_lock' => 0
     ];
 

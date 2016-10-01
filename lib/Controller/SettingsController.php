@@ -88,6 +88,7 @@ class SettingsController extends Controller
             'last_index_format' => date('r', $this->configService->getAppValue('last_index')),
             'needed_index' => $this->configService->getAppValue('needed_index'),
             'max_size' => $this->configService->getAppValue('max_size'),
+            'display_result' => $this->configService->getAppValue('display_result'),
             'live_extract' => $this->configService->getAppValue('live_extract'),
             'live_docupdate' => $this->configService->getAppValue('live_docupdate'),
             'solr_lock' => $this->configService->getAppValue('solr_lock')
@@ -96,11 +97,12 @@ class SettingsController extends Controller
         return $response;
     }
 
-    public function setOption($live_extract, $live_docupdate, $max_size, $needed_index)
+    public function setOptions($live_extract, $live_docupdate, $max_size, $display_result, $needed_index)
     {
         $this->configService->setAppValue('live_extract', $live_extract);
         $this->configService->setAppValue('live_docupdate', $live_docupdate);
         $this->configService->setAppValue('max_size', $max_size);
+        $this->configService->setAppValue('display_result', $display_result);
         if ($needed_index == 1)
             $this->configService->needIndex(true, true);
         

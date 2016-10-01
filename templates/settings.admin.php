@@ -94,6 +94,15 @@ style('nextant', 'admin');
 
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
+	    <?php p($l->t('Display result :')) ?></td>
+						<td><select id="solr_display_result" style="width: 260px;">
+								<option value="2">Integrated to the Files app</option>
+								<option value="1">Nextant style (alpha - do not use)</option>
+						</select></td>
+					</tr>
+
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
 	    <?php p($l->t('Last index :')) ?></td>
 						<td><div id="solr_last_index"></div></td>
 
