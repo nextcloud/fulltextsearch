@@ -34,45 +34,36 @@ $(document)
 							$('#searchbox').on('input', function(e) {
 								nextant.search($('#searchbox').val());
 							});
+
 						},
 
-						search : function(string) {
-							if (string == nextantCurrentSearch)
+						search : function(query) {
+							if (query == nextantCurrentSearch)
 								return;
-							nextantCurrentSearch = string;
+							nextantCurrentSearch = query;
 
-							request = {
-								search : string,
+							var data = {
+								query : query,
 								current_dir : nextant.get('dir')
 							}
 
-							nextant.searchRequest(request);
+							nextant.searchRequest(data);
 						},
 
-						searchRequest : function(request) {
-							// window.alert('nextant/searchRequest: '
-							// + request.current_dir);
+						searchRequest : function(data) {
 							$.post(
 									OC
 											.filePath('nextant', 'ajax',
-													'search.php'), request,
+													'search.php'), data,
 									nextant.searchResult);
 						},
 
 						searchResult : function(response) {
-//							window.alert('nextant/searchResult: '
-//									+ response.message + ' size: '
-//									+ response.data.length);
-
-							// OC.search.resultTypes.lucene = t('search_lucene',
-							// 'In');
-
-							// OC.search.customResults.lucene = function ($row,
-							// item){
-							// $row.find('td.result
-							// .text').text(t('search_lucene',
-							// 'Score: {score}', {score:
-							// Math.round(item.score*100)/100}));
+							if (response == null)
+								return;
+							// window.alert('nextant/searchResult: ' +
+							// response.id
+							// + ' ' + response.path);
 						},
 
 						get : function(name, url) {

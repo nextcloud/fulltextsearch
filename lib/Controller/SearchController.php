@@ -38,26 +38,64 @@ use OCP\IRequest;
 class SearchController extends Controller
 {
 
+    private $userId;
+
+    private $groupManager;
+
+    private $solrService;
+
     private $miscService;
 
-    public function __construct($appName, IRequest $request, $miscService)
+    public function __construct($appName, IRequest $request, $userId, $groupManager, $solrService, $miscService)
     {
         parent::__construct($appName, $request);
+        
+        $this->userId = $userId;
+        $this->groupManager = $groupManager;
+        $this->solrService = $solrService;
         $this->miscService = $miscService;
     }
 
-    public function searchRequest($search, $current_dir)
+    public function searchRequest($query, $current_dir)
     {
-        $this->miscService->log('searchString() - ' . $search . ' ' . $current_dir);
+        $results = array();
         
-        $result = array();
+        if ($this->solrService == false)
+            return $results;
         
-        $response = array(
-            'status' => 'success',
-            'message' => 'OK_OK',
-            'data' => $result
-        );
+        if ($query !== null) {
+            
+            // $groups
+            $groups = array_map(function ($value) {
+                return (string) $value;
+            }, array_keys($this->groupManager->getUserIdGroups($this->userId)));
+            $this->solrService->setOwner($this->userId, $groups);
+            
+            $solrResult = $this->solrService->search($query, array(
+                'current_directory' => $current_dir
+            ));
+            
+            if ($solrResult == false)
+                return $results;
+            
+            foreach ($solrResult as $data) {
+                
+                // $fileData = FileService::getFileInfo($data['id']);
+                // if ($fileData === false)
+                // continue;
+                
+                $response = array(
+                    'id' => $data['id'],
+                    'type' => 'file',
+                    'shared' => ($data['owner'] != $this->userId),
+                    'deleted' => ($data['deleted']),
+                    'highlight' => '... ' . $data['highlight'] . ' ...'
+                );
+                
+                array_push($results, $response);
+            }
+        }
         
-        return $response;
+        return $results;
     }
 }
