@@ -47,7 +47,7 @@ class ConfigService
         'live_extract' => '1',
         'live_docupdate' => '0',
         'last_index' => 0,
-        'search_display' => 2,
+        'display_result' => 2,
         'solr_lock' => 0
     ];
 

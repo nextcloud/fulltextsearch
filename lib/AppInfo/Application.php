@@ -180,7 +180,7 @@ class Application extends App
         if ($config->getAppValue('configured') != 1)
             return;
         
-        switch ($config->getAppValue('search_display')) {
+        switch ($config->getAppValue('display_result')) {
             
             case ConfigService::SEARCH_DISPLAY_NEXTANT:
                 \OC::$server->getEventDispatcher()->addListener('OCA\Files::loadAdditionalScripts', function () {
