@@ -100,7 +100,7 @@ class Index extends Base
         }
         
         $solr_locked = $this->configService->getAppValue('solr_lock');
-        if (! $input->getOption('force') && $solr_locked > 0) {
+        if (! $input->getOption('force') && ($solr_locked > (time() - (3600 * 24)))) {
             $output->writeln('Your solr is locked by a running script like an index command or background jobs (cron)');
             $output->writeln('You can still use the --force');
             return;
