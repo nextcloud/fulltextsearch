@@ -27,8 +27,14 @@ namespace OCA\Nextant\Service;
 
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\MiscService;
-use Solarium\Core\Client\Request;
 
+/**
+ *
+ * Tools to manage Solr Core
+ *
+ * @author Maxence Lange
+ *        
+ */
 class SolrToolsService
 {
 
@@ -46,21 +52,37 @@ class SolrToolsService
 
     private $output;
 
-    public function __construct($solrService, $configService, $miscService)
+    /**
+     *
+     * @param SolrService $solrService            
+     * @param ConfigService $configService            
+     * @param MiscService $miscService            
+     */
+    public function __construct(SolrService $solrService, ConfigService $configService, MiscService $miscService)
     {
-        // $this->solariumClient = $solrClient;
         $this->solrService = $solrService;
         $this->configService = $configService;
         $this->miscService = $miscService;
         $this->output = null;
     }
 
-    public function setDebug($debug)
+    /**
+     * Set debug
+     *
+     * @param boolean $debug            
+     */
+    public function setDebug($debug = false)
     {
         $this->miscService->setDebug($debug);
     }
 
-    public function optimizeSolrIndex(&$error = '')
+    /**
+     * optimize the Solr Core
+     *
+     * @param number $error            
+     * @return boolean|Solarium\Core\Query\Result
+     */
+    public function optimizeSolrIndex(&$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -81,10 +103,18 @@ class SolrToolsService
         } catch (\Solarium\Exception $e) {
             $error = SolrService::EXCEPTION;
         }
+        
         return false;
     }
 
-    public function updateDocuments($data, &$error = '')
+    /**
+     * update a stack of documents
+     *
+     * @param array $data            
+     * @param number $error            
+     * @return boolean
+     */
+    public function updateDocuments($data, &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -170,14 +200,14 @@ class SolrToolsService
                 
                 if (! $request = $client->update($query)) {
                     $this->miscService->log('updateDocument update query failed');
-                    $error = SolrService::EXCEPTION_UPDATE_QUERY_FAILED;                    
+                    $error = SolrService::EXCEPTION_UPDATE_QUERY_FAILED;
                     return false;
                 }
                 
                 if ($request->getQueryTime() > self::UPDATE_MAXIMUM_QUERYTIME) {
                     $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, standby.', 1);
                     return false;
-//                    sleep(10);
+                    // sleep(10);
                 }
                 
                 $documentProcessed += sizeof($docs);
@@ -203,6 +233,12 @@ class SolrToolsService
         return false;
     }
 
+    /**
+     *
+     * @param number|array $docs            
+     * @param string $error            
+     * @return boolean|Solarium\Core\Query\Result[][]
+     */
     private function getDocumentsStatus($docs, &$error = '')
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
@@ -262,7 +298,14 @@ class SolrToolsService
         return false;
     }
 
-    public function removeDocument($docid, &$error = '')
+    /**
+     * remove document by its id
+     *
+     * @param number $docid            
+     * @param number $error            
+     * @return boolean
+     */
+    public function removeDocument($docid, &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -287,7 +330,15 @@ class SolrToolsService
         return false;
     }
 
-    public function isDocumentUpToDate($docid, $mtime, &$error = '')
+    /**
+     * Check the mtime of a file and return if document is up to date
+     *
+     * @param number $docid            
+     * @param number $mtime            
+     * @param number $error            
+     * @return boolean
+     */
+    public function isDocumentUpToDate($docid, $mtime, &$error = 0)
     {
         if (intval($docid) == 0)
             return false;
@@ -325,7 +376,13 @@ class SolrToolsService
         return false;
     }
 
-    public function getInfoSystem(&$error = '')
+    /**
+     * return information about the current status of the Solr servlet.
+     *
+     * @param number $error            
+     * @return boolean|Solarium\Core\Query\Result
+     */
+    public function getInfoSystem(&$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;

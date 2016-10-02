@@ -85,6 +85,12 @@ class FileService
         if ($fileInfo == null)
             return false;
         
+        $size = round($fileInfo->getSize() / 1024 / 1024, 1);
+        if ($size > $this->configService->getAppValue('max_size')) {
+            $this->miscService->debug('File is too big (' . $size . ' > ' . $this->configService->getAppValue('max_size') . ')');
+            return false;
+        }
+        
         if (! SolrService::extractableFile($fileInfo->getMimeType()))
             return false;
         

@@ -48,6 +48,7 @@ class ConfigService
         'live_docupdate' => '0',
         'last_index' => 0,
         'display_result' => 2,
+        'max_size' => 40,
         'solr_lock' => 0
     ];
 
