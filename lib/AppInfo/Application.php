@@ -185,6 +185,8 @@ class Application extends App
             case ConfigService::SEARCH_DISPLAY_NEXTANT:
                 \OC::$server->getEventDispatcher()->addListener('OCA\Files::loadAdditionalScripts', function () {
                     \OCP\Util::addScript('nextant', 'navigate');
+                    \OCP\Util::addStyle('nextant', 'navigate');
+                    
                 });
                 break;
             

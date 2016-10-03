@@ -32,8 +32,10 @@
  */
 namespace OCA\Nextant\Controller;
 
+use \OCA\Nextant\Service\FileService;
 use OCP\AppFramework\Controller;
 use OCP\IRequest;
+use OC\Files\Filesystem;
 
 class SearchController extends Controller
 {
@@ -58,6 +60,9 @@ class SearchController extends Controller
 
     public function searchRequest($query, $current_dir)
     {
+        Filesystem::init($this->userId, '');
+        $view = Filesystem::getView();
+        
         $results = array();
         
         if ($this->solrService == false)
@@ -80,19 +85,51 @@ class SearchController extends Controller
             
             foreach ($solrResult as $data) {
                 
-                // $fileData = FileService::getFileInfo($data['id']);
-                // if ($fileData === false)
-                // continue;
-                
-                $response = array(
-                    'id' => $data['id'],
-                    'type' => 'file',
-                    'shared' => ($data['owner'] != $this->userId),
-                    'deleted' => ($data['deleted']),
-                    'highlight' => '... ' . $data['highlight'] . ' ...'
-                );
-                
-                array_push($results, $response);
+                try {
+                    $path = $view->getPath($data['id']);
+                    $fileData = $view->getFileInfo($path);
+                    
+                    if ($fileData === false)
+                        continue;
+                    
+                    $pathParts = pathinfo($path);
+                    $basepath = str_replace('//', '/', '/' . $pathParts['dirname'] . '/');
+                    
+                    $hl1 = '';
+                    $hl2 = '';
+                    if (key_exists('highlight', $data) && is_array($data['highlight'])) {
+                        list ($hl1, $hl2) = $data['highlight'];
+                    } 
+                    
+                    if ($hl1 == '' || $hl1 == null)
+                    {
+                        $hl1 = '';
+                        $hl2 = '';
+                    }
+                    
+                    $response = array(
+                        'id' => $data['id'],
+                        'type' => 'file',
+                        'shared' => ($data['owner'] != $this->userId),
+                        'deleted' => ($data['deleted']),
+                        'highlight' => '... ' . $data['highlight'] . ' ...',
+                        'size' => $fileData->getSize(),
+                        'path' => $path,
+                        'basepath' => $basepath,
+                        'filename' => $pathParts['basename'],
+                        'basefile' => $pathParts['filename'],
+                        'highlight1' => $hl1,
+                        'highlight2' => $hl2,
+                        'extension' => ($pathParts['extension'] != '') ? '.' . $pathParts['extension'] : '',
+                        'mime' => $fileData->getMimetype(),
+                        'webdav' => \OCP\Util::linkToRemote('webdav') . $path,
+                        'mtime' => $fileData->getMTime()
+                    );
+                    
+                    array_push($results, $response);
+                } catch (NotFoundException $e) {
+                    continue;
+                }
             }
         }
         

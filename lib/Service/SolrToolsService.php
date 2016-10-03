@@ -157,6 +157,12 @@ class SolrToolsService
                         $edited = true;
                     }
                     
+                    if (key_exists('path', $upd) && $upd['path'] != $docStatus['nextant_path']) {
+                        $doc->setField('nextant_path', $upd['path']);
+                        $doc->setFieldModifier('nextant_path', 'set');
+                        $edited = true;
+                    }
+                    
                     if (key_exists('share_users', $upd) && ! MiscService::arraysIdentical($upd['share_users'], $docStatus['nextant_share'])) {
                         if (sizeof($upd['share_users']) > 0) {
                             $doc->setField('nextant_share', $upd['share_users']);

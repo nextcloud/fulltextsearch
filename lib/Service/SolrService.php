@@ -26,6 +26,7 @@
 namespace OCA\Nextant\Service;
 
 use \OCA\Nextant\Service\FileService;
+use \OCA\Nextant\Service\ConfigService;
 
 class SolrService
 {
@@ -194,7 +195,7 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($path, $docid, $mtime, &$error = '')
+    public function extractFile($absolutePath, $docid, $mtime, &$error = '')
     {
         if (! $this->configured())
             return false;
@@ -216,7 +217,7 @@ class SolrService
             $query->addFieldMapping('content', 'text');
             $query->setUprefix('nextant_attr_');
             
-            $query->setFile($path);
+            $query->setFile($absolutePath);
             $query->setCommit(true);
             $query->setOmitHeader(true);
             // $query->setCaptureAttr(false);
@@ -224,6 +225,7 @@ class SolrService
             // add document
             $doc = $query->createDocument();
             $doc->id = $docid;
+            $doc->nextant_path = $path;
             $doc->nextant_owner = $this->owner;
             $doc->nextant_mtime = $mtime;
             
@@ -277,20 +279,24 @@ class SolrService
             ));
             
             array_push($options, 'complete_words');
-            $query->setQuery('nextant_attr_text:' . $helper->escapePhrase(((! in_array('complete_words', $options)) ? '*' : '') . $string));
+            $query->setQuery('nextant_attr_text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             
-            if (key_exists('current_directory', $options))
-                $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
+            // if (key_exists('current_directory', $options))
+            // $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
             
             $hl = $query->getHighlighting();
             $hl->setFields(array(
                 'nextant_attr_text'
             ));
-            // $hl->setSimplePrefix('<b>');
-            // $hl->setSimplePostfix('</b>');
-            $hl->setSimplePrefix('');
-            $hl->setSimplePostfix('');
+            
+            if ($this->configService->getAppValue('display_result') == ConfigService::SEARCH_DISPLAY_NEXTANT) {
+                $hl->setSimplePrefix('<span class="nextant_hl">');
+                $hl->setSimplePostfix('</span>');
+            } else {
+                $hl->setSimplePrefix('');
+                $hl->setSimplePostfix('');
+            }
             $hl->setSnippets(3);
             
             $resultset = $client->select($query);
@@ -301,13 +307,11 @@ class SolrService
                 
                 // highlight
                 $hlDoc = $highlighting->getResult($document->id);
-                $hlString = implode(' (...) ', $hlDoc->getField('nextant_attr_text'));
-                
                 array_push($return, array(
                     'id' => $document->id,
                     'deleted' => $document->nextant_deleted,
                     'owner' => $document->nextant_owner,
-                    'highlight' => $hlString,
+                    'highlight' => $hlDoc->getField('nextant_attr_text'),
                     'score' => $document->score
                 ));
             }

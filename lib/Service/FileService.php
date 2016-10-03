@@ -102,7 +102,7 @@ class FileService
         $this->miscService->debug('Extracting file ' . $path);
         
         $status = 1;
-        $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $fileInfo->getMTime());
+        $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $path, $fileInfo->getMTime());
         
         if (! $result)
             $this->configService->needIndex(true);
@@ -154,6 +154,7 @@ class FileService
             } else {
                 // if (SolrService::extractableFile($fileInfo->getMimeType())) {
                 $data['id'] = $file['fileid'];
+                $data['path'] = $file['path'];
                 array_push($pack, array_merge($data, $options));
                 // }
             }

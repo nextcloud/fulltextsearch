@@ -198,7 +198,7 @@ class SettingsController extends Controller
     {
         $testFile = __DIR__ . '/../../LICENSE';
         
-        if ($this->solrService->extractFile($testFile, '__nextant_test', 1234567890, $error)) {
+        if ($this->solrService->extractFile($testFile, '__nextant_test', '/LICENSE', 1234567890, $error)) {
             $message = 'Text successfully extracted';
             return true;
         }
@@ -211,6 +211,7 @@ class SettingsController extends Controller
     {
         $testUpdate = array(
             'id' => '__nextant_test',
+            'path' => '/LICENSE2',
             'share_users' => array(
                 '__nextant_test_owner'
             ),
