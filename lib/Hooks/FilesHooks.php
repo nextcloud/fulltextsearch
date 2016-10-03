@@ -124,13 +124,5 @@ class FilesHooks
         if (key_exists('itemSource', $params))
             self::getController()->onFileUnshare($params['itemSource']);
     }
-
-    /**
-     * hook event: file is scanned
-     */
-    public static function fileScanned($params)
-    {
-        self::getController()->onFileScan($params['path']);
-    }
 }
 

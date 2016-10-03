@@ -124,7 +124,7 @@ class FilesEvents
     public function onFileDelete($path)
     {
         // fast way to bypass files_trashbin/
-        if ($this->configService->getAppValue('live_docupdate') == '1') {
+        if ($this->configService->getAppValue('live_extract') == '1') {
             $this->fileService->setView(new \OC\Files\View('/' . $this->userId));
             $this->fileService->removeFiles($path);
         } else

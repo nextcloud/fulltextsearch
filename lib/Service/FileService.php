@@ -194,9 +194,8 @@ class FileService
                         continue;
                     $this->removeFiles($this->view->getPath($file->getId()));
                 }
-            } else {
+            } else
                 $solrResult = $this->solrTools->removeDocument($fileInfo->getId());
-            }
             
             return $solrResult;
         } catch (NotFoundException $e) {}
