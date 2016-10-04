@@ -1,3 +1,8 @@
+**v0.4.2**
+- extract and index files from trash
+- index remove orphans
+
+
 **v0.4.1**
 - Force index unlock after 24h
 - maximum size on extracted file
