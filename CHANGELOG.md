@@ -1,3 +1,15 @@
+**v0.4.2**
+- extract and index files from trash
+- orphans documents are removed while indexing
+
+
+**v0.4.1**
+- Force index unlock after 24h
+- maximum size on extracted file
+- new field nextant_path
+- bugfixes
+
+
 **v0.4.0**
 - index safe guard
 - new options on nextant:index

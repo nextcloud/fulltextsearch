@@ -109,7 +109,7 @@ class FilesEvents
             else
                 $this->configService->needIndex(true);
         } else {
-            if ($this->configService->getAppValue('live_extract') == '1')
+            if ($this->configService->getAppValue('live_docupdate') == '1')
                 $this->fileService->removeFiles($path);
             else
                 $this->configService->needIndex(true);

@@ -37,12 +37,15 @@ class Check extends Base
 
     private $solrService;
 
+    private $solrTools;
+
     private $solrAdmin;
 
-    public function __construct($solrService, $solrAdmin)
+    public function __construct($solrService, $solrTools, $solrAdmin)
     {
         parent::__construct();
         $this->solrService = $solrService;
+        $this->solrTools = $solrTools;
         $this->solrAdmin = $solrAdmin;
     }
 
@@ -53,11 +56,10 @@ class Check extends Base
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
-    {       
-        if (!$this->solrService->configured())
-        {
+    {
+        if (! $this->solrService->configured()) {
             $output->writeln('Nextant is not yet configured');
-            return;            
+            return;
         }
         
         $this->solrService->setOutput($output);
@@ -75,7 +77,7 @@ class Check extends Base
             return false;
         }
         
-        $output->writeln('Your solr contains ' . $this->solrAdmin->count() . ' documents');
+        $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents');
     }
 }
 

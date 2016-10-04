@@ -51,11 +51,11 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->miscService = $c->query('MiscService');
         $this->userManager = $c->query('UserManager');
         $this->solrService = $c->query('SolrService');
+        $this->solrTools = $c->query('SolrToolsService');
         $this->fileService = $c->query('FileService');
         $this->rootFolder = $c->query('RootFolder');
-        
-        // $this->setDebug(true);
-        
+            
+            // $this->setDebug(true);
         if (! $this->configService->neededIndex()) {
             $this->miscService->debug('Looks like there is no need to index');
             return;
@@ -90,30 +90,65 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $users = $this->userManager->search('');
         $extractedDocuments = array();
         
+        $documentIds = array();
         $noFailure = true;
         foreach ($users as $user) {
             
             $userId = $user->getUID();
             $this->solrService->setOwner($userId);
             
-            $result = $this->browseUserDirectory($userId);
-            if (! $result) {
+            $result_files = $this->browseUserDirectory($userId, '/files', array(), $docIds_files);
+            $result_trash = $this->browseUserDirectory($userId, '/files_trashbin', array(
+                'deleted' => true
+            ), $docIds_trash);
+            
+            if (! $result_files || ! $result_trash) {
                 $this->miscService->log('Background index had some issue', 2);
                 $noFailure = false;
             }
+            $documentIds = array_merge($documentIds, $docIds_files, $docIds_trash);
         }
+        
+        // orphans
+        $deleting = array();
+        $page = 0;
+        while (true) {
+            
+            $ids = $this->solrTools->getAll($page, $lastPage, $error);
+            if (! $ids)
+                break;
+            
+            foreach ($ids as $id) {
+                if (! in_array($id, $documentIds) && (! in_array($id, $deleting)))
+                    array_push($deleting, $id);
+            }
+            
+            if ($lastPage)
+                break;
+            
+            $page ++;
+            if ($page > 10000) {
+                $this->miscService->log('Looks like we reached a 1,000,000 documents');
+                break;
+            }
+        }
+        
+        foreach ($deleting as $docId)
+            $this->solrTools->removeDocument($docId);
         
         return $noFailure;
     }
 
-    private function browseUserDirectory($userId)
+    private function browseUserDirectory($userId, $dir, $options, &$docIds)
     {
+        $docIds = array();
+        
         Filesystem::tearDown();
         Filesystem::init($userId, '');
         
         $this->fileService->setView(Filesystem::getView());
         
-        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, '/files');
+        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, $dir);
         if ($userFolder == null || ! $userFolder)
             return true;
         
@@ -131,8 +166,10 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             if (! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) {
                 if (($this->fileService->addFileFromPath($file->getPath(), false))) {
                     
+                    array_push($docIds, (int) $file->getId());
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
+                        'options' => $options,
                         'path' => $file->getPath()
                     ));
                 }
@@ -141,15 +178,16 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         sleep(5);
         $i = 0;
+        $currentIndex = time();
         foreach ($fileIds as $file) {
             $i ++;
             
             $this->miscService->debug('Cron update ' . $i . ' - file #' . $file['fileid']);
             $result = $this->fileService->updateFiles(array(
                 $file
-            ));
+            ), $file['options']);
             
-            if (! $result) {
+            if ($result === false) {
                 $this->miscService->log('Failed to update files flag during background jobs (file #' . $file['fileid'] . ')', 3);
                 $noFailure = false;
                 sleep(10);

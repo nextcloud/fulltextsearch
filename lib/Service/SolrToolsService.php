@@ -38,6 +38,8 @@ use \OCA\Nextant\Service\MiscService;
 class SolrToolsService
 {
 
+    const GETALL_ROWS = 100;
+
     const UPDATE_MAXIMUM_QUERYTIME = 2000;
 
     const UPDATE_MAXIMUM_FILEPROCESS = 15;
@@ -210,13 +212,14 @@ class SolrToolsService
                     return false;
                 }
                 
+                $documentProcessed += sizeof($docs);
+                
                 if ($request->getQueryTime() > self::UPDATE_MAXIMUM_QUERYTIME) {
                     $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, standby.', 1);
                     return false;
                     // sleep(10);
                 }
                 
-                $documentProcessed += sizeof($docs);
                 if ($documentProcessed >= self::UPDATE_MAXIMUM_FILEPROCESS) {
                     $this->miscService->log('Maximum number of processed files (' . self::UPDATE_MAXIMUM_FILEPROCESS . ') reached, we won\'t go any further.', 2);
                     $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;
@@ -224,7 +227,7 @@ class SolrToolsService
                 }
             }
             
-            return true;
+            return $documentProcessed;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = SolrService::EXCEPTION_UPDATE_FIELD_FAILED;
@@ -337,6 +340,55 @@ class SolrToolsService
     }
 
     /**
+     * return ids of all documents
+     *
+     * @param number $page            
+     * @param boolean $lastpage            
+     * @param number $error            
+     * @return boolean
+     */
+    public function getAll($page, &$lastpage = false, &$error = 0)
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+            return false;
+        
+        $client = $this->solrService->getClient();
+        
+        try {
+            $query = $client->createSelect();
+            $query->setQuery('id:*');
+            $query->addSort('id', $query::SORT_ASC);
+            $query->setStart($page);
+            $query->setRows(self::GETALL_ROWS);
+            $query->setFields(array(
+                'id'
+            ));
+            
+            $resultset = $client->execute($query);
+            
+            $ids = array();
+            foreach ($resultset as $document) {
+                $docid = (int) $document->id;
+                array_push($ids, $docid);
+            }
+            
+            if ((($page + 1) * self::GETALL_ROWS) >= $resultset->getNumFound())
+                $lastpage = true;
+            
+            return $ids;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = SolrService::EXCEPTION_SOLRURI;
+            else
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = SolrService::EXCEPTION;
+        }
+        
+        return false;
+    }
+
+    /**
      * Check the mtime of a file and return if document is up to date
      *
      * @param number $docid            
@@ -407,6 +459,38 @@ class SolrToolsService
         $result = json_decode($response->getBody());
         
         return $result;
+    }
+
+    /**
+     * Count document on Solr Core
+     *
+     * @param number $error            
+     * @return boolean
+     */
+    public function count(&$error = 0)
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+            return false;
+        
+        $client = $this->solrService->getClient();
+        
+        try {
+            $query = $client->createSelect();
+            $query->setQuery('id:*');
+            $query->setRows(0);
+            $resultset = $client->execute($query);
+            
+            return $resultset->getNumFound();
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = SolrService::EXCEPTION_SOLRURI;
+            else
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = SolrService::EXCEPTION;
+        }
+        
+        return false;
     }
 }
     

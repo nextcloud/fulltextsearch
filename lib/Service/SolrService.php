@@ -150,7 +150,7 @@ class SolrService
         $this->groups = $groups;
     }
 
-    public static function extractableFile($mimetype)
+    public static function extractableFile($mimetype, $path = '')
     {
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
@@ -166,6 +166,12 @@ class SolrService
             
             case 'application/rtf':
                 return true;
+            
+            case 'application/octet-stream':
+                $ext = pathinfo($path, PATHINFO_EXTENSION);
+                if (substr($ext, 0, 1) == 'd' && ((int) (substr($ext, 1)) > 0))
+                    return true;
+                return false;
         }
         
         $acceptedMimeType = array(
