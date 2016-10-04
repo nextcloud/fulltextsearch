@@ -206,13 +206,14 @@ class SolrToolsService
                     return false;
                 }
                 
+                $documentProcessed += sizeof($docs);
+                
                 if ($request->getQueryTime() > self::UPDATE_MAXIMUM_QUERYTIME) {
                     $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, standby.', 1);
                     return false;
                     // sleep(10);
                 }
                 
-                $documentProcessed += sizeof($docs);
                 if ($documentProcessed >= self::UPDATE_MAXIMUM_FILEPROCESS) {
                     $this->miscService->log('Maximum number of processed files (' . self::UPDATE_MAXIMUM_FILEPROCESS . ') reached, we won\'t go any further.', 2);
                     $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;
@@ -220,7 +221,7 @@ class SolrToolsService
                 }
             }
             
-            return true;
+            return $documentProcessed;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = SolrService::EXCEPTION_UPDATE_FIELD_FAILED;
@@ -333,48 +334,12 @@ class SolrToolsService
     }
 
     /**
-     * remove documents that are out of index (deleted file).
+     * return ids of all documents
      *
-     * @param number $index            
+     * @param number $page            
+     * @param boolean $lastpage            
      * @param number $error            
      * @return boolean
-     */
-    /*
-     * public function removeDocumentNotIndexed($index, &$error = 0)
-     * {
-     * if ($index == 0)
-     * return false;
-     *
-     * if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
-     * return false;
-     *
-     * try {
-     *
-     * $query = $client->createSelect();
-     * $query->setQuery('!nextant_index:' . $index);
-     * $query->setRows(0);
-     *
-     * $resultset = $client->execute($query);
-     * $count = $resultset->getNumFound();
-     *
-     * // $client = $this->solrService->getClient();
-     * // $update = $client->createUpdate();
-     *
-     * // $update->addDeleteQuery('!nextant_index:' . $index);
-     * // $update->addCommit();
-     *
-     * return $count;
-     * } catch (\Solarium\Exception\HttpException $ehe) {
-     * if ($ehe->getStatusMessage() == 'OK')
-     * $error = SolrService::EXCEPTION_REMOVE_FAILED;
-     * else
-     * $error = SolrService::EXCEPTION_HTTPEXCEPTION;
-     * } catch (\Solarium\Exception $e) {
-     * $error = SolrService::EXCEPTION;
-     * }
-     *
-     * return false;
-     * }
      */
     public function getAll($page, &$lastpage = false, &$error = 0)
     {

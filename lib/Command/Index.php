@@ -26,7 +26,6 @@
  */
 namespace OCA\Nextant\Command;
 
-use \OCA\Nextant\Service\SolrToolsService;
 use \OCA\Nextant\Service\FileService;
 use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
@@ -113,7 +112,7 @@ class Index extends Base
         //
         // extract files
         $output->writeln('');
-        $output->writeln('* Extracting new files to Solr:');
+        $output->writeln('* Extracting files to Solr:');
         $output->writeln('');
         
         $users = $this->userManager->search('');
@@ -132,25 +131,28 @@ class Index extends Base
             $this->solrService->setOwner($userId);
             
             $this->miscService->debug('Init Extracting new files for user ' . $userId);
-            $result = $this->browseUserDirectory($output, $userId, $docIds);
+            $result_files = $this->browseUserDirectory($output, $userId, '/files', array(), $docIds_files);
             
-            if ($result['total'] > 0) {
-                $documentIds = array_merge($documentIds, $docIds);
+            $output->writeln('');
+            $result_trash = $this->browseUserDirectory($output, $userId, '/files_trashbin', array(
+                'deleted' => true
+            ), $docIds_trash);
+            
+            if (($result_files['total'] + $result_trash['total']) > 0) {
+                $documentIds = array_merge($documentIds, $docIds_files, $docIds_trash);
                 array_push($extractedDocuments, array(
                     'userid' => $userId,
-                    'files' => $result['files']
+                    'files' => array_merge($result_files['files'], $result_trash['files'])
                 ));
                 
-                $extractedTotal += sizeof($result['files']);
-                $processedTotal += $result['processed'];
+                $extractedTotal += sizeof($result_files['files']) + sizeof($result_trash['files']);
+                $processedTotal += $result_files['processed'] + $result_trash['processed'];
             }
             
             $output->writeln('');
         }
         
         $output->writeln('       ' . $processedTotal . ' file(s) processed ; ' . $extractedTotal . ' extracted documents');
-        
-        $currentIndex = time();
         
         //
         // update Documents
@@ -161,6 +163,7 @@ class Index extends Base
         $noFailure = true;
         $usersTotal = sizeof($extractedDocuments);
         $usersCurrent = 0;
+        $processedFile = 0;
         foreach ($extractedDocuments as $doc) {
             $usersCurrent ++;
             
@@ -170,11 +173,14 @@ class Index extends Base
             
             $this->miscService->debug('Init Updating documents for user ' . $userId);
             
-            if (! $this->updateUserDocuments($userId, $fileIds, $output, $currentIndex))
+            if (! $this->updateUserDocuments($userId, $fileIds, $output, $updateDocs))
                 $noFailure = false;
             
+            $processedFile += $updateDocs;
             $output->writeln('');
         }
+        
+        $output->writeln('       ' . $processedFile . ' file(s) updated');
         
         // $output->writeln(' - ' . $deleted . ' documents removed');
         
@@ -200,18 +206,18 @@ class Index extends Base
         $output->writeln('');
     }
 
-    private function browseUserDirectory($output, $userId, &$docIds)
+    private function browseUserDirectory($output, $userId, $dir, $options, &$docIds)
     {
         Filesystem::tearDown();
         Filesystem::init($userId, '');
         $this->fileService->setView(Filesystem::getView());
         $this->miscService->debug('(' . $userId . ') - Init Filesystem');
         
-        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, '/files');
+        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, $dir);
         if ($userFolder != null && $userFolder) {
             $folder = $userFolder->get('/');
             
-            $this->miscService->debug('(' . $userId . ') - found root folder');
+            $this->miscService->debug('(' . $userId . '/' . $dir . ') - found root folder');
             $files = $folder->search('');
         } else
             $files = array();
@@ -219,10 +225,10 @@ class Index extends Base
         $this->miscService->debug('(' . $userId . ') - found ' . sizeof($files) . ' files');
         
         $progress = new ProgressBar($output, sizeof($files));
-        $progress->setMessage('<info>' . $userId . '</info>: ');
+        $progress->setMessage('<info>' . $userId . '</info>' . $dir . ': ');
         $progress->setMessage('', 'jvm');
         $progress->setMessage('[preparing]', 'infos');
-        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+        $progress->setFormat(" %message:-38s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
         $progress->start();
         
         if (sizeof($files) > 10)
@@ -253,11 +259,11 @@ class Index extends Base
                 
                 $forceExtract = false;
                 $status = 0;
-                
                 if ($this->fileService->addFileFromPath($file->getPath(), $forceExtract, $status)) {
                     array_push($docIds, (int) $file->getId());
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
+                        'options' => $options,
                         'path' => $file->getPath()
                     ));
                     $filesProcessed += $status;
@@ -282,7 +288,7 @@ class Index extends Base
         );
     }
 
-    private function updateUserDocuments($userId, $fileIds, $output, $currentIndex)
+    private function updateUserDocuments($userId, $fileIds, $output, &$processedfile)
     {
         Filesystem::tearDown();
         Filesystem::init($userId, '');
@@ -292,7 +298,7 @@ class Index extends Base
         // $cycle = array_chunk($fileIds, 5);
         
         $progress = new ProgressBar($output, sizeof($fileIds));
-        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s% %failures:1s%     ");
+        $progress->setFormat(" %message:-38s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s% %failures:1s%     ");
         $progress->setMessage('<info>' . $userId . '</info>: ');
         $progress->setMessage('', 'jvm');
         $progress->setMessage('', 'failures');
@@ -305,6 +311,7 @@ class Index extends Base
         $i = 0;
         $lastProgressTick = 0;
         $failureIds = array();
+        $processedfile = 0;
         while ($file = array_shift($fileIds)) {
             
             if ($this->hasBeenInterrupted()) {
@@ -312,18 +319,19 @@ class Index extends Base
                 throw new \Exception('ctrl-c');
             }
             
-            $result = $this->fileService->updateFiles(array(
+            $count = $this->fileService->updateFiles(array(
                 $file
-            ));
+            ), $file['options']);
             
             // $progress->setMessage('failure(s): ' . $failure, 'failures');
             
-            if ($result)
-                $this->miscService->debug('' . $userId . ' update done');
-            else {
+            if ($count === false) {
                 array_push($failureIds, $file);
                 $progress->setMessage('failure(s): ' . sizeof($failureIds), 'failures');
                 $this->miscService->debug('' . $userId . ' update failed');
+            } else {
+                $processedfile += $count;
+                $this->miscService->debug('' . $userId . ' update done');
             }
             
             $progress->setMessage('[updating] -', 'infos');
@@ -349,6 +357,8 @@ class Index extends Base
             }
         }
         
+        $progress->setMessage('', 'jvm');
+        $progress->setMessage('', 'infos');
         $progress->finish();
         
         return (sizeof($failureIds) == 0);
@@ -359,11 +369,9 @@ class Index extends Base
         $progress = new ProgressBar($output, $this->solrTools->count());
         
         $progress->setMessage('<info>spoting orphans</info>:');
-        $progress->setMessage('', 'jvm');
-        $progress->setMessage('', 'infos');
-        
-        $progress->setFormat(" %message:-43s%[%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+        $progress->setFormat(" %message:-51s%[%bar%] %percent:3s%%");
         $progress->start();
+        
         $deleting = array();
         $page = 0;
         while (true) {
@@ -390,24 +398,23 @@ class Index extends Base
             $page ++;
         }
         
-        $output->writeln('');
-        $progress = new ProgressBar($output, sizeof($deleting));
-        
-        $progress->setMessage('<info>removing orphans</info>:');
-        $progress->setMessage('', 'jvm');
-        $progress->setMessage('', 'infos');
-        
-        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
-        $progress->start();
-        
-        foreach ($deleting as $docId) {
-            $this->solrTools->removeDocument($docId);
-            $progress->advance();
-        }
-        
-        $progress->setMessage('', 'infos');
-        $progress->setMessage('', 'jvm');
         $progress->finish();
+        $output->writeln('');
+        
+        if (sizeof($deleting) > 0) {
+            $progress = new ProgressBar($output, sizeof($deleting));
+            $progress->setMessage('<info>removing orphans</info>:');
+            $progress->setFormat(" %message:-38s%%current:5s%/%max:5s%  [%bar%] %percent:3s%%");
+            $progress->start();
+            
+            foreach ($deleting as $docId) {
+                $this->solrTools->removeDocument($docId);
+                $progress->advance();
+            }
+            
+            $progress->finish();
+        } else
+            $output->writeln(' <info>found no orphan</info>');
     }
 }
 

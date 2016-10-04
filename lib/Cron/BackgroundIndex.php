@@ -183,7 +183,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
                 $file
             ));
             
-            if (! $result) {
+            if ($result === false) {
                 $this->miscService->log('Failed to update files flag during background jobs (file #' . $file['fileid'] . ')', 3);
                 $noFailure = false;
                 sleep(10);
