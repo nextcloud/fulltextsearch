@@ -54,13 +54,12 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->solrTools = $c->query('SolrToolsService');
         $this->fileService = $c->query('FileService');
         $this->rootFolder = $c->query('RootFolder');
-        
-        // $this->setDebug(true);
-        
-        // if (! $this->configService->neededIndex()) {
-        // $this->miscService->debug('Looks like there is no need to index');
-        // return;
-        // }
+            
+            // $this->setDebug(true);
+        if (! $this->configService->neededIndex()) {
+            $this->miscService->debug('Looks like there is no need to index');
+            return;
+        }
         
         $solr_locked = $this->configService->getAppValue('solr_lock');
         if ($solr_locked > (time() - (3600 * 24))) {
@@ -98,12 +97,16 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             $userId = $user->getUID();
             $this->solrService->setOwner($userId);
             
-            $result = $this->browseUserDirectory($userId, $docIds);
-            if (! $result) {
+            $result_files = $this->browseUserDirectory($userId, '/files', array(), $docIds_files);
+            $result_trash = $this->browseUserDirectory($userId, '/files_trashbin', array(
+                'deleted' => true
+            ), $docIds_trash);
+            
+            if (! $result_files || ! $result_trash) {
                 $this->miscService->log('Background index had some issue', 2);
                 $noFailure = false;
             }
-            $documentIds = array_merge($documentIds, $docIds);
+            $documentIds = array_merge($documentIds, $docIds_files, $docIds_trash);
         }
         
         // orphans
@@ -136,7 +139,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         return $noFailure;
     }
 
-    private function browseUserDirectory($userId, &$docIds)
+    private function browseUserDirectory($userId, $dir, $options, &$docIds)
     {
         $docIds = array();
         
@@ -145,7 +148,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         $this->fileService->setView(Filesystem::getView());
         
-        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, '/files');
+        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, $dir);
         if ($userFolder == null || ! $userFolder)
             return true;
         
@@ -166,6 +169,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
                     array_push($docIds, (int) $file->getId());
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
+                        'options' => $options,
                         'path' => $file->getPath()
                     ));
                 }
@@ -181,7 +185,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             $this->miscService->debug('Cron update ' . $i . ' - file #' . $file['fileid']);
             $result = $this->fileService->updateFiles(array(
                 $file
-            ));
+            ), $file['options']);
             
             if ($result === false) {
                 $this->miscService->log('Failed to update files flag during background jobs (file #' . $file['fileid'] . ')', 3);
