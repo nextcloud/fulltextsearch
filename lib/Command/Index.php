@@ -108,6 +108,8 @@ class Index extends Base
         
         $this->configService->setAppValue('solr_lock', time());
         
+        $documentIds = array();
+        
         //
         // extract files
         $output->writeln('');
@@ -130,10 +132,10 @@ class Index extends Base
             $this->solrService->setOwner($userId);
             
             $this->miscService->debug('Init Extracting new files for user ' . $userId);
-            $result = $this->browseUserDirectory($userId, $output);
+            $result = $this->browseUserDirectory($output, $userId, $docIds);
             
             if ($result['total'] > 0) {
-                
+                $documentIds = array_merge($documentIds, $docIds);
                 array_push($extractedDocuments, array(
                     'userid' => $userId,
                     'files' => $result['files']
@@ -148,10 +150,14 @@ class Index extends Base
         
         $output->writeln('       ' . $processedTotal . ' file(s) processed ; ' . $extractedTotal . ' extracted documents');
         
+        $currentIndex = time();
+        
         //
         // update Documents
         $output->writeln('');
         $output->writeln('* Updating documents status');
+        $output->writeln('');
+        
         $noFailure = true;
         $usersTotal = sizeof($extractedDocuments);
         $usersCurrent = 0;
@@ -164,13 +170,24 @@ class Index extends Base
             
             $this->miscService->debug('Init Updating documents for user ' . $userId);
             
-            if (! $this->updateUserDocuments($userId, $fileIds, $output))
+            if (! $this->updateUserDocuments($userId, $fileIds, $output, $currentIndex))
                 $noFailure = false;
             
             $output->writeln('');
         }
         
+        // $output->writeln(' - ' . $deleted . ' documents removed');
+        
         Filesystem::tearDown();
+        
+        //
+        // removing orphan
+        $output->writeln('');
+        $output->writeln('* Removing orphan documents');
+        $output->writeln('');
+        
+        $this->removeOrphans($output, $documentIds);
+        
         $this->configService->needIndex(false);
         
         if ($noFailure)
@@ -179,9 +196,11 @@ class Index extends Base
             $this->configService->needIndex(true);
         
         $this->configService->setAppValue('solr_lock', '0');
+        
+        $output->writeln('');
     }
 
-    private function browseUserDirectory($userId, $output)
+    private function browseUserDirectory($output, $userId, &$docIds)
     {
         Filesystem::tearDown();
         Filesystem::init($userId, '');
@@ -211,10 +230,11 @@ class Index extends Base
         
         $filesProcessed = 0;
         $fileIds = array();
+        $docIds = array();
         $lastProgressTick = 0;
         foreach ($files as $file) {
             
-            $this->miscService->debug('(' . $userId . ') - scaning file #' . $file->getId() . ' (' . $file->getMimeType() . ') ' . $file->getPath());
+            $this->miscService->debug('(' . $userId . ') - scanning file #' . $file->getId() . ' (' . $file->getMimeType() . ') ' . $file->getPath());
             
             if ($this->hasBeenInterrupted()) {
                 $this->configService->setAppValue('solr_lock', '0');
@@ -235,6 +255,7 @@ class Index extends Base
                 $status = 0;
                 
                 if ($this->fileService->addFileFromPath($file->getPath(), $forceExtract, $status)) {
+                    array_push($docIds, (int) $file->getId());
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
                         'path' => $file->getPath()
@@ -261,7 +282,7 @@ class Index extends Base
         );
     }
 
-    private function updateUserDocuments($userId, $fileIds, $output)
+    private function updateUserDocuments($userId, $fileIds, $output, $currentIndex)
     {
         Filesystem::tearDown();
         Filesystem::init($userId, '');
@@ -283,8 +304,9 @@ class Index extends Base
         sleep(5);
         $i = 0;
         $lastProgressTick = 0;
-        $failure = 0;
-        foreach ($fileIds as $file) {
+        $failureIds = array();
+        while ($file = array_shift($fileIds)) {
+            
             if ($this->hasBeenInterrupted()) {
                 $this->configService->setAppValue('solr_lock', '0');
                 throw new \Exception('ctrl-c');
@@ -293,17 +315,19 @@ class Index extends Base
             $result = $this->fileService->updateFiles(array(
                 $file
             ));
-            $progress->setMessage('failure(s): ' . $failure, 'failures');
+            
+            // $progress->setMessage('failure(s): ' . $failure, 'failures');
             
             if ($result)
                 $this->miscService->debug('' . $userId . ' update done');
             else {
-                $failure ++;
-                $progress->setMessage('failure(s): ' . $failure, 'failures');
+                array_push($failureIds, $file);
+                $progress->setMessage('failure(s): ' . (sizeof($failureIds) + sizeof($tmp_failureIds)), 'failures');
                 $this->miscService->debug('' . $userId . ' update failed');
             }
             
             $progress->setMessage('[updating] -', 'infos');
+            
             if ((time() - self::REFRESH_INFO_SYSTEM) > $lastProgressTick) {
                 $infoSystem = $this->solrTools->getInfoSystem();
                 $progress->setMessage($infoSystem->jvm->memory->used, 'jvm');
@@ -317,7 +341,7 @@ class Index extends Base
             
             $i ++;
             
-            // let's take a break every 1000 files
+            // let's take a break every 500 files
             if (($i % 500) == 0) {
                 $progress->setMessage('[standby] -', 'infos');
                 $progress->display();
@@ -327,7 +351,63 @@ class Index extends Base
         
         $progress->finish();
         
-        return ($failure == 0);
+        return (sizeof($failureIds) == 0);
+    }
+
+    private function removeOrphans($output, $fileIds)
+    {
+        $progress = new ProgressBar($output, $this->solrTools->count());
+        
+        $progress->setMessage('<info>spoting orphans</info>:');
+        $progress->setMessage('', 'jvm');
+        $progress->setMessage('', 'infos');
+        
+        $progress->setFormat(" %message:-43s%[%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+        $progress->start();
+        $deleting = array();
+        $page = 0;
+        while (true) {
+            
+            if ($this->hasBeenInterrupted()) {
+                $this->configService->setAppValue('solr_lock', '0');
+                throw new \Exception('ctrl-c');
+            }
+            
+            $ids = $this->solrTools->getAll($page, $lastPage, $error);
+            if (! $ids)
+                return false;
+            
+            foreach ($ids as $id) {
+                
+                if (! in_array($id, $fileIds) && (! in_array($id, $deleting)))
+                    array_push($deleting, $id);
+                
+                $progress->advance();
+            }
+            
+            if ($lastPage)
+                break;
+            $page ++;
+        }
+        
+        $output->writeln('');
+        $progress = new ProgressBar($output, sizeof($deleting));
+        
+        $progress->setMessage('<info>removing orphans</info>:');
+        $progress->setMessage('', 'jvm');
+        $progress->setMessage('', 'infos');
+        
+        $progress->setFormat(" %message:-30s%%current:5s%/%max:5s%  [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+        $progress->start();
+        
+        foreach ($deleting as $docId) {
+            $this->solrTools->removeDocument($docId);
+            $progress->advance();
+        }
+        
+        $progress->setMessage('', 'infos');
+        $progress->setMessage('', 'jvm');
+        $progress->finish();
     }
 }
 

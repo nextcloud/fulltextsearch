@@ -1,3 +1,11 @@
+**v0.4.1**
+- Force index unlock after 24h
+- maximum size on extracted file
+- new field nextant_path
+- documents with its file deleted are removed
+- bugfixes
+
+
 **v0.4.0**
 - index safe guard
 - new options on nextant:index

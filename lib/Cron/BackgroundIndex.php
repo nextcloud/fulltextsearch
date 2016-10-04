@@ -51,6 +51,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->miscService = $c->query('MiscService');
         $this->userManager = $c->query('UserManager');
         $this->solrService = $c->query('SolrService');
+        $this->solrTools = $c->query('SolrToolsService');
         $this->fileService = $c->query('FileService');
         $this->rootFolder = $c->query('RootFolder');
         
@@ -141,6 +142,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         sleep(5);
         $i = 0;
+        $currentIndex = time();
         foreach ($fileIds as $file) {
             $i ++;
             
