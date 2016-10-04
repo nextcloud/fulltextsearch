@@ -64,7 +64,7 @@ class SettingsController extends Controller
      */
     public function index()
     {
-        $documentsCount = $this->solrAdmin->count($error);
+        $documentsCount = $this->solrTools->count($error);
         
         $params = [
             'configured' => $this->configService->getAppValue('configured'),
