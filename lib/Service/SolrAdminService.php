@@ -380,37 +380,5 @@ class SolrAdminService
         
         return false;
     }
-
-    /**
-     * Count document on Solr Core
-     *
-     * @param number $error            
-     * @return boolean
-     */
-    public function count(&$error = 0)
-    {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
-            return false;
-        
-        $client = $this->solrService->getClient();
-        
-        try {
-            $query = $client->createSelect();
-            $query->setQuery('*:*');
-            $query->setRows(0);
-            $resultset = $client->execute($query);
-            
-            return $resultset->getNumFound();
-        } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_SOLRURI;
-            else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
-        } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
-        }
-        
-        return false;
-    }
 }
     

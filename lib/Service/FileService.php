@@ -91,7 +91,7 @@ class FileService
             return false;
         }
         
-        if (! SolrService::extractableFile($fileInfo->getMimeType()))
+        if (! SolrService::extractableFile($fileInfo->getMimeType(), $path))
             return false;
         
         if (! $forceExtract && $this->solrTools->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime())) {
@@ -141,7 +141,7 @@ class FileService
                 $subfiles = $this->view->getDirectoryContent($file['path']);
                 foreach ($subfiles as $subfile) {
                     $result = $this->updateFiles($subfile->getId(), $options, false);
-                    if ($result == false)
+                    if ($result === false)
                         return false;
                     $pack = array_merge($pack, $result);
                     
@@ -162,12 +162,12 @@ class FileService
         if (! $isRoot)
             return $pack;
         
-        $solrResult = $this->solrTools->updateDocuments($pack, $error);
+        $count = $this->solrTools->updateDocuments($pack, $error);
         
-        if (! $solrResult)
+        if ($count === false)
             $this->configService->needIndex(true);
         
-        return $solrResult;
+        return $count;
     }
 
     /**
