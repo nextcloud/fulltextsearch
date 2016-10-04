@@ -322,7 +322,7 @@ class Index extends Base
                 $this->miscService->debug('' . $userId . ' update done');
             else {
                 array_push($failureIds, $file);
-                $progress->setMessage('failure(s): ' . (sizeof($failureIds) + sizeof($tmp_failureIds)), 'failures');
+                $progress->setMessage('failure(s): ' . sizeof($failureIds), 'failures');
                 $this->miscService->debug('' . $userId . ' update failed');
             }
             
