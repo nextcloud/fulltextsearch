@@ -57,10 +57,10 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         // $this->setDebug(true);
         
-        if (! $this->configService->neededIndex()) {
-            $this->miscService->debug('Looks like there is no need to index');
-            return;
-        }
+        // if (! $this->configService->neededIndex()) {
+        // $this->miscService->debug('Looks like there is no need to index');
+        // return;
+        // }
         
         $solr_locked = $this->configService->getAppValue('solr_lock');
         if ($solr_locked > (time() - (3600 * 24))) {
@@ -91,24 +91,57 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $users = $this->userManager->search('');
         $extractedDocuments = array();
         
+        $documentIds = array();
         $noFailure = true;
         foreach ($users as $user) {
             
             $userId = $user->getUID();
             $this->solrService->setOwner($userId);
             
-            $result = $this->browseUserDirectory($userId);
+            $result = $this->browseUserDirectory($userId, $docIds);
             if (! $result) {
                 $this->miscService->log('Background index had some issue', 2);
                 $noFailure = false;
             }
+            $documentIds = array_merge($documentIds, $docIds);
+        }
+        
+        // orphans
+        $deleting = array();
+        $page = 0;
+        while (true) {
+            
+            $ids = $this->solrTools->getAll($page, $lastPage, $error);
+            if (! $ids)
+                break;
+            
+            foreach ($ids as $id) {
+                if (! in_array($id, $documentIds) && (! in_array($id, $deleting)))
+                    array_push($deleting, $id);
+            }
+            
+            if ($lastPage)
+                break;
+            
+            $page ++;
+            if ($page > 10000) {
+                $this->miscService->log('Looks like we reached a 1,000,000 documents');
+                break;
+            }
+        }
+        
+        foreach ($deleting as $docId) {
+            $this->solrTools->removeDocument($docId);
+            $this->miscService->log('REMOVE DOC');
         }
         
         return $noFailure;
     }
 
-    private function browseUserDirectory($userId)
+    private function browseUserDirectory($userId, &$docIds)
     {
+        $docIds = array();
+        
         Filesystem::tearDown();
         Filesystem::init($userId, '');
         
@@ -132,6 +165,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             if (! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) {
                 if (($this->fileService->addFileFromPath($file->getPath(), false))) {
                     
+                    array_push($docIds, (int) $file->getId());
                     array_push($fileIds, array(
                         'fileid' => $file->getId(),
                         'path' => $file->getPath()
