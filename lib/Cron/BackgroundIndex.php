@@ -130,10 +130,8 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             }
         }
         
-        foreach ($deleting as $docId) {
+        foreach ($deleting as $docId)
             $this->solrTools->removeDocument($docId);
-            $this->miscService->log('REMOVE DOC');
-        }
         
         return $noFailure;
     }
