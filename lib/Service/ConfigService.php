@@ -65,6 +65,13 @@ class ConfigService
         $this->miscService = $miscService;
     }
 
+    public function reset()
+    {
+        foreach ($this->defaults as $k => $v) {
+            $this->setAppValue($k, $v);
+        }
+    }
+
     public function needIndex($need, $force = false)
     {
         if (! $need)
