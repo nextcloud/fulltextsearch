@@ -100,16 +100,17 @@ class SearchController extends Controller
                     $hl2 = '';
                     if (key_exists('highlight', $data) && is_array($data['highlight'])) {
                         if (sizeof($data['highlight']) == 1)
-                            $hl1 = $data['highlight'];
-                        else 
-                            if (sizeof($data['highlight']) > 1)
-                                list ($hl1, $hl2) = $data['highlight'];
+                            $hl1 = '... ' . $data['highlight'][0] . ' ...';
+                        if (sizeof($data['highlight']) > 1)
+                            $hl2 = '... ' . $data['highlight'][1] . ' ...';
                     }
                     
-                    if ($hl1 == '' || $hl1 == null) {
+                    $this->miscService->log('$$' . $hl1 . '$$' . $hl2 . '$$');
+                    
+                    if ($hl1 == '' || $hl1 == null)
                         $hl1 = '';
+                    if ($hl2 == '' || $hl2 == null)
                         $hl2 = '';
-                    }
                     
                     $response = array(
                         'id' => $data['id'],
