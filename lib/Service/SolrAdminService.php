@@ -100,6 +100,16 @@ class SolrAdminService
         array_push($fields, array(
             'type' => 'field',
             'data' => array(
+                'name' => 'text',
+                'type' => 'text_general',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
                 'name' => 'nextant_owner',
                 'type' => 'string',
                 'indexed' => true,
