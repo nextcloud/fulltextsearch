@@ -201,7 +201,7 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($absolutePath, $docid, $mtime, $path, &$error = '')
+    public function extractFile($absolutePath, $docid, $path, $mtime, &$error = '')
     {
         if (! $this->configured())
             return false;
@@ -220,13 +220,14 @@ class SolrService
             $client = $this->getClient();
             
             $query = $client->createExtract();
-            $query->addFieldMapping('content', 'text');
             $query->setUprefix('nextant_attr_');
+            $query->addFieldMapping('content', 'text');
+            $query->addFieldMapping('div', 'ignored_');
+            $query->addFieldMapping('a', 'ignored_');
             
             $query->setFile($absolutePath);
             $query->setCommit(true);
             $query->setOmitHeader(true);
-            // $query->setCaptureAttr(false);
             
             // add document
             $doc = $query->createDocument();
@@ -237,7 +238,15 @@ class SolrService
             
             $query->setDocument($doc);
             
-            $ret = $client->extract($query);
+            // custom options
+            $request = $client->createRequest($query);
+            $request->addParam('captureAttr', true);
+            $request->addParam('ignoreTikaException', true);
+            
+            $response = $client->executeRequest($request);
+            $ret = $client->createResult($query, $response);
+            
+            // $ret = $client->extract($query);
             
             return $ret;
         } catch (\Solarium\Exception\HttpException $ehe) {
@@ -288,8 +297,8 @@ class SolrService
             $query->setQuery('nextant_attr_text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             
-//             if (key_exists('current_directory', $options))
-//                 $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
+            // if (key_exists('current_directory', $options))
+            // $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
             
             $hl = $query->getHighlighting();
             $hl->setFields(array(
