@@ -36,6 +36,7 @@ use \OCA\Nextant\Service\FileService;
 use OCP\AppFramework\Controller;
 use OCP\IRequest;
 use OC\Files\Filesystem;
+use OCP\Files\NotFoundException;
 
 class SearchController extends Controller
 {
@@ -98,11 +99,14 @@ class SearchController extends Controller
                     $hl1 = '';
                     $hl2 = '';
                     if (key_exists('highlight', $data) && is_array($data['highlight'])) {
-                        list ($hl1, $hl2) = $data['highlight'];
-                    } 
+                        if (sizeof($data['highlight']) == 1)
+                            $hl1 = $data['highlight'];
+                        else 
+                            if (sizeof($data['highlight']) > 1)
+                                list ($hl1, $hl2) = $data['highlight'];
+                    }
                     
-                    if ($hl1 == '' || $hl1 == null)
-                    {
+                    if ($hl1 == '' || $hl1 == null) {
                         $hl1 = '';
                         $hl2 = '';
                     }
@@ -112,7 +116,6 @@ class SearchController extends Controller
                         'type' => 'file',
                         'shared' => ($data['owner'] != $this->userId),
                         'deleted' => ($data['deleted']),
-                        'highlight' => '... ' . $data['highlight'] . ' ...',
                         'size' => $fileData->getSize(),
                         'path' => $path,
                         'basepath' => $basepath,
