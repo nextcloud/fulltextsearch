@@ -1,3 +1,9 @@
+**v0.5.0**
+- Beta release
+- new Admin UI
+- new display on search result
+
+
 **v0.4.2**
 - extract and index files from trash
 - orphans documents are removed while indexing

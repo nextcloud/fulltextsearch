@@ -217,7 +217,6 @@ class SolrToolsService
                 if ($request->getQueryTime() > self::UPDATE_MAXIMUM_QUERYTIME) {
                     $this->miscService->log('Maximum Update Query Time (' . self::UPDATE_MAXIMUM_QUERYTIME . 'ms) reached, standby.', 1);
                     return false;
-                    // sleep(10);
                 }
                 
                 if ($documentProcessed >= self::UPDATE_MAXIMUM_FILEPROCESS) {
