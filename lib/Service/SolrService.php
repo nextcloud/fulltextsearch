@@ -160,7 +160,6 @@ class SolrService
         switch ($mimetype) {
             case 'application/epub+zip':
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
-                return true;
             
             case 'application/pdf':
                 return \OCP\Util::imagePath('core', 'filetypes/application-pdf.svg');
@@ -169,9 +168,10 @@ class SolrService
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
             case 'application/octet-stream':
-                $ext = pathinfo($path, PATHINFO_EXTENSION);
-                if (substr($ext, 0, 1) == 'd' && ((int) (substr($ext, 1)) > 0))
-                    return '';
+                $pinfo = pathinfo($path);
+                if (substr($pinfo['extension'], 0, 1) == 'd' && ((int) (substr($pinfo['extension'], 1)) > 0)) {
+                    return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                }
                 return false;
         }
         
