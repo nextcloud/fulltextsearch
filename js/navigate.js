@@ -100,6 +100,8 @@ $(document)
 												.replace(/%TYPE%/gi, entry.type)
 												.replace(/%SIZE%/gi, entry.size)
 												.replace(/%MIME%/gi, entry.mime)
+												.replace(/%FILEICON%/gi,
+														entry.fileicon)
 												.replace(/%MTIME%/gi,
 														entry.mtime)
 												.replace(/%BASEFILE%/gi,
@@ -115,7 +117,6 @@ $(document)
 														entry.highlight1)
 												.replace(/%HIGHLIGHT2%/gi,
 														entry.highlight2)
-
 												.replace(/%FILENAME%/gi,
 														entry.filename);
 
@@ -130,7 +131,7 @@ $(document)
 							$tmpl += '<a href="#" class="action action-favorite " data-original-title="" title="">';
 							$tmpl += '<span class="icon icon-star"></span><span class="hidden-visually">Favorite</span></a>';
 							$tmpl += '<input id="select-files-%ID%" class="selectCheckBox checkbox" type="checkbox">';
-							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(/core/img/filetypes/application-pdf.svg); background-size: 32px;"></div>';
+							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%FILEICON%); background-size: 32px;"></div>';
 							$tmpl += '<span class="hidden-visually">Select</span></label>';
 
 							$tmpl += '<a class="name" href="%WEBDAV%">';

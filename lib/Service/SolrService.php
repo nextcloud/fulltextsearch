@@ -154,23 +154,24 @@ class SolrService
     {
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
-                return true;
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
         }
         
         switch ($mimetype) {
             case 'application/epub+zip':
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
                 return true;
             
             case 'application/pdf':
-                return true;
+                return \OCP\Util::imagePath('core', 'filetypes/application-pdf.svg');
             
             case 'application/rtf':
-                return true;
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
             case 'application/octet-stream':
                 $ext = pathinfo($path, PATHINFO_EXTENSION);
                 if (substr($ext, 0, 1) == 'd' && ((int) (substr($ext, 1)) > 0))
-                    return true;
+                    return '';
                 return false;
         }
         
@@ -187,7 +188,7 @@ class SolrService
         
         foreach ($acceptedMimeType['vnd'] as $mt) {
             if (substr($mimetype, 0, strlen($mt)) == $mt)
-                return true;
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
         }
         
         return false;
@@ -222,8 +223,17 @@ class SolrService
             $query = $client->createExtract();
             $query->setUprefix('nextant_attr_');
             $query->addFieldMapping('content', 'text');
+            
             $query->addFieldMapping('div', 'ignored_');
             $query->addFieldMapping('a', 'ignored_');
+            $query->addFieldMapping('html', 'ignored_');
+            $query->addFieldMapping('link', 'ignored_');
+            $query->addFieldMapping('style', 'ignored_');
+            $query->addFieldMapping('p', 'ignored_');
+            $query->addFieldMapping('span', 'ignored_');
+            $query->addFieldMapping('h1', 'ignored_');
+            $query->addFieldMapping('h2', 'ignored_');
+            $query->addFieldMapping('h3', 'ignored_');
             
             $query->setFile($absolutePath);
             $query->setCommit(true);
@@ -294,7 +304,7 @@ class SolrService
             ));
             
             array_push($options, 'complete_words');
-            $query->setQuery('nextant_attr_text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
+            $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             
             // if (key_exists('current_directory', $options))
@@ -302,7 +312,7 @@ class SolrService
             
             $hl = $query->getHighlighting();
             $hl->setFields(array(
-                'nextant_attr_text'
+                'text'
             ));
             
             if ($this->configService->getAppValue('display_result') == ConfigService::SEARCH_DISPLAY_NEXTANT) {
@@ -326,7 +336,7 @@ class SolrService
                     'id' => $document->id,
                     'deleted' => $document->nextant_deleted,
                     'owner' => $document->nextant_owner,
-                    'highlight' => $hlDoc->getField('nextant_attr_text'),
+                    'highlight' => $hlDoc->getField('text'),
                     'score' => $document->score
                 ));
             }

@@ -152,11 +152,9 @@ class FileService
                     }
                 }
             } else {
-                // if (SolrService::extractableFile($fileInfo->getMimeType())) {
                 $data['id'] = $file['fileid'];
                 $data['path'] = $file['path'];
                 array_push($pack, array_merge($data, $options));
-                // }
             }
         }
         

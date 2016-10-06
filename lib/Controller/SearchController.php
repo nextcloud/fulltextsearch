@@ -33,6 +33,7 @@
 namespace OCA\Nextant\Controller;
 
 use \OCA\Nextant\Service\FileService;
+use \OCA\Nextant\Service\SolrService;
 use OCP\AppFramework\Controller;
 use OCP\IRequest;
 use OC\Files\Filesystem;
@@ -99,13 +100,11 @@ class SearchController extends Controller
                     $hl1 = '';
                     $hl2 = '';
                     if (key_exists('highlight', $data) && is_array($data['highlight'])) {
-                        if (sizeof($data['highlight']) == 1)
+                        if (sizeof($data['highlight']) >= 1)
                             $hl1 = '... ' . $data['highlight'][0] . ' ...';
                         if (sizeof($data['highlight']) > 1)
                             $hl2 = '... ' . $data['highlight'][1] . ' ...';
                     }
-                    
-                    $this->miscService->log('$$' . $hl1 . '$$' . $hl2 . '$$');
                     
                     if ($hl1 == '' || $hl1 == null)
                         $hl1 = '';
@@ -126,6 +125,7 @@ class SearchController extends Controller
                         'highlight2' => $hl2,
                         'extension' => ($pathParts['extension'] != '') ? '.' . $pathParts['extension'] : '',
                         'mime' => $fileData->getMimetype(),
+                        'fileicon' => SolrService::extractableFile($fileData->getMimeType(), $path),
                         'webdav' => \OCP\Util::linkToRemote('webdav') . $path,
                         'mtime' => $fileData->getMTime()
                     );
