@@ -278,6 +278,7 @@ class SolrToolsService
             $query->setFields(array(
                 'id',
                 'nextant_owner',
+                'nextant_path',
                 'nextant_share',
                 'nextant_sharegroup',
                 'nextant_deleted'
@@ -288,6 +289,7 @@ class SolrToolsService
             foreach ($resultset as $document) {
                 $result[$document->id] = array(
                     'nextant_owner' => $document->nextant_owner,
+                    'nextant_path' => $document->nextant_path,
                     'nextant_share' => $document->nextant_share,
                     'nextant_sharegroup' => $document->nextant_sharegroup,
                     'nextant_deleted' => $document->nextant_deleted

@@ -201,7 +201,7 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($absolutePath, $docid, $mtime, &$error = '')
+    public function extractFile($absolutePath, $docid, $mtime, $path, &$error = '')
     {
         if (! $this->configured())
             return false;
@@ -288,8 +288,8 @@ class SolrService
             $query->setQuery('nextant_attr_text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             
-            // if (key_exists('current_directory', $options))
-            // $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
+//             if (key_exists('current_directory', $options))
+//                 $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
             
             $hl = $query->getHighlighting();
             $hl->setFields(array(
