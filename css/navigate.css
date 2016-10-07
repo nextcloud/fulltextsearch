@@ -11,44 +11,64 @@ DIV.nextant_entry {
 	margin: 2px;
 }
 
-SPAN.nextant_line1 {
+DIV.nextant_details {
+	width: 22px;
+	background-size: 22px;
+	display: inline-block;
+	height: 22px;
+	margin-left: -8px;
+	margin-top: -8px;
+	cursor: pointer;
+	float: left;
+	position: absolute;
+	z-index: 4;
+	opacity: 0.5;
+	filter: alpha(opacity = 50)
+}
+
+A.nextant_file {
+	cursor: default !important;
+	position: relative;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	display: block;
+	height: 50px;
+	line-height: 50px;
+	padding: 0;
+	left: 50px;
+	margin-right: 50px;
+}
+
+SPAN.nextant_line {
 	position: absolute;
 	left: 55px;
-	top: -15px;
 	padding: 0;
 	overflow: hidden;
-	font-style: italic;
-	text-overflow: ellipsis;
 	padding-right: 20px;
 	max-width: 800px;
+	text-overflow: ellipsis;
+}
+
+SPAN.nextant_line1 {
+	top: -15px;
+	font-style: italic;
 	font-weight: bold;
 }
 
 SPAN.nextant_line2 {
-	position: absolute;
-	left: 55px;
 	top: 0px;
-	padding: 0;
-	overflow: hidden;
 	font-style: italic;
-	text-overflow: ellipsis;
-	padding-right: 20px;
-	max-width: 800px;
 	font-size: 12px;
+	left: 70px;
 	color: #9e9e9e;
 }
 
 SPAN.nextant_line3 {
-	position: absolute;
-	left: 55px;
-	top: 15px;
-	padding: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	max-width: 800px;
 	font-style: italic;
 	font-size: 12px;
 	color: #9e9e9e;
+	left: 70px;
+	top: 15px;
 	padding-right: 20px;
 }
 

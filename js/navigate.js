@@ -94,11 +94,13 @@ $(document)
 
 							response
 									.forEach(function(entry) {
-										$row = nextant
+										var row = nextant
 												.template_entry()
 												.replace(/%ID%/gi, entry.id)
 												.replace(/%TYPE%/gi, entry.type)
 												.replace(/%SIZE%/gi, entry.size)
+												.replace(/%FILESIZE%/gi,
+														entry.filesize)
 												.replace(/%MIME%/gi, entry.mime)
 												.replace(/%FILEICON%/gi,
 														entry.fileicon)
@@ -120,7 +122,22 @@ $(document)
 												.replace(/%FILENAME%/gi,
 														entry.filename);
 
-										$('#nextantList').append($row);
+										row = row
+												.replace(
+														/%SHARED%/gi,
+														(entry.shared != '') ? ' style="background-image:url('
+																+ entry.shared
+																+ ');"'
+																: '');
+										row = row
+												.replace(
+														/%DELETED%/gi,
+														(entry.deleted != '') ? ' style="background-image:url('
+																+ entry.deleted
+																+ ');"'
+																: '');
+
+										$('#nextantList').append(row);
 									});
 						},
 
@@ -128,18 +145,25 @@ $(document)
 
 							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%FILENAME%" data-mime="%MIME%" data-mtime="%MTIME%000" data-etag="" data-permissions="" data-has-preview="false" data-path="%DIRNAME%" data-share-permissions="">';
 							$tmpl += '<td class="filename ui-draggable">';
-							$tmpl += '<a href="#" class="action action-favorite " data-original-title="" title="">';
-							$tmpl += '<span class="icon icon-star"></span><span class="hidden-visually">Favorite</span></a>';
-							$tmpl += '<input id="select-files-%ID%" class="selectCheckBox checkbox" type="checkbox">';
-							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%FILEICON%); background-size: 32px;"></div>';
+							$tmpl += '<a class="action action-favorite " data-original-title="" title="">';
+							// $tmpl += '<span class="icon
+							// icon-star"></span><span
+							// class="hidden-visually">Favorite</span>';
+							$tmpl += '</a>';
+							// $tmpl += '<input id="select-files-%ID%"
+							// class="selectCheckBox checkbox"
+							// type="checkbox">';
+							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%FILEICON%); background-size: 32px;">';
+							$tmpl += '<div class="nextant_details" %DELETED%%SHARED%></div>';
+							$tmpl += '</div>';
 							$tmpl += '<span class="hidden-visually">Select</span></label>';
 
-							$tmpl += '<a class="name" href="%WEBDAV%">';
+							$tmpl += '<a class="nextant_file" href="%WEBDAV%">';
 							$tmpl += '<div>';
-							$tmpl += '<span class="nextant_line1">%PATH%</span>';
-							$tmpl += '<span class="nextant_line2">%HIGHLIGHT1%</span>';
-							$tmpl += '<span class="nextant_line3">%HIGHLIGHT2%</span>';
-							$tmpl += '</div>';
+							$tmpl += '<span class="nextant_line nextant_line1">%PATH%</span>';
+							$tmpl += '<span class="nextant_line nextant_line2">%HIGHLIGHT1%</span>';
+							$tmpl += '<span class="nextant_line nextant_line3">%HIGHLIGHT2%</span>';
+							$tmpl += '</div></a>';
 
 							// $tmpl += '<span class="fileactions"><a
 							// class="action action-share permanent" href="#"
@@ -154,8 +178,10 @@ $(document)
 							// icon-more"></span>';
 							// $tmpl += '<span
 							// class="hidden-visually">Actions</span></a></span></a>';
+
 							$tmpl += '</td>';
-							$tmpl += '<td class="filesize" style="color:rgb(-17,-17,-17)">13.3 MB</td><td class="date"><span class="modified" title="" style="color:rgb(155,155,155)" data-original-title="September 1, 2016 12:05 PM">a month ago</span></td></tr>';
+							$tmpl += '<td class="filesize" style="color:rgb(-17,-17,-17)">%FILESIZE%</td>';
+							$tmpl += '<td class="date"><span class="modified" title="" style="color:rgb(155,155,155)" data-original-title=""></span></td></tr>';
 
 							return $tmpl;
 

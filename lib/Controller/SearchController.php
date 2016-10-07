@@ -38,6 +38,7 @@ use OCP\AppFramework\Controller;
 use OCP\IRequest;
 use OC\Files\Filesystem;
 use OCP\Files\NotFoundException;
+use OC\Files\View;
 
 class SearchController extends Controller
 {
@@ -87,53 +88,61 @@ class SearchController extends Controller
             
             foreach ($solrResult as $data) {
                 
+                $fileData = null;
                 try {
                     $path = $view->getPath($data['id']);
                     $fileData = $view->getFileInfo($path);
-                    
-                    if ($fileData === false)
-                        continue;
-                    
-                    $pathParts = pathinfo($path);
-                    $basepath = str_replace('//', '/', '/' . $pathParts['dirname'] . '/');
-                    
-                    $hl1 = '';
-                    $hl2 = '';
-                    if (key_exists('highlight', $data) && is_array($data['highlight'])) {
-                        if (sizeof($data['highlight']) >= 1)
-                            $hl1 = '... ' . $data['highlight'][0] . ' ...';
-                        if (sizeof($data['highlight']) > 1)
-                            $hl2 = '... ' . $data['highlight'][1] . ' ...';
-                    }
-                    
-                    if ($hl1 == '' || $hl1 == null)
-                        $hl1 = '';
-                    if ($hl2 == '' || $hl2 == null)
-                        $hl2 = '';
-                    
-                    $response = array(
-                        'id' => $data['id'],
-                        'type' => 'file',
-                        'shared' => ($data['owner'] != $this->userId),
-                        'deleted' => ($data['deleted']),
-                        'size' => $fileData->getSize(),
-                        'path' => $path,
-                        'basepath' => $basepath,
-                        'filename' => $pathParts['basename'],
-                        'basefile' => $pathParts['filename'],
-                        'highlight1' => $hl1,
-                        'highlight2' => $hl2,
-                        'extension' => ($pathParts['extension'] != '') ? '.' . $pathParts['extension'] : '',
-                        'mime' => $fileData->getMimetype(),
-                        'fileicon' => SolrService::extractableFile($fileData->getMimeType(), $path),
-                        'webdav' => \OCP\Util::linkToRemote('webdav') . $path,
-                        'mtime' => $fileData->getMTime()
-                    );
-                    
-                    array_push($results, $response);
                 } catch (NotFoundException $e) {
-                    continue;
+                    try {
+                        $trashview = new View('/' . $this->userId . '/files_trashbin/files');
+                        $path = $trashview->getPath($data['id']);
+                        $fileData = $trashview->getFileInfo($path);
+                    } catch (NotFoundException $e) {
+                        continue;
+                    }
                 }
+                
+                if ($fileData == null || $fileData === false)
+                    continue;
+                
+                $pathParts = pathinfo($path);
+                $basepath = str_replace('//', '/', '/' . $pathParts['dirname'] . '/');
+                
+                $hl1 = '';
+                $hl2 = '';
+                if (key_exists('highlight', $data) && is_array($data['highlight'])) {
+                    if (sizeof($data['highlight']) >= 1)
+                        $hl1 = '... ' . $data['highlight'][0] . ' ...';
+                    if (sizeof($data['highlight']) > 1)
+                        $hl2 = '... ' . $data['highlight'][1] . ' ...';
+                }
+                
+                if ($hl1 == '' || $hl1 == null)
+                    $hl1 = '';
+                if ($hl2 == '' || $hl2 == null)
+                    $hl2 = '';
+                
+                $response = array(
+                    'id' => $data['id'],
+                    'type' => 'file',
+                    'shared' => ($data['owner'] != $this->userId) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '',
+                    'deleted' => ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '',
+                    'size' => $fileData->getSize(),
+                    'filesize' => \OC_Helper::humanFileSize($fileData->getSize()),
+                    'path' => $path,
+                    'basepath' => $basepath,
+                    'filename' => $pathParts['basename'],
+                    'basefile' => $pathParts['filename'],
+                    'highlight1' => $hl1,
+                    'highlight2' => $hl2,
+                    'extension' => ($pathParts['extension'] != '') ? '.' . $pathParts['extension'] : '',
+                    'mime' => $fileData->getMimetype(),
+                    'fileicon' => SolrService::extractableFile($fileData->getMimeType(), $path),
+                    'webdav' => str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)),
+                    'mtime' => $fileData->getMTime()
+                );
+                
+                array_push($results, $response);
             }
         }
         
