@@ -43,9 +43,9 @@ $(document)
 								needed_index = 1;
 							var data = {
 								live_extract : ($('#solr_live_extract')
-										.is(":checked")) ? 1 : 0,
+										.is(':checked')) ? 1 : 0,
 								live_docupdate : ($('#solr_live_docupdate')
-										.is(":checked")) ? 1 : 0,
+										.is(':checked')) ? 1 : 0,
 								max_size : $('#solr_max_size').val(),
 								display_result : $('#solr_display_result')
 										.val(),
@@ -76,13 +76,16 @@ $(document)
 							if (response.instant == 'true')
 								delay = 0;
 
+							$('#nextant_version')
+									.text(response.nextant_version);
+
 							if (response.configured == 1) {
-								$("#nextant_suboptions :input").attr(
+								$('#nextant_suboptions :input').attr(
 										"disabled", false);
 								$('#nextant_help_link').unbind('click');
 								$('#nextant_suboptions').fadeTo(delay, 1);
 							} else {
-								$("#nextant_suboptions :input").attr(
+								$('#nextant_suboptions :input').attr(
 										"disabled", true);
 								$('#nextant_help_link').bind('click',
 										function(e) {

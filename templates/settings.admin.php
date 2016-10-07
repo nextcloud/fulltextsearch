@@ -43,20 +43,25 @@ style('nextant', 'admin');
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
-					<tr>
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Nextant Version :')) ?></td>
+						<td><div id="nextant_version"></div></td>
+					</tr>
+					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Address of your Solr Servlet :')) ?></td>
-						<td><input type="text" name="solr_url" id="solr_url"
-							value="<?php p($_['solr_url'])?>" style="width: 250px;"></td>
+						<td><input type="text" name="solr_url" id="solr_url" value=""
+							style="width: 250px;"></td>
 					</tr>
 
-					<tr>
+					<tr style="height: 30px;">
 						<td class="nextant_admin_left"><?php p($l->t('Core :')) ?></td>
-						<td><input type="text" id="solr_core"
-							value="<?php p($_['solr_core'])?>" style="width: 250px;"></td>
+						<td><input type="text" id="solr_core" value=""
+							style="width: 250px;"></td>
 					</tr>
 
-					<tr>
+					<tr style="height: 30px;">
 						<td></td>
 						<td>
 							<button type="button" id="nextant_apply" style="width: 270px"><?php p($l->t('Test and Save')) ?></button>
