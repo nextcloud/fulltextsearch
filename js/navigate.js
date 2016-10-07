@@ -108,8 +108,6 @@ $(document)
 														entry.mtime)
 												.replace(/%BASEFILE%/gi,
 														entry.basefile)
-												.replace(/%WEBDAV%/gi,
-														entry.webdav)
 												.replace(/%EXTENSION%/gi,
 														entry.extension)
 												.replace(/%PATH%/gi, entry.path)
@@ -121,6 +119,17 @@ $(document)
 														entry.highlight2)
 												.replace(/%FILENAME%/gi,
 														entry.filename);
+
+										row = row
+												.replace(
+														/%WEBDAV%/gi,
+														(entry.webdav != '') ? entry.webdav
+																: '');
+										row = row
+												.replace(
+														/%TRASHBIN%/gi,
+														(entry.trashbin != '') ? entry.trashbin
+																: '');
 
 										row = row
 												.replace(
@@ -158,7 +167,7 @@ $(document)
 							$tmpl += '</div>';
 							$tmpl += '<span class="hidden-visually">Select</span></label>';
 
-							$tmpl += '<a class="nextant_file" href="%WEBDAV%">';
+							$tmpl += '<a class="nextant_file" href="%WEBDAV%%TRASHBIN%">';
 							$tmpl += '<div>';
 							$tmpl += '<span class="nextant_line nextant_line1">%PATH%</span>';
 							$tmpl += '<span class="nextant_line nextant_line2">%HIGHLIGHT1%</span>';

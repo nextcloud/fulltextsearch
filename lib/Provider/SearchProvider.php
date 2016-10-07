@@ -98,7 +98,7 @@ class SearchProvider extends \OCP\Search\Provider
                 $name .= ($data['owner'] != $this->userId) ? '[shared] ' : '';
                 $name .= ($data['deleted']) ? '[trashbin] ' : '';
                 if (key_exists('highlight', $data) && is_array($data['highlight']))
-                    $name .= '... ' . implode(' (...) ', $data['highlight'] . ' ...'
+                    $name .= '... ' . implode(' (...) ', $data['highlight']) . ' ...';
                 else
                     $name .= $result->path;
                 $name .= ' (Score: ' . round($data['score'], 2) . ') ';

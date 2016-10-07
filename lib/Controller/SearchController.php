@@ -97,6 +97,7 @@ class SearchController extends Controller
                         $trashview = new View('/' . $this->userId . '/files_trashbin/files');
                         $path = $trashview->getPath($data['id']);
                         $fileData = $trashview->getFileInfo($path);
+                        $data['deleted'] = true;
                     } catch (NotFoundException $e) {
                         continue;
                     }
@@ -138,7 +139,8 @@ class SearchController extends Controller
                     'extension' => ($pathParts['extension'] != '') ? '.' . $pathParts['extension'] : '',
                     'mime' => $fileData->getMimetype(),
                     'fileicon' => SolrService::extractableFile($fileData->getMimeType(), $path),
-                    'webdav' => str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)),
+                    'webdav' => (! $data['deleted']) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '',
+                    'trashbin' => ($data['deleted']) ? '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename'] : '',
                     'mtime' => $fileData->getMTime()
                 );
                 
