@@ -102,7 +102,13 @@ class FileService
         $this->miscService->debug('Extracting file ' . $path);
         
         $status = 1;
-        $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $path, $fileInfo->getMTime());
+        
+        if ($fileInfo->getStorage()->isLocal())
+            $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $path, $fileInfo->getMTime());
+        else {
+            // not local
+            return false;
+        }
         
         if (! $result)
             $this->configService->needIndex(true);
