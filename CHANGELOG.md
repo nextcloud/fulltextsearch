@@ -2,6 +2,7 @@
 - Beta release
 - new Admin UI
 - new display on search result
+- search within trash bin
 
 
 **v0.4.2**

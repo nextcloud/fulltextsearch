@@ -96,8 +96,8 @@ style('nextant', 'admin');
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Display result :')) ?></td>
 						<td><select id="solr_display_result" style="width: 260px;">
+								<option value="1">Nextant style</option>
 								<option value="2">Integrated to the Files app</option>
-								<option value="1">Nextant style (alpha - do not use)</option>
 						</select></td>
 					</tr>
 
