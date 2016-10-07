@@ -85,6 +85,10 @@ class FileService
         if ($fileInfo == null)
             return false;
         
+        $storage = $fileInfo->getStorage();
+        if (! $storage->isLocal() && $this->configService->getAppValue('external_index') != 1)
+            return false;
+        
         $size = round($fileInfo->getSize() / 1024 / 1024, 1);
         if ($size > $this->configService->getAppValue('max_size')) {
             $this->miscService->debug('File is too big (' . $size . ' > ' . $this->configService->getAppValue('max_size') . ')');
@@ -101,12 +105,24 @@ class FileService
         
         $this->miscService->debug('Extracting file ' . $path);
         
+        $storage = $fileInfo->getStorage();
         $status = 1;
-        
-        if ($fileInfo->getStorage()->isLocal())
+        if ($storage->isLocal())
             $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $path, $fileInfo->getMTime());
         else {
-            // not local
+            
+            // create a temp file containing the remote file to send to solr
+            // returns:
+            // [OCP\Files\StorageNotAvailableException]
+            // Dropbox API rate limit exceeded
+            
+            // [Dropbox_Exception_Forbidden]
+            // Forbidden. Bad or expired token. This can happen if the user or Dropbox revoked or expired an access token. To fix, you should re-authenticate the user.
+            
+            $tmp_file = tempnam(sys_get_temp_dir(), 'nextant_' . $storage->getId() . '_');
+            $content = $storage->file_get_contents($path);
+            file_put_contents($tmp_file, $content);
+            
             return false;
         }
         

@@ -83,7 +83,7 @@ class SettingsController extends Controller
             'instant' => $instant,
             'configured' => $this->configService->getAppValue('configured'),
             'ping' => $this->solrAdmin->ping($error),
-            'nextant_version' => $this->configService->getAppValue('installed_version') . ' (beta)',            
+            'nextant_version' => $this->configService->getAppValue('installed_version') . ' (beta)',
             'current_docs' => $this->solrTools->count($error),
             'last_index' => $this->configService->getAppValue('last_index'),
             'last_index_format' => date('r', $this->configService->getAppValue('last_index')),
@@ -92,16 +92,18 @@ class SettingsController extends Controller
             'display_result' => $this->configService->getAppValue('display_result'),
             'live_extract' => $this->configService->getAppValue('live_extract'),
             'live_docupdate' => $this->configService->getAppValue('live_docupdate'),
+            'external_index' => $this->configService->getAppValue('external_index'),
             'solr_lock' => $this->configService->getAppValue('solr_lock')
         );
         
         return $response;
     }
 
-    public function setOptions($live_extract, $live_docupdate, $max_size, $display_result, $needed_index)
+    public function setOptions($live_extract, $live_docupdate, $max_size, $external_index, $display_result, $needed_index)
     {
         $this->configService->setAppValue('live_extract', $live_extract);
         $this->configService->setAppValue('live_docupdate', $live_docupdate);
+        $this->configService->setAppValue('external_index', $external_index);
         $this->configService->setAppValue('max_size', $max_size);
         $this->configService->setAppValue('display_result', $display_result);
         if ($needed_index == 1)

@@ -47,6 +47,8 @@ $(document)
 								live_docupdate : ($('#solr_live_docupdate')
 										.is(':checked')) ? 1 : 0,
 								max_size : $('#solr_max_size').val(),
+								external_index : ($('#solr_external_index')
+										.is(':checked')) ? 1 : 0,
 								display_result : $('#solr_display_result')
 										.val(),
 								needed_index : needed_index
@@ -57,6 +59,10 @@ $(document)
 										: 1;
 							if (switched == 'live_docupdate')
 								data.live_docupdate = (data.live_docupdate == 1) ? 0
+										: 1;
+
+							if (switched == 'external_index')
+								data.external_index = (data.external_index == 1) ? 0
 										: 1;
 
 							$.post(OC.filePath('nextant', 'ajax/settings',
@@ -98,6 +104,8 @@ $(document)
 									(response.live_extract == 1));
 							$('#solr_live_docupdate').prop('checked',
 									(response.live_docupdate == 1));
+							$('#solr_external_index').prop('checked',
+									(response.external_index == 1));
 
 							if (response.last_index > 0)
 								$('#solr_last_index').text(
@@ -327,6 +335,9 @@ $(document)
 					});
 					$('#solr_max_size').on('input', function(e) {
 						nextantSettings.savesuboptions();
+					});
+					$('#solr_external_index').mousedown(function() {
+						nextantSettings.savesuboptions('external_index');
 					});
 					$('#nextant_force_index').on('click', function() {
 						nextantSettings.savesuboptions('force_index');
