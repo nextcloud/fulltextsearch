@@ -116,7 +116,7 @@ class SolrToolsService
      * @param number $error            
      * @return boolean
      */
-    public function updateDocuments($data, &$error = 0)
+    public function updateDocuments($type, $data, &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -133,7 +133,7 @@ class SolrToolsService
                 foreach ($batch as $entry)
                     array_push($docIds, $entry['id']);
                 
-                $currentStatus = $this->getDocumentsStatus($docIds, $error);
+                $currentStatus = $this->getDocumentsStatus($type, $docIds, $error);
                 if (! $currentStatus || sizeof($currentStatus) == 0)
                     continue;
                     
@@ -149,7 +149,7 @@ class SolrToolsService
                         continue;
                     
                     $doc = $query->createDocument();
-                    $doc->setKey('id', $upd['id']);
+                    $doc->setKey('id', $type . '_' . $upd['id']);
                     
                     $docStatus = $currentStatus[$upd['id']];
                     $edited = false;
@@ -247,7 +247,7 @@ class SolrToolsService
      * @param string $error            
      * @return boolean|Solarium\Core\Query\Result[][]
      */
-    private function getDocumentsStatus($docs, &$error = '')
+    private function getDocumentsStatus($type, $docs, &$error = '')
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -272,11 +272,16 @@ class SolrToolsService
         try {
             $query = $client->createSelect();
             
-            $query->setQuery('id:' . implode(' ', $docs));
+            $qstr = '';
+            foreach ($docs as $docId)
+                $qstr .= $type . '_' . $docId . ' ';
+            
+            $query->setQuery('id:' . $qstr);
             $query->setRows(sizeof($docs));
             $query->setFields(array(
                 'id',
                 'nextant_owner',
+                'nextant_source',
                 'nextant_path',
                 'nextant_share',
                 'nextant_sharegroup',
@@ -286,7 +291,9 @@ class SolrToolsService
             $resultset = $client->select($query);
             
             foreach ($resultset as $document) {
-                $result[$document->id] = array(
+                list ($type, $docid) = explode('_', $document->id, 2);
+                $result[$docid] = array(
+                    'nextant_source' => $document->nextant_source,
                     'nextant_owner' => $document->nextant_owner,
                     'nextant_path' => $document->nextant_path,
                     'nextant_share' => $document->nextant_share,
@@ -315,7 +322,7 @@ class SolrToolsService
      * @param number $error            
      * @return boolean
      */
-    public function removeDocument($docid, &$error = 0)
+    public function removeDocument($type, $docid, &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -324,7 +331,7 @@ class SolrToolsService
             $client = $this->solrService->getClient();
             $update = $client->createUpdate();
             
-            $update->addDeleteById($docid);
+            $update->addDeleteById($type . '_' . $docid);
             $update->addCommit();
             
             return $client->update($update);
@@ -348,7 +355,7 @@ class SolrToolsService
      * @param number $error            
      * @return boolean
      */
-    public function getAll($page, &$lastpage = false, &$error = 0)
+    public function getAll($type, $page, &$lastpage = false, &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -357,7 +364,7 @@ class SolrToolsService
         
         try {
             $query = $client->createSelect();
-            $query->setQuery('id:*');
+            $query->setQuery('id:' . $type . '_*');
             $query->addSort('id', $query::SORT_ASC);
             $query->setStart($page);
             $query->setRows(self::GETALL_ROWS);
@@ -369,7 +376,8 @@ class SolrToolsService
             
             $ids = array();
             foreach ($resultset as $document) {
-                $docid = (int) $document->id;
+                list ($type, $docid) = explode('_', $document->id, 2);
+                $docid = (int) $docid;
                 array_push($ids, $docid);
             }
             
@@ -397,7 +405,7 @@ class SolrToolsService
      * @param number $error            
      * @return boolean
      */
-    public function isDocumentUpToDate($docid, $mtime, &$error = 0)
+    public function isDocumentUpToDate($type, $docid, $mtime, &$error = 0)
     {
         if (intval($docid) == 0)
             return false;
@@ -409,7 +417,7 @@ class SolrToolsService
         
         try {
             $query = $client->createSelect();
-            $query->setQuery('id:' . $docid);
+            $query->setQuery('id:' . $type . '_' . $docid);
             $query->setFields(array(
                 'nextant_mtime'
             ));

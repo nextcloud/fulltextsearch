@@ -145,14 +145,16 @@ style('nextant', 'admin');
 							</div>
 							<button type="button" id="nextant_force_index"
 								style="width: 270px"><?php p($l->t('Force index')) ?></button>
-							<div id="nextant_index_scheduled"><i>Index is scheduled within the
-								next few hours (cron)</i></div>
+							<div id="nextant_index_scheduled">
+								<i>Index is scheduled within the next few hours (cron)</i>
+							</div>
 						</td>
 					</tr>
 
 				</table>
 			</td>
-			<td style="padding-left: 30px; padding-top: 40px; vertical-align: top">
+			<td
+				style="padding-left: 30px; padding-top: 40px; vertical-align: top">
 				<div id="nextant-display">
 					<div id="ping" class="nextant-display-line">
 						<img id="icon_check" class="nextant_display_icon"

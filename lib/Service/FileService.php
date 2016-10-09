@@ -98,7 +98,7 @@ class FileService
         if (! SolrService::extractableFile($fileInfo->getMimeType(), $path))
             return false;
         
-        if (! $forceExtract && $this->solrTools->isDocumentUpToDate($fileInfo->getId(), $fileInfo->getMTime())) {
+        if (! $forceExtract && $this->solrTools->isDocumentUpToDate('files', $fileInfo->getId(), $fileInfo->getMTime())) {
             $this->miscService->debug('File is already known ' . $path);
             return true;
         }
@@ -108,7 +108,7 @@ class FileService
         $storage = $fileInfo->getStorage();
         $status = 1;
         if ($storage->isLocal())
-            $result = $this->solrService->extractFile($this->view->getLocalFile($path), $fileInfo->getId(), $path, $fileInfo->getMTime());
+            $result = $this->solrService->extractFile($this->view->getLocalFile($path), 'files', $fileInfo->getId(), $path, $fileInfo->getMTime());
         else {
             
             // create a temp file containing the remote file to send to solr
@@ -183,7 +183,7 @@ class FileService
         if (! $isRoot)
             return $pack;
         
-        $count = $this->solrTools->updateDocuments($pack, $error);
+        $count = $this->solrTools->updateDocuments('files', $pack, $error);
         
         if ($count === false)
             $this->configService->needIndex(true);
