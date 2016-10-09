@@ -24,15 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-namespace OCA\Nextant\AppInfo;
-
-require_once __DIR__ . '/autoload.php';
+namespace OCA\Nextant\Settings;
 
 $app = new \OCA\Nextant\AppInfo\Application();
-
-// $app->registerNavigation();
-$app->registerFilesHooks();
 $app->registerSettingsAdmin();
-$app->registerSearchProvider();
 
+$response = $app->getContainer()
+    ->query('SearchController')
+    ->index();
 
+return $response->render();

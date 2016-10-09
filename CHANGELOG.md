@@ -1,13 +1,19 @@
+**v0.5.0**
+- Beta release
+- new Admin UI
+- new display on search result
+- search within trash bin
+
+
 **v0.4.2**
 - extract and index files from trash
-- index remove orphans
+- orphans documents are removed while indexing
 
 
 **v0.4.1**
 - Force index unlock after 24h
 - maximum size on extracted file
 - new field nextant_path
-- documents with its file deleted are removed
 - bugfixes
 
 

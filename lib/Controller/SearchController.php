@@ -25,46 +25,129 @@
  *
  */
 
-/*****
+/**
+ * ***
  * This Controller is now useless
- ****/
-/*
+ * **
+ */
 namespace OCA\Nextant\Controller;
 
+use \OCA\Nextant\Service\FileService;
+use \OCA\Nextant\Service\SolrService;
 use OCP\AppFramework\Controller;
 use OCP\IRequest;
-use \OCA\Nextant\Service\ConfigService;
+use OC\Files\Filesystem;
+use OCP\Files\NotFoundException;
+use OC\Files\View;
 
 class SearchController extends Controller
 {
 
-    private $appConfig;
-
     private $userId;
+
+    private $groupManager;
+
+    private $solrService;
 
     private $miscService;
 
-    public function __construct($appName, IRequest $request, AppConfig $appConfig, $userId, $miscService)
+    public function __construct($appName, IRequest $request, $userId, $groupManager, $solrService, $miscService)
     {
         parent::__construct($appName, $request);
+        
         $this->userId = $userId;
-        $this->appConfig = $appConfig;
+        $this->groupManager = $groupManager;
+        $this->solrService = $solrService;
         $this->miscService = $miscService;
     }
 
-    public function searchRequest($search)
+    public function searchRequest($query, $current_dir)
     {
-        $this->miscService->log('searchString() - ' . $search);
+        Filesystem::init($this->userId, '');
+        $view = Filesystem::getView();
         
-        $result = array();
+        $results = array();
+        
+        if ($this->solrService == false)
+            return $results;
+        
+        if ($query !== null) {
+            
+            // $groups
+            $groups = array_map(function ($value) {
+                return (string) $value;
+            }, array_keys($this->groupManager->getUserIdGroups($this->userId)));
+            $this->solrService->setOwner($this->userId, $groups);
+            
+            $solrResult = $this->solrService->search($query, array(
+                'current_directory' => $current_dir
+            ));
+            
+            if ($solrResult == false)
+                return $results;
+            
+            foreach ($solrResult as $data) {
                 
-        $response = array(
-            'status' => 'success',
-            'message' => 'OK_OK',
-            'data' => $result
-        );
+                $fileData = null;
+                try {
+                    $path = $view->getPath($data['id']);
+                    $fileData = $view->getFileInfo($path);
+                } catch (NotFoundException $e) {
+                    try {
+                        $trashview = new View('/' . $this->userId . '/files_trashbin/files');
+                        $path = $trashview->getPath($data['id']);
+                        $fileData = $trashview->getFileInfo($path);
+                        $data['deleted'] = true;
+                    } catch (NotFoundException $e) {
+                        continue;
+                    }
+                }
+                
+                if ($fileData == null || $fileData === false)
+                    continue;
+                
+                $pathParts = pathinfo($path);
+                $basepath = str_replace('//', '/', '/' . $pathParts['dirname'] . '/');
+                
+                $hl1 = '';
+                $hl2 = '';
+                if (key_exists('highlight', $data) && is_array($data['highlight'])) {
+                    if (sizeof($data['highlight']) >= 1)
+                        $hl1 = '... ' . $data['highlight'][0] . ' ...';
+                    if (sizeof($data['highlight']) > 1)
+                        $hl2 = '... ' . $data['highlight'][1] . ' ...';
+                }
+                
+                if ($hl1 == '' || $hl1 == null)
+                    $hl1 = '';
+                if ($hl2 == '' || $hl2 == null)
+                    $hl2 = '';
+                
+                $response = array(
+                    'id' => $data['id'],
+                    'type' => 'file',
+                    'shared' => ($data['owner'] != $this->userId) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '',
+                    'deleted' => ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '',
+                    'size' => $fileData->getSize(),
+                    'filesize' => \OC_Helper::humanFileSize($fileData->getSize()),
+                    'path' => $path,
+                    'basepath' => $basepath,
+                    'filename' => $pathParts['basename'],
+                    'basefile' => $pathParts['filename'],
+                    'highlight1' => $hl1,
+                    'highlight2' => $hl2,
+                    'extension' => ($pathParts['extension'] != '') ? '.' . $pathParts['extension'] : '',
+                    'mime' => $fileData->getMimetype(),
+                    'fileicon' => SolrService::extractableFile($fileData->getMimeType(), $path),
+                    'webdav' => (! $data['deleted']) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '',
+                    'trashbin' => ($data['deleted']) ? '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename'] : '',
+                    'mtime' => $fileData->getMTime()
+                );
+                
+                array_push($results, $response);
+            }
+        }
         
-        return $response;
+        return $results;
     }
 }
-*/

@@ -31,6 +31,10 @@ use OCP\IConfig;
 class ConfigService
 {
 
+    const SEARCH_DISPLAY_NEXTANT = 1;
+
+    const SEARCH_DISPLAY_FILES = 2;
+
     const ACTION_LIVE_EXTRACT = 'live_extract';
 
     const ACTION_LIVE_DOCUPDATE = 'live_docupdate';
@@ -42,7 +46,10 @@ class ConfigService
         'solr_core' => 'nextant',
         'live_extract' => '1',
         'live_docupdate' => '0',
+        'last_index' => 0,
+        'display_result' => 1,
         'max_size' => 40,
+        'external_index' => '0',
         'solr_lock' => 0
     ];
 
@@ -57,6 +64,13 @@ class ConfigService
         $this->appName = $appName;
         $this->config = $config;
         $this->miscService = $miscService;
+    }
+
+    public function reset()
+    {
+        foreach ($this->defaults as $k => $v) {
+            $this->setAppValue($k, $v);
+        }
     }
 
     public function needIndex($need, $force = false)

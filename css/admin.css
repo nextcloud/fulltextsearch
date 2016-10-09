@@ -1,0 +1,30 @@
+#nextant-display {
+	width: 400px;
+	height: 250px;
+	position: relative;
+}
+
+DIV.nextant-display-line {
+	margin: 0 auto;
+	position: absolute;
+}
+
+IMG.nextant_display_icon {
+	position: absolute;
+	width: 25px;
+	height: 25px;
+}
+
+DIV.nextant_display_text {
+	top: 3px;
+	left: 40px;
+	position: absolute;
+	font-style: italic;
+}
+
+TD.nextant_admin_left {
+	width: 250px;
+	text-align: right;
+	font-weight: bold;
+	padding-right: 15px;
+}

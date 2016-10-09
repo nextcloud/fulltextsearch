@@ -64,19 +64,11 @@ class SettingsController extends Controller
      */
     public function index()
     {
-        $documentsCount = $this->solrTools->count($error);
-        
         $params = [
-            'configured' => $this->configService->getAppValue('configured'),
-            'current_docs' => $documentsCount,
-            'last_index' => $this->configService->getAppValue('last_index'),
-            'needed_index' => $this->configService->getAppValue('needed_index'),
             'solr_url' => $this->configService->getAppValue('solr_url'),
-            'solr_core' => $this->configService->getAppValue('solr_core'),
-            'live_extract' => $this->configService->getAppValue('live_extract'),
-            'live_docupdate' => $this->configService->getAppValue('live_docupdate'),
-            'solr_lock' => $this->configService->getAppValue('solr_lock')
+            'solr_core' => $this->configService->getAppValue('solr_core')
         ];
+        
         return new TemplateResponse($this->appName, 'settings.admin', $params, 'blank');
     }
 
@@ -85,7 +77,44 @@ class SettingsController extends Controller
         $this->configService->needIndex(true);
     }
 
-    public function setSettings($solr_url, $solr_core, $live_extract, $live_docupdate, $command)
+    public function updateSubOptions($instant)
+    {
+        $response = array(
+            'instant' => $instant,
+            'configured' => $this->configService->getAppValue('configured'),
+            'ping' => $this->solrAdmin->ping($error),
+            'nextant_version' => $this->configService->getAppValue('installed_version') . ' (beta)',
+            'current_docs' => $this->solrTools->count($error),
+            'last_index' => $this->configService->getAppValue('last_index'),
+            'last_index_format' => date('r', $this->configService->getAppValue('last_index')),
+            'needed_index' => $this->configService->getAppValue('needed_index'),
+            'max_size' => $this->configService->getAppValue('max_size'),
+            'display_result' => $this->configService->getAppValue('display_result'),
+            'live_extract' => $this->configService->getAppValue('live_extract'),
+            'live_docupdate' => $this->configService->getAppValue('live_docupdate'),
+            'external_index' => $this->configService->getAppValue('external_index'),
+            'solr_url' => $this->configService->getAppValue('solr_url'),
+            'solr_core' => $this->configService->getAppValue('solr_core'),
+            'solr_lock' => $this->configService->getAppValue('solr_lock')
+        );
+        
+        return $response;
+    }
+
+    public function setOptions($live_extract, $live_docupdate, $max_size, $external_index, $display_result, $needed_index)
+    {
+        $this->configService->setAppValue('live_extract', $live_extract);
+        $this->configService->setAppValue('live_docupdate', $live_docupdate);
+        $this->configService->setAppValue('external_index', $external_index);
+        $this->configService->setAppValue('max_size', $max_size);
+        $this->configService->setAppValue('display_result', $display_result);
+        if ($needed_index == 1)
+            $this->configService->needIndex(true, true);
+        
+        return $this->updateSubOptions(false);
+    }
+
+    public function setSettings($solr_url, $solr_core, $command)
     {
         $this->solr_url = $solr_url;
         $this->solr_core = $solr_core;
@@ -133,7 +162,7 @@ class SettingsController extends Controller
                     break;
                 
                 case 'save':
-                    $result = $this->save($live_extract, $live_docupdate, $message);
+                    $result = $this->save($message);
                     break;
             }
         }
@@ -141,9 +170,7 @@ class SettingsController extends Controller
         $response = array(
             'command' => $command,
             'status' => $result ? 'success' : 'failure',
-            'data' => array(
-                'message' => $message
-            )
+            'message' => $message
         );
         
         return $response;
@@ -176,7 +203,7 @@ class SettingsController extends Controller
     {
         $testFile = __DIR__ . '/../../LICENSE';
         
-        if ($this->solrService->extractFile($testFile, '__nextant_test', 1234567890, $error)) {
+        if ($this->solrService->extractFile($testFile, '__nextant_test', '/LICENSE', 1234567890, $error)) {
             $message = 'Text successfully extracted';
             return true;
         }
@@ -189,6 +216,7 @@ class SettingsController extends Controller
     {
         $testUpdate = array(
             'id' => '__nextant_test',
+            'path' => '/LICENSE2',
             'share_users' => array(
                 '__nextant_test_owner'
             ),
@@ -245,13 +273,11 @@ class SettingsController extends Controller
         return false;
     }
 
-    private function save($live_extract, $live_docupdate, &$message)
+    private function save(&$message)
     {
         if (! is_null($this->solr_url) && ! is_null($this->solr_core)) {
             $this->configService->setAppValue('solr_url', $this->solr_url);
             $this->configService->setAppValue('solr_core', $this->solr_core);
-            $this->configService->setAppValue('live_extract', (($live_extract) ? '1' : '0'));
-            $this->configService->setAppValue('live_docupdate', (($live_docupdate) ? '1' : '0'));
             $this->configService->setAppValue('configured', '1');
             
             $message = "Your configuration has been saved";

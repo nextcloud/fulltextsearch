@@ -26,6 +26,7 @@
 namespace OCA\Nextant\Service;
 
 use \OCA\Nextant\Service\FileService;
+use \OCA\Nextant\Service\ConfigService;
 
 class SolrService
 {
@@ -153,23 +154,24 @@ class SolrService
     {
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
-                return true;
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
         }
         
         switch ($mimetype) {
             case 'application/epub+zip':
-                return true;
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
             case 'application/pdf':
-                return true;
+                return \OCP\Util::imagePath('core', 'filetypes/application-pdf.svg');
             
             case 'application/rtf':
-                return true;
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
             case 'application/octet-stream':
-                $ext = pathinfo($path, PATHINFO_EXTENSION);
-                if (substr($ext, 0, 1) == 'd' && ((int) (substr($ext, 1)) > 0))
-                    return true;
+                $pinfo = pathinfo($path);
+                if (substr($pinfo['extension'], 0, 1) == 'd' && ((int) (substr($pinfo['extension'], 1)) > 0)) {
+                    return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                }
                 return false;
         }
         
@@ -186,7 +188,7 @@ class SolrService
         
         foreach ($acceptedMimeType['vnd'] as $mt) {
             if (substr($mimetype, 0, strlen($mt)) == $mt)
-                return true;
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
         }
         
         return false;
@@ -200,7 +202,7 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($path, $docid, $mtime, &$error = '')
+    public function extractFile($absolutePath, $docid, $path, $mtime, &$error = '')
     {
         if (! $this->configured())
             return false;
@@ -219,22 +221,42 @@ class SolrService
             $client = $this->getClient();
             
             $query = $client->createExtract();
-            $query->addFieldMapping('content', 'text');
             $query->setUprefix('nextant_attr_');
+            $query->addFieldMapping('content', 'text');
             
-            $query->setFile($path);
+            $query->addFieldMapping('div', 'ignored_');
+            $query->addFieldMapping('a', 'ignored_');
+            $query->addFieldMapping('html', 'ignored_');
+            $query->addFieldMapping('link', 'ignored_');
+            $query->addFieldMapping('style', 'ignored_');
+            $query->addFieldMapping('p', 'ignored_');
+            $query->addFieldMapping('span', 'ignored_');
+            $query->addFieldMapping('h1', 'ignored_');
+            $query->addFieldMapping('h2', 'ignored_');
+            $query->addFieldMapping('h3', 'ignored_');
+            
+            $query->setFile($absolutePath);
             $query->setCommit(true);
-            $query->setOmitHeader(false);
+            $query->setOmitHeader(true);
             
             // add document
             $doc = $query->createDocument();
             $doc->id = $docid;
+            $doc->nextant_path = $path;
             $doc->nextant_owner = $this->owner;
             $doc->nextant_mtime = $mtime;
             
             $query->setDocument($doc);
             
-            $ret = $client->extract($query);
+            // custom options
+            $request = $client->createRequest($query);
+            $request->addParam('captureAttr', true);
+            $request->addParam('ignoreTikaException', true);
+            
+            $response = $client->executeRequest($request);
+            $ret = $client->createResult($query, $response);
+            
+            // $ret = $client->extract($query);
             
             return $ret;
         } catch (\Solarium\Exception\HttpException $ehe) {
@@ -282,20 +304,24 @@ class SolrService
             ));
             
             array_push($options, 'complete_words');
-            $query->setQuery('nextant_attr_text:' . $helper->escapePhrase(((! in_array('complete_words', $options)) ? '*' : '') . $string));
+            $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             
-            if (key_exists('current_directory', $options))
-                $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
+            // if (key_exists('current_directory', $options))
+            // $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
             
             $hl = $query->getHighlighting();
             $hl->setFields(array(
-                'nextant_attr_text'
+                'text'
             ));
-            // $hl->setSimplePrefix('<b>');
-            // $hl->setSimplePostfix('</b>');
-            $hl->setSimplePrefix('');
-            $hl->setSimplePostfix('');
+            
+            if ($this->configService->getAppValue('display_result') == ConfigService::SEARCH_DISPLAY_NEXTANT) {
+                $hl->setSimplePrefix('<span class="nextant_hl">');
+                $hl->setSimplePostfix('</span>');
+            } else {
+                $hl->setSimplePrefix('');
+                $hl->setSimplePostfix('');
+            }
             $hl->setSnippets(3);
             
             $resultset = $client->select($query);
@@ -306,13 +332,11 @@ class SolrService
                 
                 // highlight
                 $hlDoc = $highlighting->getResult($document->id);
-                $hlString = implode(' (...) ', $hlDoc->getField('nextant_attr_text'));
-                
                 array_push($return, array(
                     'id' => $document->id,
                     'deleted' => $document->nextant_deleted,
                     'owner' => $document->nextant_owner,
-                    'highlight' => $hlString,
+                    'highlight' => $hlDoc->getField('text'),
                     'score' => $document->score
                 ));
             }

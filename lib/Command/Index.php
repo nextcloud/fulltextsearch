@@ -79,9 +79,9 @@ class Index extends Base
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('> <comment>This is an alpha release, please report any issue to </comment>');
-        $output->writeln('   <comment> https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954/ </comment>');
-        $output->writeln('');
+        $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (beta)</comment>');
+//        $output->writeln('<comment>discussion thread:</comment> https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954/');
+//        $output->writeln('');
         if (! $this->solrService->configured()) {
             $output->writeln('Nextant is not yet configured');
             return;

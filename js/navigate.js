@@ -23,55 +23,196 @@
  * 
  */
 
-/*******************************************************************************
- * This script is now Useless - It is not even loaded.
- ******************************************************************************/
-$(document).ready(
-	function() {
+$(document)
+		.ready(
+				function() {
 
-	    var nextantCurrentSearch = '';
-	    var nextant = {
-		init : function() {
-		    console.log('nextant/init');
-		    $('#searchbox').bind('input', function() {
-			setTimeout(function() {
-			    nextant.search($('#searchbox').val());
-			}, 1000);
-		    });
-		},
+					(function(func) {
+						$.fn.addClass = function() {
+							func.apply(this, arguments);
+							this.trigger('classChanged');
+							return this;
+						}
+					})($.fn.addClass);
 
-		search : function(string) {
+					(function(func) {
+						$.fn.removeClass = function() {
+							func.apply(this, arguments);
+							this.trigger('classChanged');
+							return this;
+						}
+					})($.fn.removeClass);
 
-		    if (string == nextantCurrentSearch)
-			return;
-		    nextantCurrentSearch = string;
+					$('#searchresults').on('classChanged', function() {
+						if ($('#searchresults').attr('class') == 'hidden')
+							$('#nextantList').hide();
+						else
+							$('#nextantList').show();
+					});
 
-		    request = {
-			search : string
-		    }
+					var nextantCurrentSearch = '';
+					var nextant = {
 
-		    console.log('nextant/search: ' + request.search);
-		    nextant.searchRequest(request);
-		},
+						init : function() {
+							$('#searchbox').on('input', function(e) {
+								nextant.search($('#searchbox').val());
+							});
+						},
 
-		searchRequest : function(request) {
-		    console.log('nextant/searchRequest: ' + request.search)
-		    $.post(OC.filePath('nextant', 'ajax', 'search.php'),
-			    request, nextant.searchResult);
-		},
+						search : function(query) {
+							if (query == nextantCurrentSearch)
+								return;
+							nextantCurrentSearch = query;
 
-		searchResult : function(response) {
-		    console.log('nextant/searchResult: ' + response.message
-			    + ' size: ' + response.data.length);
+							var data = {
+								query : query,
+								current_dir : nextant.get('dir')
+							}
 
-		    // OC.search.resultTypes.lucene = t('search_lucene', 'In');
+							nextant.searchRequest(data);
+						},
 
-		    // OC.search.customResults.lucene = function ($row, item){
-		    // $row.find('td.result .text').text(t('search_lucene',
-		    // 'Score: {score}', {score:
-		    // Math.round(item.score*100)/100}));
-		}
-	    };
+						searchRequest : function(data) {
+							$.post(
+									OC
+											.filePath('nextant', 'ajax',
+													'search.php'), data,
+									nextant.searchResult);
+						},
 
-	    nextant.init();
-	});
+						searchResult : function(response) {
+							if (response == null)
+								return;
+
+							if (!$('#nextantList').length) {
+								// $('#searchresults').prepend(
+								$('#fileList')
+										.append(
+												'<tr><td colspan="3" style="margin: 0px; padding: 0px;"><div id="nextantList"></div></td></tr>');
+							}
+							$('#nextantList').empty();
+
+							response
+									.forEach(function(entry) {
+										var row = nextant
+												.template_entry()
+												.replace(/%ID%/gi, entry.id)
+												.replace(/%TYPE%/gi, entry.type)
+												.replace(/%SIZE%/gi, entry.size)
+												.replace(/%FILESIZE%/gi,
+														entry.filesize)
+												.replace(/%MIME%/gi, entry.mime)
+												.replace(/%FILEICON%/gi,
+														entry.fileicon)
+												.replace(/%MTIME%/gi,
+														entry.mtime)
+												.replace(/%BASEFILE%/gi,
+														entry.basefile)
+												.replace(/%EXTENSION%/gi,
+														entry.extension)
+												.replace(/%PATH%/gi, entry.path)
+												.replace(/%DIRNAME%/gi,
+														entry.basepath)
+												.replace(/%HIGHLIGHT1%/gi,
+														entry.highlight1)
+												.replace(/%HIGHLIGHT2%/gi,
+														entry.highlight2)
+												.replace(/%FILENAME%/gi,
+														entry.filename);
+
+										row = row
+												.replace(
+														/%WEBDAV%/gi,
+														(entry.webdav != '') ? entry.webdav
+																: '');
+										row = row
+												.replace(
+														/%TRASHBIN%/gi,
+														(entry.trashbin != '') ? entry.trashbin
+																: '');
+
+										row = row
+												.replace(
+														/%SHARED%/gi,
+														(entry.shared != '') ? ' style="background-image:url('
+																+ entry.shared
+																+ ');"'
+																: '');
+										row = row
+												.replace(
+														/%DELETED%/gi,
+														(entry.deleted != '') ? ' style="background-image:url('
+																+ entry.deleted
+																+ ');"'
+																: '');
+
+										$('#nextantList').append(row);
+									});
+						},
+
+						template_entry : function() {
+
+							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%FILENAME%" data-mime="%MIME%" data-mtime="%MTIME%000" data-etag="" data-permissions="" data-has-preview="false" data-path="%DIRNAME%" data-share-permissions="">';
+							$tmpl += '<td class="filename ui-draggable">';
+							$tmpl += '<a class="action action-favorite " data-original-title="" title="">';
+							// $tmpl += '<span class="icon
+							// icon-star"></span><span
+							// class="hidden-visually">Favorite</span>';
+							$tmpl += '</a>';
+							// $tmpl += '<input id="select-files-%ID%"
+							// class="selectCheckBox checkbox"
+							// type="checkbox">';
+							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%FILEICON%); background-size: 32px;">';
+							$tmpl += '<div class="nextant_details" %DELETED%%SHARED%></div>';
+							$tmpl += '</div>';
+							$tmpl += '<span class="hidden-visually">Select</span></label>';
+
+							$tmpl += '<a class="nextant_file" href="%WEBDAV%%TRASHBIN%">';
+							$tmpl += '<div>';
+							$tmpl += '<span class="nextant_line nextant_line1">%PATH%</span>';
+							$tmpl += '<span class="nextant_line nextant_line2">%HIGHLIGHT1%</span>';
+							$tmpl += '<span class="nextant_line nextant_line3">%HIGHLIGHT2%</span>';
+							$tmpl += '</div></a>';
+
+							// $tmpl += '<span class="fileactions"><a
+							// class="action action-share permanent" href="#"
+							// data-action="Share" data-original-title=""
+							// title="">';
+							// $tmpl += '<span class="icon
+							// icon-share"></span><span
+							// class="hidden-visually"></span></a>';
+							// $tmpl += '<a class="action action-menu permanent"
+							// href="#" data-action="menu"
+							// data-original-title="" title=""><span class="icon
+							// icon-more"></span>';
+							// $tmpl += '<span
+							// class="hidden-visually">Actions</span></a></span></a>';
+
+							$tmpl += '</td>';
+							$tmpl += '<td class="filesize" style="color:rgb(-17,-17,-17)">%FILESIZE%</td>';
+							$tmpl += '<td class="date"><span class="modified" title="" style="color:rgb(155,155,155)" data-original-title=""></span></td></tr>';
+
+							return $tmpl;
+
+						},
+
+						get : function(name, url) {
+							if (!url)
+								url = window.location.href;
+							name = name.replace(/[\[\]]/g, "\\$&");
+							var regex = new RegExp("[?&]" + name
+									+ "(=([^&#]*)|&|#|$)"), results = regex
+									.exec(url);
+							if (!results)
+								return null;
+							if (!results[2])
+								return '';
+							return decodeURIComponent(results[2].replace(/\+/g,
+									' '));
+						}
+
+					}
+
+					nextant.init();
+
+				});

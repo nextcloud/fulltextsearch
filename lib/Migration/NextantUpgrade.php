@@ -60,7 +60,9 @@ class NextantUpgrade implements IRepairStep
      */
     public function run(IOutput $output)
     {
-        $this->solrAdmin->checkSchema(true, $error);
+        $this->solrAdmin->clear();
+        $this->configService->reset();
+        // $this->solrAdmin->checkSchema(true, $error);
         // $this->configService->stopUpdate();
     }
 }

@@ -54,8 +54,8 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->solrTools = $c->query('SolrToolsService');
         $this->fileService = $c->query('FileService');
         $this->rootFolder = $c->query('RootFolder');
-            
-            // $this->setDebug(true);
+        
+        // $this->setDebug(true);
         if (! $this->configService->neededIndex()) {
             $this->miscService->debug('Looks like there is no need to index');
             return;

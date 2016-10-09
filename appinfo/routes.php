@@ -31,10 +31,20 @@ return [
             'verb' => 'POST'
         ],
         [
-        'name' => 'settings#forceIndex',
-        'url' => 'ajax/settings/forceindex.php',
-        'verb' => 'POST'
-            ]
+            'name' => 'settings#setOptions',
+            'url' => 'ajax/settings/option.php',
+            'verb' => 'POST'
+        ],
+        [
+            'name' => 'settings#updateSubOptions',
+            'url' => 'ajax/settings/updateSubOptions.php',
+            'verb' => 'POST'
+        ],
+        [
+            'name' => 'search#searchRequest',
+            'url' => 'ajax/search.php',
+            'verb' => 'POST'
+        ]
     ]
 ];
 
@@ -42,8 +52,3 @@ return [
  * This route is now useless. It was used with navigate.js + SearchController
  * We are now using SearchProvider.
  */
-//         [
-//             'name' => 'search#searchRequest',
-//             'url' => 'ajax/search.php',
-//             'verb' => 'POST'
-//         ]

@@ -24,7 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-namespace OCA\Nextant\Settings;
+namespace OCA\Nextant;
 
 $app = new \OCA\Nextant\AppInfo\Application();
 $app->registerSettingsAdmin();
