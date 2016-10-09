@@ -93,6 +93,8 @@ class SettingsController extends Controller
             'live_extract' => $this->configService->getAppValue('live_extract'),
             'live_docupdate' => $this->configService->getAppValue('live_docupdate'),
             'external_index' => $this->configService->getAppValue('external_index'),
+            'solr_url' => $this->configService->getAppValue('solr_url'),
+            'solr_core' => $this->configService->getAppValue('solr_core'),
             'solr_lock' => $this->configService->getAppValue('solr_lock')
         );
         

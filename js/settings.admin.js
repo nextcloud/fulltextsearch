@@ -84,6 +84,8 @@ $(document)
 
 							$('#nextant_version')
 									.text(response.nextant_version);
+							$('#solr_url').val(response.solr_url);
+							$('#solr_core').val(response.solr_core);
 
 							if (response.configured == 1) {
 								$('#nextant_suboptions :input').attr(
@@ -129,10 +131,16 @@ $(document)
 								$('#solr_current_docs').text(
 										'Solr Core is down');
 							else {
-								if (response.needed_index == 1) {
+								if (response.needed_index == 2) {
+									$('#nextant_first_index').show(delay);
+									$('#nextant_index_scheduled').hide(delay);
+									$('#nextant_force_index').hide(delay);
+								} else if (response.needed_index == 1) {
+									$('#nextant_first_index').hide(delay);
 									$('#nextant_force_index').hide(delay);
 									$('#nextant_index_scheduled').show(delay);
 								} else {
+									$('#nextant_first_index').hide(delay);
 									$('#nextant_index_scheduled').hide(delay);
 									$('#nextant_force_index').show(delay);
 								}
@@ -340,6 +348,9 @@ $(document)
 						nextantSettings.savesuboptions('external_index');
 					});
 					$('#nextant_force_index').on('click', function() {
+						nextantSettings.savesuboptions('force_index');
+					});
+					$('#nextant_force_first_index').on('click', function() {
 						nextantSettings.savesuboptions('force_index');
 					});
 					$('#solr_display_result').on('change', function() {

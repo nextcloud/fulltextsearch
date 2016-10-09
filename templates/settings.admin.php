@@ -37,7 +37,7 @@ style('nextant', 'admin');
 					href="https://github.com/daita/nextant/wiki" target="_blank">find
 						few guides on how to install one on the Wiki</a></em></td>
 		</tr>
-		<tr>
+		<tr valign="top">
 			<td>
 				<table>
 					<tr>
@@ -127,19 +127,32 @@ style('nextant', 'admin');
 						<td><div id="solr_current_docs"></div></td>
 					</tr>
 
+					<tr>
+						<td>&nbsp;</td>
+					</tr>
 					<tr style="height: 30px;">
-						<td></td>
 
+						<td></td>
 						<td>
+							<div id="nextant_first_index"
+								style="width: 350px; font-size: 12px; white-space: normal;">
+								<i></i> It is really adviced that your very first index of your
+								files is done using the <b>./occ nextant:index</b> command. <br />
+								However, you can force it to be started as a background process
+								of your cloud: </i> <br />
+								<button type="button" id="nextant_force_first_index"
+									style="width: 270px"><?php p($l->t('Force first index as a cronjob')) ?></button>
+							</div>
 							<button type="button" id="nextant_force_index"
 								style="width: 270px"><?php p($l->t('Force index')) ?></button>
-							<div id="nextant_index_scheduled">Index is scheduled</div>
+							<div id="nextant_index_scheduled"><i>Index is scheduled within the
+								next few hours (cron)</i></div>
 						</td>
 					</tr>
 
 				</table>
 			</td>
-			<td style="padding-left: 40px;">
+			<td style="padding-left: 30px; padding-top: 40px; vertical-align: top">
 				<div id="nextant-display">
 					<div id="ping" class="nextant-display-line">
 						<img id="icon_check" class="nextant_display_icon"
