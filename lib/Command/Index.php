@@ -95,6 +95,7 @@ class Index extends Base
         if ($input->getOption('background')) {
             $this->configService->needIndex(true, ($input->getOption('force')));
             $this->configService->setAppValue('solr_lock', '0');
+            $output->writeln('An indexing process will start as a background process within the next few hours');
             return;
         }
         
