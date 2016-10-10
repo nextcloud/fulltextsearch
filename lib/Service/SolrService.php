@@ -161,6 +161,9 @@ class SolrService
         }
         
         switch ($mimetype) {
+            case 'image/jpeg':
+                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+            
             case 'application/epub+zip':
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
