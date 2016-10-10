@@ -5,11 +5,19 @@
 
 # Nextant
 
-      One to enable a full text search within your cloud.
+      Navigate through your cloud using Solr
 
-Index your own files and your shared documents and perform fast and precise search using a Solr Servlet.
+**Nextant** indexes your documents and your shared files to perform fast and concise _Full-Text Search_. 
 
-Recognized file format: text, rtf, pdf, html, openoffice, office, ... 
+### Recognized file format: 
+- plain text, 
+- rtf, 
+- pdf, old pdf will requiert tesseract-ocr installed
+- jpeg & tiff (will also requiert tesseract-ocr)
+- html, 
+- openoffice, 
+- microsoft office, 
+ 
 
 
 ## Installation
@@ -20,6 +28,7 @@ Recognized file format: text, rtf, pdf, html, openoffice, office, ...
 - Edit the settings in the administration page.
 - Extract the current files from your cloud using the **./occ nextant:index** command 
 - Have a look to this [explanation on how Nextant works](https://github.com/daita/nextant/wiki/Extracting-&-Live-Update)
+- _(Optional)_ [Installing Tesseract](https://github.com/tesseract-ocr/tesseract/wiki) ([Optical Character Recognition](https://en.wikipedia.org/wiki/Optical_character_recognition) (OCR) Engine) will allow Nextant to extract text from image file and old pdf.
 
 
 ## Building the app
