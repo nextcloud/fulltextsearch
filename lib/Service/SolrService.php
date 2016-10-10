@@ -164,6 +164,9 @@ class SolrService
             case 'image/jpeg':
                 return \OCP\Util::imagePath('core', 'filetypes/image.svg');
             
+            case 'image/tiff':
+                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+            
             case 'application/epub+zip':
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
