@@ -29,12 +29,6 @@
 - Extract the current files from your cloud using the **./occ nextant:index** command 
 - Have a look to this [explanation on how Nextant works](https://github.com/daita/nextant/wiki/Extracting,-Live-Update)
 - _(Optional)_ [Installing Tesseract](https://github.com/tesseract-ocr/tesseract/wiki) ([Optical Character Recognition](https://en.wikipedia.org/wiki/Optical_character_recognition) (OCR) Engine) will allow Nextant to extract text from image file and old pdf.
-	
-	One to enable a Full-Text Search within your cloud.
-
- Index your own files and your shared documents and perform fast and precise search using a Solr Servlet.
-
-_Recognized file format: text, rtf, pdf, html, openoffice, office, ..._
 
 
 	</description>
@@ -54,6 +48,7 @@ _Recognized file format: text, rtf, pdf, html, openoffice, office, ..._
 	<repository>https://github.com/daita/nextant/</repository>
 	<discussion>https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954</discussion>
 	<screenshot>https://raw.githubusercontent.com/daita/nextant/master/screenshots/displayResult.jpg</screenshot>
+	<screenshot>https://raw.githubusercontent.com/daita/nextant/master/screenshots/admin.jpg</screenshot>
 	<dependencies>
 		<owncloud min-version="9.0" max-version="9.2" />
 		<nextcloud min-version="9" max-version="11" />
