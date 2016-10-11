@@ -170,6 +170,16 @@ class SolrAdminService
         array_push($fields, array(
             'type' => 'field',
             'data' => array(
+                'name' => 'nextant_tags',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => true
+            )
+        ));
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
                 'name' => 'nextant_ocr',
                 'type' => 'int',
                 'indexed' => true,
