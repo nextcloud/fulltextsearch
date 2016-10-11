@@ -135,18 +135,20 @@ style('nextant', 'admin');
 						<td></td>
 						<td>
 							<div id="nextant_first_index"
-								style="width: 350px; font-size: 12px; white-space: normal;">
-								<i></i> It is really adviced that your very first index of your
-								files is done using the <b>./occ nextant:index</b> command. <br />
-								However, you can force it to be started as a background process
-								of your cloud: </i> <br />
+								style="width: 270px; font-size: 12px; white-space: normal;">
+								<i></i> we recommand doing the very first indexing of your files
+								using the <b>./occ nextant:index</b> command.<br /> However, you
+								can force it to be started as a background process: </i> <br />
 								<button type="button" id="nextant_force_first_index"
 									style="width: 270px"><?php p($l->t('Force first index as a cronjob')) ?></button>
 							</div>
 							<button type="button" id="nextant_force_index"
 								style="width: 270px"><?php p($l->t('Force index')) ?></button>
 							<div id="nextant_index_scheduled">
-								<i>Index is scheduled within the next few hours (cron)</i>
+								<i>Indexing is scheduled within the next few hours (cron)</i>
+							</div>
+							<div id="nextant_index_inprogress">
+								<i>Indexing in progress</i>
 							</div>
 						</td>
 					</tr>
