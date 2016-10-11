@@ -178,7 +178,7 @@ class SolrService
             
             case 'application/octet-stream':
                 $pinfo = pathinfo($path);
-                if (substr($pinfo['extension'], 0, 1) == 'd' && ((int) (substr($pinfo['extension'], 1)) > 0)) {
+                if (key_exists('extension', $pinfo) && substr($pinfo['extension'], 0, 1) == 'd' && ((int) (substr($pinfo['extension'], 1)) > 0)) {
                     return \OCP\Util::imagePath('core', 'filetypes/text.svg');
                 }
                 return false;
