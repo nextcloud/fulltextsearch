@@ -80,7 +80,7 @@ style('nextant', 'admin');
 						<td><input type="checkbox" name="solr_live_extract"
 							id="solr_live_extract" value="1" style="margin: 10px;"> (<a
 							id="nextant_help_link"
-							href="https://github.com/daita/nextant/wiki/Extracting-&-Live-Update"
+							href="https://github.com/daita/nextant/wiki/Extracting,-Live-Update"
 							target="_blank">help</a>)</td>
 					</tr>
 
