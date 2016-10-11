@@ -80,8 +80,8 @@ class Index extends Base
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (beta)</comment>');
-//        $output->writeln('<comment>discussion thread:</comment> https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954/');
-//        $output->writeln('');
+        // $output->writeln('<comment>discussion thread:</comment> https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954/');
+        // $output->writeln('');
         if (! $this->solrService->configured()) {
             $output->writeln('Nextant is not yet configured');
             return;
@@ -95,6 +95,7 @@ class Index extends Base
         if ($input->getOption('background')) {
             $this->configService->needIndex(true, ($input->getOption('force')));
             $this->configService->setAppValue('solr_lock', '0');
+            $output->writeln('An indexing process will start as a background process within the next few hours');
             return;
         }
         
@@ -381,7 +382,7 @@ class Index extends Base
                 throw new \Exception('ctrl-c');
             }
             
-            $ids = $this->solrTools->getAll($page, $lastPage, $error);
+            $ids = $this->solrTools->getAll('files', $page, $lastPage, $error);
             if (! $ids)
                 return false;
             

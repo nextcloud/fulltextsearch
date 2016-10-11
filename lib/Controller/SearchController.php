@@ -88,11 +88,16 @@ class SearchController extends Controller
             
             foreach ($solrResult as $data) {
                 
+                $path = '';
                 $fileData = null;
                 try {
                     $path = $view->getPath($data['id']);
                     $fileData = $view->getFileInfo($path);
                 } catch (NotFoundException $e) {
+                    $fileData = null;
+                }
+                
+                if ($fileData == null) {
                     try {
                         $trashview = new View('/' . $this->userId . '/files_trashbin/files');
                         $path = $trashview->getPath($data['id']);
@@ -122,6 +127,9 @@ class SearchController extends Controller
                     $hl1 = '';
                 if ($hl2 == '' || $hl2 == null)
                     $hl2 = '';
+                
+                if (substr($path, - 1) == '/')
+                    $path = substr($path, 0, - 1);
                 
                 $response = array(
                     'id' => $data['id'],

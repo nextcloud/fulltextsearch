@@ -33,6 +33,9 @@ class SolrService
     
     // Owner is not set - mostly a developper mistake
     const ERROR_OWNER_NOT_SET = 4;
+    
+    // Type of document is not set
+    const ERROR_TYPE_NOT_SET = 6;
 
     const ERROR_TOOWIDE_SEARCH = 8;
     
@@ -158,6 +161,12 @@ class SolrService
         }
         
         switch ($mimetype) {
+            case 'image/jpeg':
+                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+            
+            case 'image/tiff':
+                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+            
             case 'application/epub+zip':
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
@@ -202,10 +211,15 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($absolutePath, $docid, $path, $mtime, &$error = '')
+    public function extractFile($absolutePath, $type, $docid, $path, $mtime, &$error = '')
     {
         if (! $this->configured())
             return false;
+        
+        if ($type == null || $type == '') {
+            $error = self::ERROR_TYPE_NOT_SET;
+            return false;
+        }
         
         if ($this->owner == '') {
             $error = self::ERROR_OWNER_NOT_SET;
@@ -241,7 +255,8 @@ class SolrService
             
             // add document
             $doc = $query->createDocument();
-            $doc->id = $docid;
+            $doc->id = $type . '_' . $docid;
+            $doc->nextant_source = $type;
             $doc->nextant_path = $path;
             $doc->nextant_owner = $this->owner;
             $doc->nextant_mtime = $mtime;
@@ -300,6 +315,7 @@ class SolrService
             $query->setFields(array(
                 'id',
                 'nextant_deleted',
+                'nextant_source',
                 'nextant_owner'
             ));
             
@@ -332,8 +348,11 @@ class SolrService
                 
                 // highlight
                 $hlDoc = $highlighting->getResult($document->id);
+                list ($type, $docid) = explode('_', $document->id, 2);
                 array_push($return, array(
-                    'id' => $document->id,
+                    'id' => $docid,
+                    'type' => $type,
+                    'source' => $document->nextant_source,
                     'deleted' => $document->nextant_deleted,
                     'owner' => $document->nextant_owner,
                     'highlight' => $hlDoc->getField('text'),

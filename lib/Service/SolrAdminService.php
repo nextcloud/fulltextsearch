@@ -157,6 +157,36 @@ class SolrAdminService
                 'multiValued' => false
             )
         ));
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_source',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_tags',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => true
+            )
+        ));
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_ocr',
+                'type' => 'int',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
         
         $this->solrService->message('Checking Solr schema fields');
         

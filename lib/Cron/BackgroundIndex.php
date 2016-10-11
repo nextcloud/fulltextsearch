@@ -114,7 +114,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $page = 0;
         while (true) {
             
-            $ids = $this->solrTools->getAll($page, $lastPage, $error);
+            $ids = $this->solrTools->getAll('files', $page, $lastPage, $error);
             if (! $ids)
                 break;
             

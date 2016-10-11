@@ -1,8 +1,10 @@
 **v0.5.0**
 - Beta release
+- minor bugfixes
 - new Admin UI
 - new display on search result
 - search within trash bin
+- OCR/index jpeg/tiff file (needs Tesseract installed)
 
 
 **v0.4.2**

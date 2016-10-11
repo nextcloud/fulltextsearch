@@ -131,18 +131,26 @@ $(document)
 								$('#solr_current_docs').text(
 										'Solr Core is down');
 							else {
-								if (response.needed_index == 2) {
+								if (response.solr_lock > 0) {
+									$('#nextant_first_index').hide(delay);
+									$('#nextant_index_scheduled').hide(delay);
+									$('#nextant_force_index').hide(delay);
+									$('#nextant_index_inprogress').show(delay);
+								} else if (response.needed_index == 2) {
 									$('#nextant_first_index').show(delay);
 									$('#nextant_index_scheduled').hide(delay);
 									$('#nextant_force_index').hide(delay);
+									$('#nextant_index_inprogress').hide(delay);
 								} else if (response.needed_index == 1) {
 									$('#nextant_first_index').hide(delay);
 									$('#nextant_force_index').hide(delay);
 									$('#nextant_index_scheduled').show(delay);
+									$('#nextant_index_inprogress').hide(delay);
 								} else {
 									$('#nextant_first_index').hide(delay);
 									$('#nextant_index_scheduled').hide(delay);
 									$('#nextant_force_index').show(delay);
+									$('#nextant_index_inprogress').hide(delay);
 								}
 								if (response.current_docs > 0)
 									$('#solr_current_docs').text(

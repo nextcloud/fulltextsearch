@@ -203,7 +203,7 @@ class SettingsController extends Controller
     {
         $testFile = __DIR__ . '/../../LICENSE';
         
-        if ($this->solrService->extractFile($testFile, '__nextant_test', '/LICENSE', 1234567890, $error)) {
+        if ($this->solrService->extractFile($testFile, 'test', 'nextant_test', '/LICENSE', 1234567890, $error)) {
             $message = 'Text successfully extracted';
             return true;
         }
@@ -215,7 +215,7 @@ class SettingsController extends Controller
     private function test_update(&$message)
     {
         $testUpdate = array(
-            'id' => '__nextant_test',
+            'id' => 'nextant_test',
             'path' => '/LICENSE2',
             'share_users' => array(
                 '__nextant_test_owner'
@@ -226,7 +226,7 @@ class SettingsController extends Controller
             'deleted' => false
         );
         
-        if (! $this->solrTools->updateDocuments(array(
+        if (! $this->solrTools->updateDocuments('test', array(
             $testUpdate
         ), $error)) {
             $message = 'Error Updating field (Error #' . $error . ')';
@@ -244,7 +244,7 @@ class SettingsController extends Controller
             if (sizeof($result) > 0) {
                 
                 foreach ($result as $doc) {
-                    if ($doc['id'] == '__nextant_test') {
+                    if ($doc['id'] == 'nextant_test') {
                         $message = 'Found exactly what we were looking for';
                         return true;
                     }
@@ -264,7 +264,7 @@ class SettingsController extends Controller
 
     private function test_delete(&$message)
     {
-        if ($this->solrTools->removeDocument('__nextant_test')) {
+        if ($this->solrTools->removeDocument('test', 'nextant_test')) {
             $message = 'Test document deleted';
             return true;
         }
