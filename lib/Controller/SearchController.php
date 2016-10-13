@@ -65,7 +65,7 @@ class SearchController extends Controller
     /**
      * @NoAdminRequired
      * @NoCSRFRequired
-     */    
+     */
     public function searchRequest($query, $current_dir)
     {
         $results = array();
