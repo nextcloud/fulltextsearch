@@ -78,7 +78,7 @@ class Index extends Base
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'flood the log of debug messages')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'force the lock on Solr')
             ->addOption('background', 'bg', InputOption::VALUE_NONE, 'force index as a background process')
-            ->addOption('bookmarks', 'bm', InputOption::VALUE_NONE, 'index only bookmarks');
+            ->addOption('bookmarks', 'bm', InputOption::VALUE_NONE, 'index only bookmarks - requiert <info>Bookmarks</info> installed');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -95,12 +95,15 @@ class Index extends Base
         $this->fileService->setDebug($input->getOption('debug'));
         $this->indexService->setDebug($input->getOption('debug'));
         
-        $this->solrService->setOutput($output);        
+        $this->solrService->setOutput($output);
         $this->indexService->setOutput($output);
         
         if ($input->getOption('bookmarks')) {
-            $this->indexService->extractBookmarks('cult');
-            // $this->configService->needIndexBookmarks(false);
+            $users = $this->userManager->search('');
+            foreach ($users as $user) {
+                $this->indexService->extractBookmarks($user->getUID());
+                $output->writeln('');
+            } // $this->configService->needIndexBookmarks(false);
             return;
         }
         
@@ -214,6 +217,7 @@ class Index extends Base
         else
             $this->configService->needIndexFiles(true);
         
+        $this->configService->setAppValue('configured', '1');
         $this->configService->setAppValue('index_locked', '0');
         
         $output->writeln('');

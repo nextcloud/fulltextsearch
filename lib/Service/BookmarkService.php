@@ -52,16 +52,17 @@ class BookmarkService
     {
         if (! \OCP\App::isEnabled('bookmarks'))
             return false;
-        if ($this->configService->getAppValue('index_bookmarks') != 1)
-            return false;
+            
+            // if ($this->configService->getAppValue('index_bookmarks') != 1)
+            // return false;
         
         return true;
     }
 
     public static function getSearchResult(&$data)
     {
-        $data['link_main'] = 'http://www.toto.com/';
-        $data['title'] = $data['path'];        
+        $data['link_main'] = $data['path'];
+        $data['title'] = $data['path'];
         $data['icon'] = \OCP\Util::imagePath('nextant', 'bookmarks.svg');
         
         return true;

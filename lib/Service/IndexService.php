@@ -27,6 +27,7 @@
 namespace OCA\Nextant\Service;
 
 use OCA\Bookmarks\Controller\Lib\Bookmarks;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class IndexService
 {
@@ -79,13 +80,34 @@ class IndexService
         $db = \OC::$server->getDb();
         $bookmarks = Bookmarks::findBookmarks($userId, $db, 0, 'id', array(), false, - 1);
         
+        $progress = null;
+        if ($this->output != null)
+            $progress = new ProgressBar($this->output, sizeof($files));
+        
+        if ($progress != null) {
+            $progress->setMessage('<info>' . $userId . '</info>/Bookmarks: ');
+            $progress->setMessage('', 'jvm');
+            $progress->setMessage('[preparing]', 'infos');
+            $progress->setFormat(" %message:-38s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+            $progress->start();
+        }
+        
         foreach ($bookmarks as $bookmark) {
+            
+            if ($progress != null)
+                $progress->advance();
             
             if (! $forceExtract && $this->solrTools->isDocumentUpToDate('bookmarks', $bookmark['id'], $bookmark['lastmodified']))
                 continue;
             
             if (! $this->solrService->extractFile($bookmark['url'], 'bookmarks', $bookmark['id'], $bookmark['url'], $bookmark['lastmodified'], $error))
                 continue;
+        }
+        
+        if ($progress != null) {
+            $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'infos');
+            $progress->finish();
         }
         
         return true;
