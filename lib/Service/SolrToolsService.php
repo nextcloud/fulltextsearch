@@ -247,7 +247,7 @@ class SolrToolsService
      * @param string $error            
      * @return boolean|Solarium\Core\Query\Result[][]
      */
-    private function getDocumentsStatus($type, $docs, &$error = '')
+    public function getDocumentsStatus($type, $docs, &$error = '')
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -476,16 +476,19 @@ class SolrToolsService
      * @param number $error            
      * @return boolean
      */
-    public function count(&$error = 0)
+    public function count($type = '', &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
         
         $client = $this->solrService->getClient();
         
+        if ($type != '')
+            $type .= '_';
+        
         try {
             $query = $client->createSelect();
-            $query->setQuery('id:*');
+            $query->setQuery('id:' . $type . '*');
             $query->setRows(0);
             $resultset = $client->execute($query);
             

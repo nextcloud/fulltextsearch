@@ -56,12 +56,12 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->rootFolder = $c->query('RootFolder');
         
         // $this->setDebug(true);
-        if (! $this->configService->neededIndex()) {
+        if (! $this->configService->neededIndexFiles()) {
             $this->miscService->debug('Looks like there is no need to index');
             return;
         }
         
-        $solr_locked = $this->configService->getAppValue('solr_lock');
+        $solr_locked = $this->configService->getAppValue('index_locked');
         if ($solr_locked > (time() - (3600 * 24))) {
             $this->miscService->log('The background index detected that your solr is locked by a running script. If it is not the case, you should start indexing manually using ./occ nextant:index --force');
             return;
@@ -69,12 +69,12 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         $this->miscService->debug('Cron - Init');
         
-        $this->configService->setAppValue('solr_lock', time());
+        $this->configService->setAppValue('index_locked', time());
         if ($this->scanUsers()) {
-            $this->configService->needIndex(false);
-            $this->configService->setAppValue('last_index', time());
+            $this->configService->needIndexFiles(false);
+            $this->configService->setAppValue('index_files_last', time());
         }
-        $this->configService->setAppValue('solr_lock', '0');
+        $this->configService->setAppValue('index_locked', '0');
         
         $this->miscService->debug('Cron - End');
     }

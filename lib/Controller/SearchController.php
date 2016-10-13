@@ -33,6 +33,7 @@
 namespace OCA\Nextant\Controller;
 
 use \OCA\Nextant\Service\FileService;
+use \OCA\Nextant\Service\BookmarkService;
 use \OCA\Nextant\Service\SolrService;
 use OCP\AppFramework\Controller;
 use OCP\IRequest;
@@ -61,11 +62,12 @@ class SearchController extends Controller
         $this->miscService = $miscService;
     }
 
+    /**
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     */
     public function searchRequest($query, $current_dir)
     {
-        Filesystem::init($this->userId, '');
-        $view = Filesystem::getView();
-        
         $results = array();
         
         if ($this->solrService == false)
@@ -89,30 +91,32 @@ class SearchController extends Controller
             foreach ($solrResult as $data) {
                 
                 $path = '';
-                $fileData = null;
-                try {
-                    $path = $view->getPath($data['id']);
-                    $fileData = $view->getFileInfo($path);
-                } catch (NotFoundException $e) {
-                    $fileData = null;
-                }
+                $data = array_merge($data, array(
+                    'userid' => $this->userId,
+                    'title' => '',
+                    'link_main' => '',
+                    'link_sub' => '',
+                    'filename' => '',
+                    'dirpath' => '',
+                    'size' => '',
+                    'mtime' => '',
+                    'icon' => '',
+                    'mimetype' => ''
+                ));
                 
-                if ($fileData == null) {
-                    try {
-                        $trashview = new View('/' . $this->userId . '/files_trashbin/files');
-                        $path = $trashview->getPath($data['id']);
-                        $fileData = $trashview->getFileInfo($path);
-                        $data['deleted'] = true;
-                    } catch (NotFoundException $e) {
+                switch ($data['source']) {
+                    
+                    case 'files':
+                        FileService::getSearchResult($data);
+                        break;
+                    
+                    case 'bookmarks':
+                        BookmarkService::getSearchResult($data);
+                        break;
+                    
+                    default:
                         continue;
-                    }
                 }
-                
-                if ($fileData == null || $fileData === false)
-                    continue;
-                
-                $pathParts = pathinfo($path);
-                $basepath = str_replace('//', '/', '/' . $pathParts['dirname'] . '/');
                 
                 $hl1 = '';
                 $hl2 = '';
@@ -128,31 +132,17 @@ class SearchController extends Controller
                 if ($hl2 == '' || $hl2 == null)
                     $hl2 = '';
                 
-                if (substr($path, - 1) == '/')
-                    $path = substr($path, 0, - 1);
+                $data['highlight1'] = $hl1;
+                $data['highlight2'] = $hl2;
                 
-                $response = array(
-                    'id' => $data['id'],
-                    'type' => 'file',
-                    'shared' => ($data['owner'] != $this->userId) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '',
-                    'deleted' => ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '',
-                    'size' => $fileData->getSize(),
-                    'filesize' => \OC_Helper::humanFileSize($fileData->getSize()),
-                    'path' => $path,
-                    'basepath' => $basepath,
-                    'filename' => $pathParts['basename'],
-                    'basefile' => $pathParts['filename'],
-                    'highlight1' => $hl1,
-                    'highlight2' => $hl2,
-                    'extension' => ($pathParts['extension'] != '') ? '.' . $pathParts['extension'] : '',
-                    'mime' => $fileData->getMimetype(),
-                    'fileicon' => SolrService::extractableFile($fileData->getMimeType(), $path),
-                    'webdav' => (! $data['deleted']) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '',
-                    'trashbin' => ($data['deleted']) ? '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename'] : '',
-                    'mtime' => $fileData->getMTime()
-                );
+                $data['size_readable'] = ($data['size'] > 0) ? \OC_Helper::humanFileSize($data['size']) : '';
+                $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
+                $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
                 
-                array_push($results, $response);
+                if ($data['deleted'])
+                    $this->miscService->log('$$$ ' . var_export($data, true));
+                
+                array_push($results, $data);
             }
         }
         

@@ -86,12 +86,12 @@ class FileService
             return false;
         
         $storage = $fileInfo->getStorage();
-        if (! $storage->isLocal() && $this->configService->getAppValue('external_index') != 1)
+        if (! $storage->isLocal() && $this->configService->getAppValue('index_files_external_index') != 1)
             return false;
         
         $size = round($fileInfo->getSize() / 1024 / 1024, 1);
-        if ($size > $this->configService->getAppValue('max_size')) {
-            $this->miscService->debug('File is too big (' . $size . ' > ' . $this->configService->getAppValue('max_size') . ')');
+        if ($size > $this->configService->getAppValue('index_files_max_size')) {
+            $this->miscService->debug('File is too big (' . $size . ' > ' . $this->configService->getAppValue('index_files_max_size') . ')');
             return false;
         }
         
@@ -127,7 +127,7 @@ class FileService
         }
         
         if (! $result)
-            $this->configService->needIndex(true);
+            $this->configService->needIndexFiles(true);
         
         return $result;
     }
@@ -186,7 +186,7 @@ class FileService
         $count = $this->solrTools->updateDocuments('files', $pack, $error);
         
         if ($count === false)
-            $this->configService->needIndex(true);
+            $this->configService->needIndexFiles(true);
         
         return $count;
     }
@@ -309,5 +309,67 @@ class FileService
     public static function getBaseTypeFromMime($mimetype)
     {
         return substr($mimetype, 0, strpos($mimetype, '/'));
+    }
+
+    /**
+     * complete data from a search result with more details about the file itself
+     *
+     * @param array $data            
+     * @param number $userid            
+     * @return array[]
+     */
+    public static function getSearchResult(&$data)
+    {
+        Filesystem::init($data['userid'], '');
+        $view = Filesystem::getView();
+        
+        $path = '';
+        $deleted = false;
+        $fileData = null;
+        try {
+            $path = $view->getPath($data['id']);
+            $fileData = $view->getFileInfo($path);
+        } catch (NotFoundException $e) {
+            $fileData = null;
+        }
+        
+        if ($fileData == null) {
+            try {
+                $trashview = new View('/' . $data['userid'] . '/files_trashbin/files');
+                $path = $trashview->getPath($data['id']);
+                $fileData = $trashview->getFileInfo($path);
+                $deleted = true;
+            } catch (NotFoundException $e) {
+                return false;
+            }
+        }
+        
+        if ($fileData == null || $fileData === false)
+            return false;
+        
+        $pathParts = pathinfo($path);
+        $basepath = str_replace('//', '/', '/' . $pathParts['dirname'] . '/');
+        
+        if (substr($path, - 1) == '/')
+            $path = substr($path, 0, - 1);
+            
+            // 'extension' => ($pathParts['extension'] != '') ? '.' . $pathParts['extension'] : '',
+            // 'webdav' =>
+            // 'trashbin' => ($deleted) ? '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename'] : '',
+        
+        $data = array_merge($data, array(
+            'size' => $fileData->getSize(),
+            'title' => $path,
+            'icon' => SolrService::extractableFile($fileData->getMimeType(), $path),
+            'filename' => $pathParts['filename'],
+            'dirpath' => $pathParts['dirname'],
+            'mimetype' => $fileData->getMimeType(),
+            'deleted' => $deleted,
+            'link_main' => (! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename'],
+            'link_sub' => '',
+            'mtime' => $fileData->getMTime()
+        ));
+        
+        return true;
     }
 }

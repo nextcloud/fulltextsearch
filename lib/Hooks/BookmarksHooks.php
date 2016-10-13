@@ -24,44 +24,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-namespace OCA\Nextant\Migration;
+namespace OCA\Nextant\Hooks;
 
-use OCP\Migration\IOutput;
-use OCP\Migration\IRepairStep;
-
-class NextantUpgrade implements IRepairStep
+/**
+ * init Files' Events
+ */
+class BookmarksHooks
 {
 
-    private $solrService;
-
-    private $solrAdmin;
-
-    private $configService;
-
-    public function __construct($configService, $solrService, $solrAdmin)
-    {
-        $this->solrService = $solrService;
-        $this->solrAdmin = $solrAdmin;
-        $this->configService = $configService;
-    }
-
     /**
-     * Returns the step's name
+     * retreive the BookmarksEvents' Controller
      *
-     * @return string
-     * @since 9.1.0
+     * @return BookmarksHooks
      */
-    public function getName()
+    static protected function getController()
     {
-        return 'Check and update Solr schema';
+        $app = new \OCA\Nextant\AppInfo\Application();
+        return $app->getContainer()->query('BookmarksEvents');
     }
 
     /**
+     * hook events: bookmark added
+     *
+     * @param array $params
+     *            The hook params
      */
-    public function run(IOutput $output)
+    public static function bookmarkAdd($params)
     {
-        $this->solrAdmin->checkSchema(true, $error);
-        $this->configService->copyConfigFrom050();
-        // $this->configService->stopUpdate();
+        self::getController()->onBookmarkAdd($params['id']);
+    }
+
+    /**
+     * hook events: bookmark edited
+     *
+     * @param array $params
+     *            The hook params
+     */
+    public static function bookmarkEdit($params)
+    {
+        self::getController()->onBookmarkEdit($params['id']);
+    }
+
+    /**
+     * hook events: bookmark deleted
+     *
+     * @param array $params
+     *            The hook params
+     */
+    public static function bookmarkDelete($params)
+    {
+        self::getController()->onBookmarkDelete($params['id']);
     }
 }
+

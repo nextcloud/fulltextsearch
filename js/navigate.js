@@ -98,38 +98,26 @@ $(document)
 												.template_entry()
 												.replace(/%ID%/gi, entry.id)
 												.replace(/%TYPE%/gi, entry.type)
+												.replace(/%TITLE%/gi,
+														entry.title)
+												.replace(/%LINKMAIN%/gi,
+														entry.link_main)
+												.replace(/%FILENAME%/gi,
+														entry.filename)
+												.replace(/%DIRPATH%/gi,
+														entry.dirpath)
 												.replace(/%SIZE%/gi, entry.size)
-												.replace(/%FILESIZE%/gi,
-														entry.filesize)
-												.replace(/%MIME%/gi, entry.mime)
-												.replace(/%FILEICON%/gi,
-														entry.fileicon)
+												.replace(/%SIZEREAD%/gi,
+														entry.size_readable)
+												.replace(/%MIMETYPE%/gi,
+														entry.mimetype)
+												.replace(/%ICON%/gi, entry.icon)
 												.replace(/%MTIME%/gi,
-														entry.mtime)
-												.replace(/%BASEFILE%/gi,
-														entry.basefile)
-												.replace(/%EXTENSION%/gi,
-														entry.extension)
-												.replace(/%PATH%/gi, entry.path)
-												.replace(/%DIRNAME%/gi,
-														entry.basepath)
-												.replace(/%HIGHLIGHT1%/gi,
+														entry.mtime).replace(
+														/%HIGHLIGHT1%/gi,
 														entry.highlight1)
 												.replace(/%HIGHLIGHT2%/gi,
-														entry.highlight2)
-												.replace(/%FILENAME%/gi,
-														entry.filename);
-
-										row = row
-												.replace(
-														/%WEBDAV%/gi,
-														(entry.webdav != '') ? entry.webdav
-																: '');
-										row = row
-												.replace(
-														/%TRASHBIN%/gi,
-														(entry.trashbin != '') ? entry.trashbin
-																: '');
+														entry.highlight2);
 
 										row = row
 												.replace(
@@ -152,7 +140,8 @@ $(document)
 
 						template_entry : function() {
 
-							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%FILENAME%" data-mime="%MIME%" data-mtime="%MTIME%000" data-etag="" data-permissions="" data-has-preview="false" data-path="%DIRNAME%" data-share-permissions="">';
+							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%FILENAME%" data-mime="%MIMETYPE%" data-mtime="%MTIME%000" data-etag="" ';
+							$tmpl += ' data-permissions="" data-has-preview="false" data-path="%PATH%" data-share-permissions="">';
 							$tmpl += '<td class="filename ui-draggable">';
 							$tmpl += '<a class="action action-favorite " data-original-title="" title="">';
 							// $tmpl += '<span class="icon
@@ -162,14 +151,14 @@ $(document)
 							// $tmpl += '<input id="select-files-%ID%"
 							// class="selectCheckBox checkbox"
 							// type="checkbox">';
-							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%FILEICON%); background-size: 32px;">';
+							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%ICON%); background-size: 32px;">';
 							$tmpl += '<div class="nextant_details" %DELETED%%SHARED%></div>';
 							$tmpl += '</div>';
 							$tmpl += '<span class="hidden-visually">Select</span></label>';
 
-							$tmpl += '<a class="nextant_file" href="%WEBDAV%%TRASHBIN%">';
+							$tmpl += '<a class="nextant_file" href="%LINKMAIN%">';
 							$tmpl += '<div>';
-							$tmpl += '<span class="nextant_line nextant_line1">%PATH%</span>';
+							$tmpl += '<span class="nextant_line nextant_line1">%TITLE%</span>';
 							$tmpl += '<span class="nextant_line nextant_line2">%HIGHLIGHT1%</span>';
 							$tmpl += '<span class="nextant_line nextant_line3">%HIGHLIGHT2%</span>';
 							$tmpl += '</div></a>';
@@ -189,7 +178,7 @@ $(document)
 							// class="hidden-visually">Actions</span></a></span></a>';
 
 							$tmpl += '</td>';
-							$tmpl += '<td class="filesize" style="color:rgb(-17,-17,-17)">%FILESIZE%</td>';
+							$tmpl += '<td class="filesize" style="color:rgb(-17,-17,-17)">%SIZEREAD%</td>';
 							$tmpl += '<td class="date"><span class="modified" title="" style="color:rgb(155,155,155)" data-original-title=""></span></td></tr>';
 
 							return $tmpl;

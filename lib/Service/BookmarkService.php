@@ -24,44 +24,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-namespace OCA\Nextant\Migration;
+namespace OCA\Nextant\Service;
 
-use OCP\Migration\IOutput;
-use OCP\Migration\IRepairStep;
+use \OCA\Nextant\Service\SolrService;
 
-class NextantUpgrade implements IRepairStep
+class BookmarkService
 {
-
-    private $solrService;
-
-    private $solrAdmin;
 
     private $configService;
 
-    public function __construct($configService, $solrService, $solrAdmin)
+    private $solrService;
+
+    private $solrTools;
+
+    private $miscService;
+
+    public function __construct($configService, $solrService, $solrTools, $miscService)
     {
-        $this->solrService = $solrService;
-        $this->solrAdmin = $solrAdmin;
+        // $this->root = $root;
         $this->configService = $configService;
+        $this->solrService = $solrService;
+        $this->solrTools = $solrTools;
+        $this->miscService = $miscService;
     }
 
-    /**
-     * Returns the step's name
-     *
-     * @return string
-     * @since 9.1.0
-     */
-    public function getName()
+    public function configured()
     {
-        return 'Check and update Solr schema';
+        if (! \OCP\App::isEnabled('bookmarks'))
+            return false;
+            
+            // if ($this->configService->getAppValue('index_bookmarks') != 1)
+            // return false;
+        
+        return true;
     }
 
-    /**
-     */
-    public function run(IOutput $output)
+    public static function getSearchResult(&$data)
     {
-        $this->solrAdmin->checkSchema(true, $error);
-        $this->configService->copyConfigFrom050();
-        // $this->configService->stopUpdate();
+        $data['link_main'] = $data['path'];
+        $data['title'] = $data['path'];
+        $data['icon'] = \OCP\Util::imagePath('nextant', 'bookmarks.svg');
+        
+        return true;
     }
 }

@@ -35,22 +35,28 @@ class ConfigService
 
     const SEARCH_DISPLAY_FILES = 2;
 
-    const ACTION_LIVE_EXTRACT = 'live_extract';
+    const ACTION_LIVE_EXTRACT = 'index_files_live_extract';
 
-    const ACTION_LIVE_DOCUPDATE = 'live_docupdate';
+    const ACTION_LIVE_DOCUPDATE = 'index_files_live_extract';
 
     private $defaults = [
         'configured' => '0',
-        'needed_index' => '2',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
-        'live_extract' => '1',
-        'live_docupdate' => '0',
-        'last_index' => 0,
         'display_result' => 1,
-        'max_size' => 40,
-        'external_index' => '0',
-        'solr_lock' => 0
+        
+        'index_locked' => 0,
+        'index_last' => 0,
+        
+        'index_files' => 1,
+        'index_files_needed' => 1,
+        'index_files_update_needed' => 1,
+        'index_files_live_extract' => 1,
+        'index_files_live_update' => 0,
+        'index_files_max_size' => 40,
+        
+        'index_bookmarks' => 0,
+        'index_bookmarks_needed' => 1
     ];
 
     private $appName;
@@ -73,23 +79,54 @@ class ConfigService
         }
     }
 
-    public function needIndex($need, $force = false)
+    public function copyConfigFrom050()
+    {
+        $this->setAppValue('index_locked', $this->getAppValue('solr_lock'));
+        $this->setAppValue('index_files_needed', $this->getAppValue('needed_index'));
+        $this->setAppValue('index_last', $this->getAppValue('last_index'));
+        $this->setAppValue('index_files_live_extract', $this->getAppValue('live_extract'));
+        $this->setAppValue('index_files_live_update', $this->getAppValue('live_docupdate'));
+        $this->setAppValue('index_files_max_size', $this->getAppValue('max_size'));
+        $this->setAppValue('index_files_external_index', $this->getAppValue('external_index'));
+        
+        $this->deleteAppValue('solr_lock');
+        $this->deleteAppValue('needed_index');
+        $this->deleteAppValue('last_index');
+        $this->deleteAppValue('live_extract');
+        $this->deleteAppValue('live_docupdate');
+        $this->deleteAppValue('max_size');
+        $this->deleteAppValue('external_index');
+    }
+
+    public function needIndexFiles($need, $force = false)
     {
         if (! $need)
-            $this->setAppValue('needed_index', '0');
+            $this->setAppValue('index_files_needed', '0');
         else 
-            if ($force || $this->getAppValue('needed_index') == '0')
-                $this->setAppValue('needed_index', '1');
+            if ($force || $this->getAppValue('index_files_needed') == '0')
+                $this->setAppValue('index_files_needed', '1');
     }
 
-    public function neededIndex()
+    public function neededIndexFiles()
     {
-        return ($this->getAppValue('needed_index') == '1');
+        return ($this->getAppValue('index_files_needed') == '1');
     }
 
-    public function stopIndex()
+    public function stopIndexFiles()
     {
-        $this->setAppValue('needed_index', '2');
+        $this->setAppValue('index_files_needed', '2');
+    }
+
+    public function needIndexBookmarks($need)
+    {
+        if (! $need)
+            $this->setAppValue('index_bookmarks_needed', '0');
+        $this->setAppValue('index_bookmarks_needed', '1');
+    }
+
+    public function neededIndexBookmarks()
+    {
+        return ($this->getAppValue('index_bookmarks_needed') == '1');
     }
 
     /**
@@ -116,6 +153,17 @@ class ConfigService
     public function setAppValue($key, $value)
     {
         return $this->config->setAppValue($this->appName, $key, $value);
+    }
+
+    /**
+     * remove a key
+     *
+     * @param string $key            
+     * @return string
+     */
+    public function deleteAppValue($key)
+    {
+        return $this->config->deleteAppValue($this->appName, $key);
     }
 
     /**

@@ -215,9 +215,9 @@ class SolrAdminService
         }
         
         if ($changed)
-            $this->configService->setAppValue('needed_index', '1');
+            $this->configService->setAppValue('index_files_needed', '1');
         
-        $this->configService->setAppValue('configured', '1');
+      //  $this->configService->setAppValue('configured', '1');
         return true;
     }
 

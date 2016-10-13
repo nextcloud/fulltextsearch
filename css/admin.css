@@ -1,3 +1,13 @@
+#nextant_saving {
+	font-weight: bolder;
+	font-size: 12px;
+	margin-left: 30px;
+	font-style: italic;
+	opacity: 0.5;
+	filter: alpha(opacity = 50);
+	opacity: 0.5;
+}
+
 #nextant-display {
 	width: 400px;
 	height: 250px;
@@ -27,4 +37,17 @@ TD.nextant_admin_left {
 	text-align: right;
 	font-weight: bold;
 	padding-right: 15px;
+}
+
+TR.nextant_admin_head, TR.nextant_admin_head:hover {
+	margin-top: 12px;
+	background: #ddd;
+}
+
+TD.nextant_admin_head {
+	font-weight: bold;
+	text-align: right;
+	padding: 4px;
+	padding-right: 30px;
+	font-style: italic;
 }

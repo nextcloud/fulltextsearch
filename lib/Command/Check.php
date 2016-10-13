@@ -57,7 +57,7 @@ class Check extends Base
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (! $this->solrService->configured()) {
+        if (! $this->solrService->configured(true)) {
             $output->writeln('Nextant is not yet configured');
             return;
         }
@@ -77,7 +77,9 @@ class Check extends Base
             return false;
         }
         
-        $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents');
+        $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents:');
+        $output->writeln(' - ' . $this->solrTools->count('files') . ' files');
+        $output->writeln(' - ' . $this->solrTools->count('bookmarks') . ' bookmarks');
     }
 }
 

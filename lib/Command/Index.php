@@ -45,6 +45,8 @@ class Index extends Base
 
     private $rootFolder;
 
+    private $indexService;
+
     private $solrService;
 
     private $solrTools;
@@ -55,11 +57,12 @@ class Index extends Base
 
     private $miscService;
 
-    public function __construct(IUserManager $userManager, $rootFolder, $solrService, $solrTools, $configService, $fileService, $miscService)
+    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $solrService, $solrTools, $configService, $fileService, $miscService)
     {
         parent::__construct();
         $this->userManager = $userManager;
         $this->rootFolder = $rootFolder;
+        $this->indexService = $indexService;
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->configService = $configService;
@@ -74,7 +77,8 @@ class Index extends Base
             ->setDescription('scan users\' files, generate and index Solr documents')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'flood the log of debug messages')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'force the lock on Solr')
-            ->addOption('background', 'bg', InputOption::VALUE_NONE, 'force index as a background process');
+            ->addOption('background', 'bg', InputOption::VALUE_NONE, 'force index as a background process')
+            ->addOption('bookmarks', 'bm', InputOption::VALUE_NONE, 'index only bookmarks - requiert <info>Bookmarks</info> installed');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -82,31 +86,42 @@ class Index extends Base
         $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (beta)</comment>');
         // $output->writeln('<comment>discussion thread:</comment> https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954/');
         // $output->writeln('');
-        if (! $this->solrService->configured()) {
+        if (! $this->solrService->configured(true)) {
             $output->writeln('Nextant is not yet configured');
             return;
         }
         
         $this->miscService->setDebug($input->getOption('debug'));
         $this->fileService->setDebug($input->getOption('debug'));
+        $this->indexService->setDebug($input->getOption('debug'));
         
         $this->solrService->setOutput($output);
+        $this->indexService->setOutput($output);
+        
+        if ($input->getOption('bookmarks')) {
+            $users = $this->userManager->search('');
+            foreach ($users as $user) {
+                $this->indexService->extractBookmarks($user->getUID());
+                $output->writeln('');
+            } // $this->configService->needIndexBookmarks(false);
+            return;
+        }
         
         if ($input->getOption('background')) {
-            $this->configService->needIndex(true, ($input->getOption('force')));
-            $this->configService->setAppValue('solr_lock', '0');
+            $this->configService->needIndexFiles(true, ($input->getOption('force')));
+            $this->configService->setAppValue('index_locked', '0');
             $output->writeln('An indexing process will start as a background process within the next few hours');
             return;
         }
         
-        $solr_locked = $this->configService->getAppValue('solr_lock');
+        $solr_locked = $this->configService->getAppValue('index_locked');
         if (! $input->getOption('force') && ($solr_locked > (time() - (3600 * 24)))) {
             $output->writeln('Your solr is locked by a running script like an index command or background jobs (cron)');
             $output->writeln('You can still use the --force');
             return;
         }
         
-        $this->configService->setAppValue('solr_lock', time());
+        $this->configService->setAppValue('index_locked', time());
         
         $documentIds = array();
         
@@ -195,14 +210,15 @@ class Index extends Base
         
         $this->removeOrphans($output, $documentIds);
         
-        $this->configService->needIndex(false);
+        $this->configService->needIndexFiles(false);
         
         if ($noFailure)
-            $this->configService->setAppValue('last_index', time());
+            $this->configService->setAppValue('index_files_last', time());
         else
-            $this->configService->needIndex(true);
+            $this->configService->needIndexFiles(true);
         
-        $this->configService->setAppValue('solr_lock', '0');
+        $this->configService->setAppValue('configured', '1');
+        $this->configService->setAppValue('index_locked', '0');
         
         $output->writeln('');
     }
@@ -244,7 +260,7 @@ class Index extends Base
             $this->miscService->debug('(' . $userId . ') - scanning file #' . $file->getId() . ' (' . $file->getMimeType() . ') ' . $file->getPath());
             
             if ($this->hasBeenInterrupted()) {
-                $this->configService->setAppValue('solr_lock', '0');
+                $this->configService->setAppValue('index_locked', '0');
                 throw new \Exception('ctrl-c');
             }
             
@@ -316,7 +332,7 @@ class Index extends Base
         while ($file = array_shift($fileIds)) {
             
             if ($this->hasBeenInterrupted()) {
-                $this->configService->setAppValue('solr_lock', '0');
+                $this->configService->setAppValue('index_locked', '0');
                 throw new \Exception('ctrl-c');
             }
             
@@ -367,7 +383,7 @@ class Index extends Base
 
     private function removeOrphans($output, $fileIds)
     {
-        $progress = new ProgressBar($output, $this->solrTools->count());
+        $progress = new ProgressBar($output, $this->solrTools->count('files'));
         
         $progress->setMessage('<info>spoting orphans</info>:');
         $progress->setFormat(" %message:-51s%[%bar%] %percent:3s%%");
@@ -378,7 +394,7 @@ class Index extends Base
         while (true) {
             
             if ($this->hasBeenInterrupted()) {
-                $this->configService->setAppValue('solr_lock', '0');
+                $this->configService->setAppValue('index_locked', '0');
                 throw new \Exception('ctrl-c');
             }
             
