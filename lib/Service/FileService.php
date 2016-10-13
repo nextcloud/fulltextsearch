@@ -360,6 +360,9 @@ class FileService
         $data = array_merge($data, array(
             'size' => $fileData->getSize(),
             'title' => $path,
+            'icon' => SolrService::extractableFile($fileData->getMimeType(), $path),
+            'filename' => $pathParts['filename'],
+            'dirpath' => $pathParts['dirname'],
             'mimetype' => $fileData->getMimeType(),
             'deleted' => $deleted,
             'link_main' => (! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename'],

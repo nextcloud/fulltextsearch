@@ -92,6 +92,8 @@ class SearchController extends Controller
                     'title' => '',
                     'link_main' => '',
                     'link_sub' => '',
+                    'filename' => '',
+                    'dirpath' => '',
                     'size' => '',
                     'mtime' => '',
                     'icon' => '',
@@ -130,27 +132,11 @@ class SearchController extends Controller
                 $data['highlight2'] = $hl2;
                 
                 $data['size_readable'] = ($data['size'] > 0) ? \OC_Helper::humanFileSize($data['size']) : '';
+                $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
+                $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
                 
-                // $response = array(
-                // 'id' => $data['id'],
-                // 'type' => $data['source'],
-                // 'path' => $data['more']['path'],
-                // 'shared' => ($data['owner'] != $this->userId) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '',
-                // 'deleted' => ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '',
-                // 'size' => $data['more']['size'],
-                // 'filesize' => ($data['more']['size'] > 0) ? \OC_Helper::humanFileSize($data['more']['size']) : '',
-                // 'basepath' => $data['more']['basepath'],
-                // 'filename' => $data['more']['filename'],
-                // 'basefile' => $data['more']['basefile'],
-                // 'highlight1' => $hl1,
-                // 'highlight2' => $hl2,
-                // 'extension' => $data['more']['extension'],
-                // 'mime' => $data['more']['mimetype'],
-                // 'fileicon' => SolrService::extractableFile($data['more']['mimetype'], $data['more']['path']),
-                // 'webdav' => $data['more']['webdav'],
-                // 'trashbin' => $data['more']['trashbin'],
-                // 'mtime' => $data['more']['mtime']
-                // );
+                if ($data['deleted'])
+                    $this->miscService->log('$$$ ' . var_export($data, true));
                 
                 array_push($results, $data);
             }

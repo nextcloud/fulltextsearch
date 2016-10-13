@@ -60,8 +60,9 @@ class BookmarkService
 
     public static function getSearchResult(&$data)
     {
-        $data['link'] = 'http://www.toto.com/';
-        $data['title'] = $data['path'];
+        $data['link_main'] = 'http://www.toto.com/';
+        $data['title'] = $data['path'];        
+        $data['icon'] = \OCP\Util::imagePath('nextant', 'bookmarks.svg');
         
         return true;
     }
