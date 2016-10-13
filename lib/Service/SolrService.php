@@ -239,15 +239,26 @@ class SolrService
             $query->addFieldMapping('content', 'text');
             
             $query->addFieldMapping('div', 'ignored_');
-            $query->addFieldMapping('a', 'ignored_');
             $query->addFieldMapping('html', 'ignored_');
             $query->addFieldMapping('link', 'ignored_');
             $query->addFieldMapping('style', 'ignored_');
+            $query->addFieldMapping('script', 'ignored_');
+            $query->addFieldMapping('input', 'ignored_');
+            $query->addFieldMapping('form', 'ignored_');
+            $query->addFieldMapping('img', 'ignored_');
+            $query->addFieldMapping('a', 'ignored_');
             $query->addFieldMapping('p', 'ignored_');
             $query->addFieldMapping('span', 'ignored_');
             $query->addFieldMapping('h1', 'ignored_');
             $query->addFieldMapping('h2', 'ignored_');
             $query->addFieldMapping('h3', 'ignored_');
+            $query->addFieldMapping('table', 'ignored_');
+            $query->addFieldMapping('tr', 'ignored_');
+            $query->addFieldMapping('td', 'ignored_');
+            $query->addFieldMapping('b', 'ignored_');
+            $query->addFieldMapping('i', 'ignored_');
+            $query->addFieldMapping('ul', 'ignored_');
+            $query->addFieldMapping('li', 'ignored_');
             
             $query->setFile($absolutePath);
             $query->setCommit(true);
@@ -312,16 +323,18 @@ class SolrService
             }
             
             $query->setRows(25);
-            $query->setFields(array(
-                'id',
-                'nextant_deleted',
-                'nextant_source',
-                'nextant_owner'
-            ));
             
             array_push($options, 'complete_words');
             $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
+            
+            $query->setFields(array(
+                'id',
+                'nextant_deleted',
+                'nextant_path',
+                'nextant_source',
+                'nextant_owner'
+            ));
             
             // if (key_exists('current_directory', $options))
             // $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
@@ -352,7 +365,9 @@ class SolrService
                 array_push($return, array(
                     'id' => $docid,
                     'type' => $type,
+                    'path' => $document->nextant_path,
                     'source' => $document->nextant_source,
+                    'shared' => ($document->nextant_owner != $this->owner),
                     'deleted' => $document->nextant_deleted,
                     'owner' => $document->nextant_owner,
                     'highlight' => $hlDoc->getField('text'),
