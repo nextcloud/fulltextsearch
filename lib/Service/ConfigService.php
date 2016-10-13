@@ -46,18 +46,17 @@ class ConfigService
         'display_result' => 1,
         
         'index_locked' => 0,
+        'index_last' => 0,
         
         'index_files' => 1,
         'index_files_needed' => 1,
         'index_files_update_needed' => 1,
-        'index_files_last' => 0,
         'index_files_live_extract' => 1,
         'index_files_live_update' => 0,
         'index_files_max_size' => 40,
         
         'index_bookmarks' => 0,
-        'index_bookmarks_needed' => 1,
-        'index_bookmarks_last' => 0
+        'index_bookmarks_needed' => 1
     ];
 
     private $appName;
@@ -84,7 +83,7 @@ class ConfigService
     {
         $this->setAppValue('index_locked', $this->getAppValue('solr_lock'));
         $this->setAppValue('index_files_needed', $this->getAppValue('needed_index'));
-        $this->setAppValue('index_files_last', $this->getAppValue('last_index'));
+        $this->setAppValue('index_last', $this->getAppValue('last_index'));
         $this->setAppValue('index_files_live_extract', $this->getAppValue('live_extract'));
         $this->setAppValue('index_files_live_update', $this->getAppValue('live_docupdate'));
         $this->setAppValue('index_files_max_size', $this->getAppValue('max_size'));

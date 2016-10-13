@@ -104,12 +104,6 @@ style('nextant', 'admin');
 						<td><input type="checkbox" name="solr_index_files_live_update"
 							id="solr_index_files_live_update" value="1" style="margin: 10px;"></td>
 					</tr>
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
-	    <?php p($l->t('Last index :')) ?></td>
-						<td><div id="solr_index_files_last"></div></td>
-
-					</tr>
 
 
 					<!-- 
@@ -169,6 +163,12 @@ style('nextant', 'admin');
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Number of documents :')) ?></td>
 						<td><div id="solr_current_docs"></div></td>
+					</tr>
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Last index :')) ?></td>
+						<td><div id="solr_index_last"></div></td>
+
 					</tr>
 
 					<tr>

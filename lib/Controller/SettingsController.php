@@ -86,8 +86,6 @@ class SettingsController extends Controller
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core'),
             'nextant_version' => $this->configService->getAppValue('installed_version') . ' (beta)',
-            'index_files_last' => $this->configService->getAppValue('index_files_last'),
-            'index_files_last_format' => date('r', $this->configService->getAppValue('index_files_last')),
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
             'index_files_live_extract' => $this->configService->getAppValue('index_files_live_extract'),
@@ -98,9 +96,10 @@ class SettingsController extends Controller
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
             'index_bookmarks' => $this->configService->getAppValue('index_bookmarks'),
             'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
-            'index_bookmarks_last' => $this->configService->getAppValue('index_bookmarks_last'),
             'index_bookmarks_last_format' => date('r', $this->configService->getAppValue('index_bookmarks_last')),
-            'index_locked' => $this->configService->getAppValue('index_locked')
+            'index_locked' => $this->configService->getAppValue('index_locked'),
+            'index_last' => $this->configService->getAppValue('index_last'),
+            'index_last_format' => date('r', $this->configService->getAppValue('index_last'))
         );
         
         return $response;

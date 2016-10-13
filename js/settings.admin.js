@@ -129,11 +129,11 @@ $(document)
 									'checked',
 									(response.index_files_external_index == 1));
 
-							if (response.index_files_last > 0)
-								$('#solr_index_files_last').text(
-										response.index_files_last_format);
+							if (response.index_last > 0)
+								$('#solr_index_last').text(
+										response.index_last_format);
 							else
-								$('#solr_index_files_last').text('never');
+								$('#solr_index_last').text('never');
 
 							$('#solr_index_files_max_size').val(
 									response.index_files_max_size);
