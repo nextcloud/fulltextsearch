@@ -45,6 +45,8 @@ class Index extends Base
 
     private $rootFolder;
 
+    private $indexService;
+
     private $solrService;
 
     private $solrTools;
@@ -55,11 +57,12 @@ class Index extends Base
 
     private $miscService;
 
-    public function __construct(IUserManager $userManager, $rootFolder, $solrService, $solrTools, $configService, $fileService, $miscService)
+    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $solrService, $solrTools, $configService, $fileService, $miscService)
     {
         parent::__construct();
         $this->userManager = $userManager;
         $this->rootFolder = $rootFolder;
+        $this->indexService = $indexService;
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->configService = $configService;
@@ -74,7 +77,8 @@ class Index extends Base
             ->setDescription('scan users\' files, generate and index Solr documents')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'flood the log of debug messages')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'force the lock on Solr')
-            ->addOption('background', 'bg', InputOption::VALUE_NONE, 'force index as a background process');
+            ->addOption('background', 'bg', InputOption::VALUE_NONE, 'force index as a background process')
+            ->addOption('bookmarks', 'bm', InputOption::VALUE_NONE, 'index only bookmarks');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -89,8 +93,16 @@ class Index extends Base
         
         $this->miscService->setDebug($input->getOption('debug'));
         $this->fileService->setDebug($input->getOption('debug'));
+        $this->indexService->setDebug($input->getOption('debug'));
         
-        $this->solrService->setOutput($output);
+        $this->solrService->setOutput($output);        
+        $this->indexService->setOutput($output);
+        
+        if ($input->getOption('bookmarks')) {
+            $this->indexService->extractBookmarks('cult');
+            // $this->configService->needIndexBookmarks(false);
+            return;
+        }
         
         if ($input->getOption('background')) {
             $this->configService->needIndex(true, ($input->getOption('force')));
@@ -367,7 +379,7 @@ class Index extends Base
 
     private function removeOrphans($output, $fileIds)
     {
-        $progress = new ProgressBar($output, $this->solrTools->count());
+        $progress = new ProgressBar($output, $this->solrTools->count('files'));
         
         $progress->setMessage('<info>spoting orphans</info>:');
         $progress->setFormat(" %message:-51s%[%bar%] %percent:3s%%");
