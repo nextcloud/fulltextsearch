@@ -55,14 +55,15 @@ class ConfigService
         'index_locked' => 0,
         
         'index_files' => 1,
-        'index_files_needed' => 2,
+        'index_files_needed' => 1,
+        'index_files_update_needed' => 1,
         'index_files_last' => 0,
         'index_files_live_extract' => 1,
         'index_files_live_update' => 0,
         'index_files_max_size' => 40,
         
         'index_bookmarks' => 0,
-        'index_bookmarks_needed' => 2,
+        'index_bookmarks_needed' => 1,
         'index_bookmarks_last' => 0
     ];
 
@@ -95,6 +96,14 @@ class ConfigService
         $this->setAppValue('index_files_live_update', $this->getAppValue('live_docupdate'));
         $this->setAppValue('index_files_max_size', $this->getAppValue('max_size'));
         $this->setAppValue('index_files_external_index', $this->getAppValue('external_index'));
+        
+        $this->deleteAppValue('solr_lock');
+        $this->deleteAppValue('needed_index');
+        $this->deleteAppValue('last_index');
+        $this->deleteAppValue('live_extract');
+        $this->deleteAppValue('live_docupdate');
+        $this->deleteAppValue('max_size');
+        $this->deleteAppValue('external_index');
     }
 
     public function needIndexFiles($need, $force = false)
@@ -152,6 +161,17 @@ class ConfigService
     public function setAppValue($key, $value)
     {
         return $this->config->setAppValue($this->appName, $key, $value);
+    }
+
+    /**
+     * remove a key
+     *
+     * @param string $key            
+     * @return string
+     */
+    public function deleteAppValue($key)
+    {
+        return $this->config->deleteAppValue($this->appName, $key);
     }
 
     /**

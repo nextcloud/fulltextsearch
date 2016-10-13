@@ -86,7 +86,7 @@ class Index extends Base
         $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (beta)</comment>');
         // $output->writeln('<comment>discussion thread:</comment> https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954/');
         // $output->writeln('');
-        if (! $this->solrService->configured()) {
+        if (! $this->solrService->configured(true)) {
             $output->writeln('Nextant is not yet configured');
             return;
         }

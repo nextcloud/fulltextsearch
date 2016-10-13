@@ -105,11 +105,13 @@ class SolrService
         $this->output = $output;
     }
 
-    public function configured()
+    public function configured($first = false)
     {
         if (! $this->configured) {
             $isIt = $this->configService->getAppValue('configured');
             if ($isIt == '1')
+                $this->configured = true;
+            if ($first && $isIt > 0)
                 $this->configured = true;
         }
         return $this->configured;

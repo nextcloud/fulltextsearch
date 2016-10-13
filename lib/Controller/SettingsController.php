@@ -278,7 +278,8 @@ class SettingsController extends Controller
         if (! is_null($this->solr_url) && ! is_null($this->solr_core)) {
             $this->configService->setAppValue('solr_url', $this->solr_url);
             $this->configService->setAppValue('solr_core', $this->solr_core);
-            $this->configService->setAppValue('configured', '1');
+            if ($this->configService->getAppValue('configured') != 1)
+                $this->configService->setAppValue('configured', '2');
             
             $message = "Your configuration has been saved";
             return true;

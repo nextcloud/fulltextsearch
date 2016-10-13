@@ -88,7 +88,7 @@ $(document)
 							$('#solr_url').val(response.solr_url);
 							$('#solr_core').val(response.solr_core);
 
-							if (response.configured == 1) {
+							if (response.configured > 0) {
 								$('#nextant_suboptions :input').attr(
 										"disabled", false);
 								$('#nextant_help_link').unbind('click');
@@ -107,7 +107,8 @@ $(document)
 									(response.index_files_live_extract == 1));
 							$('#solr_index_files_live_update').prop('checked',
 									(response.index_files_live_update == 1));
-							$('#solr_index_files_external_index').prop('checked',
+							$('#solr_index_files_external_index').prop(
+									'checked',
 									(response.index_files_external_index == 1));
 
 							if (response.index_files_last > 0)
@@ -129,6 +130,9 @@ $(document)
 										'Nextant is not configured yet');
 								$('#nextant_force_index').hide(delay);
 								$('#nextant_index_scheduled').hide(delay);
+								$('#nextant_first_index').hide(delay);
+								$('#nextant_index_scheduled').hide(delay);
+								$('#nextant_index_inprogress').hide(delay);
 							} else if (response.solr_ping == 'false')
 								$('#solr_current_docs').text(
 										'Solr Core is down');
@@ -138,7 +142,7 @@ $(document)
 									$('#nextant_index_scheduled').hide(delay);
 									$('#nextant_force_index').hide(delay);
 									$('#nextant_index_inprogress').show(delay);
-								} else if (response.index_files_needed == 2) {
+								} else if (response.configured == 2) {
 									$('#nextant_first_index').show(delay);
 									$('#nextant_index_scheduled').hide(delay);
 									$('#nextant_force_index').hide(delay);
@@ -266,7 +270,9 @@ $(document)
 												'#save',
 												'All test went fine. Saving your configuration',
 												0);
-								nextantSettings.checksuboptions(false);
+								setTimeout(function() {
+									nextantSettings.checksuboptions(false);
+								}, 1000);
 								break;
 							}
 
@@ -360,9 +366,12 @@ $(document)
 					$('#solr_index_files_max_size').on('input', function(e) {
 						nextantSettings.savesuboptions();
 					});
-					$('#solr_index_files_external_index').mousedown(function() {
-						nextantSettings.savesuboptions('index_files_external_index');
-					});
+					$('#solr_index_files_external_index')
+							.mousedown(
+									function() {
+										nextantSettings
+												.savesuboptions('index_files_external_index');
+									});
 					$('#nextant_force_index').on('click', function() {
 						nextantSettings.savesuboptions('force_index');
 					});

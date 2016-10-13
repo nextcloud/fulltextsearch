@@ -88,10 +88,11 @@ class IndexService
                 continue;
         }
         
-        // public static function findUniqueBookmark($id, $userId, IDb $db) {
-        
         return true;
     }
+
+    public function removeBookmarksOrphans()
+    {}
 }
 
 

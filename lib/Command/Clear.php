@@ -58,7 +58,7 @@ class Clear extends Base
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (! $this->solrService->configured()) {
+        if (! $this->solrService->configured(true)) {
             $output->writeln('Nextant is not yet configured');
             return;
         }
