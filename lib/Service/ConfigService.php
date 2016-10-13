@@ -62,7 +62,7 @@ class ConfigService
         'index_files_live_update' => 0,
         'index_files_max_size' => 40,
         
-        'index_bookmarks' => 0,
+        'index_bookmarks' => 1,
         'index_bookmarks_needed' => 1,
         'index_bookmarks_last' => 0
     ];

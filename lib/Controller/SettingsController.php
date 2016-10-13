@@ -83,30 +83,36 @@ class SettingsController extends Controller
             'instant' => $instant,
             'configured' => $this->configService->getAppValue('configured'),
             'ping' => $this->solrAdmin->ping($error),
+            'solr_url' => $this->configService->getAppValue('solr_url'),
+            'solr_core' => $this->configService->getAppValue('solr_core'),
             'nextant_version' => $this->configService->getAppValue('installed_version') . ' (beta)',
-            'current_docs' => $this->solrTools->count('files', $error),
             'index_files_last' => $this->configService->getAppValue('index_files_last'),
             'index_files_last_format' => date('r', $this->configService->getAppValue('index_files_last')),
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
-            'display_result' => $this->configService->getAppValue('display_result'),
             'index_files_live_extract' => $this->configService->getAppValue('index_files_live_extract'),
             'index_files_live_update' => $this->configService->getAppValue('index_files_live_update'),
             'index_files_external_index' => $this->configService->getAppValue('index_files_external_index'),
-            'solr_url' => $this->configService->getAppValue('solr_url'),
-            'solr_core' => $this->configService->getAppValue('solr_core'),
+            'display_result' => $this->configService->getAppValue('display_result'),
+            'current_docs' => $this->solrTools->count('files', $error),
+            'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
+            'index_bookmarks' => $this->configService->getAppValue('index_bookmarks'),
+            'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
+            'index_bookmarks_last' => $this->configService->getAppValue('index_bookmarks_last'),
+            'index_bookmarks_last_format' => date('r', $this->configService->getAppValue('index_bookmarks_last')),
             'index_locked' => $this->configService->getAppValue('index_locked')
         );
         
         return $response;
     }
 
-    public function setOptions($index_files_live_extract, $index_files_live_update, $index_files_max_size, $index_files_external_index, $display_result, $index_files_needed)
+    public function setOptions($index_files_live_extract, $index_files_live_update, $index_files_max_size, $index_files_external_index, $index_bookmarks, $display_result, $index_files_needed)
     {
         $this->configService->setAppValue('index_files_live_extract', $index_files_live_extract);
         $this->configService->setAppValue('index_files_live_update', $index_files_live_update);
         $this->configService->setAppValue('index_files_external_index', $index_files_external_index);
         $this->configService->setAppValue('index_files_max_size', $index_files_max_size);
+        $this->configService->setAppValue('index_bookmarks', $index_bookmarks);
         $this->configService->setAppValue('display_result', $display_result);
         if ($index_files_needed == 1)
             $this->configService->needIndexFiles(true, true);

@@ -104,7 +104,12 @@ style('nextant', 'admin');
 						<td><input type="checkbox" name="solr_index_files_live_update"
 							id="solr_index_files_live_update" value="1" style="margin: 10px;"></td>
 					</tr>
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Last index :')) ?></td>
+						<td><div id="solr_index_files_last"></div></td>
 
+					</tr>
 
 
 					<!-- 
@@ -116,14 +121,6 @@ style('nextant', 'admin');
 					</tr>
                     -->
 
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
-	    <?php p($l->t('Display result :')) ?></td>
-						<td><select id="solr_display_result" style="width: 260px;">
-								<option value="1">Nextant style</option>
-								<option value="2">Integrated to the Files</option>
-						</select></td>
-					</tr>
 
 					<tr>
 						<td>&nbsp;</td>
@@ -132,6 +129,21 @@ style('nextant', 'admin');
 						<td></td>
 						<td class="nextant_admin_head">Indexing Bookmarks</td>
 					</tr>
+
+
+
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Index bookmarks :')) ?></td>
+						<td>
+							<div id="nextant_bookmarks_appdisabled">Bookmarks disabled</div>
+							<div id="nextant_bookmarks_appenabled">
+								<input type="checkbox" name="solr_index_bookmarks"
+									id="solr_index_bookmarks" value="1" style="margin: 10px;">
+							</div>
+						</td>
+					</tr>
+
 
 					<tr>
 						<td>&nbsp;</td>
@@ -143,15 +155,17 @@ style('nextant', 'admin');
 
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
-	    <?php p($l->t('Number of documents :')) ?></td>
-						<td><div id="solr_current_docs"></div></td>
+	    <?php p($l->t('Display result :')) ?></td>
+						<td><select id="solr_display_result" style="width: 260px;">
+								<option value="1">Nextant style</option>
+								<option value="2">Integrated to Files</option>
+						</select></td>
 					</tr>
 
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
-	    <?php p($l->t('Last index :')) ?></td>
-						<td><div id="solr_index_files_last"></div></td>
-
+	    <?php p($l->t('Number of documents :')) ?></td>
+						<td><div id="solr_current_docs"></div></td>
 					</tr>
 
 					<tr>
