@@ -84,7 +84,7 @@ class SettingsController extends Controller
             'configured' => $this->configService->getAppValue('configured'),
             'ping' => $this->solrAdmin->ping($error),
             'nextant_version' => $this->configService->getAppValue('installed_version') . ' (beta)',
-            'current_docs' => $this->solrTools->count($error),
+            'current_docs' => $this->solrTools->count('files', $error),
             'last_index' => $this->configService->getAppValue('last_index'),
             'last_index_format' => date('r', $this->configService->getAppValue('last_index')),
             'needed_index' => $this->configService->getAppValue('needed_index'),

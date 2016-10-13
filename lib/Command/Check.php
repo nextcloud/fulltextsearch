@@ -77,7 +77,9 @@ class Check extends Base
             return false;
         }
         
-        $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents');
+        $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents:');
+        $output->writeln(' - ' . $this->solrTools->count('files') . ' files');
+        $output->writeln(' - ' . $this->solrTools->count('bookmarks') . ' bookmarks');
     }
 }
 

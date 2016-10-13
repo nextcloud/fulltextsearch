@@ -30,12 +30,16 @@ use \OCA\Nextant\Controller\SettingsController;
 use \OCA\Nextant\Controller\SearchController;
 use \OCA\Nextant\Db\IndexMapper;
 use \OCA\Nextant\Events\FilesEvents;
+use \OCA\Nextant\Events\BookmarksEvents;
 use \OCA\Nextant\Hooks\FilesHooks;
+use \OCA\Nextant\Hooks\BookmarksHooks;
 use \OCA\Nextant\Provider\SearchProvider;
 use \OCA\Nextant\Service\ConfigService;
 use \OCA\Nextant\Service\MiscService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Service\IndexService;
+use \OCA\Nextant\Service\BookmarkService;
 use \OCA\Nextant\Service\SolrAdminService;
 use \OCA\Nextant\Service\SolrToolsService;
 use \OCA\Nextant\Migration\NextantUpgrade;
@@ -68,8 +72,16 @@ class Application extends App
             return new ConfigService($c->query('AppName'), $c->query('CoreConfig'), $c->query('MiscService'));
         });
         
+        $container->registerService('IndexService', function ($c) {
+            return new IndexService($c->query('BookmarkService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+        });
+        
         $container->registerService('FileService', function ($c) {
             return new FileService($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+        });
+        
+        $container->registerService('BookmarkService', function ($c) {
+            return new BookmarkService($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
         });
         
         $container->registerService('SolrService', function ($c) {
@@ -91,6 +103,10 @@ class Application extends App
         
         $container->registerService('FilesEvents', function ($c) {
             return new FilesEvents($c->query('ConfigService'), $c->query('UserId'), $c->query('FileService'), $c->query('SolrService'), $c->query('MiscService'));
+        });
+        
+        $container->registerService('BookmarksEvents', function ($c) {
+            return new BookmarksEvents($c->query('ConfigService'), $c->query('UserId'), $c->query('SolrService'), $c->query('MiscService'));
         });
         
         // $container->query('IndexMapper')->insert(new IndexEntity(array(userid => 2, 'path' => '/toto', 'clef' => 'CLEFCLEF')));
@@ -172,6 +188,10 @@ class Application extends App
         Util::connectHook('\OCP\Trashbin', 'preDelete', '\OCA\Nextant\Hooks\FilesHooks', 'fileDeleted');
         Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
         Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
+        
+        Util::connectHook('\OCA\Bookmarks', 'post_add', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkAdd');
+        Util::connectHook('\OCA\Bookmarks', 'post_edit', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkEdit');
+        Util::connectHook('\OCA\Bookmarks', 'post_delete', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkDelete');
     }
 
     public function registerSearchProvider()
@@ -186,7 +206,6 @@ class Application extends App
                 \OC::$server->getEventDispatcher()->addListener('OCA\Files::loadAdditionalScripts', function () {
                     \OCP\Util::addScript('nextant', 'navigate');
                     \OCP\Util::addStyle('nextant', 'navigate');
-                    
                 });
                 break;
             
