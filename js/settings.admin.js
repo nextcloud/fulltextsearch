@@ -29,6 +29,7 @@ $(document)
 					var nextantSettings = {
 
 						init : function() {
+							$('#nextant_saving').fadeOut(0);
 							nextantSettings.statusclearall(true);
 							nextantSettings.checksuboptions(true);
 							setInterval(function() {
@@ -36,7 +37,16 @@ $(document)
 							}, 60000);
 						},
 
+						saving : function(load) {
+							if (load) {
+								$('#nextant_saving').fadeIn(50);
+							} else
+								$('#nextant_saving').fadeOut(50);
+						},
+
 						savesuboptions : function(switched) {
+
+							nextantSettings.saving(true);
 
 							var index_files_needed = -1;
 							if (switched == 'force_index')
@@ -88,6 +98,8 @@ $(document)
 							var delay = 600;
 							if (response.instant == 'true')
 								delay = 0;
+
+							nextantSettings.saving(false);
 
 							$('#nextant_version')
 									.text(response.nextant_version);
@@ -282,14 +294,12 @@ $(document)
 								break;
 
 							case 'save':
+								nextantSettings.saving(true);
 								nextantSettings
 										.status(
 												'#save',
 												'All test went fine. Saving your configuration',
 												0);
-								setTimeout(function() {
-									nextantSettings.checksuboptions(false);
-								}, 1000);
 								break;
 							}
 
@@ -353,7 +363,9 @@ $(document)
 								break;
 
 							case 'save':
+								nextantSettings.saving(false);
 								nextantSettings.reset();
+								nextantSettings.checksuboptions(false);
 								break;
 							}
 

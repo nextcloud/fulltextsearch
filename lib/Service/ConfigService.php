@@ -41,16 +41,9 @@ class ConfigService
 
     private $defaults = [
         'configured' => '0',
-        // 'needed_index' => '2',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
-        // 'live_extract' => '1',
-        // 'live_docupdate' => '0',
-        // 'last_index' => 0,
         'display_result' => 1,
-        // 'max_size' => 40,
-        // 'external_index' => '0',
-        // 'solr_lock' => 0,
         
         'index_locked' => 0,
         
@@ -62,7 +55,7 @@ class ConfigService
         'index_files_live_update' => 0,
         'index_files_max_size' => 40,
         
-        'index_bookmarks' => 1,
+        'index_bookmarks' => 0,
         'index_bookmarks_needed' => 1,
         'index_bookmarks_last' => 0
     ];

@@ -1,3 +1,13 @@
+#nextant_saving {
+	font-weight: bolder;
+	font-size: 12px;
+	margin-left: 30px;
+	font-style: italic;
+	opacity: 0.5;
+	filter: alpha(opacity = 50);
+	opacity: 0.5;
+}
+
 #nextant-display {
 	width: 400px;
 	height: 250px;

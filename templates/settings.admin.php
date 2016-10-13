@@ -121,6 +121,7 @@ style('nextant', 'admin');
 					</tr>
                     -->
 
+					<!-- 
 
 					<tr>
 						<td>&nbsp;</td>
@@ -131,25 +132,27 @@ style('nextant', 'admin');
 					</tr>
 
 
-
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Index bookmarks :')) ?></td>
 						<td>
-							<div id="nextant_bookmarks_appdisabled">Bookmarks disabled</div>
+							<div id="nextant_bookmarks_appdisabled">
+								The App <i>Bookmarks</i> is not installed/enabled.
+							</div>
 							<div id="nextant_bookmarks_appenabled">
 								<input type="checkbox" name="solr_index_bookmarks"
-									id="solr_index_bookmarks" value="1" style="margin: 10px;">
+									id="solr_index_bookmarks" value="1" style="margin: 10px;">								
 							</div>
 						</td>
 					</tr>
+                    -->
 
 
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
 					<tr class="nextant_admin_head">
-						<td></td>
+						<td><div id="nextant_saving">Saving</div></td>
 						<td class="nextant_admin_head">Nextant Status</td>
 					</tr>
 
