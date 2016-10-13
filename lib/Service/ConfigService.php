@@ -50,7 +50,10 @@ class ConfigService
         'display_result' => 1,
         'max_size' => 40,
         'external_index' => '0',
-        'solr_lock' => 0
+        'solr_lock' => 0,        
+        'index_bookmarks' => 0,
+        'index_bookmarks_needed' => 0,
+        'index_bookmarks_last' => 0
     ];
 
     private $appName;
@@ -90,6 +93,18 @@ class ConfigService
     public function stopIndex()
     {
         $this->setAppValue('needed_index', '2');
+    }
+
+    public function needIndexBookmarks($need)
+    {
+        if (! $need)
+            $this->setAppValue('index_bookmarks_needed', '0');
+        $this->setAppValue('index_bookmarks_needed', '1');
+    }
+
+    public function neededIndexBookmarks()
+    {
+        return ($this->getAppValue('index_bookmarks_needed') == '1');
     }
 
     /**
