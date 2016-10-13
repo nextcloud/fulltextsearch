@@ -62,6 +62,10 @@ class SearchController extends Controller
         $this->miscService = $miscService;
     }
 
+    /**
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     */    
     public function searchRequest($query, $current_dir)
     {
         $results = array();
