@@ -77,9 +77,9 @@ style('nextant', 'admin');
 						<td class="nextant_admin_left">					
 	    <?php p($l->t('Live Extract :')); ?>
 						</td>
-						<td><input type="checkbox" name="solr_live_extract"
-							id="solr_live_extract" value="1" style="margin: 10px;"> (<a
-							id="nextant_help_link"
+						<td><input type="checkbox" name="solr_index_files_live_extract"
+							id="solr_index_files_live_extract" value="1"
+							style="margin: 10px;"> (<a id="nextant_help_link"
 							href="https://github.com/daita/nextant/wiki/Extracting,-Live-Update"
 							target="_blank">help</a>)</td>
 					</tr>
@@ -87,22 +87,23 @@ style('nextant', 'admin');
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Live Document Update :')) ?></td>
-						<td><input type="checkbox" name="solr_live_docupdate"
-							id="solr_live_docupdate" value="1" style="margin: 10px;"></td>
+						<td><input type="checkbox" name="solr_index_files_live_update"
+							id="solr_index_files_live_update" value="1" style="margin: 10px;"></td>
 					</tr>
 
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Maximum File Size (Mb) :')) ?></td>
-						<td><input type="text" id="solr_max_size" style="width: 100px;"></td>
+						<td><input type="text" id="solr_index_files_max_size"
+							style="width: 100px;"></td>
 					</tr>
 
 					<!-- 
                     <tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Index External Storage :')) ?></td>
-						<td><input type="checkbox" name="solr_external_index"
-							id="solr_external_index" value="1" style="margin: 10px;"></td>
+						<td><input type="checkbox" name="solr_index_files_external_index"
+							id="solr_index_files_external_index" value="1" style="margin: 10px;"></td>
 					</tr>
                     -->
 
@@ -118,7 +119,7 @@ style('nextant', 'admin');
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Last index :')) ?></td>
-						<td><div id="solr_last_index"></div></td>
+						<td><div id="solr_index_files_last"></div></td>
 
 					</tr>
 					<tr style="height: 30px;">

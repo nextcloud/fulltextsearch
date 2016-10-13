@@ -74,7 +74,7 @@ class SettingsController extends Controller
 
     public function forceIndex()
     {
-        $this->configService->needIndex(true);
+        $this->configService->needIndexFiles(true);
     }
 
     public function updateSubOptions($instant)
@@ -85,31 +85,31 @@ class SettingsController extends Controller
             'ping' => $this->solrAdmin->ping($error),
             'nextant_version' => $this->configService->getAppValue('installed_version') . ' (beta)',
             'current_docs' => $this->solrTools->count('files', $error),
-            'last_index' => $this->configService->getAppValue('last_index'),
-            'last_index_format' => date('r', $this->configService->getAppValue('last_index')),
-            'needed_index' => $this->configService->getAppValue('needed_index'),
-            'max_size' => $this->configService->getAppValue('max_size'),
+            'index_files_last' => $this->configService->getAppValue('index_files_last'),
+            'index_files_last_format' => date('r', $this->configService->getAppValue('index_files_last')),
+            'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
+            'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
             'display_result' => $this->configService->getAppValue('display_result'),
-            'live_extract' => $this->configService->getAppValue('live_extract'),
-            'live_docupdate' => $this->configService->getAppValue('live_docupdate'),
-            'external_index' => $this->configService->getAppValue('external_index'),
+            'index_files_live_extract' => $this->configService->getAppValue('index_files_live_extract'),
+            'index_files_live_update' => $this->configService->getAppValue('index_files_live_update'),
+            'index_files_external_index' => $this->configService->getAppValue('index_files_external_index'),
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core'),
-            'solr_lock' => $this->configService->getAppValue('solr_lock')
+            'index_locked' => $this->configService->getAppValue('index_locked')
         );
         
         return $response;
     }
 
-    public function setOptions($live_extract, $live_docupdate, $max_size, $external_index, $display_result, $needed_index)
+    public function setOptions($index_files_live_extract, $index_files_live_update, $index_files_max_size, $index_files_external_index, $display_result, $index_files_needed)
     {
-        $this->configService->setAppValue('live_extract', $live_extract);
-        $this->configService->setAppValue('live_docupdate', $live_docupdate);
-        $this->configService->setAppValue('external_index', $external_index);
-        $this->configService->setAppValue('max_size', $max_size);
+        $this->configService->setAppValue('index_files_live_extract', $index_files_live_extract);
+        $this->configService->setAppValue('index_files_live_update', $index_files_live_update);
+        $this->configService->setAppValue('index_files_external_index', $index_files_external_index);
+        $this->configService->setAppValue('index_files_max_size', $index_files_max_size);
         $this->configService->setAppValue('display_result', $display_result);
-        if ($needed_index == 1)
-            $this->configService->needIndex(true, true);
+        if ($index_files_needed == 1)
+            $this->configService->needIndexFiles(true, true);
         
         return $this->updateSubOptions(false);
     }

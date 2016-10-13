@@ -38,31 +38,32 @@ $(document)
 
 						savesuboptions : function(switched) {
 
-							var needed_index = -1;
+							var index_files_needed = -1;
 							if (switched == 'force_index')
-								needed_index = 1;
+								index_files_needed = 1;
 							var data = {
-								live_extract : ($('#solr_live_extract')
+								index_files_live_extract : ($('#solr_index_files_live_extract')
 										.is(':checked')) ? 1 : 0,
-								live_docupdate : ($('#solr_live_docupdate')
+								index_files_live_update : ($('#solr_index_files_live_update')
 										.is(':checked')) ? 1 : 0,
-								max_size : $('#solr_max_size').val(),
-								external_index : ($('#solr_external_index')
+								index_files_max_size : $(
+										'#solr_index_files_max_size').val(),
+								index_files_external_index : ($('#solr_index_files_external_index')
 										.is(':checked')) ? 1 : 0,
 								display_result : $('#solr_display_result')
 										.val(),
-								needed_index : needed_index
+								index_files_needed : index_files_needed
 							}
 
-							if (switched == 'live_extract')
-								data.live_extract = (data.live_extract == 1) ? 0
+							if (switched == 'index_files_live_extract')
+								data.index_files_live_extract = (data.index_files_live_extract == 1) ? 0
 										: 1;
-							if (switched == 'live_docupdate')
-								data.live_docupdate = (data.live_docupdate == 1) ? 0
+							if (switched == 'index_files_live_update')
+								data.index_files_live_update = (data.index_files_live_update == 1) ? 0
 										: 1;
 
-							if (switched == 'external_index')
-								data.external_index = (data.external_index == 1) ? 0
+							if (switched == 'index_files_external_index')
+								data.index_files_external_index = (data.index_files_external_index == 1) ? 0
 										: 1;
 
 							$.post(OC.filePath('nextant', 'ajax/settings',
@@ -102,20 +103,21 @@ $(document)
 								$('#nextant_suboptions').fadeTo(delay, 0.4);
 							}
 
-							$('#solr_live_extract').prop('checked',
-									(response.live_extract == 1));
-							$('#solr_live_docupdate').prop('checked',
-									(response.live_docupdate == 1));
-							$('#solr_external_index').prop('checked',
-									(response.external_index == 1));
+							$('#solr_index_files_live_extract').prop('checked',
+									(response.index_files_live_extract == 1));
+							$('#solr_index_files_live_update').prop('checked',
+									(response.index_files_live_update == 1));
+							$('#solr_index_files_external_index').prop('checked',
+									(response.index_files_external_index == 1));
 
-							if (response.last_index > 0)
-								$('#solr_last_index').text(
-										response.last_index_format);
+							if (response.index_files_last > 0)
+								$('#solr_index_files_last').text(
+										response.index_files_last_format);
 							else
-								$('#solr_last_index').text('never');
+								$('#solr_index_files_last').text('never');
 
-							$('#solr_max_size').val(response.max_size);
+							$('#solr_index_files_max_size').val(
+									response.index_files_max_size);
 
 							$(
 									'#solr_display_result option[value="'
@@ -131,17 +133,17 @@ $(document)
 								$('#solr_current_docs').text(
 										'Solr Core is down');
 							else {
-								if (response.solr_lock > 0) {
+								if (response.index_locked > 0) {
 									$('#nextant_first_index').hide(delay);
 									$('#nextant_index_scheduled').hide(delay);
 									$('#nextant_force_index').hide(delay);
 									$('#nextant_index_inprogress').show(delay);
-								} else if (response.needed_index == 2) {
+								} else if (response.index_files_needed == 2) {
 									$('#nextant_first_index').show(delay);
 									$('#nextant_index_scheduled').hide(delay);
 									$('#nextant_force_index').hide(delay);
 									$('#nextant_index_inprogress').hide(delay);
-								} else if (response.needed_index == 1) {
+								} else if (response.index_files_needed == 1) {
 									$('#nextant_first_index').hide(delay);
 									$('#nextant_force_index').hide(delay);
 									$('#nextant_index_scheduled').show(delay);
@@ -343,17 +345,23 @@ $(document)
 
 					$('#nextant_apply').on('click', nextantSettings.save);
 
-					$('#solr_live_extract').mousedown(function() {
-						nextantSettings.savesuboptions('live_extract');
-					});
-					$('#solr_live_docupdate').mousedown(function() {
-						nextantSettings.savesuboptions('live_docupdate');
-					});
-					$('#solr_max_size').on('input', function(e) {
+					$('#solr_index_files_live_extract')
+							.mousedown(
+									function() {
+										nextantSettings
+												.savesuboptions('index_files_live_extract');
+									});
+					$('#solr_index_files_live_update')
+							.mousedown(
+									function() {
+										nextantSettings
+												.savesuboptions('index_files_live_update');
+									});
+					$('#solr_index_files_max_size').on('input', function(e) {
 						nextantSettings.savesuboptions();
 					});
-					$('#solr_external_index').mousedown(function() {
-						nextantSettings.savesuboptions('external_index');
+					$('#solr_index_files_external_index').mousedown(function() {
+						nextantSettings.savesuboptions('index_files_external_index');
 					});
 					$('#nextant_force_index').on('click', function() {
 						nextantSettings.savesuboptions('force_index');

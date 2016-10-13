@@ -105,20 +105,20 @@ class Index extends Base
         }
         
         if ($input->getOption('background')) {
-            $this->configService->needIndex(true, ($input->getOption('force')));
-            $this->configService->setAppValue('solr_lock', '0');
+            $this->configService->needIndexFiles(true, ($input->getOption('force')));
+            $this->configService->setAppValue('index_locked', '0');
             $output->writeln('An indexing process will start as a background process within the next few hours');
             return;
         }
         
-        $solr_locked = $this->configService->getAppValue('solr_lock');
+        $solr_locked = $this->configService->getAppValue('index_locked');
         if (! $input->getOption('force') && ($solr_locked > (time() - (3600 * 24)))) {
             $output->writeln('Your solr is locked by a running script like an index command or background jobs (cron)');
             $output->writeln('You can still use the --force');
             return;
         }
         
-        $this->configService->setAppValue('solr_lock', time());
+        $this->configService->setAppValue('index_locked', time());
         
         $documentIds = array();
         
@@ -207,14 +207,14 @@ class Index extends Base
         
         $this->removeOrphans($output, $documentIds);
         
-        $this->configService->needIndex(false);
+        $this->configService->needIndexFiles(false);
         
         if ($noFailure)
-            $this->configService->setAppValue('last_index', time());
+            $this->configService->setAppValue('index_files_last', time());
         else
-            $this->configService->needIndex(true);
+            $this->configService->needIndexFiles(true);
         
-        $this->configService->setAppValue('solr_lock', '0');
+        $this->configService->setAppValue('index_locked', '0');
         
         $output->writeln('');
     }
@@ -256,7 +256,7 @@ class Index extends Base
             $this->miscService->debug('(' . $userId . ') - scanning file #' . $file->getId() . ' (' . $file->getMimeType() . ') ' . $file->getPath());
             
             if ($this->hasBeenInterrupted()) {
-                $this->configService->setAppValue('solr_lock', '0');
+                $this->configService->setAppValue('index_locked', '0');
                 throw new \Exception('ctrl-c');
             }
             
@@ -328,7 +328,7 @@ class Index extends Base
         while ($file = array_shift($fileIds)) {
             
             if ($this->hasBeenInterrupted()) {
-                $this->configService->setAppValue('solr_lock', '0');
+                $this->configService->setAppValue('index_locked', '0');
                 throw new \Exception('ctrl-c');
             }
             
@@ -390,7 +390,7 @@ class Index extends Base
         while (true) {
             
             if ($this->hasBeenInterrupted()) {
-                $this->configService->setAppValue('solr_lock', '0');
+                $this->configService->setAppValue('index_locked', '0');
                 throw new \Exception('ctrl-c');
             }
             

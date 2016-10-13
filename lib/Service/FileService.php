@@ -86,12 +86,12 @@ class FileService
             return false;
         
         $storage = $fileInfo->getStorage();
-        if (! $storage->isLocal() && $this->configService->getAppValue('external_index') != 1)
+        if (! $storage->isLocal() && $this->configService->getAppValue('index_files_external_index') != 1)
             return false;
         
         $size = round($fileInfo->getSize() / 1024 / 1024, 1);
-        if ($size > $this->configService->getAppValue('max_size')) {
-            $this->miscService->debug('File is too big (' . $size . ' > ' . $this->configService->getAppValue('max_size') . ')');
+        if ($size > $this->configService->getAppValue('index_files_max_size')) {
+            $this->miscService->debug('File is too big (' . $size . ' > ' . $this->configService->getAppValue('index_files_max_size') . ')');
             return false;
         }
         
@@ -127,7 +127,7 @@ class FileService
         }
         
         if (! $result)
-            $this->configService->needIndex(true);
+            $this->configService->needIndexFiles(true);
         
         return $result;
     }
@@ -186,7 +186,7 @@ class FileService
         $count = $this->solrTools->updateDocuments('files', $pack, $error);
         
         if ($count === false)
-            $this->configService->needIndex(true);
+            $this->configService->needIndexFiles(true);
         
         return $count;
     }
