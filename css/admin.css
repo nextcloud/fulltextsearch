@@ -28,3 +28,16 @@ TD.nextant_admin_left {
 	font-weight: bold;
 	padding-right: 15px;
 }
+
+TR.nextant_admin_head, TR.nextant_admin_head:hover {
+	margin-top: 12px;
+	background: #ddd;
+}
+
+TD.nextant_admin_head {
+	font-weight: bold;
+	text-align: right;
+	padding: 4px;
+	padding-right: 30px;
+	font-style: italic;
+}

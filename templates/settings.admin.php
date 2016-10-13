@@ -43,6 +43,10 @@ style('nextant', 'admin');
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
+					<tr class="nextant_admin_head">
+						<td></td>
+						<td class="nextant_admin_head">Settings</td>
+					</tr>
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Nextant Version :')) ?></td>
@@ -72,6 +76,16 @@ style('nextant', 'admin');
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
+					<tr class="nextant_admin_head">
+						<td></td>
+						<td class="nextant_admin_head">Indexing Files</td>
+					</tr>
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Maximum File Size (Mb) :')) ?></td>
+						<td><input type="text" id="solr_index_files_max_size"
+							style="width: 100px;"></td>
+					</tr>
 
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">					
@@ -91,12 +105,7 @@ style('nextant', 'admin');
 							id="solr_index_files_live_update" value="1" style="margin: 10px;"></td>
 					</tr>
 
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
-	    <?php p($l->t('Maximum File Size (Mb) :')) ?></td>
-						<td><input type="text" id="solr_index_files_max_size"
-							style="width: 100px;"></td>
-					</tr>
+
 
 					<!-- 
                     <tr style="height: 30px;">
@@ -112,8 +121,30 @@ style('nextant', 'admin');
 	    <?php p($l->t('Display result :')) ?></td>
 						<td><select id="solr_display_result" style="width: 260px;">
 								<option value="1">Nextant style</option>
-								<option value="2">Integrated to the Files app</option>
+								<option value="2">Integrated to the Files</option>
 						</select></td>
+					</tr>
+
+					<tr>
+						<td>&nbsp;</td>
+					</tr>
+					<tr class="nextant_admin_head">
+						<td></td>
+						<td class="nextant_admin_head">Indexing Bookmarks</td>
+					</tr>
+
+					<tr>
+						<td>&nbsp;</td>
+					</tr>
+					<tr class="nextant_admin_head">
+						<td></td>
+						<td class="nextant_admin_head">Nextant Status</td>
+					</tr>
+
+					<tr style="height: 30px;">
+						<td class="nextant_admin_left">
+	    <?php p($l->t('Number of documents :')) ?></td>
+						<td><div id="solr_current_docs"></div></td>
 					</tr>
 
 					<tr style="height: 30px;">
@@ -121,11 +152,6 @@ style('nextant', 'admin');
 	    <?php p($l->t('Last index :')) ?></td>
 						<td><div id="solr_index_files_last"></div></td>
 
-					</tr>
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
-	    <?php p($l->t('Number of documents :')) ?></td>
-						<td><div id="solr_current_docs"></div></td>
 					</tr>
 
 					<tr>
