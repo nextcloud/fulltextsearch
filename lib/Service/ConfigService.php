@@ -98,13 +98,12 @@ class ConfigService
         $this->deleteAppValue('external_index');
     }
 
-    public function needIndexFiles($need, $force = false)
+    public function needIndexFiles($need)
     {
-        if (! $need)
+        if ($need)
+            $this->setAppValue('index_files_needed', '1');
+        else
             $this->setAppValue('index_files_needed', '0');
-        else 
-            if ($force || $this->getAppValue('index_files_needed') == '0')
-                $this->setAppValue('index_files_needed', '1');
     }
 
     public function neededIndexFiles()

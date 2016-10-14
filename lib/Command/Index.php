@@ -108,7 +108,9 @@ class Index extends Base
         }
         
         if ($input->getOption('background')) {
-            $this->configService->needIndexFiles(true, ($input->getOption('force')));
+            if ($input->getOption('force'))
+                $this->configService->setAppValue('configured', '1');
+            $this->configService->needIndexFiles(true);
             $this->configService->setAppValue('index_locked', '0');
             $output->writeln('An indexing process will start as a background process within the next few hours');
             return;

@@ -48,9 +48,10 @@ $(document)
 
 							nextantSettings.saving(true);
 
-							var index_needed = -1;
+							var force_index = 0;
 							if (switched == 'force_index')
-								index_files_needed = 1;
+								force_index = 1;
+
 							var data = {
 								index_files_live_extract : ($('#solr_index_files_live_extract')
 										.is(':checked')) ? 1 : 0,
@@ -64,7 +65,7 @@ $(document)
 										.is(':checked')) ? 1 : 0,
 								display_result : $('#solr_display_result')
 										.val(),
-								index_files_needed : index_files_needed
+								force_index : force_index
 							}
 
 							if (switched == 'index_files_live_extract')

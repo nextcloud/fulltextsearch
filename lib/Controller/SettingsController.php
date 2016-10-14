@@ -105,7 +105,7 @@ class SettingsController extends Controller
         return $response;
     }
 
-    public function setOptions($index_files_live_extract, $index_files_live_update, $index_files_max_size, $index_files_external_index, $index_bookmarks, $display_result, $index_files_needed)
+    public function setOptions($index_files_live_extract, $index_files_live_update, $index_files_max_size, $index_files_external_index, $index_bookmarks, $display_result, $force_index)
     {
         $this->configService->setAppValue('index_files_live_extract', $index_files_live_extract);
         $this->configService->setAppValue('index_files_live_update', $index_files_live_update);
@@ -113,8 +113,10 @@ class SettingsController extends Controller
         $this->configService->setAppValue('index_files_max_size', $index_files_max_size);
         $this->configService->setAppValue('index_bookmarks', $index_bookmarks);
         $this->configService->setAppValue('display_result', $display_result);
-        if ($index_files_needed == 1)
-            $this->configService->needIndexFiles(true, true);
+        if ($force_index == '1') {
+            $this->configService->setAppValue('configured', '1');
+            $this->configService->needIndexFiles(true);
+        }
         
         return $this->updateSubOptions(false);
     }
