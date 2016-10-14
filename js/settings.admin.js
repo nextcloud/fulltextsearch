@@ -48,7 +48,7 @@ $(document)
 
 							nextantSettings.saving(true);
 
-							var index_files_needed = -1;
+							var index_needed = -1;
 							if (switched == 'force_index')
 								index_files_needed = 1;
 							var data = {
