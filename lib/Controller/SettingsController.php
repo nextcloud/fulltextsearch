@@ -77,7 +77,7 @@ class SettingsController extends Controller
         $this->configService->needIndexFiles(true);
     }
 
-    public function updateSubOptions($instant)
+    public function updateSubOptions($instant, $source = '')
     {
         $response = array(
             'instant' => $instant,
@@ -99,26 +99,39 @@ class SettingsController extends Controller
             'index_bookmarks_last_format' => date('r', $this->configService->getAppValue('index_bookmarks_last')),
             'index_locked' => $this->configService->getAppValue('index_locked'),
             'index_last' => $this->configService->getAppValue('index_last'),
-            'index_last_format' => date('r', $this->configService->getAppValue('index_last'))
+            'index_last_format' => date('r', $this->configService->getAppValue('index_last')),
+            'source' => $source
         );
         
         return $response;
     }
 
-    public function setOptions($index_files_live_extract, $index_files_live_update, $index_files_max_size, $index_files_external_index, $index_bookmarks, $display_result, $force_index)
+    public function setOptionsFiles($index_files_live_extract, $index_files_live_update, $index_files_max_size, $index_files_external_index)
     {
         $this->configService->setAppValue('index_files_live_extract', $index_files_live_extract);
         $this->configService->setAppValue('index_files_live_update', $index_files_live_update);
         $this->configService->setAppValue('index_files_external_index', $index_files_external_index);
         $this->configService->setAppValue('index_files_max_size', $index_files_max_size);
+        
+        return $this->updateSubOptions(false, 'files');
+    }
+
+    public function setOptionsBookmarks($index_bookmarks)
+    {
         $this->configService->setAppValue('index_bookmarks', $index_bookmarks);
+        
+        return $this->updateSubOptions(false, 'bookmarks');
+    }
+
+    public function setOptionsStatus($display_result, $force_index)
+    {
         $this->configService->setAppValue('display_result', $display_result);
         if ($force_index == '1') {
             $this->configService->setAppValue('configured', '1');
             $this->configService->needIndexFiles(true);
         }
         
-        return $this->updateSubOptions(false);
+        return $this->updateSubOptions(false, 'status');
     }
 
     public function setSettings($solr_url, $solr_core, $command)

@@ -31,8 +31,18 @@ return [
             'verb' => 'POST'
         ],
         [
-            'name' => 'settings#setOptions',
-            'url' => 'ajax/settings/option.php',
+            'name' => 'settings#setOptionsFiles',
+            'url' => 'ajax/settings/option_files.php',
+            'verb' => 'POST'
+        ],
+        [
+            'name' => 'settings#setOptionsBookmarks',
+            'url' => 'ajax/settings/option_bookmarks.php',
+            'verb' => 'POST'
+        ],
+        [
+            'name' => 'settings#setOptionsStatus',
+            'url' => 'ajax/settings/option_status.php',
             'verb' => 'POST'
         ],
         [

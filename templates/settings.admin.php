@@ -39,12 +39,12 @@ style('nextant', 'admin');
 		</tr>
 		<tr valign="top">
 			<td>
-				<table>
+				<table style="width: 550px;">
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
 					<tr class="nextant_admin_head">
-						<td></td>
+						<td><div id="nextant_saving_settings">Saving</div></td>
 						<td class="nextant_admin_head">Settings</td>
 					</tr>
 					<tr style="height: 30px;">
@@ -68,16 +68,16 @@ style('nextant', 'admin');
 					<tr style="height: 30px;">
 						<td></td>
 						<td>
-							<button type="button" id="nextant_apply" style="width: 270px"><?php p($l->t('Test and Save')) ?></button>
+							<button type="button" id="nextant_apply" style="width: 264px"><?php p($l->t('Test and Save')) ?></button>
 						</td>
 					</tr>
 				</table>
-				<table id="nextant_suboptions">
+				<table style="width: 550px;" id="nextant_suboptions">
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
 					<tr class="nextant_admin_head">
-						<td></td>
+						<td><div id="nextant_saving_files">Saving</div></td>
 						<td class="nextant_admin_head">Indexing Files</td>
 					</tr>
 					<tr style="height: 30px;">
@@ -115,13 +115,12 @@ style('nextant', 'admin');
 					</tr>
                     -->
 
-					<!-- 
 
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
 					<tr class="nextant_admin_head">
-						<td></td>
+						<td><div id="nextant_saving_bookmarks">Saving</div></td>
 						<td class="nextant_admin_head">Indexing Bookmarks</td>
 					</tr>
 
@@ -135,18 +134,18 @@ style('nextant', 'admin');
 							</div>
 							<div id="nextant_bookmarks_appenabled">
 								<input type="checkbox" name="solr_index_bookmarks"
-									id="solr_index_bookmarks" value="1" style="margin: 10px;">								
+									id="solr_index_bookmarks" value="1" style="margin: 10px;">
 							</div>
 						</td>
 					</tr>
-                    -->
 
 
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
 					<tr class="nextant_admin_head">
-						<td><div id="nextant_saving">Saving</div></td>
+						<td><div id="nextant_saving_status">Saving</div>
+							<div id="nextant_saving_check">Checking</div></td>
 						<td class="nextant_admin_head">Nextant Status</td>
 					</tr>
 
@@ -263,6 +262,7 @@ style('nextant', 'admin');
 		</tr>
 
 	</table>
+
 </div>
 
 
