@@ -30,13 +30,14 @@ $(document)
 
 						init : function() {
 							$('#nextant_saving_status').fadeOut(0);
-							// $('#nextant_saving_check').fadeOut(0);
+							$('#nextant_saving_check').fadeOut(0);
 							$('#nextant_saving_settings').fadeOut(0);
 							$('#nextant_saving_files').fadeOut(0);
 							$('#nextant_saving_bookmarks').fadeOut(0);
 							nextantSettings.statusclearall(true);
 							nextantSettings.checksuboptions(true);
 							setInterval(function() {
+								nextantSettings.saving('check', true);
 								nextantSettings.checksuboptions(false)
 							}, 60000);
 						},
