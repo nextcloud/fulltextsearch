@@ -27,6 +27,7 @@
 namespace OCA\Nextant\Command;
 
 use \OCA\Nextant\Service\FileService;
+use \OCA\Nextant\Service\IndexService;
 use OC\Core\Command\Base;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -81,6 +82,14 @@ class Index extends Base
             ->addOption('bookmarks', 'bm', InputOption::VALUE_NONE, 'index only bookmarks - requiert <info>Bookmarks</info> installed');
     }
 
+    public function interrupted()
+    {
+        if ($this->hasBeenInterrupted()) {
+            $this->configService->setAppValue('index_locked', '0');
+            throw new \Exception('ctrl-c');
+        }
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (beta)</comment>');
@@ -97,13 +106,19 @@ class Index extends Base
         
         $this->solrService->setOutput($output);
         $this->indexService->setOutput($output);
+        $this->indexService->setParent($this);
         
+        // bookmarks - test
         if ($input->getOption('bookmarks')) {
             $users = $this->userManager->search('');
             foreach ($users as $user) {
-                $this->indexService->extractBookmarks($user->getUID());
-                $output->writeln('');
+                $docIds = array();
+                $docIds = $this->indexService->extractBookmarks($user->getUID());
+                if ($this->indexService->removeOrphans(IndexService::INDEX_BOOKMARKS, $user->getUID(), $docIds))
+                    $output->writeln('');
             } // $this->configService->needIndexBookmarks(false);
+            
+            $output->writeln('');
             return;
         }
         
