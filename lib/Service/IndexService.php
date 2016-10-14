@@ -82,7 +82,7 @@ class IndexService
         
         $progress = null;
         if ($this->output != null)
-            $progress = new ProgressBar($this->output, sizeof($files));
+            $progress = new ProgressBar($this->output, sizeof($bookmarks));
         
         if ($progress != null) {
             $progress->setMessage('<info>' . $userId . '</info>/Bookmarks: ');
