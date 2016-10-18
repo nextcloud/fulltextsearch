@@ -26,21 +26,24 @@
  */
 namespace OCA\Nextant\Service;
 
-use OCA\Bookmarks\Controller\Lib\Bookmarks;
+use \OCA\Bookmarks\Controller\Lib\Bookmarks;
+use \OCA\Nextant\Items\ItemDocument;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 class IndexService
 {
 
-    const INDEX_FILES = 'files';
+    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ";
 
-    const INDEX_BOOKMARKS = 'bookmarks';
-
-    private $bookmarkService;
+    const REFRESH_INFO_SYSTEM = 5;
 
     private $solrService;
 
     private $solrTools;
+
+    private $fileService;
+
+    private $bookmarkService;
 
     private $miscService;
 
@@ -48,12 +51,16 @@ class IndexService
 
     private $output;
 
-    public function __construct($bookmarkService, $solrService, $solrTools, $miscService)
+    private $lastProgressTick;
+
+    public function __construct($fileService, $bookmarkService, $solrService, $solrTools, $miscService)
     {
+        $this->fileService = $fileService;
         $this->bookmarkService = $bookmarkService;
         
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
+        
         $this->miscService = $miscService;
         
         $this->parent = null;
@@ -75,44 +82,26 @@ class IndexService
         $this->output = $output;
     }
 
-    private function message($line)
+    public function message($line)
     {
         if ($this->output != null)
             $this->output->writeln($line);
     }
 
     /**
-     * extract bookmarks from a specific user and return the total list of Ids owned by this user
+     * Extract whatever is sent ($data)
      *
-     * @param number $userId            
+     * @param string $type            
+     * @param string $userId            
+     * @param array $data            
      * @return array
      */
-    public function extractBookmarks($userId)
-    {
-        if (! $this->bookmarkService->configured())
-            return false;
-        
-        $db = \OC::$server->getDb();
-        $bookmarks = Bookmarks::findBookmarks($userId, $db, 0, 'id', array(), false, - 1);
-        
-        $data = array();
-        foreach ($bookmarks as $bookmark)
-            array_push($data, array(
-                'id' => $bookmark['id'],
-                'mtime' => $bookmark['lastmodified'],
-                'absolute' => $bookmark['url'],
-                'path' => $bookmark['url']
-            ));
-        
-        return $this->extract(self::INDEX_BOOKMARKS, $userId, $data);
-    }
-
-    private function extract($type, $userId, $data)
+    public function extract($type, $userId, &$data, $extract = true)
     {
         $this->solrService->setOwner($userId);
         
-        if (sizeof($data) == 0)
-            return array();
+        // if (sizeof($data) == 0)
+        // return true;
         
         $progress = null;
         if ($this->output != null)
@@ -121,32 +110,55 @@ class IndexService
         if ($progress != null) {
             $progress->setMessage($type . '/<info>' . $userId . '</info>: ');
             $progress->setMessage('', 'jvm');
+            $progress->setMessage('?', 'job');
             $progress->setMessage('[preparing]', 'infos');
-            $progress->setFormat(" %message:-38s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+            $progress->setFormat(self::PROGRESS_TEMPLATE);
             $progress->start();
         }
         
         $forceExtract = false;
         
-        $docIds = array();
+        $allDocs = $this->solrTools->getAllDocuments($type, $userId, $error);        
         foreach ($data as $entry) {
             
             if ($this->parent != null)
                 $this->parent->interrupted();
             
             if ($progress != null) {
+                $progress->setMessage('/', 'job');
                 $progress->setMessage('[scanning]', 'infos');
+                
+                if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
+                    $infoSystem = $this->solrTools->getInfoSystem();
+                    $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
+                    $this->lastProgressTick = time();
+                }
                 $progress->advance();
             }
             
-            array_push($docIds, $entry['id']);
-            if (! $forceExtract && $this->solrTools->isDocumentUpToDate($type, $entry['id'], $entry['mtime']))
+            if ($entry->getType() == ItemDocument::TYPE_FILE)
+                $this->fileService->syncDocument($entry);
+            if ($entry->getType() == ItemDocument::TYPE_BOOKMARK)
+                $this->bookmarkService->syncDocument($entry);
+            
+            if (! $extract)
+                continue;
+                
+                //
+                // $doc = ItemDocument::getItem($allDocs, $type, $entry->getId());
+                // $needed = $this->solrTools->updateDocument($entry, $doc, false);
+                //
+            
+            if (! $forceExtract && $this->solrTools->isDocumentUpToDate($type, $entry, ItemDocument::getItem($allDocs, $type, $entry->getId())))
                 continue;
             
-            if ($progress != null)
+            if ($progress != null) {
+                $progress->setMessage('+', 'job');
                 $progress->setMessage('[extracting]', 'infos');
+                $progress->display();
+            }
             
-            if (! $this->solrService->extractFile($entry['absolute'], $type, $entry['id'], $entry['path'], $entry['mtime'], $error))
+            if (! $this->solrService->extractDocument($entry, $error))
                 continue;
         }
         
@@ -156,56 +168,114 @@ class IndexService
             $progress->finish();
         }
         
-        return $docIds;
+        return true;
     }
 
-    public function removeOrphans($type, $userId, $docIds)
+    public function updateDocuments($type, $userId, &$data)
     {
-        if (! $this->bookmarkService->configured())
-            return false;
-        
-        if (! is_array($docIds) || sizeof($docIds) == 0)
-            return false;
-        
         $this->solrService->setOwner($userId);
+        if (sizeof($data) > 0 && ! $data[0]->isSynced())
+            $this->extract($type, $userId, $data, false);
         
         $progress = null;
         if ($this->output != null)
-            $progress = new ProgressBar($this->output, $this->solrTools->count($type));
+            $progress = new ProgressBar($this->output, sizeof($data));
         
         if ($progress != null) {
-            // $progress->setFormat(" %message:-51s%[%bar%] %percent:3s%%");
-            $progress->setFormat(" %message:-38s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
             $progress->setMessage($type . '/<info>' . $userId . '</info>: ');
+            $progress->setMessage('', 'jvm');
+            $progress->setMessage('/', 'job');
+            $progress->setMessage('[preparing]', 'infos');
+            $progress->setFormat(self::PROGRESS_TEMPLATE);
+            $progress->start();
+        }
+        
+        $forceExtract = false;
+        $allDocs = $this->solrTools->getAllDocuments($type, $userId, $error);
+        foreach ($data as $entry) {
+            
+            if ($this->parent != null)
+                $this->parent->interrupted();
+            
+            if ($progress != null) {
+                if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
+                    $infoSystem = $this->solrTools->getInfoSystem();
+                    $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
+                    $this->lastProgressTick = time();
+                }
+                $progress->advance();
+            }
+            
+            $doc = ItemDocument::getItem($allDocs, $type, $entry->getId());
+            $continue = false;
+            $needed = $this->solrTools->updateDocument($entry, $doc, false);
+            
+            if ($progress != null) {
+                if (! $needed) {
+                    $progress->setMessage('/', 'job');
+                    $progress->setMessage('[comparing]', 'infos');
+                } else {
+                    $progress->setMessage('!', 'job');
+                    $progress->setMessage('[updating]', 'infos');
+                }
+                $progress->display();
+            }
+            
+            if ($needed)
+                $this->solrTools->updateDocument($entry, $doc);
+        }
+        
+        if ($progress != null) {
+            $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'infos');
+            $progress->finish();
+        }
+        
+        return true;
+    }
+
+    public function removeOrphans($type, $userId, &$data)
+    {
+        $this->solrService->setOwner($userId);
+        if (sizeof($data) > 0 && ! $data[0]->isSynced())
+            $this->extract($type, $userId, $data, false);
+        
+        $progress = null;
+        if ($this->output != null)
+            $progress = new ProgressBar($this->output, sizeof($data));
+        
+        if ($progress != null) {
+            $progress->setFormat(self::PROGRESS_TEMPLATE);
+            $progress->setMessage($type . '/<info>' . $userId . '</info>: ');
+            $progress->setMessage('/', 'job');
             $progress->setMessage('', 'jvm');
             $progress->setMessage('[spoting orphans]', 'infos');
             $progress->start();
         }
         
+        $docIds = array();
+        foreach ($data as $entry)
+            array_push($docIds, (int) $entry->getId());
+        
         $deleting = array();
-        $page = 0;
-        while (true) {
+        $allDocs = $this->solrTools->getAllDocuments($type, $userId, $error);
+        foreach ($allDocs as $doc) {
             
             if ($this->parent != null)
                 $this->parent->interrupted();
             
-            $ids = $this->solrTools->getAll($type, $page, $lastPage, $error);
-            if (! $ids)
-                return false;
+            if (! in_array($doc->getId(), $docIds) && (! in_array($doc->getId(), $deleting)))
+                array_push($deleting, $doc->getId());
             
-            foreach ($ids as $id) {
+            if ($progress != null) {
+                if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
+                    $infoSystem = $this->solrTools->getInfoSystem();
+                    $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
+                    $this->lastProgressTick = time();
+                }
                 
-                if (! in_array($id, $docIds) && (! in_array($id, $deleting)))
-                    array_push($deleting, $id);
-                
-                if ($progress != null)
-                    $progress->advance();
+                $progress->advance();
             }
-            
-            if ($lastPage)
-                break;
-            
-            $page ++;
         }
         
         if ($progress != null) {
@@ -213,43 +283,57 @@ class IndexService
             $progress->setMessage('', 'infos');
             $progress->finish();
         }
-        // $this->message('');
         
         if (sizeof($deleting) > 0) {
             
             $progress = null;
             if ($this->output != null) {
-                $this->message('');
                 $progress = new ProgressBar($this->output, sizeof($deleting));
             }
             
             if ($progress != null) {
-                $progress->setFormat(" %message:-38s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ");
+                $progress->setFormat(self::PROGRESS_TEMPLATE);
                 $progress->setMessage($type . '/<info>' . $userId . '</info>: ');
+                $progress->setMessage('-', 'job');
                 $progress->setMessage('', 'jvm');
                 $progress->setMessage('[deleting orphans]', 'infos');
                 $progress->start();
             }
+            
             foreach ($deleting as $docId) {
                 
                 if ($this->parent != null)
                     $this->parent->interrupted();
                 
                 $this->solrTools->removeDocument($type, $docId);
-                if ($progress != null)
+                
+                foreach ($data as $entry) {
+                    if ($entry->getId() == $docId) {
+                        $entry->removed(true);
+                        break;
+                    }
+                }
+                
+                if ($progress != null) {
+                    if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
+                        $infoSystem = $this->solrTools->getInfoSystem();
+                        $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
+                        $this->lastProgressTick = time();
+                    }
+                    
                     $progress->advance();
-            }
-            
-            if ($progress != null) {
-                $progress->setMessage('', 'jvm');
-                $progress->setMessage('', 'infos');
-                $progress->finish();
+                }
             }
         }
-        // else
-        // $this->message(' <info>found no orphan</info>');
+        
+        if ($progress != null) {
+            $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'infos');
+            $progress->finish();
+        }
     }
 }
+
 
 
 
