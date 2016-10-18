@@ -73,15 +73,15 @@ class Application extends App
         });
         
         $container->registerService('IndexService', function ($c) {
-            return new IndexService($c->query('BookmarkService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+            return new IndexService($c->query('FileService'), $c->query('BookmarkService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
         });
         
         $container->registerService('FileService', function ($c) {
-            return new FileService($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+            return new FileService($c->query('ConfigService'), $c->query('RootFolder'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
         });
         
         $container->registerService('BookmarkService', function ($c) {
-            return new BookmarkService($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+            return new BookmarkService($c->query('ConfigService'), $c->query('MiscService'));
         });
         
         $container->registerService('SolrService', function ($c) {
