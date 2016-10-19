@@ -39,8 +39,6 @@ use \OCA\Nextant\Items\ItemDocument;
 class SolrToolsService
 {
 
-    const GETALL_ROWS = 100;
-
     const UPDATE_MAXIMUM_QUERYTIME = 2000;
 
     const UPDATE_MAXIMUM_FILEPROCESS = 15;
@@ -250,7 +248,7 @@ class SolrToolsService
      *
      * @return boolean
      */
-    public function updateDocument($source, $final, $update = true, &$error = 0)
+    public function updateDocument(&$source, $final, $update = true, &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -331,8 +329,17 @@ class SolrToolsService
             if (! $request = $client->update($query)) {
                 $this->miscService->log('updateDocument update query failed');
                 $error = SolrService::EXCEPTION_UPDATE_QUERY_FAILED;
+                $document->failed(ItemDocument::FAIL_UPDATE);
                 return false;
             }
+            
+            $source->setShare($final->getShare());
+            $source->setShareGroup($final->getShareGroup());
+            $source->setPath($final->getPath());
+            $source->setOwner($final->getOwner());
+            $source->deleted($final->isDeleted());
+            
+            $source->updated(true);
             
             return true;
             // if ($request->getQueryTime() > self::UPDATE_MAXIMUM_QUERYTIME) {
@@ -366,74 +373,74 @@ class SolrToolsService
      * @param string $error            
      * @return boolean|Solarium\Core\Query\Result[][]
      */
-//     public function getDocumentsStatus($type, $docs, &$error = '')
-//     {
-//         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
-//             return false;
-        
-//         $client = $this->solrService->getClient();
-        
-//         if (! is_array($docs))
-//             $docs = array(
-//                 $docs
-//             );
-        
-//         if (sizeof($docs) > self::UPDATE_CHUNK_SIZE) {
-//             $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;
-//             return false;
-//         }
-        
-//         $result = array();
-        
-//         if (sizeof($docs) == 0)
-//             return $result;
-        
-//         try {
-//             $query = $client->createSelect();
-            
-//             $qstr = '';
-//             foreach ($docs as $docId)
-//                 $qstr .= $type . '_' . $docId . ' ';
-            
-//             $query->setQuery('id:' . $qstr);
-//             $query->setRows(sizeof($docs));
-//             $query->setFields(array(
-//                 'id',
-//                 'nextant_owner',
-//                 'nextant_source',
-//                 'nextant_path',
-//                 'nextant_share',
-//                 'nextant_sharegroup',
-//                 'nextant_deleted'
-//             ));
-            
-//             $resultset = $client->select($query);
-            
-//             foreach ($resultset as $document) {
-//                 list ($type, $docid) = explode('_', $document->id, 2);
-//                 $result[$docid] = array(
-//                     'nextant_source' => $document->nextant_source,
-//                     'nextant_owner' => $document->nextant_owner,
-//                     'nextant_path' => $document->nextant_path,
-//                     'nextant_share' => $document->nextant_share,
-//                     'nextant_sharegroup' => $document->nextant_sharegroup,
-//                     'nextant_deleted' => $document->nextant_deleted
-//                 );
-//             }
-            
-//             return $result;
-//         } catch (\Solarium\Exception\HttpException $ehe) {
-//             if ($ehe->getStatusMessage() == 'OK')
-//                 $error = SolrService::EXCEPTION_SEARCH_FAILED;
-//             else
-//                 $error = SolrService::EXCEPTION_HTTPEXCEPTION;
-//         } catch (\Solarium\Exception $e) {
-//             $error = SolrService::EXCEPTION;
-//         }
-        
-//         return false;
-//     }
-
+    // public function getDocumentsStatus($type, $docs, &$error = '')
+    // {
+    // if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+    // return false;
+    
+    // $client = $this->solrService->getClient();
+    
+    // if (! is_array($docs))
+    // $docs = array(
+    // $docs
+    // );
+    
+    // if (sizeof($docs) > self::UPDATE_CHUNK_SIZE) {
+    // $error = SolrService::EXCEPTION_UPDATE_MAXIMUM_REACHED;
+    // return false;
+    // }
+    
+    // $result = array();
+    
+    // if (sizeof($docs) == 0)
+    // return $result;
+    
+    // try {
+    // $query = $client->createSelect();
+    
+    // $qstr = '';
+    // foreach ($docs as $docId)
+    // $qstr .= $type . '_' . $docId . ' ';
+    
+    // $query->setQuery('id:' . $qstr);
+    // $query->setRows(sizeof($docs));
+    // $query->setFields(array(
+    // 'id',
+    // 'nextant_owner',
+    // 'nextant_source',
+    // 'nextant_path',
+    // 'nextant_share',
+    // 'nextant_sharegroup',
+    // 'nextant_deleted'
+    // ));
+    
+    // $resultset = $client->select($query);
+    
+    // foreach ($resultset as $document) {
+    // list ($type, $docid) = explode('_', $document->id, 2);
+    // $result[$docid] = array(
+    // 'nextant_source' => $document->nextant_source,
+    // 'nextant_owner' => $document->nextant_owner,
+    // 'nextant_path' => $document->nextant_path,
+    // 'nextant_share' => $document->nextant_share,
+    // 'nextant_sharegroup' => $document->nextant_sharegroup,
+    // 'nextant_deleted' => $document->nextant_deleted
+    // );
+    // }
+    
+    // return $result;
+    // } catch (\Solarium\Exception\HttpException $ehe) {
+    // if ($ehe->getStatusMessage() == 'OK')
+    // $error = SolrService::EXCEPTION_SEARCH_FAILED;
+    // else
+    // $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+    // } catch (\Solarium\Exception $e) {
+    // $error = SolrService::EXCEPTION;
+    // }
+    
+    // return false;
+    // }
+    
     /**
      * remove document by its id
      *
@@ -457,91 +464,6 @@ class SolrToolsService
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = SolrService::EXCEPTION_REMOVE_FAILED;
-            else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
-        } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
-        }
-        
-        return false;
-    }
-
-    /**
-     * return ids of all documents
-     *
-     * @param string $type            
-     * @param string $userId            
-     * @param number $page            
-     * @param boolean $lastpage            
-     * @param number $error            
-     * @return boolean
-     */
-    public function getAllDocuments($type = '', $userId = '', &$error = 0)
-    {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
-            return false;
-        
-        $client = $this->solrService->getClient();
-        
-        $data = array();
-        try {
-            
-            if ($type != '')
-                $type .= '_';
-            
-            $page = 0;
-            $docIds = array();
-            while (true) {
-                $query = $client->createSelect();
-                $helper = $query->getHelper();
-                
-                $query->setQuery('id:' . $type . '*');
-                
-                if ($userId != '')
-                    $query->createFilterQuery('owner')->setQuery('nextant_owner:' . $helper->escapePhrase($userId));
-                
-                $query->addSort('id', $query::SORT_ASC);
-                $query->setStart($page * self::GETALL_ROWS);
-                $query->setRows(self::GETALL_ROWS);
-                $query->setFields(array(
-                    'id',
-                    'nextant_owner',
-                    'nextant_path',
-                    'nextant_mtime',
-                    'nextant_share',
-                    'nextant_sharegroup',
-                    'nextant_deleted',
-                    'nextant_source'
-                ));
-                
-                $resultset = $client->execute($query);
-                
-                foreach ($resultset as $document) {
-                    $doc = ItemDocument::fromCompleteId($document->id);
-                    $doc->setOwner($document->nextant_owner);
-                    $doc->setPath($document->nextant_path);
-                    $doc->setMTime($document->nextant_mtime);
-                    $doc->setShare($document->nextant_share);
-                    $doc->setShareGroup($document->nextant_sharegroup);
-                    $doc->deleted($document->nextant_deleted);
-                    $doc->setSource($document->nextant_source);
-                    
-                    if (! in_array($doc->getId(), $docIds)) {
-                        array_push($docIds, $doc->getId());
-                        $data[] = $doc;
-                    }
-                }
-                
-                if ((($page + 1) * self::GETALL_ROWS) >= $resultset->getNumFound())
-                    break;
-                
-                $page ++;
-            }
-            
-            return $data;
-        } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_SOLRURI;
             else
                 $error = SolrService::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {

@@ -495,7 +495,7 @@ class Index extends Base
     private function indexesFiles($input, $output)
     {
         if (! $this->fileService->configured()) {
-            if ($input->getOption('files') || $input->getOption('files_extract') || $input->getOption('files_rights'))
+            if ($input->getOption('files') || $input->getOption('files_extract'))
                 $output->writeln('Error while indexing Files: Nextant is not configured to extract your files.');
             return;
         }
@@ -521,14 +521,17 @@ class Index extends Base
             ));
             
             $files = array_merge($files, $files_trashbin);
-            $this->indexService->extract(ItemDocument::TYPE_FILE, $user->getUID(), $files);
-            $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user->getUID(), $files);
+            $solrDocs = null;
+            $this->indexService->extract(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
+            $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
             
             foreach ($files as $doc) {
                 if ($doc->isExtracted())
                     $extracted ++;
                 if ($doc->isProcessed())
                     $processed ++;
+            }
+            foreach ($solrDocs as $doc) {
                 if ($doc->isRemoved())
                     $removed ++;
             }
@@ -562,7 +565,7 @@ class Index extends Base
             $output->writeln('');
         }
         
-        $output->writeln('   ' . $processed . ' file(s) processed ; ' . $extracted . ' extracted documents ; ' . $removed . ' orphans removed');
+        $output->writeln('  ' . $processed . ' file(s) processed ; ' . $extracted . ' extracted documents ; ' . $removed . ' orphan(s) removed');
         
         //
         //
@@ -622,7 +625,7 @@ class Index extends Base
             }
         }
         
-        $output->writeln(' ' . $updated . ' documents(s) updated');
+        $output->writeln('  ' . $updated . ' document(s) updated');
         
         return;
     }
@@ -648,8 +651,9 @@ class Index extends Base
         foreach ($users as $user) {
             $bm = $this->bookmarkService->getBookmarksPerUserId($user->getUID());
             
-            $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm);
-            $this->indexService->removeOrphans(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm);
+            $solrDocs = null;
+            $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm, $solrDocs);
+            $this->indexService->removeOrphans(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm, $solrDocs);
             $output->writeln('');
         }
         
