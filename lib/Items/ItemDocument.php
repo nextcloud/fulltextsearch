@@ -67,6 +67,8 @@ class ItemDocument
 
     private $updated = false;
 
+    private $failed = false;
+
     private $synced = false;
 
     public function __construct($type = '', $id = 0)
@@ -257,6 +259,16 @@ class ItemDocument
     public function isUpdated()
     {
         return $this->updated;
+    }
+
+    public function failed($failed)
+    {
+        $this->failed = $failed;
+    }
+
+    public function isFailed()
+    {
+        return $this->failed;
     }
 
     public function synced($synced)
