@@ -364,8 +364,8 @@ class FileService
 
     /**
      * convert FileInfo to ItemDocument
-     * 
-     * @param FileInfo $file
+     *
+     * @param FileInfo $file            
      * @return boolean|\OCA\Nextant\Items\ItemDocument
      */
     public function getDocumentFromFile($file)
@@ -420,7 +420,7 @@ class FileService
             $item = $this->getDocumentFromFile($file);
             $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
             $item->setOwner($userId);
-            $item->deleted(key_exists('deleted', $options));
+            $item->deleted(in_array('deleted', $options));
             
             if ($item && $item != false && $item != null)
                 $data[] = $item;
