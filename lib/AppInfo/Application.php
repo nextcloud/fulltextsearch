@@ -35,6 +35,7 @@ use \OCA\Nextant\Hooks\FilesHooks;
 use \OCA\Nextant\Hooks\BookmarksHooks;
 use \OCA\Nextant\Provider\SearchProvider;
 use \OCA\Nextant\Service\ConfigService;
+use \OCA\Nextant\Service\QueueService;
 use \OCA\Nextant\Service\MiscService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
@@ -76,6 +77,10 @@ class Application extends App
             return new IndexService($c->query('FileService'), $c->query('BookmarkService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
         });
         
+        $container->registerService('QueueService', function ($c) {
+            return new QueueService($c->query('IndexService'), $c->query('FileService'), $c->query('MiscService'));
+        });
+        
         $container->registerService('FileService', function ($c) {
             return new FileService($c->query('ConfigService'), $c->query('RootFolder'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
         });
@@ -102,7 +107,7 @@ class Application extends App
         });
         
         $container->registerService('FilesEvents', function ($c) {
-            return new FilesEvents($c->query('ConfigService'), $c->query('UserId'), $c->query('FileService'), $c->query('SolrService'), $c->query('MiscService'));
+            return new FilesEvents($c->query('UserId'), $c->query('ConfigService'), $c->query('QueueService'), $c->query('MiscService'));
         });
         
         $container->registerService('BookmarksEvents', function ($c) {
