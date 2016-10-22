@@ -45,8 +45,10 @@ class ConfigService
         'solr_core' => 'nextant',
         'display_result' => 1,
         
+        'index_delay' => 2,
         'index_locked' => 0,
-        'index_last' => 0,
+        'index_last_files' => 0,
+        'index_last_bookmarks' => 0,
         
         'index_files' => 1,
         'index_files_needed' => 1,
@@ -120,6 +122,19 @@ class ConfigService
     public function stopIndex()
     {
         $this->setAppValue('configured', '2');
+    }
+
+    public function timeIndex($type)
+    {
+        $this->setAppValue('index_last_' . $type, time());
+    }
+
+    public function timeIndexDelay($type, $delay = 0)
+    {
+        if ($delay == 0)
+            $delay = $this->getAppValue('index_delay');
+        
+        return ($this->getAppValue('index_last_' . $type) < (time() - (3600 * $delay)));
     }
 
     /**
