@@ -112,6 +112,7 @@ $(document)
 								force_index = 1;
 
 							var data = {
+								index_delay : $('#solr_index_delay').val(),
 								display_result : $('#solr_display_result')
 										.val(),
 								force_index : force_index
@@ -194,6 +195,7 @@ $(document)
 							else
 								$('#solr_sub_bookmarks').hide(delay);
 
+							$('#solr_index_delay').val(response.index_delay);
 							$(
 									'#solr_display_result option[value="'
 											+ response.display_result + '"]')
@@ -460,6 +462,9 @@ $(document)
 					});
 					$('#nextant_force_first_index').on('click', function() {
 						nextantSettings.savesuboptions_status('force_index');
+					});
+					$('#solr_index_delay').on('input', function(e) {
+						nextantSettings.savesuboptions_status();
 					});
 					$('#solr_display_result').on('change', function() {
 						nextantSettings.savesuboptions_status();
