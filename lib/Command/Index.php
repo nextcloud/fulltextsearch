@@ -107,7 +107,7 @@ class Index extends Base
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (beta)</comment>');
-        // $output->writeln('<comment>discussion thread:</comment> https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954/');
+        $output->writeln('<comment>discussion forum:</comment> https://help.nextcloud.com/c/apps/nextant');
         // $output->writeln('');
         
         if (! $this->solrService->configured(true)) {
@@ -165,16 +165,22 @@ class Index extends Base
             $this->configService->needIndexBookmarks(false);
             
             // indexes
-        if (! $filtered || $input->getOption('files') || $input->getOption('files_extract'))
+        if (! $filtered || $input->getOption('files') || $input->getOption('files_extract')) {
             $this->indexesFiles($input, $output);
+            $this->configService->timeIndex('files');
+        }
         
-        if (! $filtered || $input->getOption('files') || $input->getOption('files_update'))
+        if (! $filtered || $input->getOption('files') || $input->getOption('files_update')) {
             $this->updateFiles($input, $output);
+            $this->configService->timeIndex('files');
+        }
         
-        if (! $filtered || $input->getOption('bookmarks'))
+        if (! $filtered || $input->getOption('bookmarks')) {
             $this->indexesBookmarks($input, $output);
-        
+            $this->configService->timeIndex('bookmarks');
+        }
         $this->configService->setAppValue('index_locked', '0');
+        $this->configService->setAppValue('configured', '1');
         return;
         //
         
