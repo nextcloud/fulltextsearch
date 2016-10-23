@@ -61,16 +61,12 @@ class QueueService
         if (! msg_send($queue, 1, $msg))
             $this->miscService->log('can\'t msg_send()');
     }
-    
-    // public function emptyQueue()
-    // {
-    // $queue = msg_get_queue(self::QUEUE_ID);
-    
-    // $msg_type = NULL;
-    // $msg = NULL;
-    
-    // while (msg_receive($queue, 1, $msg_type, 512, $msg) !== false) {}
-    // }
+
+    public function emptyQueue()
+    {
+        msg_remove_queue(msg_get_queue(self::QUEUE_ID));
+    }
+
     public function readQueue($standby = false)
     {
         $queue = msg_get_queue(self::QUEUE_ID);

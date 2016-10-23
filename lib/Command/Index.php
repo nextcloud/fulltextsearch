@@ -48,9 +48,9 @@ class Index extends Base
 
     private $indexService;
 
-    private $solrService;
+    private $queueService;
 
-    private $solrTools;
+    private $solrService;
 
     private $configService;
 
@@ -62,14 +62,14 @@ class Index extends Base
 
     private $currentIndexStatus = array();
 
-    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $solrService, $solrTools, $configService, $fileService, $bookmarkService, $miscService)
+    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $queueService, $solrService, $configService, $fileService, $bookmarkService, $miscService)
     {
         parent::__construct();
         $this->userManager = $userManager;
         $this->rootFolder = $rootFolder;
         $this->indexService = $indexService;
+        $this->queueService = $queueService;
         $this->solrService = $solrService;
-        $this->solrTools = $solrTools;
         $this->configService = $configService;
         $this->fileService = $fileService;
         $this->bookmarkService = $bookmarkService;
@@ -107,7 +107,7 @@ class Index extends Base
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (beta)</comment>');
-        $output->writeln('<comment>discussion forum:</comment> https://help.nextcloud.com/c/apps/nextant');
+        // $output->writeln('<comment>discussion forum:</comment> https://help.nextcloud.com/c/apps/nextant');
         // $output->writeln('');
         
         if (! $this->solrService->configured(true)) {
@@ -152,6 +152,8 @@ class Index extends Base
         $filtered = false;
         if ($input->getOption('bookmarks') || $input->getOption('files') || $input->getOption('files_extract') || $input->getOption('files_update'))
             $filtered = true;
+        else
+            $this->queueService->emptyQueue();
             
             // neededIndex
         $this->currentIndexStatus = array(
