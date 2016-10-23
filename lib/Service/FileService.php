@@ -211,7 +211,7 @@ class FileService
             if (! $file->getStorage()->isLocal())
                 continue;
             
-            if ($file->isShared())
+            if ($file->isShared() && ! in_array('forceshared', $options))
                 continue;
             
             $item = $this->getDocumentFromFile($file);
@@ -244,36 +244,43 @@ class FileService
         
         if ($fileId == '')
             return false;
-            
-            // Filesystem::tearDown();
+        
         Filesystem::init($userId, '');
         $view = Filesystem::getView();
         
         $data = array();
-        $file = self::getFileInfoFromFileId($fileId, $view);
-        if ($file == false)
+        $file = self::getFileInfoFromFileId($fileId, $view, $this->miscService);
+        
+        if ($file == null) {
+            $trashview = new View('/' . $userId . '/files_trashbin/files');
+            $file = self::getFileInfoFromFileId($fileId, $trashview, $this->miscService);
+            array_push($options, 'deleted');
+        }
+        
+        if ($file == null)
             return false;
         
         if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
-            $sub = $this->getFilesPerPath($userId, $file->getPath(), $options);
-            if (sizeof($sub) > 0)
-                $data[] = $sub;
+            $result = $this->getFilesPerPath($userId, $file->getPath(), $options);
+            if (is_array($result) && sizeof($result) > 0)
+                $data = array_merge($data, $result);
+            
             return $data;
         }
         
         if (! $file->getStorage()->isLocal())
             return $data;
         
-        if ($file->isShared())
+        if ($file->isShared() && ! in_array('forceshared', $options))
             return $data;
         
         $item = $this->getDocumentFromFile($file);
         $item->setAbsolutePath($view->getLocalFile($item->getPath()));
         $item->setOwner($userId);
+        
         $item->deleted(in_array('deleted', $options));
         
-        if ($item && $item != false && $item != null)
-            $data[] = $item;
+        $data[] = $item;
         
         return $data;
     }
@@ -307,10 +314,9 @@ class FileService
             
             $subfiles = $view->getDirectoryContent($file->getPath());
             foreach ($subfiles as $subfile) {
-                $result = $this->getFilesPerPath($userID, $subfile->getPath(), $options);
-                if ($result != false) {
-                    $data[] = $result;
-                }
+                $result = $this->getFilesPerPath($userId, $subfile->getPath(), $options);
+                if (is_array($result) && sizeof($result) > 0)
+                    $data = array_merge($data, $result);
             }
             return $data;
         }
@@ -318,7 +324,7 @@ class FileService
         if (! $file->getStorage()->isLocal())
             return $data;
         
-        if ($file->isShared())
+        if ($file->isShared() && ! in_array('forceshared', $options))
             return $data;
         
         $item = $this->getDocumentFromFile($file);
@@ -326,8 +332,7 @@ class FileService
         $item->setOwner($userId);
         $item->deleted(in_array('deleted', $options));
         
-        if ($item && $item != false && $item != null)
-            $data[] = $item;
+        $data[] = $item;
         
         return $data;
     }
@@ -347,7 +352,7 @@ class FileService
         foreach ($subdirs as $subdir) {
             $subpath .= '/' . $subdir;
             if ($subpath != '/') {
-                $subdirInfos = Filesystem::getView()->getFileInfo($subpath);
+                $subdirInfos = self::getFileInfoFromPath($subpath);
                 if (! $subdirInfos)
                     continue;
                 self::getShareRightsFromFileId($subdirInfos->getId(), $data);
@@ -378,9 +383,10 @@ class FileService
         
         $OCShares = Share::getAllSharesForFileId($fileId);
         foreach ($OCShares as $share) {
-            if ($share['share_type'] == '0')
+            
+            if ($share['share_type'] == '0' && ! in_array($share['share_with'], $data['share_users']))
                 array_push($data['share_users'], $share['share_with']);
-            if ($share['share_type'] == '1')
+            if ($share['share_type'] == '1' && ! in_array($share['share_with'], $data['share_groups']))
                 array_push($data['share_groups'], $share['share_with']);
         }
         
@@ -456,44 +462,39 @@ class FileService
      * @param View $view            
      * @return boolean|number
      */
-    public static function getFileIdFromPath($path, $view = null)
+    public static function getFileInfoFromPath($path, $view = null)
     {
         if ($view == null)
             $view = Filesystem::getView();
         if ($view == null)
-            return false;
+            return null;
         
         try {
-            $file = $view->getFileInfo($path);
-            
-            if ($file == null)
-                return false;
-            
-            return $file->getId();
+            return $view->getFileInfo($path);
         } catch (NotFoundException $e) {
             return false;
         }
     }
 
-    public static function getFileInfoFromFileId($fileId, $view = null)
+    public static function getFileInfoFromFileId($fileId, $view = null, $misc)
     {
         try {
             if ($view == null)
                 $view = Filesystem::getView();
             if ($view == null)
-                return false;
+                return null;
             
             $path = $view->getPath($fileId);
             if ($path == null)
-                return false;
+                return null;
             
             $file = $view->getFileInfo($path);
             if ($file == null)
-                return false;
+                return null;
             
             return $file;
         } catch (NotFoundException $e) {
-            return false;
+            return null;
         }
     }
 }
