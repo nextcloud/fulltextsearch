@@ -178,7 +178,7 @@ class IndexService
      * @param ItemDocument[] $solrDocs            
      * @return boolean
      */
-    public function updateDocuments($type, $userId, &$data, &$solrDocs = null)
+    public function updateDocuments($type, $userId, &$data, &$solrDocs)
     {
         $this->solrService->setOwner($userId);
         

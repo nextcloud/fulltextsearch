@@ -279,7 +279,7 @@ class FileService
     }
 
     /**
-     * get files from a userid+fileid
+     * get files/subdir from a userid+fileid
      *
      * @param number $userId            
      * @param number $fileId            
@@ -292,9 +292,6 @@ class FileService
             return false;
         
         if ($userId == '')
-            return false;
-        
-        if ($fileId == '')
             return false;
             
             // Filesystem::tearDown();

@@ -86,9 +86,10 @@ class QueueService
         switch ($item->getType()) {
             case FilesEvents::FILE_CREATE:
             case FilesEvents::FILE_UPDATE:
+                $solrDocs = null;
                 $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
                 if ($files != false && sizeof($files) > 0) {
-                    $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files, null);
+                    $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
                 }
                 break;
             
@@ -100,11 +101,10 @@ class QueueService
             case FilesEvents::FILE_RESTORE:
             case FilesEvents::FILE_SHARE:
             case FilesEvents::FILE_UNSHARE:
+                $solrDocs = null;
                 $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
-                if ($files != false && sizeof($files) > 0) {
-                    $this->miscService->log('?? ' . (($files[0]->isDeleted()) ? 'y' : 'n') . ' -- ' . $files[0]->getPath());
-                    $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files, null);
-                }
+                if ($files != false && sizeof($files) > 0)
+                    $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
                 break;
             
             case FilesEvents::FILE_DELETE:
