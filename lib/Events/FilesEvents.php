@@ -79,11 +79,11 @@ class FilesEvents
     public function onFileCreate($path)
     {
         if ($this->configService->getAppValue('index_files_live_extract') == '1') {
-            $fileid = FileService::getFileIdFromPath($path, Filesystem::getView());
-            if ($fileid > 0)
+            $file = FileService::getFileInfoFromPath($path, Filesystem::getView());
+            if ($file->getId() > 0)
                 $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_CREATE, array(
                     'userid' => $this->userId,
-                    'fileid' => $fileid
+                    'fileid' => $file->getId()
                 )));
         } else
             $this->configService->needIndexFiles(true);
@@ -97,11 +97,11 @@ class FilesEvents
     public function onFileUpdate($path)
     {
         if ($this->configService->getAppValue('index_files_live_extract') == '1') {
-            $fileid = FileService::getFileIdFromPath($path, Filesystem::getView());
-            if ($fileid > 0)
+            $file = FileService::getFileInfoFromPath($path, Filesystem::getView());
+            if ($file->getId() > 0)
                 $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_UPDATE, array(
                     'userid' => $this->userId,
-                    'fileid' => $fileid
+                    'fileid' => $file->getId()
                 )));
         } else
             $this->configService->needIndexFiles(true);
@@ -115,11 +115,11 @@ class FilesEvents
     public function onFileRename($target)
     {
         if ($this->configService->getAppValue('index_files_live_extract') == '1') {
-            $fileid = FileService::getFileIdFromPath($target, Filesystem::getView());
-            if ($fileid > 0)
+            $file = FileService::getFileInfoFromPath($target, Filesystem::getView());
+            if ($file->getId() > 0)
                 $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_RENAME, array(
                     'userid' => $this->userId,
-                    'fileid' => $fileid
+                    'fileid' => $file->getId()
                 )));
         } else
             $this->configService->needIndexFiles(true);
@@ -133,18 +133,18 @@ class FilesEvents
     public function onFileTrash($path)
     {
         if ($this->configService->getAppValue('index_files_live_extract') == '1') {
-            $fileid = FileService::getFileIdFromPath($path, Filesystem::getView());
-            if ($fileid > 0) {
+            $file = FileService::getFileInfoFromPath($path, Filesystem::getView());
+            if ($file->getId() > 0) {
                 if (\OCP\App::isEnabled('files_trashbin'))
                     
                     $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_TRASH, array(
                         'userid' => $this->userId,
-                        'fileid' => $fileid
+                        'fileid' => $file->getId()
                     )));
                 else
                     $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_DELETE, array(
                         'userid' => $this->userId,
-                        'fileid' => $fileid
+                        'fileid' => $file->getId()
                     )));
                 return;
             }
@@ -160,14 +160,15 @@ class FilesEvents
     public function onFileDelete($path)
     {
         if ($this->configService->getAppValue('index_files_live_extract') == '1') {
-            $fileid = FileService::getFileIdFromPath($path, new \OC\Files\View('/' . $this->userId));
-            if ($fileid > 0)
+            $file = FileService::getFileInfoFromPath($path, new \OC\Files\View('/' . $this->userId));
+            if ($file->getId() > 0)
                 $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_DELETE, array(
                     'userid' => $this->userId,
-                    'fileid' => $fileid
+                    'fileid' => $file->getId(),
+                    'folder' => ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER)
                 )));
         } else
-            $this->configService->needIndexFiles(true);       
+            $this->configService->needIndexFiles(true);
     }
 
     /**
@@ -178,11 +179,11 @@ class FilesEvents
     public function onFileRestore($path)
     {
         if ($this->configService->getAppValue('index_files_live_extract') == '1') {
-            $fileid = FileService::getFileIdFromPath($path, Filesystem::getView());
-            if ($fileid > 0)
+            $file = FileService::getFileInfoFromPath($path, Filesystem::getView());
+            if ($file->getId() > 0)
                 $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_RESTORE, array(
                     'userid' => $this->userId,
-                    'fileid' => $fileid
+                    'fileid' => $file->getId()
                 )));
         } else
             $this->configService->needIndexFiles(true);
