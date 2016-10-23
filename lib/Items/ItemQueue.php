@@ -37,6 +37,8 @@ class ItemQueue
 
     private $path;
 
+    private $folder = false;
+
     public function __construct($type = '', $more = array())
     {
         $this->type = $type;
@@ -48,6 +50,8 @@ class ItemQueue
                 $this->setFileId($more['fileid']);
             if (key_exists('path', $more))
                 $this->setPath($more['path']);
+            if (key_exists('folder', $more))
+                $this->setFolder($more['folder']);
         }
         
         if (is_object($more)) {
@@ -57,6 +61,8 @@ class ItemQueue
                 $this->setFileId($more->fileid);
             if (isset($more->path))
                 $this->setPath($more->path);
+            if (isset($more->folder))
+                $this->setFolder($more->folder);
         }
     }
 
@@ -100,13 +106,24 @@ class ItemQueue
         return $this->path;
     }
 
+    public function setFolder($folder)
+    {
+        $this->folder = $folder;
+    }
+
+    public function getFolder()
+    {
+        return $this->folder;
+    }
+
     public static function toJson($item)
     {
         return json_encode(array(
             'type' => $item->getType(),
             'userid' => $item->getUserId(),
             'fileid' => $item->getFileId(),
-            'path' => $item->getPath()
+            'path' => $item->getPath(),
+            'folder' => $item->getFolder()
         ));
     }
 
