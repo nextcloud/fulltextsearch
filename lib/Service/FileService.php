@@ -61,7 +61,7 @@ class FileService
         $this->solrTools = $solrTools;
         $this->miscService = $miscService;
         
-        $this->view = Filesystem::getView();
+        // $this->view = Filesystem::getView();
     }
 
     public function setDebug($debug)
@@ -82,201 +82,6 @@ class FileService
         return false;
     }
 
-    public function setView($view = null)
-    {
-        if ($view == null)
-            $view = Filesystem::getView();
-        $this->view = $view;
-    }
-    
-    // public function addFileFromPath($path, $forceExtract = false, &$status = 0)
-    // {
-    // $this->miscService->debug('Add file from path ' . $path);
-    
-    // if (! $this->view || $this->view == NULL)
-    // return false;
-    
-    // $fileInfo = $this->view->getFileInfo($path);
-    // if ($fileInfo == null)
-    // return false;
-    
-    // $storage = $fileInfo->getStorage();
-    // if (! $storage->isLocal() && $this->configService->getAppValue('index_files_external_index') != 1)
-    // return false;
-    
-    // $size = round($fileInfo->getSize() / 1024 / 1024, 1);
-    // if ($size > $this->configService->getAppValue('index_files_max_size')) {
-    // $this->miscService->debug('File is too big (' . $size . ' > ' . $this->configService->getAppValue('index_files_max_size') . ')');
-    // return false;
-    // }
-    
-    // if (! SolrService::extractableFile($fileInfo->getMimeType(), $path))
-    // return false;
-    
-    // if (! $forceExtract && $this->solrTools->isDocumentUpToDate('files', $fileInfo->getId(), $fileInfo->getMTime())) {
-    // $this->miscService->debug('File is already known ' . $path);
-    // return true;
-    // }
-    
-    // $this->miscService->debug('Extracting file ' . $path);
-    
-    // $storage = $fileInfo->getStorage();
-    // $status = 1;
-    // if ($storage->isLocal())
-    // $result = $this->solrService->extractFile($this->view->getLocalFile($path), 'files', $fileInfo->getId(), $path, $fileInfo->getMTime());
-    // else {
-    
-    // // create a temp file containing the remote file to send to solr
-    // // returns:
-    // // [OCP\Files\StorageNotAvailableException]
-    // // Dropbox API rate limit exceeded
-    
-    // // [Dropbox_Exception_Forbidden]
-    // // Forbidden. Bad or expired token. This can happen if the user or Dropbox revoked or expired an access token. To fix, you should re-authenticate the user.
-    
-    // // $tmp_file = tempnam(sys_get_temp_dir(), 'nextant_' . $storage->getId() . '_');
-    // // $content = $storage->file_get_contents($path);
-    // // file_put_contents($tmp_file, $content);
-    
-    // return false;
-    // }
-    
-    // if (! $result)
-    // $this->configService->needIndexFiles(true);
-    
-    // return $result;
-    // }
-    
-    // public function updateFiles($files, $options = null, $isRoot = true, $error = '')
-    // {
-    // if (! $this->view || $this->view == NULL)
-    // return false;
-    
-    // $this->miscService->debug('updating Files ' . var_export($files, true));
-    // try {
-    // if (! is_array($files))
-    // $files = array(
-    // 0 => array(
-    // 'fileid' => $files,
-    // 'path' => $this->view->getPath($files)
-    // )
-    // );
-    // } catch (NotFoundException $e) {
-    // return false;
-    // }
-    
-    // if ($options == null)
-    // $options = array();
-    
-    // $pack = array();
-    // foreach ($files as $file) {
-    
-    // $fileInfo = $this->view->getFileInfo($file['path']);
-    // $data = $this->getData($file['path']);
-    
-    // if ($fileInfo->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
-    // $subfiles = $this->view->getDirectoryContent($file['path']);
-    // foreach ($subfiles as $subfile) {
-    // $result = $this->updateFiles($subfile->getId(), $options, false);
-    // if ($result === false)
-    // return false;
-    // $pack = array_merge($pack, $result);
-    
-    // // we stop to cycle files after a thousand
-    // if (sizeof($pack) > self::UPDATE_MAXIMUM_FILES) {
-    // $this->miscService->log('We reached the limit of files to update (' . self::UPDATE_MAXIMUM_FILES . '), we won\'t go any further.', 2);
-    // return false;
-    // }
-    // }
-    // } else {
-    // $data['id'] = $file['fileid'];
-    // $data['path'] = $file['path'];
-    // array_push($pack, array_merge($data, $options));
-    // }
-    // }
-    
-    // if (! $isRoot)
-    // return $pack;
-    
-    // $count = $this->solrTools->updateDocuments('files', $pack, $error);
-    
-    // if ($count === false)
-    // $this->configService->needIndexFiles(true);
-    
-    // return $count;
-    // }
-    
-    /**
-     * delete file or files if directory
-     *
-     * @param string $path            
-     */
-    // public function removeFiles($path)
-    // {
-    // $solrResult = false;
-    
-    // try {
-    
-    // $fileInfo = $this->view->getFileInfo($path);
-    // if (! $fileInfo || $fileInfo == null)
-    // return false;
-    
-    // if ($fileInfo->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
-    // $files = $this->view->getDirectoryContent($path);
-    
-    // foreach ($files as $file) {
-    // if ($file == null)
-    // continue;
-    // $this->removeFiles($this->view->getPath($file->getId()));
-    // }
-    // } else
-    // $solrResult = $this->solrTools->removeDocument('files', $fileInfo->getId());
-    
-    // return $solrResult;
-    // } catch (NotFoundException $e) {}
-    
-    // return false;
-    // }
-    
-    // private function getData($path)
-    // {
-    // $data = array();
-    // $data['owner'] = $this->view->getOwner($path);
-    
-    // $subpath = '';
-    // $subdirs = explode('/', $path);
-    // foreach ($subdirs as $subdir) {
-    // $subpath .= '/' . $subdir;
-    // if ($subpath != '/') {
-    // $subdirInfos = $this->view->getFileInfo($subpath);
-    // if (! $subdirInfos)
-    // continue;
-    // $this->getDataFromFileId($subdirInfos->getId(), $data);
-    // }
-    // }
-    
-    // return $data;
-    // }
-    
-    // public static function getDataFromFileId($fileId, &$data)
-    // {
-    // if (! key_exists('share_users', $data))
-    // $data['share_users'] = array();
-    // if (! key_exists('share_groups', $data))
-    // $data['share_groups'] = array();
-    // if (! key_exists('deleted', $data))
-    // $data['deleted'] = false;
-    
-    // $OCShares = Share::getAllSharesForFileId($fileId);
-    // foreach ($OCShares as $share) {
-    // if ($share['share_type'] == '0')
-    // array_push($data['share_users'], $share['share_with']);
-    // if ($share['share_type'] == '1')
-    // array_push($data['share_groups'], $share['share_with']);
-    // }
-    
-    // return true;
-    // }
     public static function getId($path)
     {
         $fileId = 0;
@@ -354,14 +159,6 @@ class FileService
         return true;
     }
 
-    public function getDocumentFromPath($path)
-    {
-        if (! $this->view || $this->view == NULL)
-            return false;
-        
-        $fileInfo = $this->view->getFileInfo($path);
-    }
-
     /**
      * convert FileInfo to ItemDocument
      *
@@ -399,7 +196,7 @@ class FileService
         
         Filesystem::tearDown();
         Filesystem::init($userId, '');
-        $this->setView(Filesystem::getView());
+        
         $userFolder = FileService::getUserFolder($this->rootFolder, $userId, $dir);
         if (! $userFolder || $userFolder == null)
             return $data;
@@ -418,7 +215,7 @@ class FileService
                 continue;
             
             $item = $this->getDocumentFromFile($file);
-            $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
+            $item->setAbsolutePath(Filesystem::getView()->getLocalFile($item->getPath()));
             $item->setOwner($userId);
             $item->deleted(in_array('deleted', $options));
             
@@ -430,12 +227,121 @@ class FileService
     }
 
     /**
-     * Return share rights
+     * get files from a userid+fileid
      *
-     * @param unknown $path            
-     * @return NULL[]
+     * @param number $userId            
+     * @param number $fileId            
+     * @param array $options            
+     * @return array
      */
-    private function setShareRights($entry)
+    public function getFilesPerFileId($userId, $fileId, $options)
+    {
+        if (! $this->configured())
+            return false;
+        
+        if ($userId == '')
+            return false;
+        
+        if ($fileId == '')
+            return false;
+            
+            // Filesystem::tearDown();
+        Filesystem::init($userId, '');
+        $view = Filesystem::getView();
+        
+        $data = array();
+        $file = self::getFileInfoFromFileId($fileId, $view);
+        if ($file == false)
+            return false;
+        
+        if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
+            $sub = $this->getFilesPerPath($userId, $file->getPath(), $options);
+            if (sizeof($sub) > 0)
+                $data[] = $sub;
+            return $data;
+        }
+        
+        if (! $file->getStorage()->isLocal())
+            return $data;
+        
+        if ($file->isShared())
+            return $data;
+        
+        $item = $this->getDocumentFromFile($file);
+        $item->setAbsolutePath($view->getLocalFile($item->getPath()));
+        $item->setOwner($userId);
+        $item->deleted(in_array('deleted', $options));
+        
+        if ($item && $item != false && $item != null)
+            $data[] = $item;
+        
+        return $data;
+    }
+
+    /**
+     * get files from a userid+fileid
+     *
+     * @param number $userId            
+     * @param number $fileId            
+     * @param array $options            
+     * @return array
+     */
+    private function getFilesPerPath($userId, $path, $options)
+    {
+        if (! $this->configured())
+            return false;
+        
+        if ($userId == '')
+            return false;
+        
+        if ($fileId == '')
+            return false;
+            
+            // Filesystem::tearDown();
+        Filesystem::init($userId, '');
+        $view = Filesystem::getView();
+        
+        $data = array();
+        $file = $view->getFileInfo($path);
+        if ($file == false | $file == null)
+            return false;
+        
+        if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
+            
+            $subfiles = $view->getDirectoryContent($file->getPath());
+            foreach ($subfiles as $subfile) {
+                $result = $this->getFilesPerPath($userID, $subfile->getPath(), $options);
+                if ($result != false) {
+                    $data[] = $result;
+                }
+            }
+            return $data;
+        }
+        
+        if (! $file->getStorage()->isLocal())
+            return $data;
+        
+        if ($file->isShared())
+            return $data;
+        
+        $item = $this->getDocumentFromFile($file);
+        $item->setAbsolutePath($view->getLocalFile($item->getPath()));
+        $item->setOwner($userId);
+        $item->deleted(in_array('deleted', $options));
+        
+        if ($item && $item != false && $item != null)
+            $data[] = $item;
+        
+        return $data;
+    }
+
+    /**
+     * update ItemDocument share rights
+     *
+     * @param ItemDocument $entry            
+     * @return boolean
+     */
+    private function setShareRights(&$entry)
     {
         $data = array();
         
@@ -444,7 +350,7 @@ class FileService
         foreach ($subdirs as $subdir) {
             $subpath .= '/' . $subdir;
             if ($subpath != '/') {
-                $subdirInfos = $this->view->getFileInfo($subpath);
+                $subdirInfos = Filesystem::getView()->getFileInfo($subpath);
                 if (! $subdirInfos)
                     continue;
                 self::getShareRightsFromFileId($subdirInfos->getId(), $data);
@@ -453,10 +359,18 @@ class FileService
         
         $entry->setShare($data['share_users']);
         $entry->setShareGroup($data['share_groups']);
+        
         return true;
     }
 
-    public static function getShareRightsFromFileId($fileId, &$data)
+    /**
+     * update ItemDocument share rights from a specific fileid / subfolder
+     *
+     * @param number $fileId            
+     * @param ItemDocument $data            
+     * @return boolean
+     */
+    private static function getShareRightsFromFileId($fileId, &$data)
     {
         if (! key_exists('share_users', $data))
             $data['share_users'] = array();
@@ -536,5 +450,53 @@ class FileService
         ));
         
         return true;
+    }
+
+    /**
+     * returns fileId from a path
+     *
+     * @param string $path            
+     * @param View $view            
+     * @return boolean|number
+     */
+    public static function getFileIdFromPath($path, $view = null)
+    {
+        if ($view == null)
+            $view = Filesystem::getView();
+        if ($view == null)
+            return false;
+        
+        try {
+            $file = $view->getFileInfo($path);
+            
+            if ($file == null)
+                return false;
+            
+            return $file->getId();
+        } catch (NotFoundException $e) {
+            return false;
+        }
+    }
+
+    public static function getFileInfoFromFileId($fileId, $view = null)
+    {
+        try {
+            if ($view == null)
+                $view = Filesystem::getView();
+            if ($view == null)
+                return false;
+            
+            $path = $view->getPath($fileId);
+            if ($path == null)
+                return false;
+            
+            $file = $view->getFileInfo($path);
+            if ($file == null)
+                return false;
+            
+            return $file;
+        } catch (NotFoundException $e) {
+            return false;
+        }
     }
 }

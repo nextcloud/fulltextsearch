@@ -110,7 +110,7 @@ class IndexService
             $progress = new ProgressBar($this->output, sizeof($data));
         
         if ($progress != null) {
-            $progress->setMessage($type . '/<info>' . $userId . '</info>: ');
+            $progress->setMessage('<info>' . $userId . '</info>: ');
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'job');
             $progress->setMessage('', 'infos');
@@ -125,6 +125,7 @@ class IndexService
                 $this->parent->interrupted();
             
             if ($progress != null) {
+                $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType() . ': ');
                 $progress->setMessage('/', 'job');
                 $progress->setMessage('[scanning]', 'infos');
                 
@@ -143,13 +144,8 @@ class IndexService
             
             if (! $extract)
                 continue;
-                
-                //
-                // $doc = ItemDocument::getItem($allDocs, $type, $entry->getId());
-                // $needed = $this->solrTools->updateDocument($entry, $doc, false);
-                //
-            
-            if (! $forceExtract && $this->solrTools->isDocumentUpToDate($type, $entry, ItemDocument::getItem($solrDocs, $type, $entry->getId())))
+                             
+            if (! $forceExtract && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
                 continue;
             
             if ($progress != null) {
@@ -173,9 +169,19 @@ class IndexService
         return true;
     }
 
+    /**
+     * update Documents (sharing rights, trash, ...)
+     *
+     * @param string $type            
+     * @param string $userId            
+     * @param ItemDocument[] $data            
+     * @param ItemDocument[] $solrDocs            
+     * @return boolean
+     */
     public function updateDocuments($type, $userId, &$data, &$solrDocs = null)
     {
         $this->solrService->setOwner($userId);
+        
         if (sizeof($data) > 0 && ! $data[0]->isSynced())
             $this->extract($type, $userId, $data, $solrDocs, false);
         if ($solrDocs == null || $solrDocs == '')
@@ -186,7 +192,7 @@ class IndexService
             $progress = new ProgressBar($this->output, sizeof($data));
         
         if ($progress != null) {
-            $progress->setMessage($type . '/<info>' . $userId . '</info>: ');
+            $progress->setMessage('<info>' . $userId . '</info>: ');
             $progress->setMessage('', 'jvm');
             $progress->setMessage('/', 'job');
             $progress->setMessage('[comparing]', 'infos');
@@ -201,6 +207,8 @@ class IndexService
                 $this->parent->interrupted();
             
             if ($progress != null) {
+                $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType() . ': ');
+                
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     $infoSystem = $this->solrTools->getInfoSystem();
                     $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
@@ -209,10 +217,10 @@ class IndexService
                 $progress->advance();
             }
             
-            $doc = ItemDocument::getItem($solrDocs, $type, $entry->getId());
+            $doc = ItemDocument::getItem($solrDocs, $entry);
             $continue = false;
-            $needed = $this->solrTools->updateDocument($entry, $doc, false);
             
+            $needed = $this->solrTools->updateDocument($entry, $doc, false);
             if ($progress != null) {
                 if (! $needed) {
                     $progress->setMessage('/', 'job');
@@ -237,6 +245,34 @@ class IndexService
         return true;
     }
 
+    /**
+     * remove documents
+     *
+     * @param string $type            
+     * @param ItemDocument[] $data            
+     * @return boolean
+     */
+    public function removeDocuments(&$data)
+    {
+        if (sizeof($data) == 0)
+            return false;
+        
+        $forceExtract = false;
+        foreach ($data as $entry) {
+            $this->solrTools->removeDocument($entry);
+        }
+        
+        return true;
+    }
+
+    /**
+     * remove documents with no more file associated.
+     *
+     * @param string $type            
+     * @param string $userId            
+     * @param ItemDocument[] $data            
+     * @param ItemDocument[] $solrDocs            
+     */
     public function removeOrphans($type, $userId, &$data, &$solrDocs)
     {
         $this->solrService->setOwner($userId);
@@ -252,7 +288,7 @@ class IndexService
         
         if ($progress != null) {
             $progress->setFormat(self::PROGRESS_TEMPLATE);
-            $progress->setMessage($type . '/<info>' . $userId . '</info>: ');
+            $progress->setMessage('<info>' . $userId . '</info>: ');
             $progress->setMessage('/', 'job');
             $progress->setMessage('', 'jvm');
             $progress->setMessage('[spoting orphans]', 'infos');
@@ -271,11 +307,13 @@ class IndexService
             
             if (! in_array($doc->getId(), $docIds) && (! in_array($doc->getId(), $deleting))) {
                 array_push($deleting, $doc->getId());
-                $item = ItemDocument::getItem($solrDocs, $type, $doc->getId());
+                $item = ItemDocument::getItem($solrDocs, $doc);
                 $item->removed(true);
             }
             
             if ($progress != null) {
+                $progress->setMessage('<info>' . $userId . '</info>/' . $doc->getType() . ': ');
+                
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     $infoSystem = $this->solrTools->getInfoSystem();
                     $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
@@ -301,7 +339,7 @@ class IndexService
             
             if ($progress != null) {
                 $progress->setFormat(self::PROGRESS_TEMPLATE);
-                $progress->setMessage($type . '/<info>' . $userId . '</info>: ');
+                $progress->setMessage('<info>' . $userId . '</info>/' . $type . ': ');
                 $progress->setMessage('-', 'job');
                 $progress->setMessage('', 'jvm');
                 $progress->setMessage('[deleting orphans]', 'infos');

@@ -27,8 +27,8 @@
 namespace OCA\Nextant\Cron;
 
 use \OCA\Nextant\Service\FileService;
+use \OCA\Nextant\Items\ItemDocument;
 use \OCA\Nextant\AppInfo\Application;
-use OC\Files\Filesystem;
 
 class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 {
@@ -39,7 +39,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 
     public function __construct()
     {
-        $this->setInterval(60 * 60 * 2); // 2 hours
+        $this->setInterval(5); // 2 minutes
     }
 
     protected function run($argument)
@@ -53,34 +53,25 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->solrService = $c->query('SolrService');
         $this->solrTools = $c->query('SolrToolsService');
         $this->fileService = $c->query('FileService');
+        $this->indexService = $c->query('IndexService');
+        $this->bookmarkService = $c->query('BookmarkService');
+        $this->queueService = $c->query('QueueService');
         $this->rootFolder = $c->query('RootFolder');
-        
-        // $this->setDebug(true);
         
         if (! $this->solrService->configured(false))
             return;
         
-        if (! $this->configService->neededIndexFiles()) {
-            $this->miscService->debug('Looks like there is no need to index');
-            return;
-        }
-        
         $solr_locked = $this->configService->getAppValue('index_locked');
         if ($solr_locked > (time() - (3600 * 24))) {
-            $this->miscService->log('The background index detected that your solr is locked by a running script. If it is not the case, you should start indexing manually using ./occ nextant:index --force');
+            // $this->miscService->log('The background index detected that your solr is locked by a running script. If it is not the case, you should start indexing manually using ./occ nextant:index --force');
             return;
         }
         
-        $this->miscService->debug('Cron - Init');
+        $this->liveIndex();
+        $this->cronIndex();
         
-        $this->configService->setAppValue('index_locked', time());
-        if ($this->scanUsers()) {
-            $this->configService->needIndexFiles(false);
-            $this->configService->setAppValue('index_files_last', time());
-        }
-        $this->configService->setAppValue('index_locked', '0');
-        
-        $this->miscService->debug('Cron - End');
+        // if ($this->config)
+        return;
     }
 
     public function setDebug($debug)
@@ -89,119 +80,82 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->fileService->setDebug($debug);
     }
 
-    private function scanUsers()
+    private function liveIndex()
     {
-        $users = $this->userManager->search('');
-        $extractedDocuments = array();
-        
-        $documentIds = array();
-        $noFailure = true;
-        foreach ($users as $user) {
-            
-            $userId = $user->getUID();
-            $this->solrService->setOwner($userId);
-            
-            $result_files = $this->browseUserDirectory($userId, '/files', array(), $docIds_files);
-            $result_trash = $this->browseUserDirectory($userId, '/files_trashbin', array(
-                'deleted' => true
-            ), $docIds_trash);
-            
-            if (! $result_files || ! $result_trash) {
-                $this->miscService->log('Background index had some issue', 2);
-                $noFailure = false;
-            }
-            $documentIds = array_merge($documentIds, $docIds_files, $docIds_trash);
+        while (($item = $this->queueService->readQueue()) != false) {
+            $this->queueService->executeItem($item);
         }
-        
-        // orphans
-        $deleting = array();
-        $page = 0;
-        while (true) {
-            
-            $ids = $this->solrTools->getAll('files', $page, $lastPage, $error);
-            if (! $ids)
-                break;
-            
-            foreach ($ids as $id) {
-                if (! in_array($id, $documentIds) && (! in_array($id, $deleting)))
-                    array_push($deleting, $id);
-            }
-            
-            if ($lastPage)
-                break;
-            
-            $page ++;
-            if ($page > 10000) {
-                $this->miscService->log('Looks like we reached a 1,000,000 documents');
-                break;
-            }
-        }
-        
-        foreach ($deleting as $docId)
-            $this->solrTools->removeDocument('files', $docId);
-        
-        return $noFailure;
     }
 
-    private function browseUserDirectory($userId, $dir, $options, &$docIds)
+    private function cronIndex()
     {
-        $docIds = array();
-        
-        Filesystem::tearDown();
-        Filesystem::init($userId, '');
-        
-        $this->fileService->setView(Filesystem::getView());
-        
-        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, $dir);
-        if ($userFolder == null || ! $userFolder)
-            return true;
-        
-        $folder = $userFolder->get('/');
-        
-        $files = $folder->search('');
-        
-        sleep(5);
-        
-        $noFailure = true;
-        $fileIds = array();
-        foreach ($files as $file) {
-            
-            $this->miscService->debug('Cron - extract #' . $file->getId());
-            if (! $file->isShared() && $file->getType() == \OCP\Files\FileInfo::TYPE_FILE) {
-                if (($this->fileService->addFileFromPath($file->getPath(), false))) {
-                    
-                    array_push($docIds, (int) $file->getId());
-                    array_push($fileIds, array(
-                        'fileid' => $file->getId(),
-                        'options' => $options,
-                        'path' => $file->getPath()
-                    ));
-                }
-            }
+        if (($this->configService->timeIndexDelay('files') && $this->configService->neededIndexFiles()) || $this->configService->timeIndexDelay('files', 24)) {
+            $this->miscService->log('___cronFiles');
+            $this->configService->needIndexFiles(false);
+            $this->cronIndexFiles();
+            $this->cronUpdateFiles();
+            $this->configService->timeIndex('files');
         }
         
-        sleep(5);
-        $i = 0;
-        $currentIndex = time();
-        foreach ($fileIds as $file) {
-            $i ++;
-            
-            $this->miscService->debug('Cron update ' . $i . ' - file #' . $file['fileid']);
-            $result = $this->fileService->updateFiles(array(
-                $file
-            ), $file['options']);
-            
-            if ($result === false) {
-                $this->miscService->log('Failed to update files flag during background jobs (file #' . $file['fileid'] . ')', 3);
-                $noFailure = false;
-                sleep(10);
-            }
-            
-            if (($i % 1000) == 0) {
-                sleep(10);
-            }
+        if (($this->configService->timeIndexDelay('bookmarks') && $this->configService->neededIndexBookmarks()) || $this->configService->timeIndexDelay('bookmarks', 24)) {
+            $this->miscService->log('___cronBookmarks');
+            $this->configService->needIndexBookmarks(false);
+            $this->cronIndexBookmarks();
+            $this->configService->timeIndex('bookmarks');
         }
+    }
+
+    private function cronIndexFiles()
+    {
+        if (! $this->fileService->configured())
+            return;
         
-        return $noFailure;
+        $users = $this->userManager->search('');
+        
+        foreach ($users as $user) {
+            
+            $files = $this->fileService->getFilesPerUserId($user->getUID(), '/files', array());
+            $files_trashbin = $this->fileService->getFilesPerUserId($user->getUID(), '/files_trashbin', array(
+                'deleted'
+            ));
+            
+            $files = array_merge($files, $files_trashbin);
+            $solrDocs = null;
+            $this->indexService->extract(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
+            $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
+        }
+    }
+
+    private function cronUpdateFiles()
+    {
+        if (! $this->fileService->configured())
+            return;
+        
+        $users = $this->userManager->search('');
+        foreach ($users as $user) {
+            
+            $files = $this->fileService->getFilesPerUserId($user->getUID(), '/files', array());
+            $files_trashbin = $this->fileService->getFilesPerUserId($user->getUID(), '/files_trashbin', array(
+                'deleted'
+            ));
+            
+            $files = array_merge($files, $files_trashbin);
+            $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user->getUID(), $files);
+        }
+    }
+
+    private function cronIndexBookmarks()
+    {
+        if (! $this->bookmarkService->configured())
+            return;
+        
+        $users = $this->userManager->search('');
+        foreach ($users as $user) {
+            $bm = $this->bookmarkService->getBookmarksPerUserId($user->getUID());
+            
+            $solrDocs = null;
+            $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm, $solrDocs);
+            $this->indexService->removeOrphans(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm, $solrDocs);
+        }
     }
 }

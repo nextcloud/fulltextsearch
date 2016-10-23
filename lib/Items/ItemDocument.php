@@ -167,7 +167,7 @@ class ItemDocument
         return (int) $this->mtime;
     }
 
-    public function setShare($share)
+    public function setShare($share = array())
     {
         if (! is_array($share))
             $share = array();
@@ -179,7 +179,7 @@ class ItemDocument
         return $this->share;
     }
 
-    public function setShareGroup($share)
+    public function setShareGroup($share = array())
     {
         if (! is_array($share))
             $share = array();
@@ -287,10 +287,10 @@ class ItemDocument
         return new ItemDocument($type, $id);
     }
 
-    public static function getItem(&$list, $type, $id)
+    public static function getItem(&$list, $item)
     {
         foreach ($list as $entry)
-            if ($entry->getId() == $id && $entry->getType() == $type)
+            if ($entry->getId() == $item->getId() && $entry->getType() == $item->getType())
                 return $entry;
         return null;
     }

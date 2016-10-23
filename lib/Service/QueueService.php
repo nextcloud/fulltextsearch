@@ -60,7 +60,7 @@ class QueueService
             $this->miscService->log('can\'t msg_send()');
     }
 
-    public function readQueue()
+    public function readQueue($standby = false)
     {
         $queue = msg_get_queue(self::QUEUE_ID);
         
@@ -69,7 +69,7 @@ class QueueService
         $max_msg_size = 512;
         
         $infos = msg_stat_queue($queue);
-        if ($infos['msg_qnum'] == 0)
+        if (! $standby && $infos['msg_qnum'] == 0)
             return false;
         
         if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg))
@@ -82,13 +82,36 @@ class QueueService
     {
         $this->miscService->log('executeItem - ' . $item->getType() . ' (' . $item->getUserId() . ', ' . $item->getFileId() . ')');
         
+        $options = array();
         switch ($item->getType()) {
             case FilesEvents::FILE_CREATE:
-                $solrDocs = null;
-                $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), array());
+            case FilesEvents::FILE_UPDATE:
+                $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
                 if ($files != false && sizeof($files) > 0) {
-                    $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
-                  //  $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
+                    $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files, null);
+                }
+                break;
+            
+            case FilesEvents::FILE_TRASH:
+                $options = array(
+                    'deleted'
+                );
+            case FilesEvents::FILE_RENAME:
+            case FilesEvents::FILE_RESTORE:
+            case FilesEvents::FILE_SHARE:
+            case FilesEvents::FILE_UNSHARE:
+                $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
+                if ($files != false && sizeof($files) > 0) {
+                    $this->miscService->log('?? ' . (($files[0]->isDeleted()) ? 'y' : 'n') . ' -- ' . $files[0]->getPath());
+                    $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files, null);
+                }
+                break;
+            
+            case FilesEvents::FILE_DELETE:
+                $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
+                if (! $files) {
+                    $doc[] = new ItemDocument(ItemDocument::TYPE_FILE, $item->getFileId());
+                    $this->indexService->removeDocuments($doc);
                 }
                 break;
         }
