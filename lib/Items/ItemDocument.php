@@ -29,6 +29,8 @@ namespace OCA\Nextant\Items;
 class ItemDocument
 {
 
+    const TYPE_TEST = 'test';
+
     const TYPE_FILE = 'files';
 
     const TYPE_BOOKMARK = 'bookmarks';
