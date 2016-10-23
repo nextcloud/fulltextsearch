@@ -43,6 +43,8 @@ class QueueService
 
     private $miscService;
 
+    private $queue = null;
+
     public function __construct($indexService, $fileService, $miscService)
     {
         // $this->configService = $configService;\
@@ -59,7 +61,16 @@ class QueueService
         if (! msg_send($queue, 1, $msg))
             $this->miscService->log('can\'t msg_send()');
     }
-
+    
+    // public function emptyQueue()
+    // {
+    // $queue = msg_get_queue(self::QUEUE_ID);
+    
+    // $msg_type = NULL;
+    // $msg = NULL;
+    
+    // while (msg_receive($queue, 1, $msg_type, 512, $msg) !== false) {}
+    // }
     public function readQueue($standby = false)
     {
         $queue = msg_get_queue(self::QUEUE_ID);
@@ -72,44 +83,54 @@ class QueueService
         if (! $standby && $infos['msg_qnum'] == 0)
             return false;
         
-        if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg))
+        if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg, true, 0, $error)) {
             return false;
+        }
         
         return ItemQueue::fromJson($msg);
     }
 
     public function executeItem($item)
     {
-        $this->miscService->log('executeItem - ' . $item->getType() . ' (' . $item->getUserId() . ', ' . $item->getFileId() . ')');
-        
         $options = array();
         switch ($item->getType()) {
-            case FilesEvents::FILE_CREATE:
             case FilesEvents::FILE_UPDATE:
-                $solrDocs = null;
+                array_push($options, 'forceshared');
+            
+            case FilesEvents::FILE_CREATE:
                 $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
                 if ($files != false && sizeof($files) > 0) {
-                    $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
+                    $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files);
                 }
                 break;
             
             case FilesEvents::FILE_TRASH:
-                $options = array(
-                    'deleted'
-                );
+                array_push($options, 'deleted');
+            
             case FilesEvents::FILE_RENAME:
             case FilesEvents::FILE_RESTORE:
             case FilesEvents::FILE_SHARE:
             case FilesEvents::FILE_UNSHARE:
-                $solrDocs = null;
+                array_push($options, 'forceshared');
+                
                 $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
-                if ($files != false && sizeof($files) > 0)
-                    $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
+                if (is_array($files) && sizeof($files) > 0)
+                    $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files);
                 break;
             
             case FilesEvents::FILE_DELETE:
-                $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
-                if (! $files) {
+                
+                if ($item->getFolder()) {
+                    
+                    $files = $this->fileService->getFilesPerUserId($item->getUserId(), '/files', array());
+                    $files_trashbin = $this->fileService->getFilesPerUserId($item->getUserId(), '/files_trashbin', array(
+                        'deleted'
+                    ));
+                    
+                    $files = array_merge($files, $files_trashbin);
+                    $solrDocs = null;
+                    $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
+                } else {
                     $doc[] = new ItemDocument(ItemDocument::TYPE_FILE, $item->getFileId());
                     $this->indexService->removeDocuments($doc);
                 }
