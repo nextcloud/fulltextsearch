@@ -194,9 +194,9 @@ class Application extends App
         Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
         Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
         
-        Util::connectHook('\OCA\Bookmarks', 'post_add', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkAdd');
-        Util::connectHook('\OCA\Bookmarks', 'post_edit', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkEdit');
-        Util::connectHook('\OCA\Bookmarks', 'post_delete', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkDelete');
+        // Util::connectHook('\OCA\Bookmarks', 'post_add', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkAdd');
+        // Util::connectHook('\OCA\Bookmarks', 'post_edit', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkEdit');
+        // Util::connectHook('\OCA\Bookmarks', 'post_delete', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkDelete');
     }
 
     public function registerSearchProvider()
