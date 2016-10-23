@@ -139,8 +139,8 @@ class SearchController extends Controller
                 $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
                 $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
                 
-                if ($data['deleted'])
-                    $this->miscService->log('$$$ ' . var_export($data, true));
+//                 if ($data['deleted'])
+//                     $this->miscService->log('$$$ ' . var_export($data, true));
                 
                 array_push($results, $data);
             }
