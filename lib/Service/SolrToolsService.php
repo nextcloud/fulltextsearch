@@ -141,7 +141,7 @@ class SolrToolsService
             if ($source->isDeleted() != $final->isDeleted())
                 $modifs = true;
             if (! $modifs)
-                return false;
+                return true;
             if (! $update)
                 return true;
             
@@ -194,22 +194,17 @@ class SolrToolsService
                 $doc
             ))->addCommit();
             
-            if (! $request = $client->update($query)) {
-                $this->miscService->log('updateDocument update query failed');
+            if ($request = $client->update($query)) {
+                $source->setShare($final->getShare());
+                $source->setShareGroup($final->getShareGroup());
+                $source->setPath($final->getPath());
+                $source->setOwner($final->getOwner());
+                $source->deleted($final->isDeleted());
+                $source->updated(true);
+                
+                return true;
+            } else
                 $error = SolrService::EXCEPTION_UPDATE_QUERY_FAILED;
-                $document->failed(ItemDocument::FAIL_UPDATE);
-                return false;
-            }
-            
-            $source->setShare($final->getShare());
-            $source->setShareGroup($final->getShareGroup());
-            $source->setPath($final->getPath());
-            $source->setOwner($final->getOwner());
-            $source->deleted($final->isDeleted());
-            
-            $source->updated(true);
-            
-            return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = SolrService::EXCEPTION_UPDATE_FIELD_FAILED;
@@ -219,7 +214,8 @@ class SolrToolsService
             $error = SolrService::EXCEPTION;
         }
         
-        $this->miscService->debug('updateDocument error #' . $error);
+        // $this->miscService->debug('updateDocument error #' . $error);
+        $source->failedUpdate(true);
         
         return false;
     }

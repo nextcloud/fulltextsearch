@@ -207,6 +207,7 @@ class Index extends Base
         $extracted = 0;
         $processed = 0;
         $removed = 0;
+        $failed = 0;
         foreach ($users as $user) {
             
             $this->interrupted();
@@ -226,6 +227,8 @@ class Index extends Base
                     $extracted ++;
                 if ($doc->isProcessed())
                     $processed ++;
+                if ($doc->isFailedExtract())
+                    $failed ++;
             }
             foreach ($solrDocs as $doc) {
                 if ($doc->isRemoved())
@@ -236,6 +239,8 @@ class Index extends Base
         }
         
         $output->writeln('  ' . $processed . ' file(s) processed ; ' . $extracted . ' extracted documents ; ' . $removed . ' orphan(s) removed');
+        if ($failed > 0)
+            $output->writeln('  ' . $failed . ' file(s) were not processed (failure)');
     }
 
     /**
@@ -258,6 +263,7 @@ class Index extends Base
         $users = $this->userManager->search('');
         
         $updated = 0;
+        $failed = 0;
         foreach ($users as $user) {
             
             $this->interrupted();
@@ -274,10 +280,12 @@ class Index extends Base
             foreach ($files as $doc) {
                 if ($doc->isUpdated())
                     $updated ++;
+                if ($doc->isFailedUpdated())
+                    $failed ++;
             }
         }
         
-        $output->writeln('  ' . $updated . ' document(s) updated');
+        $output->writeln('  ' . $updated . ' document(s) updated ; ' . $failed . ' failure(s)');
         
         return;
     }

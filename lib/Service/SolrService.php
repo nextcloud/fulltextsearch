@@ -384,9 +384,9 @@ class SolrService
             $ret = $client->createResult($query, $response);
             
             $document->processed(true);
-            // $ret = $client->extract($query);
             
-            return $ret;
+            if ($ret)
+                return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_EXTRACT_FAILED;
@@ -395,6 +395,8 @@ class SolrService
         } catch (\Solarium\Exception $e) {
             $error = self::EXCEPTION;
         }
+        
+        $document->failedExtract(true);
         
         return false;
     }

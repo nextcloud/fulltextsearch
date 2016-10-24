@@ -98,7 +98,7 @@ class IndexService
      * @param array $data            
      * @return array
      */
-    public function extract($type, $userId, &$data, &$solrDocs = null, $extract = true)
+    public function extract($type, $userId, &$data, &$solrDocs = null, $extract = true, &$error = 0)
     {
         $this->solrService->setOwner($userId);
         
@@ -289,7 +289,7 @@ class IndexService
             $this->extract($type, $userId, $data, $solrDocs, false);
         
         if ($solrDocs == null || $solrDocs == '')
-            $solrDocs = $this->getAllDocuments($type, $userId, $error);
+            $solrDocs = $this->getAllDocuments($type, $userId);
         
         $progress = null;
         if ($this->output != null)

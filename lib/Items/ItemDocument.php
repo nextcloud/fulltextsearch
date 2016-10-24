@@ -69,7 +69,9 @@ class ItemDocument
 
     private $updated = false;
 
-    private $failed = false;
+    private $failedExtract = false;
+
+    private $failedUpdate = false;
 
     private $synced = false;
 
@@ -263,14 +265,24 @@ class ItemDocument
         return $this->updated;
     }
 
-    public function failed($failed)
+    public function failedExtract($failed)
     {
-        $this->failed = $failed;
+        $this->failedExtract = $failed;
     }
 
-    public function isFailed()
+    public function isFailedExtract()
     {
-        return $this->failed;
+        return $this->failedExtract;
+    }
+
+    public function failedUpdate($failed)
+    {
+        $this->failedUpdate = $failed;
+    }
+
+    public function isFailedUpdate()
+    {
+        return $this->failedUpdate;
     }
 
     public function synced($synced)
@@ -291,9 +303,13 @@ class ItemDocument
 
     public static function getItem(&$list, $item)
     {
+        if ($list == null || $item == null)
+            return null;
+        
         foreach ($list as $entry)
             if ($entry->getId() == $item->getId() && $entry->getType() == $item->getType())
                 return $entry;
+        
         return null;
     }
 }
