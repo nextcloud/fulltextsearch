@@ -85,10 +85,8 @@ class Live extends Base
 
     public function interrupted()
     {
-        if ($this->hasBeenInterrupted()) {
-            $this->queueService->endQueue();
+        if ($this->hasBeenInterrupted())
             throw new \Exception('ctrl-c');
-        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -127,8 +125,6 @@ class Live extends Base
             }
             $output->writeln('');
         }
-        
-        $this->queueService->endQueue();
     }
 }
 

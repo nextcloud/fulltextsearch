@@ -67,9 +67,12 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             return;
         }
         
+        $this->configService->setAppValue('index_locked', time());
+        
         $this->liveIndex();
         $this->cronIndex();
         
+        $this->configService->setAppValue('index_locked', '0');
         // if ($this->config)
         return;
     }
