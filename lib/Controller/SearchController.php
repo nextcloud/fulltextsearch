@@ -70,7 +70,7 @@ class SearchController extends Controller
     {
         $results = array();
         
-        if ($this->solrService == false)
+        if (!$this->solrService)
             return $results;
         
         if ($query !== null) {
@@ -85,7 +85,7 @@ class SearchController extends Controller
                 'current_directory' => $current_dir
             ));
             
-            if ($solrResult == false)
+            if (!$solrResult)
                 return $results;
             
             foreach ($solrResult as $data) {
@@ -127,9 +127,9 @@ class SearchController extends Controller
                         $hl2 = '... ' . $data['highlight'][1] . ' ...';
                 }
                 
-                if ($hl1 == '' || $hl1 == null)
+                if ($hl1 === '' || $hl1 === null)
                     $hl1 = '';
-                if ($hl2 == '' || $hl2 == null)
+                if ($hl2 === '' || $hl2 === null)
                     $hl2 = '';
                 
                 $data['highlight1'] = $hl1;

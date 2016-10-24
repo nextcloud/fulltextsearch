@@ -85,7 +85,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 
     private function liveIndex()
     {
-        while (($item = $this->queueService->readQueue()) != false) {
+        while (($item = $this->queueService->readQueue()) !== false) {
             $this->queueService->executeItem($item);
         }
     }

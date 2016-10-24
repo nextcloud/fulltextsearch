@@ -303,11 +303,11 @@ class ItemDocument
 
     public static function getItem(&$list, $item)
     {
-        if ($list == null || $item == null)
+        if ($list === null || $item === null)
             return null;
         
         foreach ($list as $entry)
-            if ($entry->getId() == $item->getId() && $entry->getType() == $item->getType())
+            if ($entry->getId() === $item->getId() && $entry->getType() === $item->getType())
                 return $entry;
         
         return null;
