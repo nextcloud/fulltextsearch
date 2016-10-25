@@ -81,7 +81,7 @@ class Index extends Base
         parent::configure();
         $this->setName('nextant:index')
             ->setDescription('scan users\' files, generate and index Solr documents')
-            ->addOption('debug', 'd', InputOption::VALUE_NONE, 'flood the log of debug messages')
+            ->addOption('debug', 'd', InputOption::VALUE_NONE, 'display more text')
             ->addOption('unlock', 'u', InputOption::VALUE_NONE, 'unlock on Solr')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'force extract and update of all your documents')
             ->addOption('background', 'c', InputOption::VALUE_NONE, 'force index as a background process (cron)')
