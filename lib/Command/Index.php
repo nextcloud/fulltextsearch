@@ -280,7 +280,7 @@ class Index extends Base
             foreach ($files as $doc) {
                 if ($doc->isUpdated())
                     $updated ++;
-                if ($doc->isFailedUpdated())
+                if ($doc->isFailedUpdate())
                     $failed ++;
             }
         }
