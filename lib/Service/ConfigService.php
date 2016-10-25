@@ -35,9 +35,9 @@ class ConfigService
 
     const SEARCH_DISPLAY_FILES = 2;
 
-    const ACTION_LIVE_EXTRACT = 'index_files_live_extract';
+    const ACTION_LIVE_EXTRACT = 'index_files_live';
 
-    const ACTION_LIVE_DOCUPDATE = 'index_files_live_extract';
+    const ACTION_LIVE_DOCUPDATE = 'index_files_live';
 
     private $defaults = [
         'configured' => '0',
@@ -53,8 +53,7 @@ class ConfigService
         'index_files' => 1,
         'index_files_needed' => 1,
         'index_files_update_needed' => 1,
-        'index_files_live_extract' => 1,
-        'index_files_live_update' => 0,
+        'index_files_live' => 1,
         'index_files_external_index' => 0,
         'index_files_max_size' => 40,
         
@@ -91,6 +90,8 @@ class ConfigService
         $this->deleteAppValue('live_docupdate');
         $this->deleteAppValue('max_size');
         $this->deleteAppValue('external_index');
+        $this->deleteAppValue('index_files_live_extract');
+        $this->deleteAppValue('index_files_live_update');
     }
 
     public function needIndexFiles($need)
