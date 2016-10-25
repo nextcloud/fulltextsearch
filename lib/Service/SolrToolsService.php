@@ -142,6 +142,9 @@ class SolrToolsService
                 $modifs = true;
             if (! $modifs)
                 return true;
+            
+            $source->needUpdate(true);
+            
             if (! $update)
                 return true;
             

@@ -146,6 +146,9 @@ class IndexService
             if ($entry->getType() == ItemDocument::TYPE_BOOKMARK)
                 $this->bookmarkService->syncDocument($entry);
             
+            if (! $entry->isExtractable())
+                continue;
+            
             if (! $extract)
                 continue;
             
@@ -229,19 +232,19 @@ class IndexService
             $doc = ItemDocument::getItem($solrDocs, $entry);
             $continue = false;
             
-            $needed = $this->solrTools->updateDocument($entry, $doc, false);
+            $this->solrTools->updateDocument($entry, $doc, false);
             if ($progress != null) {
-                if (! $needed) {
-                    $progress->setMessage('/', 'job');
-                    $progress->setMessage('[comparing]', 'infos');
-                } else {
+                if ($entry->neededUpdate()) {
                     $progress->setMessage('!', 'job');
                     $progress->setMessage('[updating]', 'infos');
+                } else {
+                    $progress->setMessage('/', 'job');
+                    $progress->setMessage('[comparing]', 'infos');
                 }
                 $progress->display();
             }
             
-            if ($needed)
+            if ($entry->neededUpdate())
                 $this->solrTools->updateDocument($entry, $doc);
         }
         
