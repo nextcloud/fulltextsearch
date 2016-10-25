@@ -215,7 +215,6 @@ class SolrToolsService
             $error = SolrService::EXCEPTION;
         }
         
-        // $this->miscService->debug('updateDocument error #' . $error);
         $final->failedUpdate(true);
         
         return false;
@@ -243,9 +242,12 @@ class SolrToolsService
             $update->addDeleteById($doc->getType() . '_' . $doc->getId());
             $update->addCommit();
             
-            $doc->removed(true);
+            $ret = $client->update($update);
             
-            return $client->update($update);
+            if ($ret) {
+                $doc->removed(true);
+                return true;
+            }
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = SolrService::EXCEPTION_REMOVE_FAILED;
