@@ -288,10 +288,10 @@ class SolrService
             $response = $client->executeRequest($request);
             $ret = $client->createResult($query, $response);
             
-            $document->processed(true);
-            
-            if ($ret)
+            if ($ret) {
+                $document->processed(true);
                 return true;
+            }
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_EXTRACT_FAILED;

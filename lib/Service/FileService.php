@@ -156,6 +156,11 @@ class FileService
         $item->extractable(true);
         $this->setShareRights($item);
         
+        if ($item->isDeleted()) {
+            $item->setShare();
+            $item->setShareGroup();
+        }
+        
         return true;
     }
 

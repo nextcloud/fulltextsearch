@@ -55,6 +55,8 @@ class IndexService
 
     private $lastProgressTick;
 
+    private $debug = false;
+
     public function __construct($fileService, $bookmarkService, $solrService, $solrTools, $miscService)
     {
         $this->fileService = $fileService;
@@ -71,6 +73,7 @@ class IndexService
 
     public function setDebug($debug)
     {
+        $this->debug = true;
         $this->miscService->setDebug($debug);
     }
 
@@ -104,9 +107,9 @@ class IndexService
         
         if ($solrDocs == null || $solrDocs == '') {
             if (sizeof($data) == 1)
-                $solrDocs = $this->getAllDocuments($type, $userId, $data[0]->getId(), $error);
+                $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $error);
             else
-                $solrDocs = $this->getAllDocuments($type, $userId, 0, $error);
+                $solrDocs = $this->getDocuments($type, $userId, 0, $error);
         }
         
         $progress = null;
@@ -145,6 +148,10 @@ class IndexService
                 $this->fileService->syncDocument($entry);
             if ($entry->getType() == ItemDocument::TYPE_BOOKMARK)
                 $this->bookmarkService->syncDocument($entry);
+            if ($entry->getType() == ItemDocument::TYPE_TEST) {
+                $entry->synced(true);
+                $entry->extractable(true);
+            }
             
             if (! $entry->isExtractable())
                 continue;
@@ -194,9 +201,9 @@ class IndexService
         
         if ($solrDocs == null || $solrDocs == '') {
             if (sizeof($data) == 1)
-                $solrDocs = $this->getAllDocuments($type, $userId, $data[0]->getId(), $error);
+                $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $error);
             else
-                $solrDocs = $this->getAllDocuments($type, $userId, 0, $error);
+                $solrDocs = $this->getDocuments($type, $userId, 0, $error);
         }
         
         $progress = null;
@@ -229,10 +236,11 @@ class IndexService
                 $progress->advance();
             }
             
-            $doc = ItemDocument::getItem($solrDocs, $entry);
+            $current = ItemDocument::getItem($solrDocs, $entry);
             $continue = false;
             
-            $this->solrTools->updateDocument($entry, $doc, false);
+            $this->solrTools->updateDocument($entry, $current, false);
+            
             if ($progress != null) {
                 if ($entry->neededUpdate()) {
                     $progress->setMessage('!', 'job');
@@ -245,7 +253,15 @@ class IndexService
             }
             
             if ($entry->neededUpdate())
-                $this->solrTools->updateDocument($entry, $doc);
+                $this->solrTools->updateDocument($entry, $current);
+            
+            if ($entry->isFailedUpdate()) {
+                if ($this->output != null && $this->debug) {
+                    $this->output->writeln('');
+                    $this->output->writeln('Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ')');
+                    $this->output->writeln('');
+                }
+            }
         }
         
         if ($progress != null) {
@@ -292,7 +308,7 @@ class IndexService
             $this->extract($type, $userId, $data, $solrDocs, false);
         
         if ($solrDocs == null || $solrDocs == '')
-            $solrDocs = $this->getAllDocuments($type, $userId);
+            $solrDocs = $this->getDocuments($type, $userId);
         
         $progress = null;
         if ($this->output != null)
@@ -402,7 +418,7 @@ class IndexService
      * @param number $error            
      * @return boolean
      */
-    private function getAllDocuments($type = '', $userId = '', $fileId = 0, &$error = 0)
+    public function getDocuments($type = '', $userId = '', $fileId = 0, &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
