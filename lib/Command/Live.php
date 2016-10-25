@@ -95,10 +95,15 @@ class Live extends Base
         $output->writeln('');
         
         if (! $this->solrService->configured(true)) {
-            $output->writeln('Nextant is not yet configured');
+            $output->writeln('Your nextant is not yet configured');
             return;
         }
         
+        if ($this->configService->getAppValue('index_live_files') !== '1')
+        {
+            $output->writeln('your nextant is not configured for Live Index');
+            return;
+        }
         // $this->miscService->setDebug($input->getOption('debug'));
         // $this->fileService->setDebug($input->getOption('debug'));
         // $this->indexService->setDebug($input->getOption('debug'));
