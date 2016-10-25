@@ -57,6 +57,10 @@ class ItemDocument
 
     private $storage;
 
+    private $needExtract = false;
+
+    private $needUpdate = false;
+
     private $extractable = false;
 
     private $extracted = false;
@@ -203,6 +207,26 @@ class ItemDocument
     public function getStorage()
     {
         return $this->storage;
+    }
+
+    public function needExtract($need)
+    {
+        $this->needExtract = $need;
+    }
+
+    public function neededExtract()
+    {
+        return $this->needExtract;
+    }
+
+    public function needUpdate($need)
+    {
+        $this->needUpdate = $need;
+    }
+
+    public function neededUpdate()
+    {
+        return $this->needUpdate;
     }
 
     public function extractable($extractable)
