@@ -47,8 +47,8 @@ class ConfigService
         
         'index_delay' => 2,
         'index_locked' => 0,
-        'index_last_files' => 0,
-        'index_last_bookmarks' => 0,
+        'index_files_last' => 0,
+        'index_bookmarks_last' => 0,
         
         'index_files' => 1,
         'index_files_needed' => 1,
@@ -127,7 +127,7 @@ class ConfigService
 
     public function timeIndex($type)
     {
-        $this->setAppValue('index_last_' . $type, time());
+        $this->setAppValue('index_' . $type . '_last', time());
     }
 
     public function timeIndexDelay($type, $delay = 0)
@@ -135,7 +135,7 @@ class ConfigService
         if ($delay == 0)
             $delay = $this->getAppValue('index_delay');
         
-        return ($this->getAppValue('index_last_' . $type) < (time() - (3600 * $delay)));
+        return ($this->getAppValue('index_' . $type . '_last') < (time() - (3600 * $delay)));
     }
 
     /**
@@ -181,18 +181,18 @@ class ConfigService
      * @param string $action            
      * @return boolean
      */
-    public function shoudIContinue($action)
-    {
-        switch ($action) {
-            case self::ACTION_LIVE_EXTRACT:
-                return ($this->getAppValue($action) == '1');
+//     public function shoudIContinue($action)
+//     {
+//         switch ($action) {
+//             case self::ACTION_LIVE_EXTRACT:
+//                 return ($this->getAppValue($action) == '1');
             
-            case self::ACTION_LIVE_DOCUPDATE:
-                if ($this->getAppValue(self::ACTION_LIVE_EXTRACT) != '1')
-                    return false;
-                return ($this->getAppValue($action) == '1');
-        }
-    }
+//             case self::ACTION_LIVE_DOCUPDATE:
+//                 if ($this->getAppValue(self::ACTION_LIVE_EXTRACT) != '1')
+//                     return false;
+//                 return ($this->getAppValue($action) == '1');
+//         }
+//     }
 
     /**
      * generate an array to pass config to Solarium
