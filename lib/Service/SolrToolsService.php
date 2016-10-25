@@ -110,40 +110,36 @@ class SolrToolsService
 
     /**
      *
-     * @param ItemDocument $source            
      * @param ItemDocument $final            
+     * @param ItemDocument $current            
      *
      * @return boolean
      */
-    public function updateDocument(&$source, $final, $update = true, &$error = 0)
+    public function updateDocument(&$final, &$current, $update = true, &$error = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
         
         try {
-            if ($source == null || $final == null)
+            if ($final == null || $current == null)
                 return false;
             
             $modifs = false;
-            if ($source->isDeleted()) {
-                $source->setShare();
-                $source->setShareGroup();
-            }
+            if (! MiscService::arraysIdentical($final->getShare(), $current->getShare()))
+                $modifs = true;
+            if (! MiscService::arraysIdentical($final->getShareGroup(), $current->getShareGroup()))
+                $modifs = true;
+            if ($final->getPath() !== $current->getPath())
+                $modifs = true;
+            if ($final->getOwner() !== $current->getOwner())
+                $modifs = true;
+            if ($final->isDeleted() != $current->isDeleted())
+                $modifs = true;
             
-            if (! MiscService::arraysIdentical($source->getShare(), $final->getShare()))
-                $modifs = true;
-            if (! MiscService::arraysIdentical($source->getShareGroup(), $final->getShareGroup()))
-                $modifs = true;
-            if ($source->getPath() != $final->getPath())
-                $modifs = true;
-            if ($source->getOwner() != $final->getOwner())
-                $modifs = true;
-            if ($source->isDeleted() != $final->isDeleted())
-                $modifs = true;
             if (! $modifs)
                 return true;
             
-            $source->needUpdate(true);
+            $final->needUpdate(true);
             
             if (! $update)
                 return true;
@@ -154,19 +150,19 @@ class SolrToolsService
             $doc = $query->createDocument();
             $doc->setKey('id', $final->getType() . '_' . $final->getId());
             
-            if ($source->getOwner() != $final->getOwner()) {
-                $doc->setField('nextant_owner', $source->getOwner());
+            if ($final->getOwner() !== $current->getOwner()) {
+                $doc->setField('nextant_owner', $final->getOwner());
                 $doc->setFieldModifier('nextant_owner', 'set');
             }
             
-            if ($source->getPath() != $final->getPath()) {
-                $doc->setField('nextant_path', $source->getPath());
+            if ($final->getPath() !== $current->getPath()) {
+                $doc->setField('nextant_path', $final->getPath());
                 $doc->setFieldModifier('nextant_path', 'set');
             }
             
-            if (! MiscService::arraysIdentical($source->getShare(), $final->getShare())) {
-                if (sizeof($source->getShare()) > 0) {
-                    $doc->setField('nextant_share', $source->getShare());
+            if (! MiscService::arraysIdentical($final->getShare(), $current->getShare())) {
+                if (sizeof($final->getShare()) > 0) {
+                    $doc->setField('nextant_share', $final->getShare());
                     $doc->setFieldModifier('nextant_share', 'set');
                 } else {
                     $doc->setField('nextant_share', array(
@@ -176,9 +172,9 @@ class SolrToolsService
                 }
             }
             
-            if (! MiscService::arraysIdentical($source->getShareGroup(), $final->getShareGroup())) {
-                if (sizeof($source->getShareGroup()) > 0) {
-                    $doc->setField('nextant_sharegroup', $source->getShareGroup());
+            if (! MiscService::arraysIdentical($final->getShareGroup(), $current->getShareGroup())) {
+                if (sizeof($final->getShareGroup()) > 0) {
+                    $doc->setField('nextant_sharegroup', $final->getShareGroup());
                     $doc->setFieldModifier('nextant_sharegroup', 'set');
                 } else {
                     $doc->setField('nextant_sharegroup', array(
@@ -188,8 +184,8 @@ class SolrToolsService
                 }
             }
             
-            if ($source->isDeleted() != $final->isDeleted()) {
-                $doc->setField('nextant_deleted', ($source->isDeleted()) ? 'true' : 'false');
+            if ($final->isDeleted() != $current->isDeleted()) {
+                $doc->setField('nextant_deleted', ($final->isDeleted()) ? 'true' : 'false');
                 $doc->setFieldModifier('nextant_deleted', 'set');
             }
             
@@ -198,13 +194,15 @@ class SolrToolsService
             ))->addCommit();
             
             if ($request = $client->update($query)) {
-                $source->setShare($final->getShare());
-                $source->setShareGroup($final->getShareGroup());
-                $source->setPath($final->getPath());
-                $source->setOwner($final->getOwner());
-                $source->deleted($final->isDeleted());
-                $source->updated(true);
+                // fixing solrDocs' data
+                $current->setShare($final->getShare());
+                $current->setShareGroup($final->getShareGroup());
+                $current->setPath($final->getPath());
+                $current->setOwner($final->getOwner());
+                $current->deleted($final->isDeleted());
+                $current->updated(true);
                 
+                $final->updated(true);
                 return true;
             } else
                 $error = SolrService::EXCEPTION_UPDATE_QUERY_FAILED;
@@ -218,7 +216,7 @@ class SolrToolsService
         }
         
         // $this->miscService->debug('updateDocument error #' . $error);
-        $source->failedUpdate(true);
+        $final->failedUpdate(true);
         
         return false;
     }
