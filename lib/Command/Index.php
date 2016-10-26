@@ -203,19 +203,7 @@ class Index extends Base
         $output->writeln('* Extracting files:');
         $output->writeln('');
         
-        $users = $input->getOption('user');
-        if (! $users) {
-            $users = array();
-            $userSearch = $this->userManager->search('');
-            foreach ($userSearch as $user) {
-                $users[] = $user->getUID();
-            }
-        } else {
-            if (! is_array($users))
-                $users = array(
-                    $users
-                );
-        }
+        $users = $this->getUsers($input->getOption('user'));
         
         $extracted = 0;
         $processed = 0;
@@ -276,17 +264,7 @@ class Index extends Base
         $output->writeln('* Updating files:');
         $output->writeln('');
         
-        if (($users = $input->getOption('user')) === false) {
-            $users = array();
-            $userSearch = $this->userManager->search('');
-            foreach ($userSearch as $user)
-                $users[] = $user->getUID();
-        } else {
-            if (! is_array($users))
-                $users = array(
-                    $users
-                );
-        }
+        $users = $this->getUsers($input->getOption('user'));
         
         $updated = 0;
         $failed = 0;
@@ -336,17 +314,7 @@ class Index extends Base
         $output->writeln('* Indexing bookmarks:');
         $output->writeln('');
         
-        if (($users = $input->getOption('user')) === false) {
-            $users = array();
-            $userSearch = $this->userManager->search('');
-            foreach ($userSearch as $user)
-                $users[] = $user->getUID();
-        } else {
-            if (! is_array($users))
-                $users = array(
-                    $users
-                );
-        }
+        $users = $this->getUsers($input->getOption('user'));
         
         foreach ($users as $user) {
             $this->interrupted();
@@ -364,6 +332,25 @@ class Index extends Base
         
         $output->writeln('');
         return;
+    }
+
+    private function getUsers($option)
+    {
+        if (! $option) {
+            $users = array();
+            $userSearch = $this->userManager->search('');
+            foreach ($userSearch as $user) {
+                $users[] = $user->getUID();
+            }
+        } else {
+            $users = $option;
+            if (! is_array($users))
+                $users = array(
+                    $users
+                );
+        }
+        
+        return $users;
     }
 }
 
