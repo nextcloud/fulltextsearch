@@ -335,6 +335,7 @@ class SolrService
             
             array_push($options, 'complete_words');
             $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
+            
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             
             $query->setFields(array(

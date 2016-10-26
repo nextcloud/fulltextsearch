@@ -252,14 +252,15 @@ class IndexService
                 $progress->display();
             }
             
-            if ($entry->neededUpdate())
-                $this->solrTools->updateDocument($entry, $current);
-            
-            if ($entry->isFailedUpdate()) {
-                if ($this->output != null && $this->debug) {
-                    $this->output->writeln('');
-                    $this->output->writeln('Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ')');
-                    $this->output->writeln('');
+            if ($entry->neededUpdate()) {
+                $this->solrTools->updateDocument($entry, $current, true, $error);
+                
+                if ($entry->isFailedUpdate()) {
+                    if ($this->output != null && $this->debug) {
+                        $this->output->writeln('');
+                        $this->output->writeln('Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error);
+                        $this->output->writeln('');
+                    }
                 }
             }
         }
