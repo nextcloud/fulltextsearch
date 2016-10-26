@@ -28,6 +28,7 @@ namespace OCA\Nextant\Controller;
 
 use \OCA\Nextant\Service\ConfigService;
 use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Items\ItemDocument;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
@@ -39,6 +40,8 @@ class SettingsController extends Controller
 
     private $miscService;
 
+    private $indexService;
+
     private $solrService;
 
     private $solrTools;
@@ -49,10 +52,11 @@ class SettingsController extends Controller
 
     private $solr_core;
 
-    public function __construct($appName, IRequest $request, ConfigService $configService, $solrService, $solrTools, $solrAdmin, $miscService)
+    public function __construct($appName, IRequest $request, ConfigService $configService, $indexService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
         parent::__construct($appName, $request);
         $this->configService = $configService;
+        $this->indexService = $indexService;
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->solrAdmin = $solrAdmin;
@@ -89,28 +93,29 @@ class SettingsController extends Controller
             'index_files' => $this->configService->getAppValue('index_files'),
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
-            'index_files_live_extract' => $this->configService->getAppValue('index_files_live_extract'),
-            'index_files_live_update' => $this->configService->getAppValue('index_files_live_update'),
+            'index_files_live' => $this->configService->getAppValue('index_files_live'),
             'index_files_external_index' => $this->configService->getAppValue('index_files_external_index'),
             'display_result' => $this->configService->getAppValue('display_result'),
             'current_docs' => $this->solrTools->count('files', $error),
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
             'index_bookmarks' => $this->configService->getAppValue('index_bookmarks'),
             'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
+            'index_delay' => $this->configService->getAppValue('index_delay'),
             'index_locked' => $this->configService->getAppValue('index_locked'),
-            'index_last' => $this->configService->getAppValue('index_last'),
-            'index_last_format' => date('r', $this->configService->getAppValue('index_last')),
+            'index_files_last' => $this->configService->getAppValue('index_files_last'),
+            'index_files_last_format' => date('r', $this->configService->getAppValue('index_files_last')),
+            'index_bookmarks_last' => $this->configService->getAppValue('index_bookmarks_last'),
+            'index_bookmarks_last_format' => date('r', $this->configService->getAppValue('index_bookmarks_last')),
             'source' => $source
         );
         
         return $response;
     }
 
-    public function setOptionsFiles($index_files, $index_files_live_extract, $index_files_live_update, $index_files_max_size, $index_files_external_index)
+    public function setOptionsFiles($index_files, $index_files_live, $index_files_max_size, $index_files_external_index)
     {
         $this->configService->setAppValue('index_files', $index_files);
-        $this->configService->setAppValue('index_files_live_extract', $index_files_live_extract);
-        $this->configService->setAppValue('index_files_live_update', $index_files_live_update);
+        $this->configService->setAppValue('index_files_live', $index_files_live);
         $this->configService->setAppValue('index_files_external_index', $index_files_external_index);
         $this->configService->setAppValue('index_files_max_size', $index_files_max_size);
         
@@ -124,10 +129,12 @@ class SettingsController extends Controller
         return $this->updateSubOptions(false, 'bookmarks');
     }
 
-    public function setOptionsStatus($display_result, $force_index)
+    public function setOptionsStatus($index_delay, $display_result, $force_index)
     {
+        if ($index_delay > 0)
+            $this->configService->setAppValue('index_delay', $index_delay);
         $this->configService->setAppValue('display_result', $display_result);
-        if ($force_index == '1') {
+        if ($force_index === '1') {
             $this->configService->setAppValue('configured', '1');
             $this->configService->needIndexFiles(true);
         }
@@ -174,7 +181,6 @@ class SettingsController extends Controller
                     break;
                 
                 case 'search':
-                    // if ($this->test_search(SolrService::SEARCH_OWNER, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_SHARED, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_SHARED_GROUP, SolrService::SEARCH_TRASHBIN_ALL, $message) && $this->test_search(SolrService::SEARCH_OWNER, SolrService::SEARCH_TRASHBIN_ONLY, $message))
                     $result = $this->test_search($message);
                     break;
                 
@@ -223,8 +229,18 @@ class SettingsController extends Controller
     private function test_extract(&$message)
     {
         $testFile = __DIR__ . '/../../LICENSE';
+        $doc = new ItemDocument(ItemDocument::TYPE_TEST, 1);
+        $doc->setAbsolutePath($testFile);
+        $doc->setPath('/LICENSE');
+        $doc->setMTime(time());
         
-        if ($this->solrService->extractFile($testFile, 'test', 'nextant_test', '/LICENSE', 1234567890, $error)) {
+        $data = array(
+            $doc
+        );
+        $solrDocs = null;
+        $this->indexService->extract(ItemDocument::TYPE_TEST, '_nextant_test', $data, $solrDocs, true, $error);
+        
+        if ($doc->isProcessed()) {
             $message = 'Text successfully extracted';
             return true;
         }
@@ -235,21 +251,28 @@ class SettingsController extends Controller
 
     private function test_update(&$message)
     {
-        $testUpdate = array(
-            'id' => 'nextant_test',
-            'path' => '/LICENSE2',
-            'share_users' => array(
-                '__nextant_test_owner'
-            ),
-            'share_groups' => array(
-                '__nextant_share_group'
-            ),
-            'deleted' => false
-        );
+        $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $error);
         
-        if (! $this->solrTools->updateDocuments('test', array(
-            $testUpdate
-        ), $error)) {
+        if (sizeof($asource) != 1) {
+            $message('Error Updating field - Can\'t find original document');
+            return false;
+        }
+        
+        $source = $asource[0];
+        $final = new ItemDocument(ItemDocument::TYPE_TEST, 1);
+        $final->setOwner('_nextant_test');
+        $final->setPath('/LICENSE2');
+        $final->setShare(array(
+            'nextant_test_share'
+        ));
+        $final->setShareGroup(array(
+            'nextant_test_share_group'
+        ));
+        $final->deleted(false);
+        
+        $this->solrTools->updateDocument($final, $source, true, $error);
+        
+        if (! $source->isUpdated()) {
             $message = 'Error Updating field (Error #' . $error . ')';
             return false;
         }
@@ -261,11 +284,12 @@ class SettingsController extends Controller
     private function test_search(&$message)
     {
         $keyword = 'LICENSE';
-        if ($result = $this->solrService->search($keyword, null, $error)) {
+        $this->solrService->setOwner('_nextant_test');
+        if ($result = $this->solrService->search($keyword, array(), $error)) {
             if (sizeof($result) > 0) {
                 
                 foreach ($result as $doc) {
-                    if ($doc['id'] == 'nextant_test') {
+                    if ($doc['type'] === ItemDocument::TYPE_TEST && $doc['id'] === '1') {
                         $message = 'Found exactly what we were looking for';
                         return true;
                     }
@@ -285,7 +309,9 @@ class SettingsController extends Controller
 
     private function test_delete(&$message)
     {
-        if ($this->solrTools->removeDocument('test', 'nextant_test')) {
+        $doc = new ItemDocument(ItemDocument::TYPE_TEST, 1);
+        $this->solrTools->removeDocument($doc);
+        if ($doc->isRemoved()) {
             $message = 'Test document deleted';
             return true;
         }
@@ -299,7 +325,7 @@ class SettingsController extends Controller
         if (! is_null($this->solr_url) && ! is_null($this->solr_core)) {
             $this->configService->setAppValue('solr_url', $this->solr_url);
             $this->configService->setAppValue('solr_core', $this->solr_core);
-            if ($this->configService->getAppValue('configured') != 1)
+            if ($this->configService->getAppValue('configured') !== '1')
                 $this->configService->setAppValue('configured', '2');
             
             $message = "Your configuration has been saved";
