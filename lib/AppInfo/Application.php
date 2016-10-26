@@ -35,6 +35,7 @@ use \OCA\Nextant\Hooks\FilesHooks;
 use \OCA\Nextant\Hooks\BookmarksHooks;
 use \OCA\Nextant\Provider\SearchProvider;
 use \OCA\Nextant\Service\ConfigService;
+use \OCA\Nextant\Service\QueueService;
 use \OCA\Nextant\Service\MiscService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
@@ -73,15 +74,19 @@ class Application extends App
         });
         
         $container->registerService('IndexService', function ($c) {
-            return new IndexService($c->query('BookmarkService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+            return new IndexService($c->query('FileService'), $c->query('BookmarkService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+        });
+        
+        $container->registerService('QueueService', function ($c) {
+            return new QueueService($c->query('IndexService'), $c->query('FileService'), $c->query('MiscService'));
         });
         
         $container->registerService('FileService', function ($c) {
-            return new FileService($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+            return new FileService($c->query('ConfigService'), $c->query('RootFolder'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
         });
         
         $container->registerService('BookmarkService', function ($c) {
-            return new BookmarkService($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+            return new BookmarkService($c->query('ConfigService'), $c->query('MiscService'));
         });
         
         $container->registerService('SolrService', function ($c) {
@@ -102,7 +107,7 @@ class Application extends App
         });
         
         $container->registerService('FilesEvents', function ($c) {
-            return new FilesEvents($c->query('ConfigService'), $c->query('UserId'), $c->query('FileService'), $c->query('SolrService'), $c->query('MiscService'));
+            return new FilesEvents($c->query('UserId'), $c->query('ConfigService'), $c->query('QueueService'), $c->query('MiscService'));
         });
         
         $container->registerService('BookmarksEvents', function ($c) {
@@ -116,7 +121,7 @@ class Application extends App
         });
         
         $container->registerService('SettingsController', function ($c) {
-            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
+            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('IndexService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
         });
         
         /**
@@ -189,15 +194,15 @@ class Application extends App
         Util::connectHook('OCP\Share', 'post_shared', '\OCA\Nextant\Hooks\FilesHooks', 'fileShared');
         Util::connectHook('OCP\Share', 'post_unshare', '\OCA\Nextant\Hooks\FilesHooks', 'fileUnshared');
         
-        Util::connectHook('\OCA\Bookmarks', 'post_add', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkAdd');
-        Util::connectHook('\OCA\Bookmarks', 'post_edit', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkEdit');
-        Util::connectHook('\OCA\Bookmarks', 'post_delete', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkDelete');
+        // Util::connectHook('\OCA\Bookmarks', 'post_add', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkAdd');
+        // Util::connectHook('\OCA\Bookmarks', 'post_edit', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkEdit');
+        // Util::connectHook('\OCA\Bookmarks', 'post_delete', '\OCA\Nextant\Hooks\BookmarksHooks', 'bookmarkDelete');
     }
 
     public function registerSearchProvider()
     {
         $config = $this->getContainer()->query('ConfigService');
-        if ($config->getAppValue('configured') != 1)
+        if ($config->getAppValue('configured') !== '1')
             return;
         
         switch ($config->getAppValue('display_result')) {

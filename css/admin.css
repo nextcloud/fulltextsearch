@@ -1,9 +1,10 @@
-#nextant_saving {
+#nextant_saving_settings, #nextant_saving_files,
+	#nextant_saving_bookmarks, #nextant_saving_check,
+	#nextant_saving_status {
 	font-weight: bolder;
 	font-size: 12px;
 	margin-left: 30px;
 	font-style: italic;
-	opacity: 0.5;
 	filter: alpha(opacity = 50);
 	opacity: 0.5;
 }
@@ -33,7 +34,7 @@ DIV.nextant_display_text {
 }
 
 TD.nextant_admin_left {
-	width: 250px;
+	width: 200px;
 	text-align: right;
 	font-weight: bold;
 	padding-right: 15px;

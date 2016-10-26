@@ -66,9 +66,9 @@ class MiscService
 
     public static function arraysIdentical($a, $b)
     {
-        if ($a == null)
+        if ($a == null || $a == '')
             $a = array();
-        if ($b == null)
+        if ($b == null || $b == '')
             $b = array();
         if (! is_array($a) || ! is_array($b))
             return true;

@@ -39,12 +39,12 @@ style('nextant', 'admin');
 		</tr>
 		<tr valign="top">
 			<td>
-				<table>
+				<table style="width: 550px;">
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
 					<tr class="nextant_admin_head">
-						<td></td>
+						<td><div id="nextant_saving_settings">Saving</div></td>
 						<td class="nextant_admin_head">Settings</td>
 					</tr>
 					<tr style="height: 30px;">
@@ -68,45 +68,51 @@ style('nextant', 'admin');
 					<tr style="height: 30px;">
 						<td></td>
 						<td>
-							<button type="button" id="nextant_apply" style="width: 270px"><?php p($l->t('Test and Save')) ?></button>
+							<button type="button" id="nextant_apply" style="width: 264px"><?php p($l->t('Test and Save')) ?></button>
 						</td>
 					</tr>
 				</table>
-				<table id="nextant_suboptions">
-					<tr>
-						<td>&nbsp;</td>
-					</tr>
-					<tr class="nextant_admin_head">
-						<td></td>
-						<td class="nextant_admin_head">Indexing Files</td>
-					</tr>
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
+				<div id="nextant_suboptions">
+					<table style="width: 550px;">
+						<tr>
+							<td>&nbsp;</td>
+						</tr>
+						<tr class="nextant_admin_head" id="solr_index_files_cont">
+							<td><div id="nextant_saving_files">Saving</div></td>
+							<td class="nextant_admin_head"><input type="checkbox"
+								name="solr_index_files" id="solr_index_files" value="1"
+								style="margin: 5px; margin-right: 15px;">Indexing Files</td>
+						</tr>
+					</table>
+					<div id="solr_sub_files">
+						<table style="width: 550px;">
+
+							<tr style="height: 30px;">
+								<td class="nextant_admin_left">
 	    <?php p($l->t('Maximum File Size (Mb) :')) ?></td>
-						<td><input type="text" id="solr_index_files_max_size"
-							style="width: 100px;"></td>
-					</tr>
+								<td><input type="text" id="solr_index_files_max_size"
+									style="width: 100px;"></td>
+							</tr>
 
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">					
-	    <?php p($l->t('Live Extract :')); ?>
+							<tr style="height: 30px;">
+								<td class="nextant_admin_left">					
+	    <?php p($l->t('Live Index :')); ?>
 						</td>
-						<td><input type="checkbox" name="solr_index_files_live_extract"
-							id="solr_index_files_live_extract" value="1"
-							style="margin: 10px;"> (<a id="nextant_help_link"
-							href="https://github.com/daita/nextant/wiki/Extracting,-Live-Update"
-							target="_blank">help</a>)</td>
-					</tr>
+								<td><input type="checkbox" name="solr_index_files_live"
+									id="solr_index_files_live" value="1" style="margin: 10px;"> (<a
+									id="nextant_help_link"
+									href="https://github.com/daita/nextant/wiki/Extracting,-Live-Update"
+									target="_blank">help</a>)</td>
+							</tr>
+							<tr style="height: 30px;">
+								<td class="nextant_admin_left">
+	    <?php p($l->t('Last index :')) ?></td>
+								<td><div id="solr_index_files_last"></div></td>
 
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
-	    <?php p($l->t('Live Document Update :')) ?></td>
-						<td><input type="checkbox" name="solr_index_files_live_update"
-							id="solr_index_files_live_update" value="1" style="margin: 10px;"></td>
-					</tr>
+							</tr>
 
 
-					<!-- 
+							<!-- 
                     <tr style="height: 30px;">
 						<td class="nextant_admin_left">
 	    <?php p($l->t('Index External Storage :')) ?></td>
@@ -114,90 +120,106 @@ style('nextant', 'admin');
 							id="solr_index_files_external_index" value="1" style="margin: 10px;"></td>
 					</tr>
                     -->
+						</table>
+					</div>
 
-					<!-- 
+					<table style="width: 550px;">
+						<tr>
+							<td>&nbsp;</td>
+						</tr>
+						<tr class="nextant_admin_head" id="solr_index_bookmarks_cont">
+							<td><div id="nextant_saving_bookmarks">Saving</div></td>
+							<td class="nextant_admin_head"><input type="checkbox"
+								name="solr_index_bookmarks" id="solr_index_bookmarks" value="1"
+								style="margin: 5px; margin-right: 15px;">Indexing Bookmarks</td>
+						</tr>
+					</table>
 
-					<tr>
-						<td>&nbsp;</td>
-					</tr>
-					<tr class="nextant_admin_head">
-						<td></td>
-						<td class="nextant_admin_head">Indexing Bookmarks</td>
-					</tr>
-
-
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
-	    <?php p($l->t('Index bookmarks :')) ?></td>
-						<td>
-							<div id="nextant_bookmarks_appdisabled">
-								The App <i>Bookmarks</i> is not installed/enabled.
-							</div>
-							<div id="nextant_bookmarks_appenabled">
-								<input type="checkbox" name="solr_index_bookmarks"
-									id="solr_index_bookmarks" value="1" style="margin: 10px;">								
-							</div>
-						</td>
-					</tr>
-                    -->
-
-
-					<tr>
-						<td>&nbsp;</td>
-					</tr>
-					<tr class="nextant_admin_head">
-						<td><div id="nextant_saving">Saving</div></td>
-						<td class="nextant_admin_head">Nextant Status</td>
-					</tr>
-
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
-	    <?php p($l->t('Display result :')) ?></td>
-						<td><select id="solr_display_result" style="width: 260px;">
-								<option value="1">Nextant style</option>
-								<option value="2">Integrated to Files</option>
-						</select></td>
-					</tr>
-
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
-	    <?php p($l->t('Number of documents :')) ?></td>
-						<td><div id="solr_current_docs"></div></td>
-					</tr>
-					<tr style="height: 30px;">
-						<td class="nextant_admin_left">
+					<div id="solr_sub_bookmarks">
+						<table style="width: 550px;">
+							<tr style="height: 30px;">
+								<td colspan="2">
+									<div id="nextant_bookmarks_appdisabled">
+										The App <i>Bookmarks</i> is not installed/enabled.
+									</div>
+									<div id="nextant_bookmarks_appenabled">
+										The App <i>Bookmarks</i> is enabled, your bookmarks will be
+										indexed.
+									</div>
+								</td>
+							</tr>
+							<tr style="height: 30px;">
+								<td class="nextant_admin_left">
 	    <?php p($l->t('Last index :')) ?></td>
-						<td><div id="solr_index_last"></div></td>
+								<td><div id="solr_index_bookmarks_last"></div></td>
 
-					</tr>
+							</tr>
 
-					<tr>
-						<td>&nbsp;</td>
-					</tr>
-					<tr style="height: 30px;">
+						</table>
+					</div>
 
-						<td></td>
-						<td>
-							<div id="nextant_first_index"
-								style="width: 270px; font-size: 12px; white-space: normal;">
-								<i></i> we recommand doing the very first indexing of your files
-								using the <b>./occ nextant:index</b> command.<br /> However, you
-								can force it to be started as a background process: </i> <br />
-								<button type="button" id="nextant_force_first_index"
-									style="width: 270px"><?php p($l->t('Force first index as a cronjob')) ?></button>
-							</div>
-							<button type="button" id="nextant_force_index"
-								style="width: 270px"><?php p($l->t('Force index')) ?></button>
-							<div id="nextant_index_scheduled">
-								<i>Indexing is scheduled within the next few hours (cron)</i>
-							</div>
-							<div id="nextant_index_inprogress">
-								<i>Indexing in progress</i>
-							</div>
-						</td>
-					</tr>
+					<table style="width: 550px;">
 
-				</table>
+						<tr>
+							<td>&nbsp;</td>
+						</tr>
+						<tr class="nextant_admin_head">
+							<td><div id="nextant_saving_status">Saving</div>
+								<div id="nextant_saving_check">Checking</div></td>
+							<td class="nextant_admin_head">Nextant Status</td>
+						</tr>
+
+						<tr style="height: 30px;">
+							<td class="nextant_admin_left">
+	    <?php p($l->t('Background Index delay :')) ?></td>
+							<td><input type="text" name="solr_index_delay"
+								id="solr_index_delay" value="2" style="width: 50px;" /> hours</td>
+						</tr>
+
+						<tr style="height: 30px;">
+							<td class="nextant_admin_left">
+	    <?php p($l->t('Display result :')) ?></td>
+							<td><select id="solr_display_result" style="width: 260px;">
+									<option value="1">Nextant style</option>
+									<option value="2">Integrated to Files</option>
+							</select></td>
+						</tr>
+
+						<tr style="height: 30px;">
+							<td class="nextant_admin_left">
+	    <?php p($l->t('Number of documents :')) ?></td>
+							<td><div id="solr_current_docs"></div></td>
+						</tr>
+
+						<tr>
+							<td>&nbsp;</td>
+						</tr>
+						<tr style="height: 30px;">
+
+							<td></td>
+							<td>
+								<div id="nextant_first_index"
+									style="width: 270px; font-size: 12px; white-space: normal;">
+									<i></i> we recommand doing the very first indexing of your
+									files using the <b>./occ nextant:index</b> command.<br />
+									However, you can force it to be started as a background
+									process: </i> <br />
+									<button type="button" id="nextant_force_first_index"
+										style="width: 270px"><?php p($l->t('Force first index as a cronjob')) ?></button>
+								</div>
+								<button type="button" id="nextant_force_index"
+									style="width: 270px"><?php p($l->t('Force index')) ?></button>
+								<div id="nextant_index_scheduled">
+									<i>Indexing is scheduled within the next few hours (cron)</i>
+								</div>
+								<div id="nextant_index_inprogress">
+									<i>Indexing in progress</i>
+								</div>
+							</td>
+						</tr>
+
+					</table>
+				</div>
 			</td>
 			<td
 				style="padding-left: 30px; padding-top: 40px; vertical-align: top">
@@ -263,6 +285,7 @@ style('nextant', 'admin');
 		</tr>
 
 	</table>
+
 </div>
 
 

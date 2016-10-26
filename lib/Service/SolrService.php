@@ -109,7 +109,7 @@ class SolrService
     {
         if (! $this->configured) {
             $isIt = $this->configService->getAppValue('configured');
-            if ($isIt == '1')
+            if ($isIt === '1')
                 $this->configured = true;
             if ($first && $isIt > 0)
                 $this->configured = true;
@@ -213,12 +213,12 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractFile($absolutePath, $type, $docid, $path, $mtime, &$error = '')
+    public function extractDocument(&$document, &$error = '')
     {
         if (! $this->configured())
             return false;
         
-        if ($type == null || $type == '') {
+        if ($document->getType() == null || $document->getType() == '') {
             $error = self::ERROR_TYPE_NOT_SET;
             return false;
         }
@@ -262,17 +262,21 @@ class SolrService
             $query->addFieldMapping('ul', 'ignored_');
             $query->addFieldMapping('li', 'ignored_');
             
-            $query->setFile($absolutePath);
+            $query->setFile($document->getAbsolutePath());
             $query->setCommit(true);
             $query->setOmitHeader(true);
             
             // add document
             $doc = $query->createDocument();
-            $doc->id = $type . '_' . $docid;
-            $doc->nextant_source = $type;
-            $doc->nextant_path = $path;
+            $doc->id = $document->getType() . '_' . $document->getId();
+            $doc->nextant_source = $document->getType();
+            
+            $doc->nextant_mtime = $document->getMTime();
             $doc->nextant_owner = $this->owner;
-            $doc->nextant_mtime = $mtime;
+            $doc->nextant_path = $document->getPath();
+            $doc->nextant_share = $document->getShare();
+            $doc->nextant_sharegroup = $document->getShareGroup();
+            $doc->nextant_deleted = $document->isDeleted();
             
             $query->setDocument($doc);
             
@@ -284,9 +288,10 @@ class SolrService
             $response = $client->executeRequest($request);
             $ret = $client->createResult($query, $response);
             
-            // $ret = $client->extract($query);
-            
-            return $ret;
+            if ($ret) {
+                $document->processed(true);
+                return true;
+            }
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
                 $error = self::EXCEPTION_EXTRACT_FAILED;
@@ -295,6 +300,8 @@ class SolrService
         } catch (\Solarium\Exception $e) {
             $error = self::EXCEPTION;
         }
+        
+        $document->failedExtract(true);
         
         return false;
     }
@@ -328,6 +335,7 @@ class SolrService
             
             array_push($options, 'complete_words');
             $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
+            
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             
             $query->setFields(array(

@@ -1,7 +1,15 @@
+**v0.6.0**
+- Beta 2
+- New Admin UI
+- Complete rewrite of the index core engine using IndexService and QueueService
+- ./occ nextant:live
+
+
 **v0.5.1**
 - indexes your Bookmarks
 - bugfix: search allowed to non-admin
 - bugfix: warning on deleted file with no extension
+ 
  
 **v0.5.0**
 - Beta release

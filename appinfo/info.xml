@@ -32,7 +32,7 @@
 
 
 	</description>
-	<version>0.5.1</version>
+	<version>0.6.0</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<types>
@@ -46,7 +46,7 @@
 	<website>https://github.com/daita/nextant/wiki</website>
 	<bugs>https://github.com/daita/nextant/issues</bugs>
 	<repository>https://github.com/daita/nextant/</repository>
-	<discussion>https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954</discussion>
+	<!-- <discussion>https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954</discussion> -->
 	<screenshot>https://raw.githubusercontent.com/daita/nextant/master/screenshots/displayResult.jpg</screenshot>
 	<screenshot>https://raw.githubusercontent.com/daita/nextant/master/screenshots/admin.jpg</screenshot>
 	<dependencies>

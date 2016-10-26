@@ -56,7 +56,7 @@ class BookmarksEvents
      */
     public function onBookmarkAdd($bookmarkId)
     {
-        if ($this->configService->getAppValue('index_bookmarks') == '1')
+        if ($this->configService->getAppValue('index_bookmarks') === '1')
             $this->configService->needIndexBookmarks(true);
     }
 
@@ -67,7 +67,7 @@ class BookmarksEvents
      */
     public function onBookmarkEdit($bookmarkId)
     {
-        if ($this->configService->getAppValue('index_bookmarks') == '1')
+        if ($this->configService->getAppValue('index_bookmarks') === '1')
             $this->configService->needIndexBookmarks(true);
     }
 
@@ -78,7 +78,7 @@ class BookmarksEvents
      */
     public function onBookmarkDelete($bookmarkId)
     {
-        if ($this->configService->getAppValue('index_bookmarks') == '1')
+        if ($this->configService->getAppValue('index_bookmarks') === '1')
             $this->configService->needIndexBookmarks(true);
     }
 }

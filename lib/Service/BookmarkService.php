@@ -26,25 +26,22 @@
  */
 namespace OCA\Nextant\Service;
 
-use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Items\ItemDocument;
+use OCA\Bookmarks\Controller\Lib\Bookmarks;
 
 class BookmarkService
 {
 
     private $configService;
-
-    private $solrService;
-
-    private $solrTools;
-
+    
+    // private $solrService;
+    
+    // private $solrTools;
     private $miscService;
 
-    public function __construct($configService, $solrService, $solrTools, $miscService)
+    public function __construct($configService, $miscService)
     {
-        // $this->root = $root;
         $this->configService = $configService;
-        $this->solrService = $solrService;
-        $this->solrTools = $solrTools;
         $this->miscService = $miscService;
     }
 
@@ -52,11 +49,45 @@ class BookmarkService
     {
         if (! \OCP\App::isEnabled('bookmarks'))
             return false;
-            
-            // if ($this->configService->getAppValue('index_bookmarks') != 1)
-            // return false;
+        
+        if ($this->configService->getAppValue('index_bookmarks') == 1)
+            return true;
+        
+        return false;
+    }
+
+    public function syncDocument(&$item)
+    {
+        $item->synced(true);
+        $item->extractable(true);
         
         return true;
+    }
+
+    /**
+     * get bookmarks from a specific user
+     *
+     * @param number $userId            
+     * @return array
+     */
+    public function getBookmarksPerUserId($userId)
+    {
+        if (! $this->configured())
+            return false;
+        
+        $db = \OC::$server->getDb();
+        $bookmarks = Bookmarks::findBookmarks($userId, $db, 0, 'id', array(), false, - 1);
+        
+        $data = array();
+        foreach ($bookmarks as $bookmark) {
+            $item = new ItemDocument(ItemDocument::TYPE_BOOKMARK, $bookmark['id']);
+            $item->setMTime($bookmark['lastmodified']);
+            $item->setAbsolutePath($bookmark['url']);
+            $item->setPath($bookmark['url']);
+            $data[] = $item;
+        }
+        
+        return $data;
     }
 
     public static function getSearchResult(&$data)

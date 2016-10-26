@@ -35,9 +35,9 @@ class ConfigService
 
     const SEARCH_DISPLAY_FILES = 2;
 
-    const ACTION_LIVE_EXTRACT = 'index_files_live_extract';
+    const ACTION_LIVE_EXTRACT = 'index_files_live';
 
-    const ACTION_LIVE_DOCUPDATE = 'index_files_live_extract';
+    const ACTION_LIVE_DOCUPDATE = 'index_files_live';
 
     private $defaults = [
         'configured' => '0',
@@ -45,14 +45,16 @@ class ConfigService
         'solr_core' => 'nextant',
         'display_result' => 1,
         
+        'index_delay' => 2,
         'index_locked' => 0,
-        'index_last' => 0,
+        'index_files_last' => 0,
+        'index_bookmarks_last' => 0,
         
         'index_files' => 1,
         'index_files_needed' => 1,
         'index_files_update_needed' => 1,
-        'index_files_live_extract' => 1,
-        'index_files_live_update' => 0,
+        'index_files_live' => 1,
+        'index_files_external_index' => 0,
         'index_files_max_size' => 40,
         
         'index_bookmarks' => 0,
@@ -79,16 +81,8 @@ class ConfigService
         }
     }
 
-    public function copyConfigFrom050()
+    public function removeOldConfig()
     {
-        $this->setAppValue('index_locked', $this->getAppValue('solr_lock'));
-        $this->setAppValue('index_files_needed', $this->getAppValue('needed_index'));
-        $this->setAppValue('index_last', $this->getAppValue('last_index'));
-        $this->setAppValue('index_files_live_extract', $this->getAppValue('live_extract'));
-        $this->setAppValue('index_files_live_update', $this->getAppValue('live_docupdate'));
-        $this->setAppValue('index_files_max_size', $this->getAppValue('max_size'));
-        $this->setAppValue('index_files_external_index', $this->getAppValue('external_index'));
-        
         $this->deleteAppValue('solr_lock');
         $this->deleteAppValue('needed_index');
         $this->deleteAppValue('last_index');
@@ -96,6 +90,8 @@ class ConfigService
         $this->deleteAppValue('live_docupdate');
         $this->deleteAppValue('max_size');
         $this->deleteAppValue('external_index');
+        $this->deleteAppValue('index_files_live_extract');
+        $this->deleteAppValue('index_files_live_update');
     }
 
     public function needIndexFiles($need)
@@ -111,21 +107,35 @@ class ConfigService
         return ($this->getAppValue('index_files_needed') == '1');
     }
 
-    public function stopIndexFiles()
-    {
-        $this->setAppValue('index_files_needed', '2');
-    }
-
     public function needIndexBookmarks($need)
     {
-        if (! $need)
+        if ($need)
+            $this->setAppValue('index_bookmarks_needed', '1');
+        else
             $this->setAppValue('index_bookmarks_needed', '0');
-        $this->setAppValue('index_bookmarks_needed', '1');
     }
 
     public function neededIndexBookmarks()
     {
         return ($this->getAppValue('index_bookmarks_needed') == '1');
+    }
+
+    public function stopIndex()
+    {
+        $this->setAppValue('configured', '2');
+    }
+
+    public function timeIndex($type)
+    {
+        $this->setAppValue('index_' . $type . '_last', time());
+    }
+
+    public function timeIndexDelay($type, $delay = 0)
+    {
+        if ($delay == 0)
+            $delay = $this->getAppValue('index_delay');
+        
+        return ($this->getAppValue('index_' . $type . '_last') < (time() - (3600 * $delay)));
     }
 
     /**
@@ -171,18 +181,18 @@ class ConfigService
      * @param string $action            
      * @return boolean
      */
-    public function shoudIContinue($action)
-    {
-        switch ($action) {
-            case self::ACTION_LIVE_EXTRACT:
-                return ($this->getAppValue($action) == '1');
+//     public function shoudIContinue($action)
+//     {
+//         switch ($action) {
+//             case self::ACTION_LIVE_EXTRACT:
+//                 return ($this->getAppValue($action) == '1');
             
-            case self::ACTION_LIVE_DOCUPDATE:
-                if ($this->getAppValue(self::ACTION_LIVE_EXTRACT) != '1')
-                    return false;
-                return ($this->getAppValue($action) == '1');
-        }
-    }
+//             case self::ACTION_LIVE_DOCUPDATE:
+//                 if ($this->getAppValue(self::ACTION_LIVE_EXTRACT) != '1')
+//                     return false;
+//                 return ($this->getAppValue($action) == '1');
+//         }
+//     }
 
     /**
      * generate an array to pass config to Solarium
