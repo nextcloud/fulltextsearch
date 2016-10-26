@@ -1,6 +1,8 @@
 **v0.6.0**
 - Beta 2
-- complete rewrite of the index core engine using IndexService
+- New Admin UI
+- Complete rewrite of the index core engine using IndexService and QueueService
+- ./occ nextant:live
 
 
 **v0.5.1**
