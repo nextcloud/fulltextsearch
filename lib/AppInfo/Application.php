@@ -121,7 +121,7 @@ class Application extends App
         });
         
         $container->registerService('SettingsController', function ($c) {
-            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
+            return new SettingsController($c->query('AppName'), $c->query('Request'), $c->query('ConfigService'), $c->query('IndexService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
         });
         
         /**
@@ -202,7 +202,7 @@ class Application extends App
     public function registerSearchProvider()
     {
         $config = $this->getContainer()->query('ConfigService');
-        if ($config->getAppValue('configured') != 1)
+        if ($config->getAppValue('configured') !== '1')
             return;
         
         switch ($config->getAppValue('display_result')) {
