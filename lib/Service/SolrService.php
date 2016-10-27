@@ -265,6 +265,9 @@ class SolrService
             $query->addFieldMapping('ul', 'ignored_');
             $query->addFieldMapping('li', 'ignored_');
             
+            $query->addFieldMapping('media_black_point', 'ignored_');
+            $query->addFieldMapping('media_white_point', 'ignored_');
+            
             $query->setFile($document->getAbsolutePath());
             $query->setCommit(true);
             $query->setOmitHeader(true);
