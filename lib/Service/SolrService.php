@@ -178,10 +178,18 @@ class SolrService
             case 'application/rtf':
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
+            case 'application/msword':
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+            
             case 'application/octet-stream':
+                if ($path === '')
+                    return false;
+                
                 $pinfo = pathinfo($path);
                 if (key_exists('extension', $pinfo) && substr($pinfo['extension'], 0, 1) == 'd' && ((int) (substr($pinfo['extension'], 1)) > 0)) {
-                    return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                    $tmppath = substr($path, 0, strrpos($path, '.'));
+                    $tmpmime = \OC::$server->getMimeTypeDetector()->detectPath($tmppath);
+                    return self::extractableFile($tmpmime);
                 }
                 return false;
         }
@@ -261,6 +269,9 @@ class SolrService
             $query->addFieldMapping('i', 'ignored_');
             $query->addFieldMapping('ul', 'ignored_');
             $query->addFieldMapping('li', 'ignored_');
+            
+            $query->addFieldMapping('media_black_point', 'ignored_');
+            $query->addFieldMapping('media_white_point', 'ignored_');
             
             $query->setFile($document->getAbsolutePath());
             $query->setCommit(true);

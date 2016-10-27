@@ -82,8 +82,9 @@ class Index extends Base
         $this->setName('nextant:index')
             ->setDescription('scan users\' files, generate and index Solr documents')
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'display more text')
-            ->addOption('unlock', 'u', InputOption::VALUE_NONE, 'unlock on Solr')
+            ->addOption('unlock', 'k', InputOption::VALUE_NONE, 'unlock on Solr')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'force extract and update of all your documents')
+            ->addOption('user', 'u', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'indexes file of the given user(s)')
             ->addOption('background', 'c', InputOption::VALUE_NONE, 'force index as a background process (cron)')
             ->addOption('bookmarks', 'b', InputOption::VALUE_NONE, 'only indexes bookmarks - requiert <comment>Bookmarks</comment> installed')
             ->addOption('files', 'i', InputOption::VALUE_NONE, 'only indexes files')
@@ -202,7 +203,7 @@ class Index extends Base
         $output->writeln('* Extracting files:');
         $output->writeln('');
         
-        $users = $this->userManager->search('');
+        $users = $this->getUsers($input->getOption('user'));
         
         $extracted = 0;
         $processed = 0;
@@ -212,15 +213,18 @@ class Index extends Base
             
             $this->interrupted();
             
-            $files = $this->fileService->getFilesPerUserId($user->getUID(), '/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId($user->getUID(), '/files_trashbin', array(
+            if (! $this->userManager->userExists($user))
+                continue;
+            
+            $files = $this->fileService->getFilesPerUserId($user, '/files', array());
+            $files_trashbin = $this->fileService->getFilesPerUserId($user, '/files_trashbin', array(
                 'deleted'
             ));
             
             $files = array_merge($files, $files_trashbin);
             $solrDocs = null;
-            $this->indexService->extract(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
-            $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
+            $this->indexService->extract(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
+            $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
             
             foreach ($files as $doc) {
                 if ($doc->isExtracted())
@@ -260,7 +264,7 @@ class Index extends Base
         $output->writeln('* Updating files:');
         $output->writeln('');
         
-        $users = $this->userManager->search('');
+        $users = $this->getUsers($input->getOption('user'));
         
         $updated = 0;
         $failed = 0;
@@ -268,13 +272,16 @@ class Index extends Base
             
             $this->interrupted();
             
-            $files = $this->fileService->getFilesPerUserId($user->getUID(), '/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId($user->getUID(), '/files_trashbin', array(
+            if (! $this->userManager->userExists($user))
+                continue;
+            
+            $files = $this->fileService->getFilesPerUserId($user, '/files', array());
+            $files_trashbin = $this->fileService->getFilesPerUserId($user, '/files_trashbin', array(
                 'deleted'
             ));
             
             $files = array_merge($files, $files_trashbin);
-            $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user->getUID(), $files);
+            $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user, $files);
             
             $output->writeln('');
             foreach ($files as $doc) {
@@ -307,18 +314,43 @@ class Index extends Base
         $output->writeln('* Indexing bookmarks:');
         $output->writeln('');
         
-        $users = $this->userManager->search('');
+        $users = $this->getUsers($input->getOption('user'));
+        
         foreach ($users as $user) {
-            $bm = $this->bookmarkService->getBookmarksPerUserId($user->getUID());
+            $this->interrupted();
+            
+            if (! $this->userManager->userExists($user))
+                continue;
+            
+            $bm = $this->bookmarkService->getBookmarksPerUserId($user);
             
             $solrDocs = null;
-            $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm, $solrDocs);
-            $this->indexService->removeOrphans(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm, $solrDocs);
+            $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user, $bm, $solrDocs);
+            $this->indexService->removeOrphans(ItemDocument::TYPE_BOOKMARK, $user, $bm, $solrDocs);
             $output->writeln('');
         }
         
         $output->writeln('');
         return;
+    }
+
+    private function getUsers($option)
+    {
+        if (! $option) {
+            $users = array();
+            $userSearch = $this->userManager->search('');
+            foreach ($userSearch as $user) {
+                $users[] = $user->getUID();
+            }
+        } else {
+            $users = $option;
+            if (! is_array($users))
+                $users = array(
+                    $users
+                );
+        }
+        
+        return $users;
     }
 }
 

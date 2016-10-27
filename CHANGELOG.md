@@ -1,3 +1,9 @@
+**v0.6.1**
+- fixing an issue with federated cloud sharing
+- fixing an issue when indexing java source stored in the trashbin
+- add --user option in ./occ nextant:index
+
+
 **v0.6.0**
 - Beta 2
 - New Admin UI

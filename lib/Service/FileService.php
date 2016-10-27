@@ -199,7 +199,7 @@ class FileService
         
         $data = array();
         
-        Filesystem::tearDown();
+      //  Filesystem::tearDown();
         Filesystem::init($userId, '');
         
         $userFolder = FileService::getUserFolder($this->rootFolder, $userId, $dir);

@@ -12,11 +12,11 @@
 ### Recognized file format: 
 - plain text, 
 - rtf, 
-- pdf, old pdf will requiert Tesseract installed
-- jpeg, tiff (will also requiert Tesseract)
 - html, 
 - openoffice, 
 - microsoft office, 
+- image JPEG and TIFF (will requiert Tesseract installed) 
+- old pdf (will also requiert Tesseract) _[work in progress]_
  
 
 
@@ -32,7 +32,7 @@
 
 
 	</description>
-	<version>0.6.0</version>
+	<version>0.6.1</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<types>
