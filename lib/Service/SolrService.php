@@ -178,6 +178,9 @@ class SolrService
             case 'application/rtf':
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
+            case 'application/msword':
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+            
             case 'application/octet-stream':
                 $pinfo = pathinfo($path);
                 if (key_exists('extension', $pinfo) && substr($pinfo['extension'], 0, 1) == 'd' && ((int) (substr($pinfo['extension'], 1)) > 0)) {
