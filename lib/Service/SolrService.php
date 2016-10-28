@@ -189,6 +189,9 @@ class SolrService
                 if (key_exists('extension', $pinfo) && substr($pinfo['extension'], 0, 1) == 'd' && ((int) (substr($pinfo['extension'], 1)) > 0)) {
                     $tmppath = substr($path, 0, strrpos($path, '.'));
                     $tmpmime = \OC::$server->getMimeTypeDetector()->detectPath($tmppath);
+                    
+                    if ($tmpmime === 'application/octet-stream')
+                        return false;
                     return self::extractableFile($tmpmime);
                 }
                 return false;
