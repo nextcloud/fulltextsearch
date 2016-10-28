@@ -70,10 +70,12 @@ class SearchController extends Controller
     {
         $results = array();
         
-        if (!$this->solrService)
+        if (! $this->solrService)
             return $results;
         
         if ($query !== null) {
+            
+            $this->displaySuggestions($query);
             
             // $groups
             $groups = array_map(function ($value) {
@@ -85,7 +87,7 @@ class SearchController extends Controller
                 'current_directory' => $current_dir
             ));
             
-            if (!$solrResult)
+            if (! $solrResult)
                 return $results;
             
             foreach ($solrResult as $data) {
@@ -139,13 +141,22 @@ class SearchController extends Controller
                 $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
                 $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
                 
-//                 if ($data['deleted'])
-//                     $this->miscService->log('$$$ ' . var_export($data, true));
+                // if ($data['deleted'])
+                // $this->miscService->log('$$$ ' . var_export($data, true));
                 
                 array_push($results, $data);
             }
         }
         
         return $results;
+    }
+
+    private function displaySuggestions($query)
+    {
+        $suggest = $this->solrService->suggest($query, $error);
+        if ($suggest == false)
+            return;
+        
+        $this->miscService->log('Suggestions: ' . var_export($suggest, true));
     }
 }

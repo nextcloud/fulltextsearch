@@ -1,0 +1,27 @@
+
+
+<searchComponent class="solr.SpellCheckComponent" name="suggest">
+	<lst name="spellchecker">
+		<str name="name">suggest</str>
+		<str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+		<str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookupFactory</str>
+		<str name="field">text</str>
+		<float name="threshold">0.005</float>
+		<str name="buildOnCommit">true</str>
+	</lst>
+</searchComponent>
+
+<requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
+	<lst name="defaults">
+		<str name="spellcheck">true</str>
+		<str name="spellcheck.dictionary">suggest</str>
+		<str name="spellcheck.onlyMorePopular">true</str>
+		<str name="spellcheck.count">5</str>
+		<str name="spellcheck.collate">true</str>
+	</lst>
+	<arr name="components">
+		<str>suggest</str>
+	</arr>
+</requestHandler>
+
+ 

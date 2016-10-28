@@ -412,6 +412,56 @@ class SolrService
         return false;
     }
 
+    public function suggest($string, &$error = '')
+    {
+        if (! $this->configured())
+            return false;
+        
+        if ($this->getClient() == false)
+            return false;
+        
+        try {
+            $client = $this->getClient();
+            $query = $client->createSuggester();
+            
+            $query->setQuery($string);
+            
+            $query->setDictionary('suggest');
+            $query->setOnlyMorePopular(true);
+            $query->setCount(5);
+            $query->setCollate(true);
+            
+            $resultset = $client->suggester($query);
+            $suggTotal = sizeof($resultset);
+            
+            $queryBase = substr($string, 0, strrpos($string, ' '));
+            if ($queryBase != '')
+                $queryBase .= ' ';
+            
+            $t = 0;
+            $suggestions = array();
+            foreach ($resultset as $term => $termResult) {
+                
+                $t ++;
+                if ($t == $suggTotal) {
+                    foreach ($termResult as $result)
+                        $suggestions[] = $queryBase . $result;
+                }
+            }
+            
+            return $suggestions;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = self::EXCEPTION_SEARCH_FAILED;
+            else
+                $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = self::EXCEPTION;
+        }
+        
+        return false;
+    }
+
     private function generateOwnerQuery($type, $helper, &$error)
     {
         $ownerQuery = '';
