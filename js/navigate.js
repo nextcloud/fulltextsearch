@@ -50,16 +50,57 @@ $(document)
 							$('#nextantList').show();
 					});
 
+					$('#searchbox').focusout(function() {
+						nextantCurrentFocus = false;
+						nextant.suggestShow();
+					});
+
+					$('#searchbox').focusin(function() {
+						nextantCurrentFocus = true;
+						nextant.suggestShow();
+					});
+
+					$(document).keypress(function(e) {
+						if (e.which == 13 && nextantCurrentFocus) {
+							nextant.search();
+						}
+					});
+
 					var nextantCurrentSearch = '';
+					var nextantCurrentFocus = false;
+					var nextantSearchDelayTimer = null;
+					var nextantSuggestDelayTimer = null;
 					var nextant = {
 
 						init : function() {
 							$('#searchbox').on('input', function(e) {
-								nextant.search($('#searchbox').val());
+								nextant.searchTimer();
+								nextant.suggestTimer();
 							});
 						},
 
-						search : function(query) {
+						searchTimer : function() {
+							if (nextantSearchDelayTimer != null)
+								clearTimeout(nextantSearchDelayTimer);
+
+							nextantSearchDelayTimer = setTimeout(function() {
+								nextant.search();
+							}, 150);
+						},
+
+						suggestTimer : function() {
+							if (nextantSuggestDelayTimer != null)
+								clearTimeout(nextantSuggestDelayTimer);
+
+							nextantSuggestDelayTimer = setTimeout(function() {
+								nextant.suggest();
+							}, 0);
+						},
+
+						search : function() {
+							nextantSearchDelayTimer = null;
+
+							var query = $('#searchbox').val();
 							if (query == nextantCurrentSearch)
 								return;
 							nextantCurrentSearch = query;
@@ -69,8 +110,16 @@ $(document)
 								current_dir : nextant.get('dir')
 							}
 
-							nextant.suggestRequest(data);
 							nextant.searchRequest(data);
+						},
+
+						suggest : function() {
+							nextantSuggestDelayTimer = null;
+							var query = $('#searchbox').val();
+							var data = {
+								query : query
+							}
+							nextant.suggestRequest(data);
 						},
 
 						suggestRequest : function(data) {
@@ -82,12 +131,17 @@ $(document)
 
 						suggestResult : function(response) {
 
-							if (response == null)
+							if (response == null || response.length == 0) {
+								if ($('#nextantSugg_list').length)
+									$('#nextantSugg_list').hide(200);
 								return;
+							}
 
 							if (!$('#nextantSugg_list').length)
 								$('#body-user').append(
 										'<div id="nextantSugg_list"></div>');
+
+							nextant.suggestShow();
 
 							var offset = $('#searchbox').offset();
 							var height = $('#searchbox').height();
@@ -105,12 +159,35 @@ $(document)
 								var first = '';
 								if (i == 0)
 									first = 'nextantSugg_firstitem';
-								$('#nextantSugg_list').append(
-										'<div class="nextantSugg_item ' + first
-												+ '">' + response[i].suggestion
-												+ '</div>');
 
+								$('#nextantSugg_list').append(
+										'<div id="nextant_sugg_' + i
+												+ '" class="nextantSugg_item '
+												+ first + '">'
+												+ response[i].suggestion
+												+ '</div>');
 							}
+
+							$('.nextantSugg_item').click(function() {
+								nextant.suggestReplace($(this).text());
+								nextant.search();
+							});
+
+						},
+
+						suggestShow : function() {
+
+							if (!$('#nextantSugg_list').length)
+								return;
+							if (nextantCurrentFocus)
+								$('#nextantSugg_list').show(200);
+							else
+								$('#nextantSugg_list').hide(200);
+						},
+
+						suggestReplace : function(txt) {
+							$('#searchbox').val(txt + ' ');
+							$('#searchbox').focus();
 						},
 
 						searchRequest : function(data) {
