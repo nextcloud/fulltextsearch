@@ -445,7 +445,9 @@ class SolrService
                 $t ++;
                 if ($t == $suggTotal) {
                     foreach ($termResult as $result)
-                        $suggestions[] = $queryBase . $result;
+                        $suggestions[] = array(
+                            'suggestion' => $queryBase . $result
+                        );
                 }
             }
             

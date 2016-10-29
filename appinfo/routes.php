@@ -54,6 +54,11 @@ return [
             'name' => 'search#searchRequest',
             'url' => 'ajax/search.php',
             'verb' => 'POST'
+        ],
+        [
+            'name' => 'search#getSuggestions',
+            'url' => 'ajax/suggest.php',
+            'verb' => 'POST'
         ]
     ]
 ];

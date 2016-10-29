@@ -75,8 +75,6 @@ class SearchController extends Controller
         
         if ($query !== null) {
             
-            $this->displaySuggestions($query);
-            
             // $groups
             $groups = array_map(function ($value) {
                 return (string) $value;
@@ -151,12 +149,19 @@ class SearchController extends Controller
         return $results;
     }
 
-    private function displaySuggestions($query)
+    /**
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     */
+    public function getSuggestions($query)
     {
-        $suggest = $this->solrService->suggest($query, $error);
-        if ($suggest == false)
-            return;
+        if (! $this->solrService)
+            return false;
         
-        $this->miscService->log('Suggestions: ' . var_export($suggest, true));
+        if ($query == null || $query === '')
+            return false;
+        
+        $suggest = $this->solrService->suggest($query, $error);
+        return $suggest;
     }
 }

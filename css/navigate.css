@@ -1,5 +1,10 @@
 @CHARSET "ISO-8859-1";
 
+.searchbox input[type="search"]:valid, .searchbox input[type="search"]:focus
+	{
+	width: 300px;
+}
+
 #nextantList {
 	width: 100%;
 }
@@ -75,4 +80,21 @@ SPAN.nextant_line3 {
 SPAN.nextant_hl {
 	color: #000;
 	font-weight: bold;
+}
+
+#nextantSugg_list {
+	z-index: 200;
+	margin-top: 18px;
+	padding: 3px;
+	border: solid 1px #0000004D;
+	background: #fffc;
+	width: 360px;
+}
+
+DIV.nextantSugg_item {
+	border-top: dashed 1px #0003;
+}
+
+DIV.nextantSugg_firstitem {
+	border-top: 0px;
 }

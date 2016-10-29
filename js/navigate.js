@@ -69,7 +69,48 @@ $(document)
 								current_dir : nextant.get('dir')
 							}
 
+							nextant.suggestRequest(data);
 							nextant.searchRequest(data);
+						},
+
+						suggestRequest : function(data) {
+							$.post(
+									OC.filePath('nextant', 'ajax',
+											'suggest.php'), data,
+									nextant.suggestResult);
+						},
+
+						suggestResult : function(response) {
+
+							if (response == null)
+								return;
+
+							if (!$('#nextantSugg_list').length)
+								$('#body-user').append(
+										'<div id="nextantSugg_list"></div>');
+
+							var offset = $('#searchbox').offset();
+							var height = $('#searchbox').height();
+							var top = offset.top + height + "px";
+							var left = offset.left + "px";
+
+							$('#nextantSugg_list').css({
+								'position' : 'absolute',
+								'left' : left,
+								'top' : top
+							});
+
+							$('#nextantSugg_list').empty();
+							for (var i = 0; i < response.length; i++) {
+								var first = '';
+								if (i == 0)
+									first = 'nextantSugg_firstitem';
+								$('#nextantSugg_list').append(
+										'<div class="nextantSugg_item ' + first
+												+ '">' + response[i].suggestion
+												+ '</div>');
+
+							}
 						},
 
 						searchRequest : function(data) {
@@ -84,12 +125,11 @@ $(document)
 							if (response == null)
 								return;
 
-							if (!$('#nextantList').length) {
-								// $('#searchresults').prepend(
+							if (!$('#nextantList').length)
 								$('#fileList')
 										.append(
 												'<tr><td colspan="3" style="margin: 0px; padding: 0px;"><div id="nextantList"></div></td></tr>');
-							}
+
 							$('#nextantList').empty();
 
 							response
@@ -144,13 +184,7 @@ $(document)
 							$tmpl += ' data-permissions="" data-has-preview="false" data-path="%PATH%" data-share-permissions="">';
 							$tmpl += '<td class="filename ui-draggable">';
 							$tmpl += '<a class="action action-favorite " data-original-title="" title="">';
-							// $tmpl += '<span class="icon
-							// icon-star"></span><span
-							// class="hidden-visually">Favorite</span>';
 							$tmpl += '</a>';
-							// $tmpl += '<input id="select-files-%ID%"
-							// class="selectCheckBox checkbox"
-							// type="checkbox">';
 							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%ICON%); background-size: 32px;">';
 							$tmpl += '<div class="nextant_details" %DELETED%%SHARED%></div>';
 							$tmpl += '</div>';
@@ -162,21 +196,6 @@ $(document)
 							$tmpl += '<span class="nextant_line nextant_line2">%HIGHLIGHT1%</span>';
 							$tmpl += '<span class="nextant_line nextant_line3">%HIGHLIGHT2%</span>';
 							$tmpl += '</div></a>';
-
-							// $tmpl += '<span class="fileactions"><a
-							// class="action action-share permanent" href="#"
-							// data-action="Share" data-original-title=""
-							// title="">';
-							// $tmpl += '<span class="icon
-							// icon-share"></span><span
-							// class="hidden-visually"></span></a>';
-							// $tmpl += '<a class="action action-menu permanent"
-							// href="#" data-action="menu"
-							// data-original-title="" title=""><span class="icon
-							// icon-more"></span>';
-							// $tmpl += '<span
-							// class="hidden-visually">Actions</span></a></span></a>';
-
 							$tmpl += '</td>';
 							$tmpl += '<td class="filesize" style="color:rgb(-17,-17,-17)">%SIZEREAD%</td>';
 							$tmpl += '<td class="date"><span class="modified" title="" style="color:rgb(155,155,155)" data-original-title=""></span></td></tr>';
