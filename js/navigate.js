@@ -70,6 +70,7 @@ $(document)
 					var nextantCurrentFocus = false;
 					var nextantSearchDelayTimer = null;
 					var nextantSuggestDelayTimer = null;
+					var nextantNoSpamSuggest = false;
 					var nextant = {
 
 						init : function() {
@@ -123,6 +124,8 @@ $(document)
 						},
 
 						suggestRequest : function(data) {
+							if (nextantNoSpamSuggest)
+								return;
 							$.post(
 									OC.filePath('nextant', 'ajax',
 											'suggest.php'), data,
@@ -131,7 +134,14 @@ $(document)
 
 						suggestResult : function(response) {
 
-							if (response == null || response.length == 0) {
+							if (response == null || response.length == 0
+									|| response == false) {
+								if (response == false) {
+									nextantNoSpamSuggest = true;
+									setTimeout(function() {
+										nextantNoSpamSuggest = false;
+									}, 60000);
+								}
 								if ($('#nextantSugg_list').length)
 									$('#nextantSugg_list').hide(200);
 								return;
