@@ -136,6 +136,8 @@ $(document)
 
 							if (response == null || response.length == 0
 									|| response == false) {
+								
+								window.alert('>> ' . response);
 								if (response == false) {
 									nextantNoSpamSuggest = true;
 									setTimeout(function() {
