@@ -5,7 +5,7 @@
 
 # Nextant
 
-      Navigate through your cloud using Solr
+>      Navigate through your cloud using Solr
 
 **Nextant** indexes your documents and your shared files to perform fast and concise _Full-Text Search_. 
 
