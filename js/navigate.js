@@ -86,7 +86,7 @@ $(document)
 
 							nextantSearchDelayTimer = setTimeout(function() {
 								nextant.search();
-							}, 150);
+							}, 250);
 						},
 
 						suggestTimer : function() {
@@ -95,7 +95,7 @@ $(document)
 
 							nextantSuggestDelayTimer = setTimeout(function() {
 								nextant.suggest();
-							}, 0);
+							}, 50);
 						},
 
 						search : function() {
