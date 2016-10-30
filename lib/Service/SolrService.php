@@ -59,6 +59,8 @@ class SolrService
 
     const EXCEPTION_SEARCH_FAILED = 81;
 
+    const EXCEPTION_SUGGEST_FAILED = 85;
+
     const EXCEPTION_REMOVE_FAILED = 101;
 
     const EXCEPTION_OPTIMIZE_FAILED = 121;
@@ -412,8 +414,10 @@ class SolrService
         return false;
     }
 
-    public function suggest($string, &$error = '')
+    public function suggest($string, &$error = 0)
     {
+        $error = 0;
+        
         if (! $this->configured())
             return false;
         
@@ -454,7 +458,7 @@ class SolrService
             return $suggestions;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_SEARCH_FAILED;
+                $error = self::EXCEPTION_SUGGEST_FAILED;
             else
                 $error = self::EXCEPTION_HTTPEXCEPTION;
         } catch (\Solarium\Exception $e) {
