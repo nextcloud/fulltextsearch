@@ -119,6 +119,7 @@ class Index extends Base
         $this->miscService->setDebug($input->getOption('debug'));
         $this->fileService->setDebug($input->getOption('debug'));
         $this->indexService->setDebug($input->getOption('debug'));
+        $this->indexService->setForcing($input->getOption('force'));
         
         $this->solrService->setOutput($output);
         $this->indexService->setOutput($output);

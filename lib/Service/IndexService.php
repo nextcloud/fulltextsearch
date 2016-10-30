@@ -57,6 +57,8 @@ class IndexService
 
     private $debug = false;
 
+    private $force = false;
+
     public function __construct($fileService, $bookmarkService, $solrService, $solrTools, $miscService)
     {
         $this->fileService = $fileService;
@@ -69,6 +71,11 @@ class IndexService
         
         $this->parent = null;
         $this->output = null;
+    }
+
+    public function setForcing($force)
+    {
+        $this->force = $force;
     }
 
     public function setDebug($debug)
@@ -125,7 +132,6 @@ class IndexService
             $progress->start();
         }
         
-        $forceExtract = false;
         foreach ($data as $entry) {
             
             if ($this->parent != null)
@@ -159,7 +165,7 @@ class IndexService
             if (! $extract)
                 continue;
             
-            if (! $forceExtract && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
+            if (! $this->force && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
                 continue;
             
             if ($progress != null) {
@@ -219,7 +225,6 @@ class IndexService
             $progress->start();
         }
         
-        $forceExtract = false;
         foreach ($data as $entry) {
             
             if ($this->parent != null)
