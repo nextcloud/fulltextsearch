@@ -134,11 +134,10 @@ $(document)
 
 						suggestResult : function(response) {
 
-							if (response == null || response.length == 0
-									|| response == false) {
-								
-								window.alert('>> ' . response);
-								if (response == false) {
+							if (response == null || response.status > 0
+									|| response.result.length == 0) {
+
+								if (response.status > 0) {
 									nextantNoSpamSuggest = true;
 									setTimeout(function() {
 										nextantNoSpamSuggest = false;
@@ -167,7 +166,8 @@ $(document)
 							});
 
 							$('#nextantSugg_list').empty();
-							for (var i = 0; i < response.length; i++) {
+							var result = response.result;
+							for (var i = 0; i < result.length; i++) {
 								var first = '';
 								if (i == 0)
 									first = 'nextantSugg_firstitem';
@@ -176,7 +176,7 @@ $(document)
 										'<div id="nextant_sugg_' + i
 												+ '" class="nextantSugg_item '
 												+ first + '">'
-												+ response[i].suggestion
+												+ result[i].suggestion
 												+ '</div>');
 							}
 

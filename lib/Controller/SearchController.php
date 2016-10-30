@@ -162,6 +162,10 @@ class SearchController extends Controller
             return false;
         
         $suggest = $this->solrService->suggest($query, $error);
-        return $suggest;
+        
+        return array(
+            'status' => $error,
+            'result' => $suggest
+        );
     }
 }
