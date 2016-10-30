@@ -11,7 +11,8 @@
 	</lst>
 </searchComponent>
 
-<requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
+<requestHandler class="org.apache.solr.handler.component.SearchHandler"
+	name="/suggest">
 	<lst name="defaults">
 		<str name="spellcheck">true</str>
 		<str name="spellcheck.dictionary">suggest</str>
