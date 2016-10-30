@@ -60,17 +60,30 @@ $(document)
 						nextant.suggestShow();
 					});
 
-					$(document).keypress(function(e) {
-						if (e.which == 13 && nextantCurrentFocus) {
-							nextant.search();
-						}
+					$(window).resize(function() {
+						nextant.suggestShow();
+					});
+
+					$('html').keydown(function(e) {
+						if (!nextantCurrentFocus)
+							return;
+						if (e.which == 13)
+							return nextant.search();
+//						if (e.which == 38)
+//							return nextant.suggestSelect('prev');
+//						if (e.which == 39)
+//							return nextant.suggestSelect('select');
+//						if (e.which == 40)
+//							return nextant.suggestSelect('next');
 					});
 
 					var nextantCurrentSearch = '';
 					var nextantCurrentFocus = false;
 					var nextantSearchDelayTimer = null;
 					var nextantSuggestDelayTimer = null;
-					var nextantNoSpamSuggest = false;
+					var nextantSuggestNoSpam = false;
+					var nextantSuggestSelected = 0;
+					var nextantSuggestResults = null;
 					var nextant = {
 
 						init : function() {
@@ -124,7 +137,7 @@ $(document)
 						},
 
 						suggestRequest : function(data) {
-							if (nextantNoSpamSuggest)
+							if (nextantSuggestNoSpam)
 								return;
 							$.post(
 									OC.filePath('nextant', 'ajax',
@@ -138,9 +151,9 @@ $(document)
 									|| response.result.length == 0) {
 
 								if (response.status > 0) {
-									nextantNoSpamSuggest = true;
+									nextantSuggestNoSpam = true;
 									setTimeout(function() {
-										nextantNoSpamSuggest = false;
+										nextantSuggestNoSpam = false;
 									}, 60000);
 								}
 								if ($('#nextantSugg_list').length)
@@ -154,19 +167,9 @@ $(document)
 
 							nextant.suggestShow();
 
-							var offset = $('#searchbox').offset();
-							var height = $('#searchbox').height();
-							var top = offset.top + height + "px";
-							var left = offset.left + "px";
-
-							$('#nextantSugg_list').css({
-								'position' : 'absolute',
-								'left' : left,
-								'top' : top
-							});
-
 							$('#nextantSugg_list').empty();
 							var result = response.result;
+							nextantSuggestResult = result;
 							for (var i = 0; i < result.length; i++) {
 								var first = '';
 								if (i == 0)
@@ -189,6 +192,17 @@ $(document)
 
 						suggestShow : function() {
 
+							var offset = $('#searchbox').offset();
+							var height = $('#searchbox').height();
+							var top = offset.top + height + "px";
+							var left = offset.left + "px";
+
+							$('#nextantSugg_list').css({
+								'position' : 'absolute',
+								'left' : left,
+								'top' : top
+							});
+
 							if (!$('#nextantSugg_list').length)
 								return;
 							if (nextantCurrentFocus)
@@ -201,6 +215,31 @@ $(document)
 							$('#searchbox').val(txt + ' ');
 							$('#searchbox').focus();
 						},
+
+//						suggestSelect : function(pos) {
+//							if (!nextantCurrentFocus)
+//								return;
+//							if (nextantSuggestResult == null)
+//								return;
+//							
+//							switch (pos) {
+//							case 'next':
+//								if (nextantSuggestSelected < nextantSuggestResult.length)
+//									nextantSuggestSelected++;
+//								break;
+//							case 'prev':
+//								if (nextantSuggestSelected > 1)
+//									nextantSuggestSelected--;
+//								break;
+//							case 'select':
+//								suggestReplace(nextantSuggestResult[nextantSuggestSelected]);
+//								break;
+//
+//							case 'reset':
+//								nextantSuggestSelected = 0;
+//								break;
+//							}
+//						},
 
 						searchRequest : function(data) {
 							$.post(
