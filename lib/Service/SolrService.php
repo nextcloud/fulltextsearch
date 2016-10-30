@@ -436,13 +436,9 @@ class SolrService
             $query->setCollate(true);
             
             $resultset = $client->suggester($query);
-            $suggTotal = sizeof($resultset);
-            
-            $queryBase = substr($string, 0, strrpos($string, ' '));
-            if ($queryBase != '')
-                $queryBase .= ' ';
             
             $t = 0;
+            $suggTotal = sizeof($resultset);
             $suggestions = array();
             foreach ($resultset as $term => $termResult) {
                 
@@ -450,7 +446,7 @@ class SolrService
                 if ($t == $suggTotal) {
                     foreach ($termResult as $result)
                         $suggestions[] = array(
-                            'suggestion' => $queryBase . $result
+                            'suggestion' => '<b>' . $string . '</b>' . (($termResult->getEndOffset() >= strlen($string)) ? substr($result, strlen($term)) : '')
                         );
                 }
             }
