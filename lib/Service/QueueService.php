@@ -89,11 +89,16 @@ class QueueService
     public function executeItem($item)
     {
         $options = array();
+        
+        if (!$item->getUserId())
+            return false;
+        
         switch ($item->getType()) {
             case FilesEvents::FILE_UPDATE:
                 array_push($options, 'forceshared');
             
             case FilesEvents::FILE_CREATE:
+                $this->fileService->initUser($item->getUserId());                
                 $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
                 if ($files != false && sizeof($files) > 0) {
                     $ispack = (sizeof($files) != 1);
@@ -110,6 +115,7 @@ class QueueService
             case FilesEvents::FILE_UNSHARE:
                 array_push($options, 'forceshared');
                 
+                $this->fileService->initUser($item->getUserId());                
                 $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
                 if (is_array($files) && sizeof($files) > 0) {
                     $ispack = (sizeof($files) != 1);
@@ -121,6 +127,7 @@ class QueueService
                 
                 if ($item->getFolder()) {
                     
+                    $this->fileService->initUser($item->getUserId());                    
                     $files = $this->fileService->getFilesPerUserId($item->getUserId(), '/files', array());
                     $files_trashbin = $this->fileService->getFilesPerUserId($item->getUserId(), '/files_trashbin', array(
                         'deleted'

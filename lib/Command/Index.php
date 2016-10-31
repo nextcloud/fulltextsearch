@@ -217,6 +217,7 @@ class Index extends Base
             if (! $this->userManager->userExists($user))
                 continue;
             
+            $this->fileService->initUser($user);
             $files = $this->fileService->getFilesPerUserId($user, '/files', array());
             $files_trashbin = $this->fileService->getFilesPerUserId($user, '/files_trashbin', array(
                 'deleted'
@@ -276,6 +277,7 @@ class Index extends Base
             if (! $this->userManager->userExists($user))
                 continue;
             
+            $this->fileService->initUser($user);
             $files = $this->fileService->getFilesPerUserId($user, '/files', array());
             $files_trashbin = $this->fileService->getFilesPerUserId($user, '/files_trashbin', array(
                 'deleted'
