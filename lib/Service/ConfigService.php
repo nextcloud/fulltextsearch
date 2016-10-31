@@ -53,10 +53,9 @@ class ConfigService
         'index_files' => 1,
         'index_files_needed' => 1,
         'index_files_update_needed' => 1,
-        'index_files_remote' => 0,
+        'index_files_external' => 0,
         'index_files_encrypted' => 0,
         'index_files_live' => 1,
-        'index_files_external_index' => 0,
         'index_files_max_size' => 40,
         
         'index_bookmarks' => 0,
