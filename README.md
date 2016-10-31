@@ -7,7 +7,13 @@
 
 >      Navigate through your cloud using Solr
 
-**Nextant** indexes your documents and your shared files to perform fast and concise _Full-Text Search_. 
+**Nextant** performs fast and concise _Full-Text Search_ within:
+
+- your own files,
+- shared files,
+- external storage,
+- bookmarks
+ 
 
 ### Recognized file format: 
 - plain text, 

@@ -11,12 +11,13 @@
 
 ### Recognized file format: 
 - plain text, 
-- rtf, 
+- rtf,
+- pdf, 
 - html, 
 - openoffice, 
 - microsoft office, 
 - image JPEG and TIFF (will requiert Tesseract installed) 
-- old pdf (will also requiert Tesseract) _[work in progress]_
+- pdf with no text layer (will also requiert Tesseract) _[work in progress]_
  
 
 
@@ -28,11 +29,11 @@
 - Edit the settings in the administration page.
 - Extract the current files from your cloud using the **./occ nextant:index** command 
 - Have a look to this [explanation on how Nextant works](https://github.com/daita/nextant/wiki/Extracting,-Live-Update)
-- _(Optional)_ [Installing Tesseract](https://github.com/tesseract-ocr/tesseract/wiki) ([Optical Character Recognition](https://en.wikipedia.org/wiki/Optical_character_recognition) (OCR) Engine) will allow Nextant to extract text from image file and old pdf.
+- _(Optional)_ [Installing Tesseract](https://github.com/tesseract-ocr/tesseract/wiki) ([Optical Character Recognition](https://en.wikipedia.org/wiki/Optical_character_recognition) (OCR) Engine) will allow Nextant to extract text from images and pdfs without text layer.
 
 
 	</description>
-	<version>0.6.1</version>
+	<version>0.6.2</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<types>
