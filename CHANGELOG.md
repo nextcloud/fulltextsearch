@@ -1,3 +1,10 @@
+**v0.6.2**
+- adding suggestions - https://github.com/nextcloud/nextant/wiki/And-some-more-...
+- adding external storage indexing
+- adding server-side encrypted file indexing
+- fixing an issue with nextant:live
+
+
 **v0.6.1**
 - fixing an issue with federated cloud sharing
 - fixing an issue when indexing java source stored in the trashbin
