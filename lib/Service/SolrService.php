@@ -231,6 +231,9 @@ class SolrService
         if (! $this->configured())
             return false;
         
+        if ($document->getAbsolutePath() == null)
+            return false;
+        
         if ($document->getType() == null || $document->getType() == '') {
             $error = self::ERROR_TYPE_NOT_SET;
             return false;
@@ -306,7 +309,7 @@ class SolrService
             
             if ($ret) {
                 $document->processed(true);
-                $document->extracted(true);                
+                $document->extracted(true);
                 return true;
             }
         } catch (\Solarium\Exception\HttpException $ehe) {

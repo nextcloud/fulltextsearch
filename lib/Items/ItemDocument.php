@@ -47,7 +47,7 @@ class ItemDocument
 
     private $size;
 
-    private $absolutePath;
+    private $absolutePath = null;
 
     private $mtime;
 
