@@ -306,6 +306,7 @@ class SolrService
             
             if ($ret) {
                 $document->processed(true);
+                $document->extracted(true);                
                 return true;
             }
         } catch (\Solarium\Exception\HttpException $ehe) {
