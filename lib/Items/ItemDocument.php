@@ -81,6 +81,8 @@ class ItemDocument
 
     private $failedUpdate = false;
 
+    private $temp = false;
+
     private $synced = false;
 
     public function __construct($type = '', $id = 0)
@@ -159,9 +161,10 @@ class ItemDocument
         return $this->size;
     }
 
-    public function setAbsolutePath($absolutePath)
+    public function setAbsolutePath($absolutePath, $temp = false)
     {
         $this->absolutePath = $absolutePath;
+        $this->temp = $temp;
     }
 
     public function getAbsolutePath()
@@ -341,6 +344,11 @@ class ItemDocument
     public function isSynced()
     {
         return $this->synced;
+    }
+
+    public function isTemp()
+    {
+        return $this->temp;
     }
 
     public static function fromCompleteId($str)
