@@ -94,6 +94,7 @@ style('nextant', 'admin');
 									style="width: 100px;"></td>
 							</tr>
 
+
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">					
 	    <?php p($l->t('Live Index :')); ?>
@@ -104,22 +105,28 @@ style('nextant', 'admin');
 									href="https://github.com/daita/nextant/wiki/Extracting,-Live-Update"
 									target="_blank">help</a>)</td>
 							</tr>
+
+							<tr style="height: 30px;">
+								<td class="nextant_admin_left">
+	    <?php p($l->t('Index External Storage :')) ?></td>
+								<td><input type="checkbox" name="solr_index_files_external"
+									id="solr_index_files_external" value="1" style="margin: 10px;"></td>
+							</tr>
+
+							<tr style="height: 30px;">
+								<td class="nextant_admin_left">
+	    <?php p($l->t('Index Encrypted Files :')) ?></td>
+								<td><input type="checkbox" name="solr_index_files_encrypted"
+									id="solr_index_files_encrypted" value="1" style="margin: 10px;"></td>
+							</tr>
+
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
 	    <?php p($l->t('Last index :')) ?></td>
 								<td><div id="solr_index_files_last"></div></td>
-
 							</tr>
 
 
-							<!-- 
-                    <tr style="height: 30px;">
-						<td class="nextant_admin_left">
-	    <?php p($l->t('Index External Storage :')) ?></td>
-						<td><input type="checkbox" name="solr_index_files_external_index"
-							id="solr_index_files_external_index" value="1" style="margin: 10px;"></td>
-					</tr>
-                    -->
 						</table>
 					</div>
 
