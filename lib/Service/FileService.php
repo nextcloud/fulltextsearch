@@ -141,8 +141,8 @@ class FileService
         $item->synced(true);
         
         // && $this->configService->getAppValue('index_files_external_index') != 1)
-        if (! $item->getStorage()->isLocal())
-            return false;
+        // if (! $item->getStorage()->isLocal())
+        // return false;
         
         $size = round($item->getSize() / 1024 / 1024, 1);
         if ($size > $this->configService->getAppValue('index_files_max_size')) {
@@ -165,6 +165,33 @@ class FileService
     }
 
     /**
+     * generate a local file and set its path in the item/AbsolutePath
+     *
+     * @param ItemDocument $item            
+     */
+    public function generateTempDocument(&$item)
+    {
+        // We generate a local tmp file from the remote one
+        if ($item->isRemote() && $this->configService->getAppValue('index_files_remote') === '1')
+            $item->setAbsolutePath(Filesystem::getView()->toTmpFile($item->getPath()), true);
+            
+            // We generate a local tmp file from the remote one
+        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') === '1')
+            $item->setAbsolutePath(Filesystem::getView()->toTmpFile($item->getPath()), true);
+    }
+
+    /**
+     * destroy local temp file
+     *
+     * @param unknown $item            
+     */
+    public function destroyTempDocument(&$item)
+    {
+        if ($item->isTemp())
+            unlink($item->getAbsolutePath());
+    }
+
+    /**
      * convert FileInfo to ItemDocument
      *
      * @param FileInfo $file            
@@ -178,10 +205,17 @@ class FileService
         $item = new ItemDocument(ItemDocument::TYPE_FILE, $file->getId());
         $item->setMTime($file->getMTime());
         $item->setMimetype($file->getMimeType());
-        $item->setAbsolutePath($file->getPath());
         $item->setPath($file->getPath());
         $item->setSize($file->getSize());
         $item->setStorage($file->getStorage());
+        
+        if ($file->getStorage()->isLocal())
+            $item->setAbsolutePath(Filesystem::getView()->getLocalFile($item->getPath()));
+        else
+            $item->remote(true);
+        
+        if ($file->isEncrypted())
+            $item->encrypted(true);
         
         return $item;
     }
@@ -199,7 +233,7 @@ class FileService
         
         $data = array();
         
-      //  Filesystem::tearDown();
+        // Filesystem::tearDown();
         Filesystem::init($userId, '');
         
         $userFolder = FileService::getUserFolder($this->rootFolder, $userId, $dir);
@@ -213,14 +247,10 @@ class FileService
             if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER)
                 continue;
             
-            if (! $file->getStorage()->isLocal())
-                continue;
-            
             if ($file->isShared() && ! in_array('forceshared', $options))
                 continue;
             
             $item = $this->getDocumentFromFile($file);
-            $item->setAbsolutePath(Filesystem::getView()->getLocalFile($item->getPath()));
             $item->setOwner($userId);
             $item->deleted(in_array('deleted', $options));
             
@@ -273,16 +303,11 @@ class FileService
             return $data;
         }
         
-        if (! $file->getStorage()->isLocal())
-            return $data;
-        
         if ($file->isShared() && ! in_array('forceshared', $options))
             return $data;
         
         $item = $this->getDocumentFromFile($file);
-        $item->setAbsolutePath($view->getLocalFile($item->getPath()));
         $item->setOwner($userId);
-        
         $item->deleted(in_array('deleted', $options));
         
         $data[] = $item;
@@ -326,14 +351,10 @@ class FileService
             return $data;
         }
         
-        if (! $file->getStorage()->isLocal())
-            return $data;
-        
         if ($file->isShared() && ! in_array('forceshared', $options))
             return $data;
         
         $item = $this->getDocumentFromFile($file);
-        $item->setAbsolutePath($view->getLocalFile($item->getPath()));
         $item->setOwner($userId);
         $item->deleted(in_array('deleted', $options));
         
