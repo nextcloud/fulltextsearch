@@ -108,19 +108,18 @@ class IndexService
      * @param array $data            
      * @return array
      */
-    public function extract($type, $userId, &$data, &$solrDocs = null, $extract = true, &$error = 0)
+    public function extract($type, $userId, &$data, &$solrDocs, $extract = true, &$error = 0)
     {
         $this->solrService->setOwner($userId);
         
-        if ($solrDocs == null || $solrDocs == '') {
-            if (sizeof($data) == 1)
+        if ($solrDocs === null)
+            $solrDocs = $this->getDocuments($type, $userId, 0, $error);
+        else 
+            if ($solrDocs === false)
                 $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $error);
-            else
-                $solrDocs = $this->getDocuments($type, $userId, 0, $error);
-        }
         
         $progress = null;
-        if ($this->output != null)
+        if ($this->output !== null)
             $progress = new ProgressBar($this->output, sizeof($data));
         
         if ($progress != null) {
@@ -174,10 +173,13 @@ class IndexService
                 $progress->display();
             }
             
-            if (! $this->solrService->extractDocument($entry, $error))
-                continue;
+            if ($entry->getType() == ItemDocument::TYPE_FILE)
+                $this->fileService->generateTempDocument($entry);
             
-            // $entry->processed(true);
+            $this->solrService->extractDocument($entry, $error);
+            
+            if ($entry->getType() == ItemDocument::TYPE_FILE)
+                $this->fileService->destroyTempDocument($entry);
         }
         
         if ($progress != null) {
@@ -205,18 +207,17 @@ class IndexService
         if (sizeof($data) > 0 && ! $data[0]->isSynced())
             $this->extract($type, $userId, $data, $solrDocs, false);
         
-        if ($solrDocs == null || $solrDocs == '') {
-            if (sizeof($data) == 1)
+        if ($solrDocs === null)
+            $solrDocs = $this->getDocuments($type, $userId, 0, $error);
+        else 
+            if ($solrDocs === false)
                 $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $error);
-            else
-                $solrDocs = $this->getDocuments($type, $userId, 0, $error);
-        }
         
         $progress = null;
-        if ($this->output != null)
+        if ($this->output !== null)
             $progress = new ProgressBar($this->output, sizeof($data));
         
-        if ($progress != null) {
+        if ($progress !== null) {
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('', 'jvm');
             $progress->setMessage('/', 'job');
@@ -230,7 +231,7 @@ class IndexService
             if ($this->parent != null)
                 $this->parent->interrupted();
             
-            if ($progress != null) {
+            if ($progress !== null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
