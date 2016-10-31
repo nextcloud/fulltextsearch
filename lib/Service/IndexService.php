@@ -331,8 +331,10 @@ class IndexService
         }
         
         $docIds = array();
-        foreach ($data as $entry)
-            array_push($docIds, (int) $entry->getId());
+        foreach ($data as $entry) {
+            if (! $entry->isInvalid())
+                array_push($docIds, (int) $entry->getId());
+        }
         
         $deleting = array();
         foreach ($solrDocs as $doc) {

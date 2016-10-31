@@ -83,6 +83,8 @@ class ItemDocument
 
     private $temp = false;
 
+    private $invalid = false;
+
     private $synced = false;
 
     public function __construct($type = '', $id = 0)
@@ -349,6 +351,16 @@ class ItemDocument
     public function isTemp()
     {
         return $this->temp;
+    }
+
+    public function invalid($invalid)
+    {
+        $this->invalid = $invalid;
+    }
+
+    public function isInvalid()
+    {
+        return $this->invalid;
     }
 
     public static function fromCompleteId($str)
