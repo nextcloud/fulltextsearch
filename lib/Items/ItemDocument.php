@@ -47,7 +47,7 @@ class ItemDocument
 
     private $size;
 
-    private $absolutePath;
+    private $absolutePath = null;
 
     private $mtime;
 
@@ -60,6 +60,10 @@ class ItemDocument
     private $needExtract = false;
 
     private $needUpdate = false;
+
+    private $remote = false;
+
+    private $encrypted = false;
 
     private $extractable = false;
 
@@ -76,6 +80,10 @@ class ItemDocument
     private $failedExtract = false;
 
     private $failedUpdate = false;
+
+    private $temp = false;
+
+    private $invalid = false;
 
     private $synced = false;
 
@@ -155,9 +163,10 @@ class ItemDocument
         return $this->size;
     }
 
-    public function setAbsolutePath($absolutePath)
+    public function setAbsolutePath($absolutePath, $temp = false)
     {
         $this->absolutePath = $absolutePath;
+        $this->temp = $temp;
     }
 
     public function getAbsolutePath()
@@ -227,6 +236,26 @@ class ItemDocument
     public function neededUpdate()
     {
         return $this->needUpdate;
+    }
+
+    public function remote($remote)
+    {
+        $this->remote = $remote;
+    }
+
+    public function isRemote()
+    {
+        return $this->remote;
+    }
+
+    public function encrypted($encrypted)
+    {
+        $this->encrypted = $encrypted;
+    }
+
+    public function isEncrypted()
+    {
+        return $this->encrypted;
     }
 
     public function extractable($extractable)
@@ -317,6 +346,21 @@ class ItemDocument
     public function isSynced()
     {
         return $this->synced;
+    }
+
+    public function isTemp()
+    {
+        return $this->temp;
+    }
+
+    public function invalid($invalid)
+    {
+        $this->invalid = $invalid;
+    }
+
+    public function isInvalid()
+    {
+        return $this->invalid;
     }
 
     public static function fromCompleteId($str)

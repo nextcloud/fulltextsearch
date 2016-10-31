@@ -53,8 +53,9 @@ class ConfigService
         'index_files' => 1,
         'index_files_needed' => 1,
         'index_files_update_needed' => 1,
+        'index_files_external' => 0,
+        'index_files_encrypted' => 0,
         'index_files_live' => 1,
-        'index_files_external_index' => 0,
         'index_files_max_size' => 40,
         
         'index_bookmarks' => 0,
@@ -181,19 +182,19 @@ class ConfigService
      * @param string $action            
      * @return boolean
      */
-//     public function shoudIContinue($action)
-//     {
-//         switch ($action) {
-//             case self::ACTION_LIVE_EXTRACT:
-//                 return ($this->getAppValue($action) == '1');
-            
-//             case self::ACTION_LIVE_DOCUPDATE:
-//                 if ($this->getAppValue(self::ACTION_LIVE_EXTRACT) != '1')
-//                     return false;
-//                 return ($this->getAppValue($action) == '1');
-//         }
-//     }
-
+    // public function shoudIContinue($action)
+    // {
+    // switch ($action) {
+    // case self::ACTION_LIVE_EXTRACT:
+    // return ($this->getAppValue($action) == '1');
+    
+    // case self::ACTION_LIVE_DOCUPDATE:
+    // if ($this->getAppValue(self::ACTION_LIVE_EXTRACT) != '1')
+    // return false;
+    // return ($this->getAppValue($action) == '1');
+    // }
+    // }
+    
     /**
      * generate an array to pass config to Solarium
      *

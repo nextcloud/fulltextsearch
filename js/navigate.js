@@ -50,16 +50,71 @@ $(document)
 							$('#nextantList').show();
 					});
 
+					$('#searchbox').focusout(function() {
+						nextantCurrentFocus = false;
+						nextant.suggestShow();
+					});
+
+					$('#searchbox').focusin(function() {
+						nextantCurrentFocus = true;
+						nextant.suggestShow();
+					});
+
+					$(window).resize(function() {
+						nextant.suggestShow();
+					});
+
+					$('html').keydown(function(e) {
+						if (!nextantCurrentFocus)
+							return;
+						if (e.which == 13)
+							return nextant.search();
+//						if (e.which == 38)
+//							return nextant.suggestSelect('prev');
+//						if (e.which == 39)
+//							return nextant.suggestSelect('select');
+//						if (e.which == 40)
+//							return nextant.suggestSelect('next');
+					});
+
 					var nextantCurrentSearch = '';
+					var nextantCurrentFocus = false;
+					var nextantSearchDelayTimer = null;
+					var nextantSuggestDelayTimer = null;
+					var nextantSuggestNoSpam = false;
+					var nextantSuggestSelected = 0;
+					var nextantSuggestResults = null;
 					var nextant = {
 
 						init : function() {
 							$('#searchbox').on('input', function(e) {
-								nextant.search($('#searchbox').val());
+								nextant.searchTimer();
+								nextant.suggestTimer();
 							});
 						},
 
-						search : function(query) {
+						searchTimer : function() {
+							if (nextantSearchDelayTimer != null)
+								clearTimeout(nextantSearchDelayTimer);
+
+							nextantSearchDelayTimer = setTimeout(function() {
+								nextant.search();
+							}, 250);
+						},
+
+						suggestTimer : function() {
+							if (nextantSuggestDelayTimer != null)
+								clearTimeout(nextantSuggestDelayTimer);
+
+							nextantSuggestDelayTimer = setTimeout(function() {
+								nextant.suggest();
+							}, 50);
+						},
+
+						search : function() {
+							nextantSearchDelayTimer = null;
+
+							var query = $('#searchbox').val();
 							if (query == nextantCurrentSearch)
 								return;
 							nextantCurrentSearch = query;
@@ -71,6 +126,120 @@ $(document)
 
 							nextant.searchRequest(data);
 						},
+
+						suggest : function() {
+							nextantSuggestDelayTimer = null;
+							var query = $('#searchbox').val();
+							var data = {
+								query : query
+							}
+							nextant.suggestRequest(data);
+						},
+
+						suggestRequest : function(data) {
+							if (nextantSuggestNoSpam)
+								return;
+							$.post(
+									OC.filePath('nextant', 'ajax',
+											'suggest.php'), data,
+									nextant.suggestResult);
+						},
+
+						suggestResult : function(response) {
+
+							if (response == null || response.status > 0
+									|| response.result.length == 0) {
+
+								if (response.status > 0) {
+									nextantSuggestNoSpam = true;
+									setTimeout(function() {
+										nextantSuggestNoSpam = false;
+									}, 60000);
+								}
+								if ($('#nextantSugg_list').length)
+									$('#nextantSugg_list').hide(200);
+								return;
+							}
+
+							if (!$('#nextantSugg_list').length)
+								$('#body-user').append(
+										'<div id="nextantSugg_list"></div>');
+
+							nextant.suggestShow();
+
+							$('#nextantSugg_list').empty();
+							var result = response.result;
+							nextantSuggestResult = result;
+							for (var i = 0; i < result.length; i++) {
+								var first = '';
+								if (i == 0)
+									first = 'nextantSugg_firstitem';
+
+								$('#nextantSugg_list').append(
+										'<div id="nextant_sugg_' + i
+												+ '" class="nextantSugg_item '
+												+ first + '">'
+												+ result[i].suggestion
+												+ '</div>');
+							}
+
+							$('.nextantSugg_item').click(function() {
+								nextant.suggestReplace($(this).text());
+								nextant.search();
+							});
+
+						},
+
+						suggestShow : function() {
+
+							var offset = $('#searchbox').offset();
+							var height = $('#searchbox').height();
+							var top = offset.top + height + "px";
+							var left = offset.left + "px";
+
+							$('#nextantSugg_list').css({
+								'position' : 'absolute',
+								'left' : left,
+								'top' : top
+							});
+
+							if (!$('#nextantSugg_list').length)
+								return;
+							if (nextantCurrentFocus)
+								$('#nextantSugg_list').show(200);
+							else
+								$('#nextantSugg_list').hide(200);
+						},
+
+						suggestReplace : function(txt) {
+							$('#searchbox').val(txt + ' ');
+							$('#searchbox').focus();
+						},
+
+//						suggestSelect : function(pos) {
+//							if (!nextantCurrentFocus)
+//								return;
+//							if (nextantSuggestResult == null)
+//								return;
+//							
+//							switch (pos) {
+//							case 'next':
+//								if (nextantSuggestSelected < nextantSuggestResult.length)
+//									nextantSuggestSelected++;
+//								break;
+//							case 'prev':
+//								if (nextantSuggestSelected > 1)
+//									nextantSuggestSelected--;
+//								break;
+//							case 'select':
+//								suggestReplace(nextantSuggestResult[nextantSuggestSelected]);
+//								break;
+//
+//							case 'reset':
+//								nextantSuggestSelected = 0;
+//								break;
+//							}
+//						},
 
 						searchRequest : function(data) {
 							$.post(
@@ -84,12 +253,11 @@ $(document)
 							if (response == null)
 								return;
 
-							if (!$('#nextantList').length) {
-								// $('#searchresults').prepend(
+							if (!$('#nextantList').length)
 								$('#fileList')
 										.append(
 												'<tr><td colspan="3" style="margin: 0px; padding: 0px;"><div id="nextantList"></div></td></tr>');
-							}
+
 							$('#nextantList').empty();
 
 							response
@@ -144,13 +312,7 @@ $(document)
 							$tmpl += ' data-permissions="" data-has-preview="false" data-path="%PATH%" data-share-permissions="">';
 							$tmpl += '<td class="filename ui-draggable">';
 							$tmpl += '<a class="action action-favorite " data-original-title="" title="">';
-							// $tmpl += '<span class="icon
-							// icon-star"></span><span
-							// class="hidden-visually">Favorite</span>';
 							$tmpl += '</a>';
-							// $tmpl += '<input id="select-files-%ID%"
-							// class="selectCheckBox checkbox"
-							// type="checkbox">';
 							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%ICON%); background-size: 32px;">';
 							$tmpl += '<div class="nextant_details" %DELETED%%SHARED%></div>';
 							$tmpl += '</div>';
@@ -162,21 +324,6 @@ $(document)
 							$tmpl += '<span class="nextant_line nextant_line2">%HIGHLIGHT1%</span>';
 							$tmpl += '<span class="nextant_line nextant_line3">%HIGHLIGHT2%</span>';
 							$tmpl += '</div></a>';
-
-							// $tmpl += '<span class="fileactions"><a
-							// class="action action-share permanent" href="#"
-							// data-action="Share" data-original-title=""
-							// title="">';
-							// $tmpl += '<span class="icon
-							// icon-share"></span><span
-							// class="hidden-visually"></span></a>';
-							// $tmpl += '<a class="action action-menu permanent"
-							// href="#" data-action="menu"
-							// data-original-title="" title=""><span class="icon
-							// icon-more"></span>';
-							// $tmpl += '<span
-							// class="hidden-visually">Actions</span></a></span></a>';
-
 							$tmpl += '</td>';
 							$tmpl += '<td class="filesize" style="color:rgb(-17,-17,-17)">%SIZEREAD%</td>';
 							$tmpl += '<td class="date"><span class="modified" title="" style="color:rgb(155,155,155)" data-original-title=""></span></td></tr>';

@@ -94,7 +94,8 @@ class SettingsController extends Controller
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
             'index_files_live' => $this->configService->getAppValue('index_files_live'),
-            'index_files_external_index' => $this->configService->getAppValue('index_files_external_index'),
+            'index_files_external' => $this->configService->getAppValue('index_files_external'),
+            'index_files_encrypted' => $this->configService->getAppValue('index_files_encrypted'),
             'display_result' => $this->configService->getAppValue('display_result'),
             'current_docs' => $this->solrTools->count('files', $error),
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
@@ -112,11 +113,11 @@ class SettingsController extends Controller
         return $response;
     }
 
-    public function setOptionsFiles($index_files, $index_files_live, $index_files_max_size, $index_files_external_index)
+    public function setOptionsFiles($index_files, $index_files_live, $index_files_max_size, $index_files_external, $index_files_encrypted)
     {
         $this->configService->setAppValue('index_files', $index_files);
         $this->configService->setAppValue('index_files_live', $index_files_live);
-        $this->configService->setAppValue('index_files_external_index', $index_files_external_index);
+        $this->configService->setAppValue('index_files_external', $index_files_external);
         $this->configService->setAppValue('index_files_max_size', $index_files_max_size);
         
         return $this->updateSubOptions(false, 'files');

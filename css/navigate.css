@@ -1,5 +1,10 @@
 @CHARSET "ISO-8859-1";
 
+.searchbox input[type="search"]:valid, .searchbox input[type="search"]:focus
+	{
+	width: 300px;
+}
+
 #nextantList {
 	width: 100%;
 }
@@ -75,4 +80,37 @@ SPAN.nextant_line3 {
 SPAN.nextant_hl {
 	color: #000;
 	font-weight: bold;
+}
+
+#nextantSugg_list {
+	z-index: 2000;
+	margin-top: 18px;
+	border: solid 1px #0000004D;
+	border-radius: 4px;
+	background: #fffc;
+	width: 350px;
+	box-shadow: 2px 2px 5px #0000004D;
+}
+
+DIV.nextantSugg_item {
+	border-top: dashed 1px #0003;
+	padding: 4px;
+	padding-left: 12px;
+	padding-right: 12px;
+}
+
+DIV.nextantSugg_item, DIV.nextantSugg_item:hover {
+	-webkit-transition: background-color 200ms linear;
+	-moz-transition: background-color 200ms linear;
+	-o-transition: background-color 200ms linear;
+	-ms-transition: background-color 200ms linear;
+	transition: background-color 200ms linear;
+}
+
+DIV.nextantSugg_item:hover {
+	background: #eee;;
+}
+
+DIV.nextantSugg_firstitem {
+	border-top: 0px;
 }

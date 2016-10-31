@@ -96,7 +96,8 @@ class QueueService
             case FilesEvents::FILE_CREATE:
                 $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
                 if ($files != false && sizeof($files) > 0) {
-                    $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files);
+                    $ispack = (sizeof($files) != 1);
+                    $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $ispack);
                 }
                 break;
             
@@ -110,8 +111,10 @@ class QueueService
                 array_push($options, 'forceshared');
                 
                 $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
-                if (is_array($files) && sizeof($files) > 0)
-                    $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files);
+                if (is_array($files) && sizeof($files) > 0) {
+                    $ispack = (sizeof($files) != 1);
+                    $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $ispack);
+                }
                 break;
             
             case FilesEvents::FILE_DELETE:
