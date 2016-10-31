@@ -61,6 +61,10 @@ class ItemDocument
 
     private $needUpdate = false;
 
+    private $remote = false;
+
+    private $encrypted = false;
+
     private $extractable = false;
 
     private $extracted = false;
@@ -227,6 +231,26 @@ class ItemDocument
     public function neededUpdate()
     {
         return $this->needUpdate;
+    }
+
+    public function remote($remote)
+    {
+        $this->remote = $remote;
+    }
+
+    public function isRemote()
+    {
+        return $this->remote;
+    }
+
+    public function encrypted($encrypted)
+    {
+        $this->encrypted = $encrypted;
+    }
+
+    public function isEncrypted()
+    {
+        return $this->encrypted;
     }
 
     public function extractable($extractable)
