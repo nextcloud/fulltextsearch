@@ -119,12 +119,7 @@ class FileService
         
         return false;
     }
-    
-    // public static function getAbsolutePath($path, $root = false)
-    // {
-    // $view = Filesystem::getView();
-    // return $view->getAbsolutePath($path);
-    // }
+
     public static function getBaseTypeFromMime($mimetype)
     {
         return substr($mimetype, 0, strpos($mimetype, '/'));
@@ -140,9 +135,11 @@ class FileService
     {
         $item->synced(true);
         
-        // && $this->configService->getAppValue('index_files_external_index') != 1)
-        // if (! $item->getStorage()->isLocal())
-        // return false;
+        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') !== '1')
+            return false;
+        
+        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') !== '1')
+            return false;
         
         $size = round($item->getSize() / 1024 / 1024, 1);
         if ($size > $this->configService->getAppValue('index_files_max_size')) {
@@ -172,7 +169,7 @@ class FileService
     public function generateTempDocument(&$item)
     {
         // We generate a local tmp file from the remote one
-        if ($item->isRemote() && $this->configService->getAppValue('index_files_remote') === '1')
+        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') === '1')
             $item->setAbsolutePath(Filesystem::getView()->toTmpFile($item->getPath()), true);
             
             // We generate a local tmp file from the remote one
