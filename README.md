@@ -18,8 +18,8 @@
 ### Recognized file format: 
 - plain text, 
 - rtf, 
-- pdf, old pdf will requiert Tesseract installed
-- jpeg & tiff (will also requiert Tesseract)
+- pdf,
+- jpeg & tiff (will requiert Tesseract)
 - html, 
 - openoffice, 
 - microsoft office, 
