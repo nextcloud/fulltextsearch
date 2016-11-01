@@ -504,7 +504,6 @@ class SolrService
                 $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . implode(' OR ', $groups);
         }
         
-        $this->miscService->log('>> ' . $ownerQuery);
         return $ownerQuery;
     }
 
