@@ -74,7 +74,9 @@ class SolrService
 
     const SEARCH_SHARED_GROUP = 4;
 
-    const SEARCH_ALL = 7;
+    const SEARCH_EXTERNAL = 8;
+
+    const SEARCH_ALL = 15;
 
     private $solariumClient;
 
@@ -486,6 +488,10 @@ class SolrService
                 return false;
             }
             $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:' . $helper->escapePhrase($this->owner) . ' ';
+        }
+        
+        if ($type & self::SEARCH_EXTERNAL) {           
+            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:"__all" ';
         }
         
         if ($type & self::SEARCH_SHARED_GROUP) {

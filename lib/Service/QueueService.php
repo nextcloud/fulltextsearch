@@ -89,16 +89,22 @@ class QueueService
     public function executeItem($item)
     {
         $options = array();
+        
+        if (! $item->getUserId())
+            return false;
+        
         switch ($item->getType()) {
             case FilesEvents::FILE_UPDATE:
                 array_push($options, 'forceshared');
             
             case FilesEvents::FILE_CREATE:
-                $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
+                $this->fileService->initUser($item->getUserId());
+                $files = $this->fileService->getFilesPerFileId($item->getFileId(), $options);
                 if ($files != false && sizeof($files) > 0) {
                     $ispack = (sizeof($files) != 1);
                     $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $ispack);
                 }
+                $this->fileService->endUser();
                 break;
             
             case FilesEvents::FILE_TRASH:
@@ -110,25 +116,30 @@ class QueueService
             case FilesEvents::FILE_UNSHARE:
                 array_push($options, 'forceshared');
                 
-                $files = $this->fileService->getFilesPerFileId($item->getUserId(), $item->getFileId(), $options);
+                $this->fileService->initUser($item->getUserId());
+                $files = $this->fileService->getFilesPerFileId($item->getFileId(), $options);
                 if (is_array($files) && sizeof($files) > 0) {
                     $ispack = (sizeof($files) != 1);
                     $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $ispack);
                 }
+                $this->fileService->endUser();
                 break;
             
             case FilesEvents::FILE_DELETE:
                 
                 if ($item->getFolder()) {
                     
-                    $files = $this->fileService->getFilesPerUserId($item->getUserId(), '/files', array());
-                    $files_trashbin = $this->fileService->getFilesPerUserId($item->getUserId(), '/files_trashbin', array(
+                    $this->fileService->initUser($item->getUserId());
+                    $files = $this->fileService->getFilesPerUserId('/files', array());
+                    $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
                         'deleted'
                     ));
                     
                     $files = array_merge($files, $files_trashbin);
                     $solrDocs = null;
                     $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
+                    
+                    $this->fileService->endUser();
                 } else {
                     $doc[] = new ItemDocument(ItemDocument::TYPE_FILE, $item->getFileId());
                     $this->indexService->removeDocuments($doc);

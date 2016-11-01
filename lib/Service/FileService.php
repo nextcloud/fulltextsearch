@@ -52,6 +52,10 @@ class FileService
 
     private $view;
 
+    private $userId;
+
+    private $externalMountPoint;
+
     public function __construct($configService, $rootFolder, $solrService, $solrTools, $miscService)
     {
         // $this->root = $root;
@@ -123,6 +127,39 @@ class FileService
     public static function getBaseTypeFromMime($mimetype)
     {
         return substr($mimetype, 0, strpos($mimetype, '/'));
+    }
+
+    public function initUser($userId)
+    {
+        $this->userId = $userId;
+        Filesystem::init($this->userId, '');
+        
+        $this->initUserExternalMountPoints();
+    }
+
+    public function endUser()
+    {
+        $this->userId = '';
+        // $this->externalMountPoint = array();
+    }
+
+    private function initUserExternalMountPoints()
+    {
+        if ($this->configService->getAppValue('index_files_external') !== '1')
+            return false;
+        
+        $data = array();
+        $mounts = \OC_Mount_Config::getAbsoluteMountPoints($this->userId);
+        foreach ($mounts as $mountPoint => $mount) {
+            $data[] = array(
+                'id' => $mount['id'],
+                'path' => $mountPoint,
+                'shares' => $mount['applicable'],
+                'personal' => $mount['personal']
+            );
+        }
+        
+        $this->externalMountPoint = $data;
     }
 
     /**
@@ -204,9 +241,10 @@ class FileService
             return false;
         
         $item = new ItemDocument(ItemDocument::TYPE_FILE, $file->getId());
+        $item->setOwner($this->userId);
         $item->setMTime($file->getMTime());
         $item->setMimetype($file->getMimeType());
-        $item->setPath($file->getPath());
+        $item->setPath(str_replace('//', '/', $file->getPath()));
         $item->setSize($file->getSize());
         $item->setStorage($file->getStorage());
         
@@ -227,17 +265,19 @@ class FileService
      * @param number $userId            
      * @return array
      */
-    public function getFilesPerUserId($userId, $dir, $options)
+    public function getFilesPerUserId($dir, $options)
     {
         if (! $this->configured())
+            return false;
+        
+        if ($this->userId === '')
             return false;
         
         $data = array();
         
         // Filesystem::tearDown();
-        Filesystem::init($userId, '');
         
-        $userFolder = FileService::getUserFolder($this->rootFolder, $userId, $dir);
+        $userFolder = FileService::getUserFolder($this->rootFolder, $this->userId, $dir);
         if (! $userFolder || $userFolder == null)
             return $data;
         
@@ -252,7 +292,6 @@ class FileService
                 continue;
             
             $item = $this->getDocumentFromFile($file);
-            $item->setOwner($userId);
             $item->deleted(in_array('deleted', $options));
             
             if ($item && $item != false && $item != null)
@@ -270,25 +309,24 @@ class FileService
      * @param array $options            
      * @return array
      */
-    public function getFilesPerFileId($userId, $fileId, $options)
+    public function getFilesPerFileId($fileId, $options)
     {
         if (! $this->configured())
             return false;
         
-        if ($userId == '')
+        if ($this->userId === '')
             return false;
         
         if ($fileId == '')
             return false;
         
-        Filesystem::init($userId, '');
         $view = Filesystem::getView();
         
         $data = array();
         $file = self::getFileInfoFromFileId($fileId, $view, $this->miscService);
         
         if ($file == null) {
-            $trashview = new View('/' . $userId . '/files_trashbin/files');
+            $trashview = new View('/' . $this->userId . '/files_trashbin/files');
             $file = self::getFileInfoFromFileId($fileId, $trashview, $this->miscService);
             array_push($options, 'deleted');
         }
@@ -297,7 +335,7 @@ class FileService
             return false;
         
         if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
-            $result = $this->getFilesPerPath($userId, $file->getPath(), $options);
+            $result = $this->getFilesPerPath($file->getPath(), $options);
             if (is_array($result) && sizeof($result) > 0)
                 $data = array_merge($data, $result);
             
@@ -308,7 +346,6 @@ class FileService
             return $data;
         
         $item = $this->getDocumentFromFile($file);
-        $item->setOwner($userId);
         $item->deleted(in_array('deleted', $options));
         
         $data[] = $item;
@@ -324,16 +361,15 @@ class FileService
      * @param array $options            
      * @return array
      */
-    private function getFilesPerPath($userId, $path, $options)
+    private function getFilesPerPath($path, $options)
     {
         if (! $this->configured())
             return false;
         
-        if ($userId == '')
+        if ($this->userId === '')
             return false;
             
             // Filesystem::tearDown();
-        Filesystem::init($userId, '');
         $view = Filesystem::getView();
         
         $data = array();
@@ -345,7 +381,7 @@ class FileService
             
             $subfiles = $view->getDirectoryContent($file->getPath());
             foreach ($subfiles as $subfile) {
-                $result = $this->getFilesPerPath($userId, $subfile->getPath(), $options);
+                $result = $this->getFilesPerPath($subfile->getPath(), $options);
                 if (is_array($result) && sizeof($result) > 0)
                     $data = array_merge($data, $result);
             }
@@ -356,7 +392,6 @@ class FileService
             return $data;
         
         $item = $this->getDocumentFromFile($file);
-        $item->setOwner($userId);
         $item->deleted(in_array('deleted', $options));
         
         $data[] = $item;
@@ -377,19 +412,67 @@ class FileService
         $subpath = '';
         $subdirs = explode('/', $entry->getPath());
         foreach ($subdirs as $subdir) {
+            
+            if ($subdir == '')
+                continue;
+            
             $subpath .= '/' . $subdir;
-            if ($subpath != '/') {
+            if (strlen($subpath) > 0 && $subpath != '/') {
+                
+                self::getShareRightsFromExternalMountPoint($this->miscService, $this->externalMountPoint, $subpath, $data, $entry);
+                
                 $subdirInfos = self::getFileInfoFromPath($subpath);
+                
                 if (! $subdirInfos)
                     continue;
                 self::getShareRightsFromFileId($subdirInfos->getId(), $data);
             }
         }
         
-        $entry->setShare($data['share_users']);
-        $entry->setShareGroup($data['share_groups']);
+        if (key_exists('share_users', $data))
+            $entry->setShare($data['share_users']);
+        if (key_exists('share_groups', $data))
+            $entry->setShareGroup($data['share_groups']);
         
         return true;
+    }
+
+    private static function getShareRightsFromExternalMountPoint($misc, $mountPoints, $path, &$data, &$entry)
+    {
+        if (! $entry->isRemote())
+            return false;
+        
+        if (! key_exists('share_users', $data))
+            $data['share_users'] = array();
+        if (! key_exists('share_groups', $data))
+            $data['share_groups'] = array();
+        
+        $edited = false;
+        foreach ($mountPoints as $mount) {
+            if ($mount['path'] !== $path)
+                continue;
+            
+            $edited = true;
+            if (! $mount['personal']) {
+                $entry->setOwner('__global');
+                if (sizeof($mount['shares']['users']) == 1 && sizeof($mount['shares']['groups']) == 0 && $mount['shares']['users'][0] == 'all' && (! in_array('__all', $data['share_users']))) {
+                    array_push($data['share_users'], '__all');
+                    continue;
+                }
+            }
+            
+            foreach ($mount['shares']['users'] as $share_user) {
+                if ($share_user != $entry->getOwner() && ! in_array($share_user, $data['share_users']))
+                    array_push($data['share_users'], $share_user);
+            }
+            
+            foreach ($mount['shares']['groups'] as $share_group) {
+                if (! in_array($share_group, $data['share_groups']))
+                    array_push($data['share_groups'], $share_group);
+            }
+        }
+        
+        return $edited;
     }
 
     /**
@@ -410,7 +493,6 @@ class FileService
         
         $OCShares = Share::getAllSharesForFileId($fileId);
         foreach ($OCShares as $share) {
-            
             if ($share['share_type'] == '0' && ! in_array($share['share_with'], $data['share_users']))
                 array_push($data['share_users'], $share['share_with']);
             if ($share['share_type'] == '1' && ! in_array($share['share_with'], $data['share_groups']))
