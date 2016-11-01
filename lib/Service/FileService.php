@@ -377,9 +377,17 @@ class FileService
         $subpath = '';
         $subdirs = explode('/', $entry->getPath());
         foreach ($subdirs as $subdir) {
+            
+            if ($subdir == '')
+                continue;
+            
             $subpath .= '/' . $subdir;
-            if ($subpath != '/') {
+            if (strlen($subpath) > 0 && $subpath != '/') {
+                
+                self::getShareRightsFromExternalMountPoint($this->miscService, $this->externalMountPoint, $subpath, $data, $entry);
+                
                 $subdirInfos = self::getFileInfoFromPath($subpath);
+                
                 if (! $subdirInfos)
                     continue;
                 self::getShareRightsFromFileId($subdirInfos->getId(), $data);
@@ -390,6 +398,44 @@ class FileService
         $entry->setShareGroup($data['share_groups']);
         
         return true;
+    }
+
+    private static function getShareRightsFromExternalMountPoint($misc, $mountPoints, $path, &$data, &$entry)
+    {
+        if (! $entry->isRemote())
+            return false;
+        
+        if (! key_exists('share_users', $data))
+            $data['share_users'] = array();
+        if (! key_exists('share_groups', $data))
+            $data['share_groups'] = array();
+        
+        $edited = false;
+        foreach ($mountPoints as $mount) {
+            if ($mount['path'] !== $path)
+                continue;
+            
+            $edited = true;
+            if (! $mount['personal']) {
+                $entry->setOwner('__global');
+                if (sizeof($mount['shares']['users']) == 1 && sizeof($mount['shares']['groups']) == 0 && $mount['shares']['users'][0] == 'all' && (! in_array('__all', $data['share_users']))) {
+                    array_push($data['share_users'], '__all');
+                    continue;
+                }
+            }
+            
+            foreach ($mount['shares']['users'] as $share_user) {
+                if ($share_user != $entry->getOwner() && ! in_array($share_user, $data['share_users']))
+                    array_push($data['share_users'], $share_user);
+            }
+            
+            foreach ($mount['shares']['groups'] as $share_group) {
+                if (! in_array($share_group, $data['share_groups']))
+                    array_push($data['share_groups'], $share_group);
+            }
+        }
+        
+        return $edited;
     }
 
     /**
