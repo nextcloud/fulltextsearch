@@ -218,8 +218,8 @@ class Index extends Base
                 continue;
             
             $this->fileService->initUser($user);
-            $files = $this->fileService->getFilesPerUserId($user, '/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId($user, '/files_trashbin', array(
+            $files = $this->fileService->getFilesPerUserId('/files', array());
+            $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
             ));
             
@@ -227,6 +227,8 @@ class Index extends Base
             $solrDocs = null;
             $this->indexService->extract(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
             $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
+
+            $this->fileService->endUser();
             
             foreach ($files as $doc) {
                 if ($doc->isExtracted())
@@ -278,13 +280,15 @@ class Index extends Base
                 continue;
             
             $this->fileService->initUser($user);
-            $files = $this->fileService->getFilesPerUserId($user, '/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId($user, '/files_trashbin', array(
+            $files = $this->fileService->getFilesPerUserId('/files', array());
+            $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
             ));
             
             $files = array_merge($files, $files_trashbin);
             $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user, $files);
+            
+            $this->fileService->endUser();
             
             $output->writeln('');
             foreach ($files as $doc) {

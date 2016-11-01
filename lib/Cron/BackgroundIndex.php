@@ -93,7 +93,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
     private function cronIndex()
     {
         if (($this->configService->timeIndexDelay('files') && $this->configService->neededIndexFiles()) || $this->configService->timeIndexDelay('files', 24)) {
-//             $this->miscService->log('___cronFiles');
+            // $this->miscService->log('___cronFiles');
             $this->configService->needIndexFiles(false);
             $this->cronIndexFiles();
             $this->cronUpdateFiles();
@@ -101,7 +101,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         }
         
         if (($this->configService->timeIndexDelay('bookmarks') && $this->configService->neededIndexBookmarks()) || $this->configService->timeIndexDelay('bookmarks', 24)) {
-//             $this->miscService->log('___cronBookmarks');
+            // $this->miscService->log('___cronBookmarks');
             $this->configService->needIndexBookmarks(false);
             $this->cronIndexBookmarks();
             $this->configService->timeIndex('bookmarks');
@@ -117,9 +117,9 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         foreach ($users as $user) {
             
-            $this->fileService->initUser($user);            
-            $files = $this->fileService->getFilesPerUserId($user->getUID(), '/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId($user->getUID(), '/files_trashbin', array(
+            $this->fileService->initUser($user->getUID());
+            $files = $this->fileService->getFilesPerUserId('/files', array());
+            $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
             ));
             
@@ -127,6 +127,8 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             $solrDocs = null;
             $this->indexService->extract(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
             $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
+            
+            $this->fileService->endUser();
         }
     }
 
@@ -138,14 +140,16 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $users = $this->userManager->search('');
         foreach ($users as $user) {
             
-            $this->fileService->initUser($user);            
-            $files = $this->fileService->getFilesPerUserId($user->getUID(), '/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId($user->getUID(), '/files_trashbin', array(
+            $this->fileService->initUser($user->getUID());
+            $files = $this->fileService->getFilesPerUserId('/files', array());
+            $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
             ));
             
             $files = array_merge($files, $files_trashbin);
             $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user->getUID(), $files);
+            
+            $this->fileService->endUser();
         }
     }
 
