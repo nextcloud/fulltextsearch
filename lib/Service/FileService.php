@@ -411,7 +411,6 @@ class FileService
         
         $subpath = '';
         $subdirs = explode('/', $entry->getPath());
-        $this->miscService->log('__' . $entry->getPath());
         foreach ($subdirs as $subdir) {
             
             if ($subdir == '')
