@@ -512,7 +512,7 @@ class FileService
      * @param number $userid            
      * @return array[]
      */
-    public static function getSearchResult(&$data)
+    public static function getSearchResult(&$data, $base = '')
     {
         Filesystem::init($data['userid'], '');
         $view = Filesystem::getView();
@@ -553,7 +553,7 @@ class FileService
         
         $data = array_merge($data, array(
             'size' => $fileData->getSize(),
-            'title' => $path,
+            'title' => substr($path, strpos($path, $base) + strlen($base)),
             'icon' => SolrService::extractableFile($fileData->getMimeType(), $path),
             'filename' => $pathParts['filename'],
             'dirpath' => $pathParts['dirname'],
