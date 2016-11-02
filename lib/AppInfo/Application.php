@@ -212,6 +212,10 @@ class Application extends App
                     \OCP\Util::addScript('nextant', 'navigate');
                     \OCP\Util::addStyle('nextant', 'navigate');
                 });
+                \OC::$server->getEventDispatcher()->addListener('OCA\Files_Sharing::loadAdditionalScripts', function () {
+                    \OCP\Util::addScript('nextant', 'navigate_sharelink');
+                    \OCP\Util::addStyle('nextant', 'navigate');
+                });
                 break;
             
             case ConfigService::SEARCH_DISPLAY_FILES:
