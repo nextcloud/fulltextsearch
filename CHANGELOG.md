@@ -1,6 +1,6 @@
 **v0.6.3**
 - search within public shared documents
-
+- mp3 are now indexed
 
 
 **v0.6.2**

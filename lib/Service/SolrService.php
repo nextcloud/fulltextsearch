@@ -185,6 +185,9 @@ class SolrService
             case 'application/msword':
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
+            case 'audio/mpeg':
+                return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
+            
             case 'application/octet-stream':
                 if ($path === '')
                     return false;
@@ -490,7 +493,7 @@ class SolrService
             $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:' . $helper->escapePhrase($this->owner) . ' ';
         }
         
-        if ($type & self::SEARCH_EXTERNAL) {           
+        if ($type & self::SEARCH_EXTERNAL) {
             $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:"__all" ';
         }
         
