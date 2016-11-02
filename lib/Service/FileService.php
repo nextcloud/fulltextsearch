@@ -509,10 +509,11 @@ class FileService
      * complete data from a search result with more details about the file itself
      *
      * @param array $data            
-     * @param number $userid            
+     * @param string $base            
+     * @param boolean $trashbin            
      * @return array[]
      */
-    public static function getSearchResult(&$data, $base = '')
+    public static function getSearchResult(&$data, $base = '', $trashbin = true)
     {
         Filesystem::init($data['userid'], '');
         $view = Filesystem::getView();
@@ -527,7 +528,7 @@ class FileService
             $fileData = null;
         }
         
-        if ($fileData == null) {
+        if ($fileData == null && $trash) {
             try {
                 $trashview = new View('/' . $data['userid'] . '/files_trashbin/files');
                 $path = $trashview->getPath($data['id']);

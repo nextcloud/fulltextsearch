@@ -208,7 +208,7 @@ class SearchController extends Controller
                 switch ($data['source']) {
                     
                     case 'files':
-                        FileService::getSearchResult($data, $share['file_target']);
+                        FileService::getSearchResult($data, $share['file_target'], false);
                         break;
                     
                     // case 'bookmarks':
