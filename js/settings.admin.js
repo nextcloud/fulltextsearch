@@ -60,6 +60,10 @@ $(document)
 										.is(':checked')) ? 1 : 0,
 								index_files_max_size : $(
 										'#solr_index_files_max_size').val(),
+								index_files_tree : ($('#solr_index_files_tree')
+										.is(':checked')) ? 1 : 0,
+								index_files_sharelink : ($('#solr_index_files_sharelink')
+										.is(':checked')) ? 1 : 0,
 								index_files_external : ($('#solr_index_files_external')
 										.is(':checked')) ? 1 : 0,
 								index_files_encrypted : ($('#solr_index_files_encrypted')
@@ -71,6 +75,14 @@ $(document)
 										: 1;
 							if (switched == 'index_files_live')
 								data.index_files_live = (data.index_files_live == 1) ? 0
+										: 1;
+
+							if (switched == 'index_files_tree')
+								data.index_files_tree = (data.index_files_tree == 1) ? 0
+										: 1;
+
+							if (switched == 'index_files_sharelink')
+								data.index_files_sharelink = (data.index_files_sharelink == 1) ? 0
 										: 1;
 
 							if (switched == 'index_files_external')
@@ -164,6 +176,10 @@ $(document)
 									(response.index_files == 1));
 							$('#solr_index_files_live').prop('checked',
 									(response.index_files_live == 1));
+							$('#solr_index_files_tree').prop('checked',
+									(response.index_files_tree == 1));
+							$('#solr_index_files_sharelink').prop('checked',
+									(response.index_files_sharelink == 1));
 							$('#solr_index_files_external').prop('checked',
 									(response.index_files_external == 1));
 							$('#solr_index_files_encrypted').prop('checked',
@@ -451,6 +467,25 @@ $(document)
 					$('#solr_index_files_max_size').on('input', function(e) {
 						nextantSettings.savesuboptions_files();
 					});
+					
+					
+					
+					
+					$('#solr_index_files_tree')
+					.mousedown(
+							function() {
+								nextantSettings
+										.savesuboptions_files('index_files_tree');
+							});
+					
+					$('#solr_index_files_sharelink')
+					.mousedown(
+							function() {
+								nextantSettings
+										.savesuboptions_files('index_files_sharelink');
+							});
+					
+					
 					$('#solr_index_files_external')
 							.mousedown(
 									function() {
@@ -463,6 +498,7 @@ $(document)
 										nextantSettings
 												.savesuboptions_files('index_files_encrypted');
 									});
+					
 					$('#nextant_force_index').on('click', function() {
 						nextantSettings.savesuboptions_status('force_index');
 					});
