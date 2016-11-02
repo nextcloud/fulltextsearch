@@ -59,6 +59,11 @@ return [
             'name' => 'search#getSuggestions',
             'url' => 'ajax/suggest.php',
             'verb' => 'POST'
+        ],
+        [
+            'name' => 'search#searchRequestShareLink',
+            'url' => 'ajax/search_sharelink.php',
+            'verb' => 'POST'
         ]
     ]
 ];
