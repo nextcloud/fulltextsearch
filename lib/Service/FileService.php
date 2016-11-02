@@ -411,6 +411,7 @@ class FileService
         
         $subpath = '';
         $subdirs = explode('/', $entry->getPath());
+        $this->miscService->log('__' . $entry->getPath());
         foreach ($subdirs as $subdir) {
             
             if ($subdir == '')
@@ -419,7 +420,7 @@ class FileService
             $subpath .= '/' . $subdir;
             if (strlen($subpath) > 0 && $subpath != '/') {
                 
-                self::getShareRightsFromExternalMountPoint($this->miscService, $this->externalMountPoint, $subpath, $data, $entry);
+                self::getShareRightsFromExternalMountPoint($this->externalMountPoint, $subpath, $data, $entry);
                 
                 $subdirInfos = self::getFileInfoFromPath($subpath);
                 
@@ -437,7 +438,7 @@ class FileService
         return true;
     }
 
-    private static function getShareRightsFromExternalMountPoint($misc, $mountPoints, $path, &$data, &$entry)
+    private static function getShareRightsFromExternalMountPoint($mountPoints, $path, &$data, &$entry)
     {
         if (! $entry->isRemote())
             return false;
@@ -493,10 +494,12 @@ class FileService
         
         $OCShares = Share::getAllSharesForFileId($fileId);
         foreach ($OCShares as $share) {
-            if ($share['share_type'] == '0' && ! in_array($share['share_with'], $data['share_users']))
+            if ($share['share_type'] == \OC\Share\Constants::SHARE_TYPE_USER && ! in_array($share['share_with'], $data['share_users']))
                 array_push($data['share_users'], $share['share_with']);
-            if ($share['share_type'] == '1' && ! in_array($share['share_with'], $data['share_groups']))
+            if ($share['share_type'] == \OC\Share\Constants::SHARE_TYPE_GROUP && ! in_array($share['share_with'], $data['share_groups']))
                 array_push($data['share_groups'], $share['share_with']);
+            if ($share['share_type'] == \OC\Share\Constants::SHARE_TYPE_LINK && ! in_array('__link', $data['share_users']))
+                array_push($data['share_users'], '__link_' . $share['id']);
         }
         
         return true;
@@ -506,10 +509,11 @@ class FileService
      * complete data from a search result with more details about the file itself
      *
      * @param array $data            
-     * @param number $userid            
+     * @param string $base            
+     * @param boolean $trashbin            
      * @return array[]
      */
-    public static function getSearchResult(&$data)
+    public static function getSearchResult(&$data, $base = '', $trashbin = true)
     {
         Filesystem::init($data['userid'], '');
         $view = Filesystem::getView();
@@ -524,7 +528,7 @@ class FileService
             $fileData = null;
         }
         
-        if ($fileData == null) {
+        if ($fileData == null && $trash) {
             try {
                 $trashview = new View('/' . $data['userid'] . '/files_trashbin/files');
                 $path = $trashview->getPath($data['id']);
@@ -550,7 +554,7 @@ class FileService
         
         $data = array_merge($data, array(
             'size' => $fileData->getSize(),
-            'title' => $path,
+            'title' => substr($path, strpos($path, $base) + strlen($base)),
             'icon' => SolrService::extractableFile($fileData->getMimeType(), $path),
             'filename' => $pathParts['filename'],
             'dirpath' => $pathParts['dirname'],

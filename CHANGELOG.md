@@ -1,3 +1,8 @@
+**v0.6.3**
+- search within public shared documents
+
+
+
 **v0.6.2**
 - adding suggestions - https://github.com/nextcloud/nextant/wiki/And-some-more-...
 - adding external storage indexing

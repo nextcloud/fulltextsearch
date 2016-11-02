@@ -139,9 +139,6 @@ class SearchController extends Controller
                 $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
                 $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
                 
-                // if ($data['deleted'])
-                // $this->miscService->log('$$$ ' . var_export($data, true));
-                
                 array_push($results, $data);
             }
         }
@@ -167,5 +164,86 @@ class SearchController extends Controller
             'status' => $error,
             'result' => $suggest
         );
+    }
+
+    /**
+     * @NoCSRFRequired
+     * @PublicPage
+     */
+    public function searchRequestShareLink($query, $key)
+    {
+        $results = array();
+        
+        if (! $this->solrService)
+            return $results;
+        
+        $share = \OC\Share\Share::getShareByToken($key);
+        if (! $share)
+            return $result;
+        
+        if ($query !== null) {
+            
+            $this->solrService->setOwner('__link_' . $share['id']);
+            $solrResult = $this->solrService->search($query, array());
+            
+            if (! $solrResult)
+                return $results;
+            
+            foreach ($solrResult as $data) {
+                
+                $path = '';
+                $data = array_merge($data, array(
+                    'userid' => $share['uid_owner'],
+                    'title' => '',
+                    'link_main' => '',
+                    'link_sub' => '',
+                    'filename' => '',
+                    'dirpath' => '',
+                    'size' => '',
+                    'mtime' => '',
+                    'icon' => '',
+                    'mimetype' => ''
+                ));
+                
+                switch ($data['source']) {
+                    
+                    case 'files':
+                        FileService::getSearchResult($data, $share['file_target'], false);
+                        break;
+                    
+                    // case 'bookmarks':
+                    // BookmarkService::getSearchResult($data);
+                    // break;
+                    
+                    default:
+                        continue;
+                }
+                
+                $hl1 = '';
+                $hl2 = '';
+                if (key_exists('highlight', $data) && is_array($data['highlight'])) {
+                    if (sizeof($data['highlight']) >= 1)
+                        $hl1 = '... ' . $data['highlight'][0] . ' ...';
+                    if (sizeof($data['highlight']) > 1)
+                        $hl2 = '... ' . $data['highlight'][1] . ' ...';
+                }
+                
+                if ($hl1 === '' || $hl1 === null)
+                    $hl1 = '';
+                if ($hl2 === '' || $hl2 === null)
+                    $hl2 = '';
+                
+                $data['highlight1'] = $hl1;
+                $data['highlight2'] = $hl2;
+                
+                $data['size_readable'] = ($data['size'] > 0) ? \OC_Helper::humanFileSize($data['size']) : '';
+                $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
+                $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
+                
+                array_push($results, $data);
+            }
+        }
+        
+        return $results;
     }
 }
