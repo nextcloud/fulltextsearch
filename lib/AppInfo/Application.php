@@ -117,7 +117,7 @@ class Application extends App
         // $container->query('IndexMapper')->insert(new IndexEntity(array(userid => 2, 'path' => '/toto', 'clef' => 'CLEFCLEF')));
         
         $container->registerService('SearchController', function ($c) {
-            return new SearchController($c->query('AppName'), $c->query('Request'), $c->query('UserId'), $c->query('GroupManager'), $c->query('SolrService'), $c->query('MiscService'));
+            return new SearchController($c->query('AppName'), $c->query('Request'), $c->query('UserId'), $c->query('GroupManager'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('MiscService'));
         });
         
         $container->registerService('SettingsController', function ($c) {
@@ -208,14 +208,17 @@ class Application extends App
         switch ($config->getAppValue('display_result')) {
             
             case ConfigService::SEARCH_DISPLAY_NEXTANT:
+                
                 \OC::$server->getEventDispatcher()->addListener('OCA\Files::loadAdditionalScripts', function () {
                     \OCP\Util::addScript('nextant', 'navigate');
                     \OCP\Util::addStyle('nextant', 'navigate');
                 });
-                \OC::$server->getEventDispatcher()->addListener('OCA\Files_Sharing::loadAdditionalScripts', function () {
-                    \OCP\Util::addScript('nextant', 'navigate_sharelink');
-                    \OCP\Util::addStyle('nextant', 'navigate');
-                });
+                
+                if ($config->getAppValue('index_files_sharelink') === '1')
+                    \OC::$server->getEventDispatcher()->addListener('OCA\Files_Sharing::loadAdditionalScripts', function () {
+                        \OCP\Util::addScript('nextant', 'navigate_sharelink');
+                        \OCP\Util::addStyle('nextant', 'navigate');
+                    });
                 break;
             
             case ConfigService::SEARCH_DISPLAY_FILES:

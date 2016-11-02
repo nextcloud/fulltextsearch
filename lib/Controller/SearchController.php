@@ -48,16 +48,20 @@ class SearchController extends Controller
 
     private $groupManager;
 
+    private $configService;
+
     private $solrService;
 
     private $miscService;
 
-    public function __construct($appName, IRequest $request, $userId, $groupManager, $solrService, $miscService)
+    public function __construct($appName, IRequest $request, $userId, $groupManager, $configService, $solrService, $miscService)
     {
         parent::__construct($appName, $request);
         
         $this->userId = $userId;
         $this->groupManager = $groupManager;
+        $this->configService = $configService;
+        
         $this->solrService = $solrService;
         $this->miscService = $miscService;
     }
@@ -174,12 +178,20 @@ class SearchController extends Controller
     {
         $results = array();
         
+        if ($this->configService->getAppValue('index_files_sharelink') !== '1')
+            return $results;
+        
         if (! $this->solrService)
             return $results;
         
+        if (strpos($key, '?') > 0)
+            $key = substr($key, 0, strpos($key, '?'));
+        if (strpos($key, '#') > 0)
+            $key = substr($key, 0, strpos($key, '#'));
+        
         $share = \OC\Share\Share::getShareByToken($key);
         if (! $share)
-            return $result;
+            return $results;
         
         if ($query !== null) {
             
