@@ -180,6 +180,16 @@ class SolrAdminService
         array_push($fields, array(
             'type' => 'field',
             'data' => array(
+                'name' => 'nextant_extracted',
+                'type' => 'boolean',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
                 'name' => 'nextant_ocr',
                 'type' => 'int',
                 'indexed' => true,
@@ -235,6 +245,7 @@ class SolrAdminService
         
         $this->solrService->message('Checking Solr schema fields');
         
+        $failed = false;
         $changed = false;
         while (true) {
             foreach ($fields as $field) {
@@ -252,12 +263,15 @@ class SolrAdminService
                         else
                             self::createField($client, $field);
                     } else
-                        return false;
+                        $failed = true;
                 }
             }
             
             break;
         }
+        
+        if ($failed)
+            return false;
         
         if ($changed)
             $this->configService->setAppValue('index_files_needed', '1');
