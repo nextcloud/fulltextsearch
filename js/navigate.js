@@ -308,7 +308,7 @@ $(document)
 
 						template_entry : function() {
 
-							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%FILENAME%" data-mime="%MIMETYPE%" data-mtime="%MTIME%000" data-etag="" ';
+							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%TITLE%" data-mime="%MIMETYPE%" data-mtime="%MTIME%000" data-etag="" ';
 							$tmpl += ' data-permissions="" data-has-preview="false" data-path="%PATH%" data-share-permissions="">';
 							$tmpl += '<td class="filename ui-draggable">';
 							$tmpl += '<a class="action action-favorite " data-original-title="" title="">';
