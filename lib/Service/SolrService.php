@@ -388,6 +388,7 @@ class SolrService
             return false;
         
         $string = str_replace('  ', ' ', trim($string));
+        $astring = explode(' ', $string);
         
         if ($string == '')
             return false;
@@ -414,7 +415,7 @@ class SolrService
             // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
             
             array_push($options, 'complete_words');
-            $q = 'text:' . $helper->escapeTerm($string) . "\n";
+            $q = 'text:' . $helper->escapeTerm(implode(' AND ', $astring)) . "\n";
             $words = explode(' ', $string);
             foreach ($words as $word)
                 $q .= 'nextant_path:*' . $helper->escapeTerm($word) . '*' . "\n";
