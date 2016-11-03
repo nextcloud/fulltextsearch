@@ -11,8 +11,10 @@
 
 - your own files,
 - shared files,
+- federated cloud shares,
 - external storage,
-- bookmarks
+- server-side encrypted storage,
+- your bookmarks.
  
 
 ### Recognized file format: 
