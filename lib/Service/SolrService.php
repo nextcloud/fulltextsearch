@@ -231,7 +231,7 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function extractDocument(&$document, &$error = '')
+    public function indexDocument(&$document, &$error = '')
     {
         if (! $this->configured())
             return false;
@@ -257,40 +257,42 @@ class SolrService
         try {
             $client = $this->getClient();
             
-            $query = $client->createExtract();
-            $query->setUprefix('nextant_attr_');
-            $query->addFieldMapping('content', 'text');
-            
-            $query->addFieldMapping('div', 'ignored_');
-            $query->addFieldMapping('html', 'ignored_');
-            $query->addFieldMapping('link', 'ignored_');
-            $query->addFieldMapping('style', 'ignored_');
-            $query->addFieldMapping('script', 'ignored_');
-            $query->addFieldMapping('input', 'ignored_');
-            $query->addFieldMapping('form', 'ignored_');
-            $query->addFieldMapping('img', 'ignored_');
-            $query->addFieldMapping('a', 'ignored_');
-            $query->addFieldMapping('p', 'ignored_');
-            $query->addFieldMapping('span', 'ignored_');
-            $query->addFieldMapping('h1', 'ignored_');
-            $query->addFieldMapping('h2', 'ignored_');
-            $query->addFieldMapping('h3', 'ignored_');
-            $query->addFieldMapping('table', 'ignored_');
-            $query->addFieldMapping('tr', 'ignored_');
-            $query->addFieldMapping('td', 'ignored_');
-            $query->addFieldMapping('b', 'ignored_');
-            $query->addFieldMapping('i', 'ignored_');
-            $query->addFieldMapping('ul', 'ignored_');
-            $query->addFieldMapping('li', 'ignored_');
-            
-            $query->addFieldMapping('media_black_point', 'ignored_');
-            $query->addFieldMapping('media_white_point', 'ignored_');
-            
-            $query->setFile($document->getAbsolutePath());
-            $query->setCommit(true);
-            $query->setOmitHeader(true);
-            
-            // add document
+            if ($document->isExtractable()) {
+                $query = $client->createExtract();
+                $query->setUprefix('nextant_attr_');
+                $query->addFieldMapping('content', 'text');
+                
+                $query->addFieldMapping('div', 'ignored_');
+                $query->addFieldMapping('html', 'ignored_');
+                $query->addFieldMapping('link', 'ignored_');
+                $query->addFieldMapping('style', 'ignored_');
+                $query->addFieldMapping('script', 'ignored_');
+                $query->addFieldMapping('input', 'ignored_');
+                $query->addFieldMapping('form', 'ignored_');
+                $query->addFieldMapping('img', 'ignored_');
+                $query->addFieldMapping('a', 'ignored_');
+                $query->addFieldMapping('p', 'ignored_');
+                $query->addFieldMapping('span', 'ignored_');
+                $query->addFieldMapping('h1', 'ignored_');
+                $query->addFieldMapping('h2', 'ignored_');
+                $query->addFieldMapping('h3', 'ignored_');
+                $query->addFieldMapping('table', 'ignored_');
+                $query->addFieldMapping('tr', 'ignored_');
+                $query->addFieldMapping('td', 'ignored_');
+                $query->addFieldMapping('b', 'ignored_');
+                $query->addFieldMapping('i', 'ignored_');
+                $query->addFieldMapping('ul', 'ignored_');
+                $query->addFieldMapping('li', 'ignored_');
+                
+                $query->addFieldMapping('media_black_point', 'ignored_');
+                $query->addFieldMapping('media_white_point', 'ignored_');
+                
+                $query->setFile($document->getAbsolutePath());
+                $query->setOmitHeader(true);
+            } else
+                $query = $client->createUpdate();
+                
+                // add document
             $doc = $query->createDocument();
             $doc->id = $document->getType() . '_' . $document->getId();
             $doc->nextant_source = $document->getType();
@@ -302,20 +304,37 @@ class SolrService
             $doc->nextant_sharegroup = $document->getShareGroup();
             $doc->nextant_deleted = $document->isDeleted();
             
-            $query->setDocument($doc);
-            
-            // custom options
-            $request = $client->createRequest($query);
-            $request->addParam('captureAttr', true);
-            $request->addParam('ignoreTikaException', true);
-            
-            $response = $client->executeRequest($request);
-            $ret = $client->createResult($query, $response);
-            
-            if ($ret) {
-                $document->processed(true);
-                $document->extracted(true);
-                return true;
+            if ($document->isExtractable()) {
+                $query->setCommit(true);
+                $query->setDocument($doc);
+                
+                // custom options
+                $request = $client->createRequest($query);
+                $request->addParam('captureAttr', true);
+                $request->addParam('ignoreTikaException', true);
+                
+                $response = $client->executeRequest($request);
+                $ret = $client->createResult($query, $response);
+                
+                if ($ret) {
+                    $document->extracted(true);
+                    $document->processed(true);
+                    $document->indexed(true);
+                    return true;
+                }
+            } else {
+                $query->addCommit();
+                $query->addDocuments(array(
+                    $doc
+                ));
+                
+                $ret = $client->update($query);
+                
+                if ($ret) {
+                    $document->processed(true);
+                    $document->indexed(true);
+                    return true;
+                }
             }
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
@@ -339,6 +358,11 @@ class SolrService
         if ($this->getClient() == false)
             return false;
         
+        $string = str_replace('  ', ' ', trim($string));
+        
+        if ($string == '')
+            return false;
+        
         if ($options == null)
             $options = array();
         
@@ -359,7 +383,18 @@ class SolrService
             $query->setRows(25);
             
             array_push($options, 'complete_words');
-            $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
+            // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
+            $q = 'text:' . $helper->escapeTerm($string) . "\n";
+            $words = explode(' ', $string);
+            foreach ($words as $word)
+                $q .= 'nextant_path:*' . $helper->escapeTerm($word) . '*' . "\n";
+                
+                // nextant_path:*Dlve*
+                // nextant_path:*Route*
+            
+            $query->setQuery($q);
+            $this->miscService->log($q);
+            // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
             
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             

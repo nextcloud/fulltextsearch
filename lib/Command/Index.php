@@ -206,6 +206,7 @@ class Index extends Base
         
         $users = $this->getUsers($input->getOption('user'));
         
+        $indexed = 0;
         $extracted = 0;
         $processed = 0;
         $removed = 0;
@@ -227,10 +228,12 @@ class Index extends Base
             $solrDocs = null;
             $this->indexService->extract(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
             $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
-
+            
             $this->fileService->endUser();
             
             foreach ($files as $doc) {
+                if ($doc->isIndexed())
+                    $indexed ++;
                 if ($doc->isExtracted())
                     $extracted ++;
                 if ($doc->isProcessed())
@@ -246,7 +249,9 @@ class Index extends Base
             $output->writeln('');
         }
         
-        $output->writeln('  ' . $processed . ' file(s) processed ; ' . $extracted . ' extracted documents ; ' . $removed . ' orphan(s) removed');
+        $output->writeln('  ' . $processed . ' file(s) processed ; ' . $removed . ' orphan(s) removed');
+        $output->writeln('  ' . $indexed . ' documents indexed ; ' . $extracted . ' fully extracted');
+        
         if ($failed > 0)
             $output->writeln('  ' . $failed . ' file(s) were not processed (failure)');
     }

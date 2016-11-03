@@ -188,10 +188,15 @@ class FileService
             return false;
         }
         
-        if (! SolrService::extractableFile($item->getMimeType(), $item->getPath()))
-            return false;
+        // $this->miscService->log('__' . $item->getMimeType());
+        if (! SolrService::extractableFile($item->getMimeType(), $item->getPath())) {
+            $item->extractable(false);
+            
+            if ($this->configService->getAppValue('index_files_tree') !== '1')
+                $item->invalid(true);
+        } else
+            $item->extractable(true);
         
-        $item->extractable(true);
         $this->setShareRights($item);
         
         if ($item->isDeleted()) {
@@ -527,7 +532,7 @@ class FileService
             $fileData = null;
         }
         
-        if ($fileData == null && $trash) {
+        if ($fileData == null && $trashbin) {
             try {
                 $trashview = new View('/' . $data['userid'] . '/files_trashbin/files');
                 $path = $trashview->getPath($data['id']);
@@ -553,7 +558,7 @@ class FileService
         
         $data = array_merge($data, array(
             'size' => $fileData->getSize(),
-            'title' => substr($path, strpos($path, $base) + strlen($base)),
+            'title' => (($base === '') ? $path : substr($path, strpos($path, $base) + strlen($base))),
             'icon' => SolrService::extractableFile($fileData->getMimeType(), $path),
             'filename' => $pathParts['filename'],
             'dirpath' => $pathParts['dirname'],
@@ -561,6 +566,7 @@ class FileService
             'deleted' => $deleted,
             'link_main' => (! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename'],
             'link_sub' => '',
+            'valid' => true,
             'mtime' => $fileData->getMTime()
         ));
         

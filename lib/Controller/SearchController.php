@@ -105,7 +105,8 @@ class SearchController extends Controller
                     'size' => '',
                     'mtime' => '',
                     'icon' => '',
-                    'mimetype' => ''
+                    'mimetype' => '',
+                    'valid' => false
                 ));
                 
                 switch ($data['source']) {
@@ -121,6 +122,9 @@ class SearchController extends Controller
                     default:
                         continue;
                 }
+                
+                if (! $data['valid'])
+                    continue;
                 
                 $hl1 = '';
                 $hl2 = '';

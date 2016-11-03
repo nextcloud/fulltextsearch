@@ -67,6 +67,8 @@ class ItemDocument
 
     private $extractable = false;
 
+    private $indexed = false;
+
     private $extracted = false;
 
     private $processed = false;
@@ -266,6 +268,16 @@ class ItemDocument
     public function isExtractable()
     {
         return $this->extractable;
+    }
+
+    public function indexed($indexed)
+    {
+        $this->indexed = $indexed;
+    }
+
+    public function isIndexed()
+    {
+        return $this->indexed;
     }
 
     public function extracted($extracted)
