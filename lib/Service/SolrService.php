@@ -209,6 +209,10 @@ class SolrService
                         return false;
                     return self::extractableFile($tmpmime);
                 }
+                
+                if (key_exists('extension', $pinfo))
+                    return self::extractableFileExtension($pinfo['extension']);
+                
                 return false;
         }
         
@@ -226,6 +230,21 @@ class SolrService
         foreach ($acceptedMimeType['vnd'] as $mt) {
             if (substr($mimetype, 0, strlen($mt)) == $mt)
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+        }
+        
+        return false;
+    }
+
+    /**
+     *
+     * @param unknown $extension            
+     * @return unknown|boolean
+     */
+    public static function extractableFileExtension($extension)
+    {
+        switch ($extension) {
+            case 'mid':
+                return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
         }
         
         return false;
@@ -313,6 +332,8 @@ class SolrService
             $doc->nextant_deleted = $document->isDeleted();
             
             if ($document->isExtractable()) {
+                $doc->nextant_extracted = true;
+                
                 $query->setCommit(true);
                 $query->setDocument($doc);
                 
