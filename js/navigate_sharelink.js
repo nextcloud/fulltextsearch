@@ -27,6 +27,13 @@ $(document)
 		.ready(
 				function() {
 
+					$('html').keydown(function(e) {
+						if (!nextantCurrentFocus)
+							return;
+						if (e.which == 13)
+							return nextant_share_link.search(true);
+					});
+
 					var nextantCurrentSearch = '';
 					var nextantSearchDelayTimer = null;
 					var nextantSearchDisplayed = false;
@@ -56,15 +63,15 @@ $(document)
 								clearTimeout(nextantSearchDelayTimer);
 
 							nextantSearchDelayTimer = setTimeout(function() {
-								nextant_share_link.search();
+								nextant_share_link.search(false);
 							}, 250);
 						},
 
-						search : function() {
+						search : function(force) {
 							nextantSearchDelayTimer = null;
 
 							var query = $('#linksearchbox').val();
-							if (query == nextantCurrentSearch)
+							if (!force && query == nextantCurrentSearch)
 								return;
 
 							if (query == '') {
