@@ -157,7 +157,7 @@ class SolrService
     {
         return $this->solariumClient->getOptions();
     }
-    
+
     public function setOwner($owner, $groups = array())
     {
         $this->owner = $owner;
@@ -533,9 +533,9 @@ class SolrService
             $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:' . $helper->escapePhrase($this->owner) . ' ';
         }
         
-        if ($type & self::SEARCH_EXTERNAL) {
-            $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:"__all" ';
-        }
+        // if ($type & self::SEARCH_EXTERNAL) {
+        // $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:"__all" ';
+        // }
         
         if ($type & self::SEARCH_SHARED_GROUP) {
             $ownerGroups = '';
