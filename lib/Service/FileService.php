@@ -293,7 +293,7 @@ class FileService
             if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER)
                 continue;
             
-            if ($file->isShared() && ! in_array('forceshared', $options))
+            if ($file->isShared() && $file->getStorage()->isLocal() && ! in_array('forceshared', $options))
                 continue;
             
             $item = $this->getDocumentFromFile($file);
