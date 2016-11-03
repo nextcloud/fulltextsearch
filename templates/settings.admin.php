@@ -106,14 +106,12 @@ style('nextant', 'admin');
 									target="_blank">help</a>)</td>
 							</tr>
 
-
-							<!--  <tr style="height: 30px;">
+							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
 	    <?php p($l->t('Index Files Tree :')) ?></td>
 								<td><input type="checkbox" name="solr_index_files_tree"
 									id="solr_index_files_tree" value="1" style="margin: 10px;"></td>
 							</tr>
-							 -->
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
