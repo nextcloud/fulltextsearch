@@ -460,8 +460,8 @@ class FileService
             $edited = true;
             if (! $mount['personal']) {
                 $entry->setOwner('__global');
-                if (sizeof($mount['shares']['users']) == 1 && sizeof($mount['shares']['groups']) == 0 && $mount['shares']['users'][0] == 'all' && (! in_array('__all', $data['share_users']))) {
-                    array_push($data['share_users'], '__all');
+                if (sizeof($mount['shares']['users']) == 1 && sizeof($mount['shares']['groups']) == 0 && $mount['shares']['users'][0] == 'all' && (! in_array('__all', $data['share_groups']))) {
+                    array_push($data['share_groups'], '__all');
                     continue;
                 }
             }
@@ -502,7 +502,7 @@ class FileService
                 array_push($data['share_users'], $share['share_with']);
             if ($share['share_type'] == \OC\Share\Constants::SHARE_TYPE_GROUP && ! in_array($share['share_with'], $data['share_groups']))
                 array_push($data['share_groups'], $share['share_with']);
-            if ($share['share_type'] == \OC\Share\Constants::SHARE_TYPE_LINK && ! in_array('__link', $data['share_users']))
+            if ($share['share_type'] == \OC\Share\Constants::SHARE_TYPE_LINK && ! in_array('__link_' . $share['id'], $data['share_users']))
                 array_push($data['share_users'], '__link_' . $share['id']);
         }
         
@@ -551,20 +551,23 @@ class FileService
         
         if (substr($path, - 1) == '/')
             $path = substr($path, 0, - 1);
-            
-            // 'extension' => ($pathParts['extension'] != '') ? '.' . $pathParts['extension'] : '',
-            // 'webdav' =>
-            // 'trashbin' => ($deleted) ? '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename'] : '',
+        
+        $dirpath = $pathParts['dirname'];
+        
+        if ($base !== '') {
+            $path = substr($path, strpos($path, $base) + strlen($base));
+            $dirpath = substr($dirpath, strpos($dirpath, $base) + strlen($base)) . '/';
+        }
         
         $data = array_merge($data, array(
             'size' => $fileData->getSize(),
-            'title' => (($base === '') ? $path : substr($path, strpos($path, $base) + strlen($base))),
+            'title' => $path,
             'icon' => SolrService::extractableFile($fileData->getMimeType(), $path),
-            'filename' => $pathParts['filename'],
-            'dirpath' => $pathParts['dirname'],
+            'filename' => ((key_exists('extension', $pathParts)) ? ($pathParts['filename'] . '.' . $pathParts['extension']) : $pathParts['filename']),
+            'dirpath' => $dirpath,
             'mimetype' => $fileData->getMimeType(),
             'deleted' => $deleted,
-            'link_main' => (! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename'],
+            'link_main' => ((! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename']),
             'link_sub' => '',
             'valid' => true,
             'mtime' => $fileData->getMTime()
