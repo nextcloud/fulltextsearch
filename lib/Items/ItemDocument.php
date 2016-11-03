@@ -85,6 +85,8 @@ class ItemDocument
 
     private $temp = false;
 
+    private $link = false;
+
     private $invalid = false;
 
     private $synced = false;
@@ -364,6 +366,16 @@ class ItemDocument
     {
         return $this->temp;
     }
+
+//     public function sharelink($link)
+//     {
+//         $this->link = $link;
+//     }
+
+//     public function isSharelink()
+//     {
+//         return $this->link;
+//     }
 
     public function invalid($invalid)
     {
