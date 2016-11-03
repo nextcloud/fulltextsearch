@@ -385,19 +385,16 @@ class SolrService
             
             $query->setRows(25);
             
-            array_push($options, 'complete_words');
             // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
+            
+            array_push($options, 'complete_words');
             $q = 'text:' . $helper->escapeTerm($string) . "\n";
             $words = explode(' ', $string);
             foreach ($words as $word)
                 $q .= 'nextant_path:*' . $helper->escapeTerm($word) . '*' . "\n";
                 
-                // nextant_path:*Dlve*
-                // nextant_path:*Route*
-            
+                // $this->miscService->log($q);
             $query->setQuery($q);
-            $this->miscService->log($q);
-            // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $string);
             
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
             
