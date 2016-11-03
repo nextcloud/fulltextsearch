@@ -238,7 +238,7 @@ class SolrAdminService
         $changed = false;
         while (true) {
             foreach ($fields as $field) {
-                $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\': ', false);
+                $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\' : ', false);
                 if (self::checkFieldProperty($this->miscService, $client, $field, $curr))
                     $this->solrService->message('<info>ok</info>');
                 else {

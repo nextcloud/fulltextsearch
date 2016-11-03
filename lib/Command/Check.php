@@ -66,9 +66,10 @@ class Check extends Base
         
         $this->solrService->setOutput($output);
         
-        $output->write('Ping: ');
+        $client = $this->solrService->getClientConfig()['endpoint']['localhost'];
+        $output->write('Pinging ' . $client['host'] . ':' . $client['port'] . $client['path'] . $client['core'] . ' : ');
         if ($this->solrAdmin->ping())
-            $output->writeln('<info>ok</info>'); 
+            $output->writeln('<info>ok</info>');
         else {
             $output->writeln('<error>fail</error>');
             return false;
@@ -80,7 +81,7 @@ class Check extends Base
             return false;
         }
         
-        $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents:');
+        $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents :');
         $output->writeln(' - ' . $this->solrTools->count('files') . ' files');
         $output->writeln(' - ' . $this->solrTools->count('bookmarks') . ' bookmarks');
     }

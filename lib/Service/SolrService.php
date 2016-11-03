@@ -153,6 +153,11 @@ class SolrService
         return new \Solarium\Client($options);
     }
 
+    public function getClientConfig()
+    {
+        return $this->solariumClient->getOptions();
+    }
+    
     public function setOwner($owner, $groups = array())
     {
         $this->owner = $owner;
