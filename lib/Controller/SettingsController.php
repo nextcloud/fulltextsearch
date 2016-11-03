@@ -94,6 +94,8 @@ class SettingsController extends Controller
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
             'index_files_live' => $this->configService->getAppValue('index_files_live'),
+            'index_files_tree' => $this->configService->getAppValue('index_files_tree'),
+            'index_files_sharelink' => $this->configService->getAppValue('index_files_sharelink'),
             'index_files_external' => $this->configService->getAppValue('index_files_external'),
             'index_files_encrypted' => $this->configService->getAppValue('index_files_encrypted'),
             'display_result' => $this->configService->getAppValue('display_result'),
@@ -113,11 +115,14 @@ class SettingsController extends Controller
         return $response;
     }
 
-    public function setOptionsFiles($index_files, $index_files_live, $index_files_max_size, $index_files_external, $index_files_encrypted)
+    public function setOptionsFiles($index_files, $index_files_live, $index_files_max_size, $index_files_tree, $index_files_sharelink, $index_files_external, $index_files_encrypted)
     {
         $this->configService->setAppValue('index_files', $index_files);
         $this->configService->setAppValue('index_files_live', $index_files_live);
+        $this->configService->setAppValue('index_files_tree', $index_files_tree);
+        $this->configService->setAppValue('index_files_sharelink', $index_files_sharelink);
         $this->configService->setAppValue('index_files_external', $index_files_external);
+        $this->configService->setAppValue('index_files_encrypted', $index_files_encrypted);
         $this->configService->setAppValue('index_files_max_size', $index_files_max_size);
         
         return $this->updateSubOptions(false, 'files');

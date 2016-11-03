@@ -57,6 +57,7 @@ class SearchProvider extends \OCP\Search\Provider
         $groups = array_map(function ($value) {
             return (string) $value;
         }, array_keys($this->groupManager->getUserIdGroups($this->userId)));
+        array_push($groups, '__all');
         
         $this->solrService->setOwner($this->userId, $groups);
     }

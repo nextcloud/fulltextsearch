@@ -91,7 +91,7 @@ class SolrAdminService
             'type' => 'field',
             'data' => array(
                 'name' => 'nextant_path',
-                'type' => 'string',
+                'type' => 'text_general',
                 'indexed' => true,
                 'stored' => true,
                 'multiValued' => false
@@ -180,6 +180,16 @@ class SolrAdminService
         array_push($fields, array(
             'type' => 'field',
             'data' => array(
+                'name' => 'nextant_extracted',
+                'type' => 'boolean',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
                 'name' => 'nextant_ocr',
                 'type' => 'int',
                 'indexed' => true,
@@ -187,17 +197,63 @@ class SolrAdminService
                 'multiValued' => false
             )
         ));
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'text_general',
+                'class' => 'solr.TextField',
+                'omitNorms' => false,
+                'indexAnalyzer' => array(
+                    'tokenizer' => array(
+                        'class' => 'solr.StandardTokenizerFactory'
+                    ),
+                    'filters' => array(
+                        array(
+                            'class' => 'solr.StandardFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.ASCIIFoldingFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.LowerCaseFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.EdgeNGramFilterFactory',
+                            'maxGramSize' => '15',
+                            'minGramSize' => '1'
+                        )
+                    )
+                ),
+                'queryAnalyzer' => array(
+                    'tokenizer' => array(
+                        'class' => 'solr.StandardTokenizerFactory'
+                    ),
+                    'filters' => array(
+                        array(
+                            'class' => 'solr.ASCIIFoldingFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.StandardFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.LowerCaseFilterFactory'
+                        )
+                    )
+                )
+            )
+        ));
         
         $this->solrService->message('Checking Solr schema fields');
         
+        $failed = false;
         $changed = false;
         while (true) {
             foreach ($fields as $field) {
-                $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\': ', false);
-                if (self::checkFieldProperty($client, $field, $curr))
-                    $this->solrService->message('ok.');
+                $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\' : ', false);
+                if (self::checkFieldProperty($this->miscService, $client, $field, $curr))
+                    $this->solrService->message('<info>ok</info>');
                 else {
-                    $this->solrService->message('fail. ');
+                    $this->solrService->message('<error>fail</error>');
                     
                     if ($fix) {
                         $changed = true;
@@ -207,17 +263,20 @@ class SolrAdminService
                         else
                             self::createField($client, $field);
                     } else
-                        return false;
+                        $failed = true;
                 }
             }
             
             break;
         }
         
+        if ($failed)
+            return false;
+        
         if ($changed)
             $this->configService->setAppValue('index_files_needed', '1');
-        
-      //  $this->configService->setAppValue('configured', '1');
+            
+            // $this->configService->setAppValue('configured', '1');
         return true;
     }
 
@@ -258,17 +317,36 @@ class SolrAdminService
      * @param array $property            
      * @return boolean
      */
-    private static function checkFieldProperty(\Solarium\Client $client, $field, &$property)
+    private static function checkFieldProperty($misc, \Solarium\Client $client, $field, &$property)
     {
         $property = self::getFieldProperty($client, $field['type'], $field['data']['name']);
         if (! $property)
             return false;
         
-        $k = array_keys($field['data']);
-        foreach ($k as $key) {
-            if ($field['data'][$key] != $property[$key])
+        return self::checkFieldPropertyRecursive($misc, $field['data'], $property);
+    }
+
+    private static function checkFieldPropertyRecursive($misc, $value, $property)
+    {
+        if (is_array($value)) {
+            
+            if (! is_array($property))
                 return false;
-        }
+            
+            if (sizeof($value) != sizeof($property))
+                return false;
+            
+            $key = array_keys($value);
+            foreach ($key as $k) {
+                if (! key_exists($k, $property))
+                    return false;
+                
+                if (! self::checkFieldPropertyRecursive($misc, $value[$k], $property[$k]))
+                    return false;
+            }
+        } else 
+            if ($value != $property)
+                return false;
         
         return true;
     }
@@ -288,6 +366,8 @@ class SolrAdminService
             $url = 'schema/fields/';
         if ($fieldType == 'dynamic-field')
             $url = 'schema/dynamicfields/';
+        if ($fieldType == 'field-type')
+            $url = 'schema/fieldtypes/';
         if ($url == '')
             return false;
         
@@ -302,10 +382,15 @@ class SolrAdminService
         
         $result = json_decode($response->getBody());
         foreach ($result as $data) {
-            foreach ($data as $k => $v)
+            foreach ($data as $k => $v) {
+                if ($v instanceof stdClass)
+                    $v = (array) $v;
                 $property[$k] = $v;
+            }
         }
         
+        // lazy one-liner method : convert stdClass -> array()
+        $property = json_decode(json_encode($property), true);
         return $property;
     }
 
@@ -363,7 +448,6 @@ class SolrAdminService
     private static function solariumPostSchemaRequest(\Solarium\Client $client, $data)
     {
         try {
-            
             $query = $client->createSelect();
             $request = $client->createRequest($query);
             

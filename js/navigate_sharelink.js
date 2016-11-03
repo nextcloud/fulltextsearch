@@ -27,9 +27,17 @@ $(document)
 		.ready(
 				function() {
 
+					$('html').keydown(function(e) {
+						if (!nextantCurrentFocus)
+							return;
+						if (e.which == 13)
+							return nextant_share_link.search(true);
+					});
+
 					var nextantCurrentSearch = '';
 					var nextantSearchDelayTimer = null;
 					var nextantSearchDisplayed = false;
+					var nextantCurrentFocus = false;
 
 					var nextant_share_link = {
 
@@ -56,15 +64,15 @@ $(document)
 								clearTimeout(nextantSearchDelayTimer);
 
 							nextantSearchDelayTimer = setTimeout(function() {
-								nextant_share_link.search();
+								nextant_share_link.search(false);
 							}, 250);
 						},
 
-						search : function() {
+						search : function(force) {
 							nextantSearchDelayTimer = null;
 
 							var query = $('#linksearchbox').val();
-							if (query == nextantCurrentSearch)
+							if (!force && query == nextantCurrentSearch)
 								return;
 
 							if (query == '') {
@@ -115,14 +123,22 @@ $(document)
 
 							response
 									.forEach(function(entry) {
+
+										var link = parent.location.protocol
+												+ '//' + location.host
+												+ OC.generateUrl('/s/')
+												+ entry.sharelink_token;
+										link += '/download?path='
+												+ entry.dirpath + '&files='
+												+ entry.filename;
+										
 										var row = nextant_share_link
 												.template_entry()
 												.replace(/%ID%/gi, entry.id)
 												.replace(/%TYPE%/gi, entry.type)
 												.replace(/%TITLE%/gi,
 														entry.title)
-												.replace(/%LINKMAIN%/gi,
-														entry.link_main)
+												.replace(/%LINKMAIN%/gi, link)
 												.replace(/%FILENAME%/gi,
 														entry.filename)
 												.replace(/%DIRPATH%/gi,

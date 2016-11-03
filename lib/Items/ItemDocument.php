@@ -67,6 +67,8 @@ class ItemDocument
 
     private $extractable = false;
 
+    private $indexed = false;
+
     private $extracted = false;
 
     private $processed = false;
@@ -82,6 +84,8 @@ class ItemDocument
     private $failedUpdate = false;
 
     private $temp = false;
+
+    private $link = false;
 
     private $invalid = false;
 
@@ -268,6 +272,16 @@ class ItemDocument
         return $this->extractable;
     }
 
+    public function indexed($indexed)
+    {
+        $this->indexed = $indexed;
+    }
+
+    public function isIndexed()
+    {
+        return $this->indexed;
+    }
+
     public function extracted($extracted)
     {
         $this->extracted = $extracted;
@@ -352,6 +366,16 @@ class ItemDocument
     {
         return $this->temp;
     }
+
+//     public function sharelink($link)
+//     {
+//         $this->link = $link;
+//     }
+
+//     public function isSharelink()
+//     {
+//         return $this->link;
+//     }
 
     public function invalid($invalid)
     {

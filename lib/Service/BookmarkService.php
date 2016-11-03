@@ -94,6 +94,7 @@ class BookmarkService
     {
         $data['link_main'] = $data['path'];
         $data['title'] = $data['path'];
+        $data['valid'] = true;
         $data['icon'] = \OCP\Util::imagePath('nextant', 'bookmarks.svg');
         
         return true;

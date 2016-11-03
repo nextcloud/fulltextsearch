@@ -43,6 +43,8 @@ class IndexService
 
     private $solrTools;
 
+    private $configService;
+
     private $fileService;
 
     private $bookmarkService;
@@ -59,8 +61,9 @@ class IndexService
 
     private $force = false;
 
-    public function __construct($fileService, $bookmarkService, $solrService, $solrTools, $miscService)
+    public function __construct($configService, $fileService, $bookmarkService, $solrService, $solrTools, $miscService)
     {
+        $this->configService = $configService;
         $this->fileService = $fileService;
         $this->bookmarkService = $bookmarkService;
         
@@ -158,7 +161,7 @@ class IndexService
                 $entry->extractable(true);
             }
             
-            if (! $entry->isExtractable())
+            if (! $entry->isExtractable() && $this->configService->getAppValue('index_files_tree') !== '1')
                 continue;
             
             if (! $extract)
@@ -176,7 +179,7 @@ class IndexService
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->generateTempDocument($entry);
             
-            $this->solrService->extractDocument($entry, $error);
+            $this->solrService->indexDocument($entry, $error);
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->destroyTempDocument($entry);

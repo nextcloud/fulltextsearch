@@ -1,6 +1,10 @@
 **v0.6.3**
-- search within public shared documents
-
+- search within link shared documents, both public and private (w/ key)
+- search within federated documents
+- admin can choose to add files and directory structure to improve search
+- mid, mp3 and flac are now indexed.
+- index/search now ignore case and accents
+- minor bugfixes
 
 
 **v0.6.2**

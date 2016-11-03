@@ -274,7 +274,9 @@ class SolrToolsService
             return false;
         
         if ($solr != null && $solr != '' && ($document->getMTime() == $solr->getMTime())) {
-            $document->extracted(true);
+            if ($document->isExtractable())
+                $document->extracted(true);
+            $document->indexed(true);
             return true;
         }
         
@@ -298,7 +300,9 @@ class SolrToolsService
             
             foreach ($resultset as $doc) {
                 if ($document->getMTime() == $doc->nextant_mtime) {
-                    $document->extracted(true);
+                    if ($document->isExtractable())
+                        $document->extracted(true);
+                    $document->indexed(true);
                     return true;
                 }
             }

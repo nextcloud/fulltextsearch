@@ -52,7 +52,9 @@ class Check extends Base
     protected function configure()
     {
         parent::configure();
-        $this->setName('nextant:check')->setDescription('check, fix and optimise your current Solr configuration');
+        $this->setName('nextant:check')
+            ->setDescription('check, fix and optimise your current Solr configuration')
+            ->addOption('fix', 'f', InputOption::VALUE_NONE, 'fix');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -64,20 +66,22 @@ class Check extends Base
         
         $this->solrService->setOutput($output);
         
-        $output->write('Ping: ');
+        $client = $this->solrService->getClientConfig()['endpoint']['localhost'];
+        $output->write('Pinging ' . $client['host'] . ':' . $client['port'] . $client['path'] . $client['core'] . ' : ');
         if ($this->solrAdmin->ping())
-            $output->writeln('ok');
+            $output->writeln('<info>ok</info>');
         else {
-            $output->writeln('fail');
+            $output->writeln('<error>fail</error>');
             return false;
         }
         
-        if (! $this->solrAdmin->checkSchema(true, $error)) {
-            $output->writeln('Error: ' . $error);
+        if (! $this->solrAdmin->checkSchema(($input->getOption('fix')), $error)) {
+            if ($input->getOption('fix'))
+                $output->writeln('Error: ' . $error);
             return false;
         }
         
-        $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents:');
+        $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents :');
         $output->writeln(' - ' . $this->solrTools->count('files') . ' files');
         $output->writeln(' - ' . $this->solrTools->count('bookmarks') . ' bookmarks');
     }
