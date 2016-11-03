@@ -37,6 +37,7 @@ $(document)
 					var nextantCurrentSearch = '';
 					var nextantSearchDelayTimer = null;
 					var nextantSearchDisplayed = false;
+					var nextantCurrentFocus = false;
 
 					var nextant_share_link = {
 
@@ -122,14 +123,22 @@ $(document)
 
 							response
 									.forEach(function(entry) {
+
+										var link = parent.location.protocol
+												+ '//' + location.host
+												+ OC.generateUrl('/s/')
+												+ entry.sharelink_token;
+										link += '/download?path='
+												+ entry.dirpath + '&files='
+												+ entry.filename;
+										
 										var row = nextant_share_link
 												.template_entry()
 												.replace(/%ID%/gi, entry.id)
 												.replace(/%TYPE%/gi, entry.type)
 												.replace(/%TITLE%/gi,
 														entry.title)
-												.replace(/%LINKMAIN%/gi,
-														entry.link_main)
+												.replace(/%LINKMAIN%/gi, link)
 												.replace(/%FILENAME%/gi,
 														entry.filename)
 												.replace(/%DIRPATH%/gi,

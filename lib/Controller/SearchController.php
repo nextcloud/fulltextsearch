@@ -108,7 +108,6 @@ class SearchController extends Controller
                     'mtime' => '',
                     'icon' => '',
                     'mimetype' => '',
-                    'sharelink' => false,
                     'valid' => false
                 ));
                 
@@ -222,8 +221,8 @@ class SearchController extends Controller
                     'mtime' => '',
                     'icon' => '',
                     'mimetype' => '',
-                    'sharelink' => true,
-                    'valid' => false,
+                    'sharelink_token' => $key,
+                    'valid' => false
                 ));
                 
                 switch ($data['source']) {

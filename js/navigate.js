@@ -69,12 +69,12 @@ $(document)
 							return;
 						if (e.which == 13)
 							return nextant.search();
-//						if (e.which == 38)
-//							return nextant.suggestSelect('prev');
-//						if (e.which == 39)
-//							return nextant.suggestSelect('select');
-//						if (e.which == 40)
-//							return nextant.suggestSelect('next');
+						// if (e.which == 38)
+						// return nextant.suggestSelect('prev');
+						// if (e.which == 39)
+						// return nextant.suggestSelect('select');
+						// if (e.which == 40)
+						// return nextant.suggestSelect('next');
 					});
 
 					var nextantCurrentSearch = '';
@@ -216,30 +216,31 @@ $(document)
 							$('#searchbox').focus();
 						},
 
-//						suggestSelect : function(pos) {
-//							if (!nextantCurrentFocus)
-//								return;
-//							if (nextantSuggestResult == null)
-//								return;
-//							
-//							switch (pos) {
-//							case 'next':
-//								if (nextantSuggestSelected < nextantSuggestResult.length)
-//									nextantSuggestSelected++;
-//								break;
-//							case 'prev':
-//								if (nextantSuggestSelected > 1)
-//									nextantSuggestSelected--;
-//								break;
-//							case 'select':
-//								suggestReplace(nextantSuggestResult[nextantSuggestSelected]);
-//								break;
-//
-//							case 'reset':
-//								nextantSuggestSelected = 0;
-//								break;
-//							}
-//						},
+						// suggestSelect : function(pos) {
+						// if (!nextantCurrentFocus)
+						// return;
+						// if (nextantSuggestResult == null)
+						// return;
+						//							
+						// switch (pos) {
+						// case 'next':
+						// if (nextantSuggestSelected <
+						// nextantSuggestResult.length)
+						// nextantSuggestSelected++;
+						// break;
+						// case 'prev':
+						// if (nextantSuggestSelected > 1)
+						// nextantSuggestSelected--;
+						// break;
+						// case 'select':
+						// suggestReplace(nextantSuggestResult[nextantSuggestSelected]);
+						// break;
+						//
+						// case 'reset':
+						// nextantSuggestSelected = 0;
+						// break;
+						// }
+						// },
 
 						searchRequest : function(data) {
 							$.post(
@@ -329,7 +330,6 @@ $(document)
 							$tmpl += '<td class="date"><span class="modified" title="" style="color:rgb(155,155,155)" data-original-title=""></span></td></tr>';
 
 							return $tmpl;
-
 						},
 
 						get : function(name, url) {
