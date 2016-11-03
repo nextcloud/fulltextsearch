@@ -188,6 +188,9 @@ class SolrService
             case 'audio/mpeg':
                 return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
             
+            case 'audio/flac':
+                return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
+            
             case 'application/octet-stream':
                 if ($path === '')
                     return false;
