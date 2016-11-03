@@ -567,6 +567,7 @@ class FileService
             'dirpath' => $dirpath,
             'mimetype' => $fileData->getMimeType(),
             'deleted' => $deleted,
+            'etag' => $fileData->getETag(),
             'link_main' => ((! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename']),
             'link_sub' => '',
             'valid' => true,

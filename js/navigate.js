@@ -275,6 +275,7 @@ $(document)
 														entry.filename)
 												.replace(/%DIRPATH%/gi,
 														entry.dirpath)
+												.replace(/%ETAG%/gi, entry.etag)
 												.replace(/%SIZE%/gi, entry.size)
 												.replace(/%SIZEREAD%/gi,
 														entry.size_readable)
@@ -309,8 +310,8 @@ $(document)
 
 						template_entry : function() {
 
-							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%TITLE%" data-mime="%MIMETYPE%" data-mtime="%MTIME%000" data-etag="" ';
-							$tmpl += ' data-permissions="" data-has-preview="false" data-path="%PATH%" data-share-permissions="">';
+							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%FILENAME%" data-mime="%MIMETYPE%" data-mtime="%MTIME%000" data-etag="%ETAG%" ';
+							$tmpl += ' data-permissions="" data-has-preview="true" data-path="%DIRPATH%" data-share-permissions="">';
 							$tmpl += '<td class="filename ui-draggable">';
 							$tmpl += '<a class="action action-favorite " data-original-title="" title="">';
 							$tmpl += '</a>';
