@@ -83,6 +83,8 @@ class SearchController extends Controller
             $groups = array_map(function ($value) {
                 return (string) $value;
             }, array_keys($this->groupManager->getUserIdGroups($this->userId)));
+            array_push($groups, '__all');
+            
             $this->solrService->setOwner($this->userId, $groups);
             
             $solrResult = $this->solrService->search($query, array(
@@ -106,6 +108,7 @@ class SearchController extends Controller
                     'mtime' => '',
                     'icon' => '',
                     'mimetype' => '',
+                    'sharelink' => false,
                     'valid' => false
                 ));
                 
@@ -218,7 +221,9 @@ class SearchController extends Controller
                     'size' => '',
                     'mtime' => '',
                     'icon' => '',
-                    'mimetype' => ''
+                    'mimetype' => '',
+                    'sharelink' => true,
+                    'valid' => false,
                 ));
                 
                 switch ($data['source']) {
