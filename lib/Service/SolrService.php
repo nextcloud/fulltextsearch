@@ -45,6 +45,9 @@ class SolrService
     // can't reach http - solr running at the right place ?
     const EXCEPTION_HTTPEXCEPTION = 21;
     
+    // issue during runtime
+    const EXCEPTION_RUNTIME = 22;
+    
     // can't reach solr - check uri
     const EXCEPTION_SOLRURI = 24;
     
@@ -370,6 +373,8 @@ class SolrService
                 $error = self::EXCEPTION_EXTRACT_FAILED;
             else
                 $error = self::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $error = self::EXCEPTION_RUNTIME;
         } catch (\Solarium\Exception $e) {
             $error = self::EXCEPTION;
         }
@@ -388,6 +393,7 @@ class SolrService
             return false;
         
         $string = str_replace('  ', ' ', trim($string));
+        $astring = explode(' ', $string);
         
         if ($string == '')
             return false;
@@ -414,7 +420,7 @@ class SolrService
             // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
             
             array_push($options, 'complete_words');
-            $q = 'text:' . $helper->escapeTerm($string) . "\n";
+            $q = 'text:' . $helper->escapeTerm(implode(' AND ', $astring)) . "\n";
             $words = explode(' ', $string);
             foreach ($words as $word)
                 $q .= 'nextant_path:*' . $helper->escapeTerm($word) . '*' . "\n";

@@ -83,7 +83,7 @@ class IndexService
 
     public function setDebug($debug)
     {
-        $this->debug = true;
+        $this->debug = $debug;
         $this->miscService->setDebug($debug);
     }
 
@@ -181,6 +181,14 @@ class IndexService
             
             $this->solrService->indexDocument($entry, $error);
             
+            if ($entry->isFailedExtract()) {
+                if ($this->output != null && $this->debug) {
+                    $this->output->writeln('');
+                    $this->output->writeln('*** Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error);
+                    $this->output->writeln('');
+                }
+            }
+            
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->destroyTempDocument($entry);
         }
@@ -267,7 +275,7 @@ class IndexService
                 if ($entry->isFailedUpdate()) {
                     if ($this->output != null && $this->debug) {
                         $this->output->writeln('');
-                        $this->output->writeln('Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error);
+                        $this->output->writeln('*** Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error);
                         $this->output->writeln('');
                     }
                 }
@@ -317,8 +325,11 @@ class IndexService
         if (sizeof($data) > 0 && ! $data[0]->isSynced())
             $this->extract($type, $userId, $data, $solrDocs, false);
         
-        if ($solrDocs == null || $solrDocs == '')
+        if ($solrDocs == null || $solrDocs == '' || ! is_array($solrDocs))
             $solrDocs = $this->getDocuments($type, $userId);
+        
+        if (! is_array($solrDocs))
+            return false;
         
         $progress = null;
         if ($this->output != null)
@@ -335,7 +346,7 @@ class IndexService
         
         $docIds = array();
         foreach ($data as $entry) {
-            if (! $entry->isInvalid())
+            if (! $entry->isInvalid() && ! $entry->isFailedExtract())
                 array_push($docIds, (int) $entry->getId());
         }
         
