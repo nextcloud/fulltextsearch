@@ -241,9 +241,12 @@ class Index extends Base
                 if ($doc->isFailedExtract())
                     $failed ++;
             }
-            foreach ($solrDocs as $doc) {
-                if ($doc->isRemoved())
-                    $removed ++;
+            
+            if (is_array($solrDocs)) {
+                foreach ($solrDocs as $doc) {
+                    if ($doc->isRemoved())
+                        $removed ++;
+                }
             }
             
             $output->writeln('');
