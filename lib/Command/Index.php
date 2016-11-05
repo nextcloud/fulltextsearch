@@ -153,7 +153,7 @@ class Index extends Base
         if ($this->configService->isLockedIndex($delay)) {
             $output->writeln('');
             $output->writeln('nextant is currently locked by another indexing script (command line or background job)');
-            $output->writeln('last tick from this script ' . $delay . ' second(s) ago');
+            $output->writeln('last tick from this script was ' . $delay . ' second(s) ago');
             $output->writeln('');
             $output->writeln('If you think the other script exited improperly, you can use <info>./occ nextant:index --unlock</info> to unlock');
             $output->writeln('');
