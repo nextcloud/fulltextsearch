@@ -52,6 +52,8 @@ class SettingsController extends Controller
 
     private $solr_core;
 
+    private $solr_timeout;
+
     public function __construct($appName, IRequest $request, ConfigService $configService, $indexService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
         parent::__construct($appName, $request);
@@ -70,7 +72,8 @@ class SettingsController extends Controller
     {
         $params = [
             'solr_url' => $this->configService->getAppValue('solr_url'),
-            'solr_core' => $this->configService->getAppValue('solr_core')
+            'solr_core' => $this->configService->getAppValue('solr_core'),
+            'solr_timeout' => $this->configService->getAppValue('solr_timeout')
         ];
         
         return new TemplateResponse($this->appName, 'settings.admin', $params, 'blank');
@@ -89,6 +92,7 @@ class SettingsController extends Controller
             'ping' => $this->solrAdmin->ping($error),
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core'),
+            'solr_timeout' => $this->configService->getAppValue('solr_timeout'),
             'nextant_version' => $this->configService->getAppValue('installed_version') . ' (beta)',
             'index_files' => $this->configService->getAppValue('index_files'),
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
@@ -148,14 +152,16 @@ class SettingsController extends Controller
         return $this->updateSubOptions(false, 'status');
     }
 
-    public function setSettings($solr_url, $solr_core, $command)
+    public function setSettings($solr_url, $solr_core, $solr_timeout, $command)
     {
         $this->solr_url = $solr_url;
         $this->solr_core = $solr_core;
+        $this->solr_timeout = $solr_timeout;
         
         $tmpConfig = array(
             'solr_url' => $solr_url,
-            'solr_core' => $solr_core
+            'solr_core' => $solr_core,
+            'solr_timeout' => $solr_timeout
         );
         
         // testing with use __nextant_test_owner from the group __nextant_share_group
@@ -328,9 +334,10 @@ class SettingsController extends Controller
 
     private function save(&$message)
     {
-        if (! is_null($this->solr_url) && ! is_null($this->solr_core)) {
+        if (! is_null($this->solr_url) && ! is_null($this->solr_core) && ! is_null($this->solr_timeout)) {
             $this->configService->setAppValue('solr_url', $this->solr_url);
             $this->configService->setAppValue('solr_core', $this->solr_core);
+            $this->configService->setAppValue('solr_timeout', $this->solr_timeout);
             if ($this->configService->getAppValue('configured') !== '1')
                 $this->configService->setAppValue('configured', '2');
             

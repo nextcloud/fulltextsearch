@@ -156,6 +156,7 @@ $(document)
 									.text(response.nextant_version);
 							$('#solr_url').val(response.solr_url);
 							$('#solr_core').val(response.solr_core);
+							$('#solr_timeout').val(response.solr_timeout);
 
 							if (response.configured > 0) {
 								$('#nextant_suboptions :input').attr(
@@ -317,6 +318,7 @@ $(document)
 							$('#nextant_apply').attr('disabled', true);
 							$('#solr_url').attr('disabled', true);
 							$('#solr_core').attr('disabled', true);
+							$('#solr_timeout').attr('disabled', true);
 							nextantSettings.test('ping');
 						},
 
@@ -331,6 +333,7 @@ $(document)
 							var data = {
 								solr_url : $('#solr_url').val(),
 								solr_core : $('#solr_core').val(),
+								solr_timeout : $('#solr_timeout').val(),
 								command : command
 							}
 
@@ -449,6 +452,7 @@ $(document)
 						reset : function() {
 							$('#solr_url').attr('disabled', false);
 							$('#solr_core').attr('disabled', false);
+							$('#solr_timeout').attr('disabled', false);
 							$('#nextant_apply').attr('disabled', false);
 						}
 					}

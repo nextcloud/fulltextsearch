@@ -43,6 +43,7 @@ class ConfigService
         'configured' => '0',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
+        'solr_timeout' => 30,
         'display_result' => 1,
         
         'index_delay' => 2,
@@ -248,6 +249,7 @@ class ConfigService
         return array(
             'endpoint' => array(
                 'localhost' => array(
+                    'timeout' => $this->getAppValue('solr_timeout'),
                     'host' => $t['host'],
                     'port' => $t['port'],
                     'core' => $config['solr_core'],
