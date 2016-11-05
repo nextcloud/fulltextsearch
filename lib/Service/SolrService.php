@@ -70,8 +70,6 @@ class SolrService
     const EXCEPTION_REMOVE_FAILED = 101;
 
     const EXCEPTION_OPTIMIZE_FAILED = 121;
-
-    const EXCEPTION_SUGGEST_FAILED = 151;
     
     // undocumented exception
     const EXCEPTION = 9;
@@ -379,9 +377,9 @@ class SolrService
             else
                 $ierror = new ItemError(self::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getStatusMessage());
+            $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $ierror = new ItemError(self::EXCEPTION, $e->getStatusMessage());
+            $ierror = new ItemError(self::EXCEPTION, $e->getMessage());
         }
         
         $document->failedExtract(true);
@@ -489,9 +487,9 @@ class SolrService
             else
                 $ierror = new ItemError(self::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getStatusMessage());
+            $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $ierror = new ItemError(self::EXCEPTION, $e->getStatusMessage());
+            $ierror = new ItemError(self::EXCEPTION, $e->getMessage());
         }
         
         return false;
@@ -539,9 +537,9 @@ class SolrService
             else
                 $ierror = new ItemError(self::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getStatusMessage());
+            $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $ierror = new ItemError(self::EXCEPTION, $e->getStatusMessage());
+            $ierror = new ItemError(self::EXCEPTION, $e->getMessage());
         }
         
         return false;

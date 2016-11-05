@@ -99,9 +99,9 @@ class SolrToolsService
         } catch (\Solarium\Exception\HttpException $ehe) {
             $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
         
         return false;
@@ -211,9 +211,9 @@ class SolrToolsService
             else
                 $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
         
         $final->failedUpdate(true);
@@ -252,9 +252,9 @@ class SolrToolsService
         } catch (\Solarium\Exception\HttpException $ehe) {
             $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
         
         return false;
@@ -309,9 +309,9 @@ class SolrToolsService
         } catch (\Solarium\Exception\HttpException $ehe) {
             $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
         
         return false;
@@ -346,9 +346,9 @@ class SolrToolsService
         } catch (\Solarium\Exception\HttpException $ehe) {
             $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
         
         return false;
@@ -387,9 +387,9 @@ class SolrToolsService
         } catch (\Solarium\Exception\HttpException $ehe) {
             $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
         
         return false;
