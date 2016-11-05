@@ -299,9 +299,9 @@ class IndexService
             }
             
             if ($entry->neededUpdate()) {
-                $this->solrTools->updateDocument($entry, $current, true, $error);
+                $this->solrTools->updateDocument($entry, $current, true, $ierror);
                 
-                if ($entry->isFailedUpdate($error) && ! $this->manageFailure($error, $progress, '*** Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error))
+                if ($entry->isFailedUpdate() && ! $this->manageFailure($ierror, $progress, 'Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
                     return false;
             }
         }

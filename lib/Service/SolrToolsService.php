@@ -39,11 +39,11 @@ use \OCA\Nextant\Items\ItemDocument;
 class SolrToolsService
 {
 
-    const UPDATE_MAXIMUM_QUERYTIME = 2000;
+//     const UPDATE_MAXIMUM_QUERYTIME = 2000;
 
-    const UPDATE_MAXIMUM_FILEPROCESS = 15;
+//     const UPDATE_MAXIMUM_FILEPROCESS = 15;
 
-    const UPDATE_CHUNK_SIZE = 5;
+//     const UPDATE_CHUNK_SIZE = 5;
 
     private $solrService;
 
@@ -115,7 +115,7 @@ class SolrToolsService
      *
      * @return boolean
      */
-    public function updateDocument(&$final, &$current, $update = true, &$error = 0)
+    public function updateDocument(&$final, &$current, $update = true, &$ierror = '')
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -205,14 +205,16 @@ class SolrToolsService
                 $final->updated(true);
                 return true;
             } else
-                $error = SolrService::EXCEPTION_UPDATE_QUERY_FAILED;
+                $ierror = new ItemError(SolrService::EXCEPTION_UPDATE_QUERY_FAILED);
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_UPDATE_FIELD_FAILED;
+                $ierror = new ItemError(SolrService::EXCEPTION_EXTRACT_FAILED, $ehe->getStatusMessage());
             else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+                $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
         }
         
         $final->failedUpdate(true);
