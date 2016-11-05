@@ -39,7 +39,7 @@ class IndexService
 
     const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:12s% %jvm:-30s%      ";
 
-    const REFRESH_INFO_SYSTEM = 5;
+    const REFRESH_INFO_SYSTEM = 10;
 
     private $solrService;
 
@@ -211,9 +211,9 @@ class IndexService
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->generateTempDocument($entry);
             
-            $this->solrService->indexDocument($entry, $error);
+            $this->solrService->indexDocument($entry, $ierror);
             
-            if ($entry->isFailedExtract($error) && ! $this->manageFailure($error, $progress, '*** Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error))
+            if ($entry->isFailedExtract() && ! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
                 return false;
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
@@ -591,19 +591,21 @@ class IndexService
         return false;
     }
 
-    private function manageFailure($error, $progress = null, $message = '')
+    private function manageFailure($ierror, $progress = null, $message = '')
     {
         if ($this->output != null && $this->debug) {
             $this->output->writeln('');
             $this->output->writeln('');
-            $this->output->writeln($message);
-            if ($error == SolrService::EXCEPTION_HTTPEXCEPTION)
+            $this->output->writeln('*** Error #' . $ierror->getCode() . ' (' . $ierror->getMessage() . ')');
+            $this->output->writeln('*** ' . $message);
+            
+            if ($ierror->getCode() == SolrService::EXCEPTION_HTTPEXCEPTION)
                 $this->output->writeln('Note: we will wait here for few seconds and check if Solr is still running');
             $this->output->writeln('');
             $this->output->writeln('');
         }
         
-        if ($error == SolrService::EXCEPTION_HTTPEXCEPTION) {
+        if ($ierror->getCode() == SolrService::EXCEPTION_HTTPEXCEPTION) {
             if ($progress != null) {
                 $progress->setMessage('|', 'job');
                 $progress->setMessage('[standby]', 'infos');
@@ -617,9 +619,12 @@ class IndexService
                     $this->output->writeln('');
                     $this->output->writeln('Is Solr Up and Running ?');
                     $this->output->writeln('');
-                    $this->parent->end();
                 }
                 
+                if ($this->parent != null)
+                    $this->parent->end();
+                else
+                    exit();
                 return false;
             }
         }

@@ -25,6 +25,7 @@
  */
 namespace OCA\Nextant\Service;
 
+use \OCA\Nextant\Items\ItemError;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\ConfigService;
 
@@ -261,7 +262,7 @@ class SolrService
      * @param string $mimetype            
      * @return result
      */
-    public function indexDocument(&$document, &$error = '')
+    public function indexDocument(&$document, &$ierror = '')
     {
         if (! $this->configured())
             return false;
@@ -270,17 +271,17 @@ class SolrService
             return false;
         
         if ($document->getType() == null || $document->getType() == '') {
-            $error = self::ERROR_TYPE_NOT_SET;
+            $ierror = new ItemError(self::ERROR_TYPE_NOT_SET);
             return false;
         }
         
         if ($this->owner == '') {
-            $error = self::ERROR_OWNER_NOT_SET;
+            $ierror = new ItemError(self::ERROR_OWNER_NOT_SET);
             return false;
         }
         
         if (! $this->getClient()) {
-            $error = self::ERROR_SOLR_CONFIG;
+            $ierror = new ItemError(self::ERROR_SOLR_CONFIG);
             return false;
         }
         
@@ -370,13 +371,13 @@ class SolrService
             }
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_EXTRACT_FAILED;
+                $ierror = new ItemError(self::EXCEPTION_EXTRACT_FAILED, $ehe->getStatusMessage());
             else
-                $error = self::EXCEPTION_HTTPEXCEPTION;
+                $ierror = new ItemError(self::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
-            $error = self::EXCEPTION_RUNTIME;
+            $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getStatusMessage());
         } catch (\Solarium\Exception $e) {
-            $error = self::EXCEPTION;
+            $ierror = new ItemError(self::EXCEPTION, $e->getStatusMessage());
         }
         
         $document->failedExtract(true);
