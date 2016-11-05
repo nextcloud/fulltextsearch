@@ -168,10 +168,13 @@ class SearchController extends Controller
         if ($query == null || $query === '')
             return false;
         
-        $suggest = $this->solrService->suggest($query, $error);
+        $ierror = null;
+        $suggest = $this->solrService->suggest($query, $ierror);
+        
+        $err = ($ierror == null) ? 0 : $ierror->getCode();
         
         return array(
-            'status' => $error,
+            'status' => $err,
             'result' => $suggest
         );
     }

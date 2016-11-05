@@ -66,6 +66,12 @@ style('nextant', 'admin');
 					</tr>
 
 					<tr style="height: 30px;">
+						<td class="nextant_admin_left"><?php p($l->t('Timeout (in seconds) :')) ?></td>
+						<td><input type="text" id="solr_timeout" value=""
+							style="width: 100px;"></td>
+					</tr>
+
+					<tr style="height: 30px;">
 						<td></td>
 						<td>
 							<button type="button" id="nextant_apply" style="width: 264px"><?php p($l->t('Test and Save')) ?></button>

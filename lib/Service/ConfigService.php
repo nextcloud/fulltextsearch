@@ -43,6 +43,7 @@ class ConfigService
         'configured' => '0',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
+        'solr_timeout' => 30,
         'display_result' => 1,
         
         'index_delay' => 2,
@@ -141,6 +142,35 @@ class ConfigService
         return ($this->getAppValue('index_' . $type . '_last') < (time() - (3600 * $delay)));
     }
 
+    public function lockIndex($lock)
+    {
+        if ($lock)
+            $this->setAppValue('index_locked', time());
+        else
+            $this->setAppValue('index_locked', '0');
+    }
+
+    /**
+     * returns false if index is not locked or number of seconds since last tick
+     * after 10 minutes, lock is reseted
+     *
+     * @return boolean|number
+     */
+    public function isLockedIndex(&$delay = 0)
+    {
+        $lock = $this->getAppValue('index_locked');
+        if ($lock === '0')
+            return false;
+        
+        $delay = time() - $lock;
+        if ($delay > 600)
+            $this->lockIndex(false);
+        else
+            return true;
+        
+        return false;
+    }
+
     /**
      * Get a value by key
      *
@@ -216,9 +246,12 @@ class ConfigService
         if (! key_exists('host', $t) || ! key_exists('port', $t) || ! key_exists('path', $t))
             return false;
         
+        $timeout = $this->getAppValue('solr_timeout');
+        
         return array(
             'endpoint' => array(
                 'localhost' => array(
+                    'timeout' => ($timeout < 5) ? 5 : $timeout,
                     'host' => $t['host'],
                     'port' => $t['port'],
                     'core' => $config['solr_core'],

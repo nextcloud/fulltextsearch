@@ -28,6 +28,7 @@ namespace OCA\Nextant\Service;
 
 use \OCA\Bookmarks\Controller\Lib\Bookmarks;
 use \OCA\Nextant\Items\ItemDocument;
+use \OCA\Nextant\Items\ItemError;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 class IndexService
@@ -35,13 +36,17 @@ class IndexService
 
     const GETALL_ROWS = 100;
 
-    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ";
+    const REFRESH_LOCK = 10;
 
-    const REFRESH_INFO_SYSTEM = 5;
+    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:12s% %jvm:-30s%      ";
+
+    const REFRESH_INFO_SYSTEM = 10;
 
     private $solrService;
 
     private $solrTools;
+
+    private $solrAdmin;
 
     private $configService;
 
@@ -61,7 +66,11 @@ class IndexService
 
     private $force = false;
 
-    public function __construct($configService, $fileService, $bookmarkService, $solrService, $solrTools, $miscService)
+    private $last_lock = 0;
+
+    private $active_lock = false;
+
+    public function __construct($configService, $fileService, $bookmarkService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
         $this->configService = $configService;
         $this->fileService = $fileService;
@@ -69,6 +78,7 @@ class IndexService
         
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
+        $this->solrAdmin = $solrAdmin;
         
         $this->miscService = $miscService;
         
@@ -103,6 +113,27 @@ class IndexService
             $this->output->writeln($line);
     }
 
+    public function lockActive($active)
+    {
+        $this->active_lock = $active;
+    }
+
+    public function lockIndex($lock)
+    {
+        if (! $this->active_lock)
+            return;
+        
+        if ($lock && $this->last_lock > (time() - self::REFRESH_LOCK))
+            return false;
+        
+        if ($lock)
+            $this->last_lock = time();
+        else
+            $this->last_lock = 0;
+        
+        $this->configService->lockIndex($lock);
+    }
+
     /**
      * Extract whatever is sent ($data)
      *
@@ -111,15 +142,15 @@ class IndexService
      * @param array $data            
      * @return array
      */
-    public function extract($type, $userId, &$data, &$solrDocs, $extract = true, &$error = 0)
+    public function extract($type, $userId, &$data, &$solrDocs, $extract = true, &$ierror = '')
     {
         $this->solrService->setOwner($userId);
         
         if ($solrDocs === null)
-            $solrDocs = $this->getDocuments($type, $userId, 0, $error);
+            $solrDocs = $this->getDocuments($type, $userId, 0, $ierror);
         else 
             if ($solrDocs === false)
-                $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $error);
+                $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $ierror);
         
         $progress = null;
         if ($this->output !== null)
@@ -139,13 +170,16 @@ class IndexService
             if ($this->parent != null)
                 $this->parent->interrupted();
             
+            $this->lockIndex(true);
+            
             if ($progress != null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
                 $progress->setMessage('/', 'job');
                 $progress->setMessage('[scanning]', 'infos');
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
-                    $infoSystem = $this->solrTools->getInfoSystem();
+                    if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
+                        $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
                     $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
                     $this->lastProgressTick = time();
                 }
@@ -179,15 +213,10 @@ class IndexService
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->generateTempDocument($entry);
             
-            $this->solrService->indexDocument($entry, $error);
+            $this->solrService->indexDocument($entry, $ierror);
             
-            if ($entry->isFailedExtract()) {
-                if ($this->output != null && $this->debug) {
-                    $this->output->writeln('');
-                    $this->output->writeln('*** Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error);
-                    $this->output->writeln('');
-                }
-            }
+            if ($entry->isFailedExtract() && ! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
+                return false;
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->destroyTempDocument($entry);
@@ -219,10 +248,10 @@ class IndexService
             $this->extract($type, $userId, $data, $solrDocs, false);
         
         if ($solrDocs === null)
-            $solrDocs = $this->getDocuments($type, $userId, 0, $error);
+            $solrDocs = $this->getDocuments($type, $userId, 0, $ierror);
         else 
             if ($solrDocs === false)
-                $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $error);
+                $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $ierror);
         
         $progress = null;
         if ($this->output !== null)
@@ -242,11 +271,14 @@ class IndexService
             if ($this->parent != null)
                 $this->parent->interrupted();
             
+            $this->lockIndex(true);
+            
             if ($progress !== null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
-                    $infoSystem = $this->solrTools->getInfoSystem();
+                    if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
+                        $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
                     $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
                     $this->lastProgressTick = time();
                 }
@@ -270,15 +302,10 @@ class IndexService
             }
             
             if ($entry->neededUpdate()) {
-                $this->solrTools->updateDocument($entry, $current, true, $error);
+                $this->solrTools->updateDocument($entry, $current, true, $ierror);
                 
-                if ($entry->isFailedUpdate()) {
-                    if ($this->output != null && $this->debug) {
-                        $this->output->writeln('');
-                        $this->output->writeln('*** Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error);
-                        $this->output->writeln('');
-                    }
-                }
+                if ($entry->isFailedUpdate() && ! $this->manageFailure($ierror, $progress, 'Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
+                    return false;
             }
         }
         
@@ -305,6 +332,7 @@ class IndexService
         
         $forceExtract = false;
         foreach ($data as $entry) {
+            $this->lockIndex(true);
             $this->solrTools->removeDocument($entry);
         }
         
@@ -326,7 +354,7 @@ class IndexService
             $this->extract($type, $userId, $data, $solrDocs, false);
         
         if ($solrDocs == null || $solrDocs == '' || ! is_array($solrDocs))
-            $solrDocs = $this->getDocuments($type, $userId);
+            $solrDocs = $this->getDocuments($type, $userId, 0, $ierror);
         
         if (! is_array($solrDocs))
             return false;
@@ -356,6 +384,8 @@ class IndexService
             if ($this->parent != null)
                 $this->parent->interrupted();
             
+            $this->lockIndex(true);
+            
             if (! in_array($doc->getId(), $docIds) && (! in_array($doc->getId(), $deleting))) {
                 array_push($deleting, $doc->getId());
                 $item = ItemDocument::getItem($solrDocs, $doc);
@@ -366,7 +396,8 @@ class IndexService
                 $progress->setMessage('<info>' . $userId . '</info>/' . $doc->getType());
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
-                    $infoSystem = $this->solrTools->getInfoSystem();
+                    if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
+                        $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
                     $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
                     $this->lastProgressTick = time();
                 }
@@ -402,6 +433,8 @@ class IndexService
                 if ($this->parent != null)
                     $this->parent->interrupted();
                 
+                $this->lockIndex(true);
+                
                 $del = new ItemDocument($type, $docId);
                 $this->solrTools->removeDocument($del);
                 
@@ -414,7 +447,8 @@ class IndexService
                 
                 if ($progress != null) {
                     if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
-                        $infoSystem = $this->solrTools->getInfoSystem();
+                        if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
+                            $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
                         $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
                         $this->lastProgressTick = time();
                     }
@@ -438,10 +472,10 @@ class IndexService
      * @param string $userId            
      * @param number $page            
      * @param boolean $lastpage            
-     * @param number $error            
+     * @param ItemDocument $ierror            
      * @return boolean
      */
-    public function getDocuments($type = '', $userId = '', $fileId = 0, &$error = 0)
+    public function getDocuments($type = '', $userId = '', $fileId = 0, &$ierror = '')
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -507,6 +541,8 @@ class IndexService
                     if ($this->parent != null)
                         $this->parent->interrupted();
                     
+                    $this->lockIndex(true);
+                    
                     $doc = ItemDocument::fromCompleteId($document->id);
                     $doc->setOwner($document->nextant_owner);
                     $doc->setPath($document->nextant_path);
@@ -526,7 +562,8 @@ class IndexService
                     if ($progress != null) {
                         
                         if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
-                            $infoSystem = $this->solrTools->getInfoSystem();
+                            if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
+                                $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
                             $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
                             $this->lastProgressTick = time();
                         }
@@ -549,15 +586,58 @@ class IndexService
             
             return $data;
         } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_SOLRURI;
-            else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
+        }
+        return false;
+    }
+
+    private function manageFailure($ierror, $progress = null, $message = '')
+    {
+        if ($ierror == null || $ierror === '')
+            $ierror = new ItemError();
+        
+        if ($this->output != null && $this->debug) {
+            $this->output->writeln('');
+            $this->output->writeln('');
+            if ($ierror->getCode() > 0)
+                $this->output->writeln('*** Error #' . $ierror->getCode() . ' (' . $ierror->getMessage() . ')');
+            $this->output->writeln('*** ' . $message);
+            
+            if ($ierror->getCode() == SolrService::EXCEPTION_HTTPEXCEPTION)
+                $this->output->writeln('Note: we will wait here for few seconds and check if Solr is still running');
+            $this->output->writeln('');
+            $this->output->writeln('');
         }
         
-        return false;
+        if ($ierror->getCode() == SolrService::EXCEPTION_HTTPEXCEPTION) {
+            if ($progress != null) {
+                $progress->setMessage('|', 'job');
+                $progress->setMessage('[standby]', 'infos');
+                $progress->display();
+            }
+            sleep(30);
+            
+            if (! $this->solrAdmin->ping()) {
+                if ($this->output != null) {
+                    $this->output->writeln('');
+                    $this->output->writeln('');
+                    $this->output->writeln('Is Solr Up and Running ?');
+                    $this->output->writeln('');
+                }
+                
+                if ($this->parent != null)
+                    $this->parent->end();
+                else
+                    exit();
+                return false;
+            }
+        }
+        
+        return true;
     }
 }
 

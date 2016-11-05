@@ -74,7 +74,7 @@ class Application extends App
         });
         
         $container->registerService('IndexService', function ($c) {
-            return new IndexService($c->query('ConfigService'), $c->query('FileService'), $c->query('BookmarkService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('MiscService'));
+            return new IndexService($c->query('ConfigService'), $c->query('FileService'), $c->query('BookmarkService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
         });
         
         $container->registerService('QueueService', function ($c) {

@@ -61,19 +61,17 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         if (! $this->solrService->configured(false))
             return;
         
-        $solr_locked = $this->configService->getAppValue('index_locked');
-        if ($solr_locked > (time() - (3600 * 23))) {
-            // $this->miscService->log('The background index detected that your solr is locked by a running script. If it is not the case, you should start indexing manually using ./occ nextant:index --force');
+        if ($this->configService->isLockedIndex())
             return;
-        }
         
-        $this->configService->setAppValue('index_locked', time());
+        $this->indexService->lockActive(true);            
+        $this->configService->lockIndex(true);
         
         $this->liveIndex();
         $this->cronIndex();
         
-        $this->configService->setAppValue('index_locked', '0');
-        // if ($this->config)
+        $this->configService->lockIndex(false);
+        
         return;
     }
 
