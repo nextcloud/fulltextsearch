@@ -55,6 +55,8 @@ class SolrService
     // can't extract - check solr configuration for the solr-cell plugin
     const EXCEPTION_EXTRACT_FAILED = 41;
 
+    const EXCEPTION_UPDATE_FAILED = 51;
+
     const EXCEPTION_UPDATE_FIELD_FAILED = 61;
 
     const EXCEPTION_UPDATE_QUERY_FAILED = 71;
@@ -68,6 +70,8 @@ class SolrService
     const EXCEPTION_REMOVE_FAILED = 101;
 
     const EXCEPTION_OPTIMIZE_FAILED = 121;
+
+    const EXCEPTION_SUGGEST_FAILED = 151;
     
     // undocumented exception
     const EXCEPTION = 9;
@@ -385,7 +389,7 @@ class SolrService
         return false;
     }
 
-    public function search($string, $options = array(), &$error = '')
+    public function search($string, $options = array(), &$ierror = '')
     {
         if (! $this->configured())
             return false;
@@ -407,12 +411,12 @@ class SolrService
             $query = $client->createSelect();
             
             $helper = $query->getHelper();
-            $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $helper, $error);
+            $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $helper, $ierror);
             if ($ownerQuery === false)
                 return false;
             
             if ($ownerQuery == '') {
-                $error = self::ERROR_TOOWIDE_SEARCH;
+                $ierror = new ItemError(self::ERROR_TOOWIDE_SEARCH);
                 return false;
             }
             
@@ -481,20 +485,20 @@ class SolrService
             return $return;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_SEARCH_FAILED;
+                $ierror = new ItemError(self::EXCEPTION_SEARCH_FAILED, $ehe->getStatusMessage());
             else
-                $error = self::EXCEPTION_HTTPEXCEPTION;
+                $ierror = new ItemError(self::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getStatusMessage());
         } catch (\Solarium\Exception $e) {
-            $error = self::EXCEPTION;
+            $ierror = new ItemError(self::EXCEPTION, $e->getStatusMessage());
         }
         
         return false;
     }
 
-    public function suggest($string, &$error = 0)
+    public function suggest($string, &$ierror = '')
     {
-        $error = 0;
-        
         if (! $this->configured())
             return false;
         
@@ -531,22 +535,24 @@ class SolrService
             return $suggestions;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = self::EXCEPTION_SUGGEST_FAILED;
+                $ierror = new ItemError(self::EXCEPTION_SUGGEST_FAILED, $ehe->getStatusMessage());
             else
-                $error = self::EXCEPTION_HTTPEXCEPTION;
+                $ierror = new ItemError(self::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getStatusMessage());
         } catch (\Solarium\Exception $e) {
-            $error = self::EXCEPTION;
+            $ierror = new ItemError(self::EXCEPTION, $e->getStatusMessage());
         }
         
         return false;
     }
 
-    private function generateOwnerQuery($type, $helper, &$error)
+    private function generateOwnerQuery($type, $helper, &$ierror)
     {
         $ownerQuery = '';
         if ($type & self::SEARCH_OWNER) {
             if ($this->owner == '') {
-                $error = self::ERROR_OWNER_NOT_SET;
+                $ierror = new ItemError(self::ERROR_OWNER_NOT_SET);
                 return false;
             }
             
@@ -555,7 +561,7 @@ class SolrService
         
         if ($type & self::SEARCH_SHARED) {
             if ($this->owner == '') {
-                $error = self::ERROR_OWNER_NOT_SET;
+                $ierror = new ItemError(self::ERROR_OWNER_NOT_SET);
                 return false;
             }
             $ownerQuery .= (($ownerQuery != '') ? 'OR ' : '') . 'nextant_share:' . $helper->escapePhrase($this->owner) . ' ';

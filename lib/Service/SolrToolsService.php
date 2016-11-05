@@ -28,6 +28,7 @@ namespace OCA\Nextant\Service;
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\MiscService;
 use \OCA\Nextant\Items\ItemDocument;
+use \OCA\Nextant\Items\ItemError;
 
 /**
  *
@@ -38,13 +39,12 @@ use \OCA\Nextant\Items\ItemDocument;
  */
 class SolrToolsService
 {
-
-//     const UPDATE_MAXIMUM_QUERYTIME = 2000;
-
-//     const UPDATE_MAXIMUM_FILEPROCESS = 15;
-
-//     const UPDATE_CHUNK_SIZE = 5;
-
+    
+    // const UPDATE_MAXIMUM_QUERYTIME = 2000;
+    
+    // const UPDATE_MAXIMUM_FILEPROCESS = 15;
+    
+    // const UPDATE_CHUNK_SIZE = 5;
     private $solrService;
 
     private $configService;
@@ -83,7 +83,7 @@ class SolrToolsService
      * @param number $error            
      * @return boolean|Solarium\Core\Query\Result
      */
-    public function optimizeSolrIndex(&$error = 0)
+    public function optimizeSolrIndex(&$ierror = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -97,12 +97,11 @@ class SolrToolsService
             
             return $result;
         } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_OPTIMIZE_FAILED;
-            else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
         }
         
         return false;
@@ -208,7 +207,7 @@ class SolrToolsService
                 $ierror = new ItemError(SolrService::EXCEPTION_UPDATE_QUERY_FAILED);
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $ierror = new ItemError(SolrService::EXCEPTION_EXTRACT_FAILED, $ehe->getStatusMessage());
+                $ierror = new ItemError(SolrService::EXCEPTION_UPDATE_FAILED, $ehe->getStatusMessage());
             else
                 $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
@@ -229,7 +228,7 @@ class SolrToolsService
      * @param number $error            
      * @return boolean
      */
-    public function removeDocument(&$doc)
+    public function removeDocument(&$doc, $ierror)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -251,12 +250,11 @@ class SolrToolsService
                 return true;
             }
         } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_REMOVE_FAILED;
-            else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
         }
         
         return false;
@@ -270,7 +268,7 @@ class SolrToolsService
      * @param number $error            
      * @return boolean
      */
-    public function isDocumentUpToDate(&$document, $solr = null, &$error = 0)
+    public function isDocumentUpToDate(&$document, $solr = null, &$ierror = 0)
     {
         if (intval($document->getId()) == 0)
             return false;
@@ -309,12 +307,11 @@ class SolrToolsService
                 }
             }
         } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_SEARCH_FAILED;
-            else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
         }
         
         return false;
@@ -326,7 +323,7 @@ class SolrToolsService
      * @param number $error            
      * @return boolean|Solarium\Core\Query\Result
      */
-    public function getInfoSystem(&$error = 0)
+    public function getInfoSystem(&$ierror = '')
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -347,22 +344,25 @@ class SolrToolsService
             
             return $result;
         } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_SOLRURI;
-            else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
         }
+        
+        return false;
     }
 
     /**
      * Count document on Solr Core
      *
-     * @param number $error            
+     * @param number $type            
+     * @param number $userId            
+     * @param ItemError $ierror            
      * @return boolean
      */
-    public function count($type = '', $userId = '', &$error = 0)
+    public function count($type = '', $userId = '', &$ierror = '')
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
@@ -385,12 +385,11 @@ class SolrToolsService
             
             return $resultset->getNumFound();
         } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_SOLRURI;
-            else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getStatusMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getStatusMessage());
         }
         
         return false;

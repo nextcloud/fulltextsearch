@@ -103,7 +103,7 @@ class SettingsController extends Controller
             'index_files_external' => $this->configService->getAppValue('index_files_external'),
             'index_files_encrypted' => $this->configService->getAppValue('index_files_encrypted'),
             'display_result' => $this->configService->getAppValue('display_result'),
-            'current_docs' => $this->solrTools->count('files', $error),
+            'current_docs' => $this->solrTools->count('files'),
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
             'index_bookmarks' => $this->configService->getAppValue('index_bookmarks'),
             'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
@@ -282,10 +282,10 @@ class SettingsController extends Controller
         ));
         $final->deleted(false);
         
-        $this->solrTools->updateDocument($final, $source, true, $error);
+        $this->solrTools->updateDocument($final, $source, true, $ierror);
         
         if (! $source->isUpdated()) {
-            $message = 'Error Updating field (Error #' . $error . ')';
+            $message = 'Error Updating field (Error #' . $error->getCode() . ')';
             return false;
         }
         
@@ -297,7 +297,7 @@ class SettingsController extends Controller
     {
         $keyword = 'LICENSE';
         $this->solrService->setOwner('_nextant_test');
-        if ($result = $this->solrService->search($keyword, array(), $error)) {
+        if ($result = $this->solrService->search($keyword, array(), $ierror)) {
             if (sizeof($result) > 0) {
                 
                 foreach ($result as $doc) {
@@ -315,7 +315,7 @@ class SettingsController extends Controller
             return false;
         }
         
-        $message = 'Search failed. Please check the configuration of your Solr server (Error #' . $error . ')';
+        $message = 'Search failed. Please check the configuration of your Solr server (Error #' . $ierror->getCode() . ')';
         return false;
     }
 
