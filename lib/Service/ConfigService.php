@@ -246,10 +246,12 @@ class ConfigService
         if (! key_exists('host', $t) || ! key_exists('port', $t) || ! key_exists('path', $t))
             return false;
         
+        $timeout = $this->getAppValue('solr_timeout');
+        
         return array(
             'endpoint' => array(
                 'localhost' => array(
-                    'timeout' => $this->getAppValue('solr_timeout'),
+                    'timeout' => ($timeout < 5) ? 5 : $timeout,
                     'host' => $t['host'],
                     'port' => $t['port'],
                     'core' => $config['solr_core'],

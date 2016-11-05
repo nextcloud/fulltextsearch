@@ -335,6 +335,10 @@ class SettingsController extends Controller
     private function save(&$message)
     {
         if (! is_null($this->solr_url) && ! is_null($this->solr_core) && ! is_null($this->solr_timeout)) {
+            
+            if ($this->solr_timeout < 5)
+                $this->solr_timeout = 5;
+            
             $this->configService->setAppValue('solr_url', $this->solr_url);
             $this->configService->setAppValue('solr_core', $this->solr_core);
             $this->configService->setAppValue('solr_timeout', $this->solr_timeout);
