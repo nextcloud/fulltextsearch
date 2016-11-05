@@ -94,6 +94,7 @@ class QueueService
             return false;
         
         switch ($item->getType()) {
+            
             case FilesEvents::FILE_UPDATE:
                 array_push($options, 'forceshared');
             

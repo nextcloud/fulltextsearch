@@ -95,14 +95,21 @@ class Index extends Base
     public function interrupted()
     {
         if ($this->hasBeenInterrupted()) {
-            $this->configService->lockIndex(false);
-            if (key_exists('files', $this->currentIndexStatus))
-                $this->configService->needIndexFiles($this->currentIndexStatus['files']);
-            if (key_exists('bookmarks', $this->currentIndexStatus))
-                $this->configService->needIndexBookmarks($this->currentIndexStatus['bookmarks']);
-            
+            $this->end(false);
             throw new \Exception('ctrl-c');
         }
+    }
+
+    public function end($exit = true)
+    {
+        $this->configService->lockIndex(false);
+        if (key_exists('files', $this->currentIndexStatus))
+            $this->configService->needIndexFiles($this->currentIndexStatus['files']);
+        if (key_exists('bookmarks', $this->currentIndexStatus))
+            $this->configService->needIndexBookmarks($this->currentIndexStatus['bookmarks']);
+        
+        if ($exit)
+            exit();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -189,8 +196,11 @@ class Index extends Base
             $this->indexesBookmarks($input, $output);
             $this->configService->timeIndex('bookmarks');
         }
+        
         $this->configService->lockIndex(false);
         $this->configService->setAppValue('configured', '1');
+        
+        $output->writeln('');
     }
 
     /**

@@ -329,20 +329,29 @@ class SolrToolsService
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
             return false;
         
-        $client = $this->solrService->getAdminClient();
-        
-        $query = $client->createSelect();
-        $request = $client->createRequest($query);
-        
-        $request->setHandler('admin/info/system');
-        
-        $response = $client->executeRequest($request);
-        if ($response->getStatusCode() != 200)
-            return false;
-        
-        $result = json_decode($response->getBody());
-        
-        return $result;
+        try {
+            $client = $this->solrService->getAdminClient();
+            
+            $query = $client->createSelect();
+            $request = $client->createRequest($query);
+            
+            $request->setHandler('admin/info/system');
+            
+            $response = $client->executeRequest($request);
+            if ($response->getStatusCode() != 200)
+                return false;
+            
+            $result = json_decode($response->getBody());
+            
+            return $result;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            if ($ehe->getStatusMessage() == 'OK')
+                $error = SolrService::EXCEPTION_SOLRURI;
+            else
+                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+        } catch (\Solarium\Exception $e) {
+            $error = SolrService::EXCEPTION;
+        }
     }
 
     /**

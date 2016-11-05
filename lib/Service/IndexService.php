@@ -45,6 +45,8 @@ class IndexService
 
     private $solrTools;
 
+    private $solrAdmin;
+
     private $configService;
 
     private $fileService;
@@ -67,7 +69,7 @@ class IndexService
 
     private $active_lock = false;
 
-    public function __construct($configService, $fileService, $bookmarkService, $solrService, $solrTools, $miscService)
+    public function __construct($configService, $fileService, $bookmarkService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
         $this->configService = $configService;
         $this->fileService = $fileService;
@@ -75,6 +77,7 @@ class IndexService
         
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
+        $this->solrAdmin = $solrAdmin;
         
         $this->miscService = $miscService;
         
@@ -210,13 +213,8 @@ class IndexService
             
             $this->solrService->indexDocument($entry, $error);
             
-            if ($entry->isFailedExtract()) {
-                if ($this->output != null && $this->debug) {
-                    $this->output->writeln('');
-                    $this->output->writeln('*** Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error);
-                    $this->output->writeln('');
-                }
-            }
+            if ($entry->isFailedExtract($error) && ! $this->manageFailure($error, $progress, '*** Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error))
+                return false;
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->destroyTempDocument($entry);
@@ -303,13 +301,8 @@ class IndexService
             if ($entry->neededUpdate()) {
                 $this->solrTools->updateDocument($entry, $current, true, $error);
                 
-                if ($entry->isFailedUpdate()) {
-                    if ($this->output != null && $this->debug) {
-                        $this->output->writeln('');
-                        $this->output->writeln('*** Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error);
-                        $this->output->writeln('');
-                    }
-                }
+                if ($entry->isFailedUpdate($error) && ! $this->manageFailure($error, $progress, '*** Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ') -- Error #' . $error))
+                    return false;
             }
         }
         
@@ -596,6 +589,42 @@ class IndexService
         }
         
         return false;
+    }
+
+    private function manageFailure($error, $progress = null, $message = '')
+    {
+        if ($this->output != null && $this->debug) {
+            $this->output->writeln('');
+            $this->output->writeln('');
+            $this->output->writeln($message);
+            if ($error == SolrService::EXCEPTION_HTTPEXCEPTION)
+                $this->output->writeln('Note: we will wait here for few seconds and check if Solr is still running');
+            $this->output->writeln('');
+            $this->output->writeln('');
+        }
+        
+        if ($error == SolrService::EXCEPTION_HTTPEXCEPTION) {
+            if ($progress != null) {
+                $progress->setMessage('|', 'job');
+                $progress->setMessage('[standby]', 'infos');
+                $progress->display();
+            }
+            sleep(30);
+            
+            if (! $this->solrAdmin->ping()) {
+                if ($this->output != null) {
+                    $this->output->writeln('');
+                    $this->output->writeln('');
+                    $this->output->writeln('Is Solr Up and Running ?');
+                    $this->output->writeln('');
+                    $this->parent->end();
+                }
+                
+                return false;
+            }
+        }
+        
+        return true;
     }
 }
 
