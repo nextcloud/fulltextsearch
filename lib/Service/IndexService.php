@@ -35,7 +35,9 @@ class IndexService
 
     const GETALL_ROWS = 100;
 
-    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:1s% %jvm:-30s%      ";
+    const REFRESH_LOCK = 10;
+
+    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:12s% %jvm:-30s%      ";
 
     const REFRESH_INFO_SYSTEM = 5;
 
@@ -60,6 +62,10 @@ class IndexService
     private $debug = false;
 
     private $force = false;
+
+    private $last_lock = 0;
+
+    private $active_lock = false;
 
     public function __construct($configService, $fileService, $bookmarkService, $solrService, $solrTools, $miscService)
     {
@@ -103,6 +109,27 @@ class IndexService
             $this->output->writeln($line);
     }
 
+    public function lockActive($active)
+    {
+        $this->active_lock = $active;
+    }
+
+    public function lockIndex($lock)
+    {
+        if (! $this->active_lock)
+            return;
+        
+        if ($lock && $this->last_lock > (time() - self::REFRESH_LOCK))
+            return false;
+        
+        if ($lock)
+            $this->last_lock = time();
+        else
+            $this->last_lock = 0;
+        
+        $this->configService->lockIndex($lock);
+    }
+
     /**
      * Extract whatever is sent ($data)
      *
@@ -138,6 +165,8 @@ class IndexService
             
             if ($this->parent != null)
                 $this->parent->interrupted();
+            
+            $this->lockIndex(true);
             
             if ($progress != null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
@@ -242,6 +271,8 @@ class IndexService
             if ($this->parent != null)
                 $this->parent->interrupted();
             
+            $this->lockIndex(true);
+            
             if ($progress !== null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
                 
@@ -305,6 +336,7 @@ class IndexService
         
         $forceExtract = false;
         foreach ($data as $entry) {
+            $this->lockIndex(true);
             $this->solrTools->removeDocument($entry);
         }
         
@@ -356,6 +388,8 @@ class IndexService
             if ($this->parent != null)
                 $this->parent->interrupted();
             
+            $this->lockIndex(true);
+            
             if (! in_array($doc->getId(), $docIds) && (! in_array($doc->getId(), $deleting))) {
                 array_push($deleting, $doc->getId());
                 $item = ItemDocument::getItem($solrDocs, $doc);
@@ -401,6 +435,8 @@ class IndexService
                 
                 if ($this->parent != null)
                     $this->parent->interrupted();
+                
+                $this->lockIndex(true);
                 
                 $del = new ItemDocument($type, $docId);
                 $this->solrTools->removeDocument($del);
@@ -506,6 +542,8 @@ class IndexService
                     
                     if ($this->parent != null)
                         $this->parent->interrupted();
+                    
+                    $this->lockIndex(true);
                     
                     $doc = ItemDocument::fromCompleteId($document->id);
                     $doc->setOwner($document->nextant_owner);

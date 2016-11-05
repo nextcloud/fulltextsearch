@@ -141,6 +141,35 @@ class ConfigService
         return ($this->getAppValue('index_' . $type . '_last') < (time() - (3600 * $delay)));
     }
 
+    public function lockIndex($lock)
+    {
+        if ($lock)
+            $this->setAppValue('index_locked', time());
+        else
+            $this->setAppValue('index_locked', '0');
+    }
+
+    /**
+     * returns false if index is not locked or number of seconds since last tick
+     * after 10 minutes, lock is reseted
+     *
+     * @return boolean|number
+     */
+    public function isLockedIndex(&$delay = 0)
+    {
+        $lock = $this->getAppValue('index_locked');
+        if ($lock === '0')
+            return false;
+        
+        $delay = time() - $lock;
+        if ($delay > 600)
+            $this->lockIndex(false);
+        else
+            return true;
+        
+        return false;
+    }
+
     /**
      * Get a value by key
      *

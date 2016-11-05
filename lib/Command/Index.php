@@ -95,7 +95,7 @@ class Index extends Base
     public function interrupted()
     {
         if ($this->hasBeenInterrupted()) {
-            $this->configService->setAppValue('index_locked', '0');
+            $this->configService->lockIndex(false);
             if (key_exists('files', $this->currentIndexStatus))
                 $this->configService->needIndexFiles($this->currentIndexStatus['files']);
             if (key_exists('bookmarks', $this->currentIndexStatus))
@@ -128,7 +128,7 @@ class Index extends Base
         if ($input->getOption('background')) {
             if ($input->getOption('unlock')) {
                 $this->configService->setAppValue('configured', '1');
-                $this->configService->setAppValue('index_locked', '0');
+                $this->configService->lockIndex(false);
             }
             $this->configService->needIndexFiles(true);
             $this->configService->needIndexBookmarks(true);
@@ -137,19 +137,25 @@ class Index extends Base
         }
         
         if ($input->getOption('unlock')) {
-            $this->configService->setAppValue('index_locked', '0');
+            $this->configService->lockIndex(false);
             $output->writeln('Nextant is not locked anymore.');
             return;
         }
         
-        $solr_locked = $this->configService->getAppValue('index_locked');
-        if (! $input->getOption('unlock') && ($solr_locked > (time() - (3600 * 24)))) {
-            $output->writeln('Your solr is locked by a running script like an index command or background jobs (cron)');
-            $output->writeln('You can still use ./occ nextant:index --unlock');
+        $delay = 0;
+        if ($this->configService->isLockedIndex($delay)) {
+            $output->writeln('');
+            $output->writeln('nextant is currently locked by another indexing script (command line or background job)');
+            $output->writeln('last tick from this script ' . $delay . ' second(s) ago');
+            $output->writeln('');
+            $output->writeln('If you think the other script exited improperly, you can use <info>./occ nextant:index --unlock</info> to unlock');
+            $output->writeln('');
+            
             return;
         }
         
-        $this->configService->setAppValue('index_locked', time());
+        $this->indexService->lockActive(true);
+        $this->configService->lockIndex(true);
         
         $filtered = false;
         if ($input->getOption('bookmarks') || $input->getOption('files') || $input->getOption('files_extract') || $input->getOption('files_update'))
@@ -183,7 +189,7 @@ class Index extends Base
             $this->indexesBookmarks($input, $output);
             $this->configService->timeIndex('bookmarks');
         }
-        $this->configService->setAppValue('index_locked', '0');
+        $this->configService->lockIndex(false);
         $this->configService->setAppValue('configured', '1');
     }
 
@@ -331,6 +337,11 @@ class Index extends Base
         
         $users = $this->getUsers($input->getOption('user'));
         
+        $indexed = 0;
+        $extracted = 0;
+        $processed = 0;
+        $removed = 0;
+        $failed = 0;
         foreach ($users as $user) {
             $this->interrupted();
             
@@ -342,10 +353,34 @@ class Index extends Base
             $solrDocs = null;
             $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user, $bm, $solrDocs);
             $this->indexService->removeOrphans(ItemDocument::TYPE_BOOKMARK, $user, $bm, $solrDocs);
+            
+            foreach ($files as $doc) {
+                if ($doc->isIndexed())
+                    $indexed ++;
+                if ($doc->isExtracted())
+                    $extracted ++;
+                if ($doc->isProcessed())
+                    $processed ++;
+                if ($doc->isFailedExtract())
+                    $failed ++;
+            }
+            
+            if (is_array($solrDocs)) {
+                foreach ($solrDocs as $doc) {
+                    if ($doc->isRemoved())
+                        $removed ++;
+                }
+            }
+            
             $output->writeln('');
         }
         
-        $output->writeln('');
+        $output->writeln('  ' . $processed . ' bookmark(s) processed ; ' . $removed . ' orphan(s) removed');
+        $output->writeln('  ' . $indexed . ' document indexed ; ' . $extracted . ' fully extracted');
+        
+        if ($failed > 0)
+            $output->writeln('  ' . $failed . ' file(s) were not processed (failure)');
+        
         return;
     }
 
