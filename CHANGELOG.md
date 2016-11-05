@@ -1,3 +1,8 @@
+*v0.6.4**
+- better error and debug information
+- bugfixes
+ 
+
 **v0.6.3**
 - search within link shared documents, both public and private (w/ key)
 - search within federated documents
