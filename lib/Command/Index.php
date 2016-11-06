@@ -52,6 +52,8 @@ class Index extends Base
 
     private $solrService;
 
+    private $solrAdmin;
+
     private $configService;
 
     private $fileService;
@@ -62,7 +64,7 @@ class Index extends Base
 
     private $currentIndexStatus = array();
 
-    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $queueService, $solrService, $configService, $fileService, $bookmarkService, $miscService)
+    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $queueService, $solrService, $solrAdmin, $configService, $fileService, $bookmarkService, $miscService)
     {
         parent::__construct();
         $this->userManager = $userManager;
@@ -70,6 +72,7 @@ class Index extends Base
         $this->indexService = $indexService;
         $this->queueService = $queueService;
         $this->solrService = $solrService;
+        $this->solrAdmin = $solrAdmin;
         $this->configService = $configService;
         $this->fileService = $fileService;
         $this->bookmarkService = $bookmarkService;
@@ -159,6 +162,11 @@ class Index extends Base
             $output->writeln('');
             
             return;
+        }
+        
+        if (! ($this->solrAdmin->ping())) {
+            $output->writeln('*** Solr seems down.');
+            return false;
         }
         
         $this->indexService->lockActive(true);
@@ -364,7 +372,7 @@ class Index extends Base
             $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user, $bm, $solrDocs);
             $this->indexService->removeOrphans(ItemDocument::TYPE_BOOKMARK, $user, $bm, $solrDocs);
             
-            foreach ($files as $doc) {
+            foreach ($bm as $doc) {
                 if ($doc->isIndexed())
                     $indexed ++;
                 if ($doc->isExtracted())
