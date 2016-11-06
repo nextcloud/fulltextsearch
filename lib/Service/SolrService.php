@@ -176,13 +176,19 @@ class SolrService
     }
 
     public static function extractableFile($mimetype, $path = '')
-    {
-        switch (FileService::getBaseTypeFromMime($mimetype)) {
-            case 'text':
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
-        }
+    {      
+//         switch (FileService::getBaseTypeFromMime($mimetype)) {
+//             case 'text':
+//                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+//         }
         
         switch ($mimetype) {
+            case 'text/plain':
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                
+//             case 'text/x-java-source':
+//                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                    
             case 'image/jpeg':
                 return \OCP\Util::imagePath('core', 'filetypes/image.svg');
             
