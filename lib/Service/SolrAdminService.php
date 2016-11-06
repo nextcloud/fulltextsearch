@@ -28,6 +28,7 @@ namespace OCA\Nextant\Service;
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\ConfigService;
 use \OCA\Nextant\Service\MiscService;
+use \OCA\Nextant\Items\ItemError;
 use Solarium\Core\Client\Request;
 use Solarium\Solarium;
 
@@ -66,13 +67,17 @@ class SolrAdminService
      * Check the Schema of the Solr Core.
      *
      * @param boolean $fix            
-     * @param number $error            
+     * @param ItemError $ierror            
      * @return boolean
      */
-    public function checkSchema($fix = false, &$error = 0)
+    public function checkSchema($fix = false, &$ierror = '')
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        $ierror = new ItemError();
+        
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         $client = $this->solrService->getClient();
         
@@ -250,18 +255,25 @@ class SolrAdminService
         while (true) {
             foreach ($fields as $field) {
                 $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\' : ', false);
-                if (self::checkFieldProperty($this->miscService, $client, $field, $curr))
+                if (self::checkFieldProperty($this->miscService, $client, $field, $curr, $ierror))
                     $this->solrService->message('<info>ok</info>');
                 else {
-                    $this->solrService->message('<error>fail</error>');
+                    if ($ierror->getCode() == 0)
+                        $this->solrService->message('<error>fail</error>');
+                    else
+                        return false;
                     
                     if ($fix) {
                         $changed = true;
                         $this->solrService->message('   -> Fixing ' . $field['type'] . ' \'' . $field['data']['name'] . '\'');
-                        if ($curr)
-                            self::modifyField($client, $field);
-                        else
-                            self::createField($client, $field);
+                        
+                        if ($curr) {
+                            if (! self::modifyField($client, $field, $ierror))
+                                return false;
+                        } else {
+                            if (! self::createField($client, $field, $ierror))
+                                return false;
+                        }
                     } else
                         $failed = true;
                 }
@@ -283,13 +295,15 @@ class SolrAdminService
     /**
      * Ping and test connection to the Solr Core
      *
-     * @param number $error            
+     * @param ItemError $ierror            
      * @return boolean
      */
-    public function ping(&$error = 0)
+    public function ping(&$ierror = 0)
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         $client = $this->solrService->getClient();
         $ping = $client->createPing();
@@ -299,11 +313,13 @@ class SolrAdminService
             return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_SOLRURI;
+                $ierror = new ItemError(SolrService::EXCEPTION_SOLRURI, $ehe->getStatusMessage());
             else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+                $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
         
         return false;
@@ -317,9 +333,9 @@ class SolrAdminService
      * @param array $property            
      * @return boolean
      */
-    private static function checkFieldProperty($misc, \Solarium\Client $client, $field, &$property)
+    private static function checkFieldProperty($misc, \Solarium\Client $client, $field, &$property, &$ierror)
     {
-        $property = self::getFieldProperty($client, $field['type'], $field['data']['name']);
+        $property = self::getFieldProperty($client, $field['type'], $field['data']['name'], $ierror);
         if (! $property)
             return false;
         
@@ -359,7 +375,7 @@ class SolrAdminService
      * @param string $fieldName            
      * @return boolean|mixed
      */
-    private static function getFieldProperty(\Solarium\Client $client, $fieldType, $fieldName)
+    private static function getFieldProperty(\Solarium\Client $client, $fieldType, $fieldName, &$ierror = '')
     {
         $url = '';
         if ($fieldType == 'field')
@@ -371,27 +387,36 @@ class SolrAdminService
         if ($url == '')
             return false;
         
-        $query = $client->createSelect();
-        $request = $client->createRequest($query);
-        
-        $request->setHandler($url . $fieldName);
-        
-        $response = $client->executeRequest($request);
-        if ($response->getStatusCode() != 200)
-            return false;
-        
-        $result = json_decode($response->getBody());
-        foreach ($result as $data) {
-            foreach ($data as $k => $v) {
-                if ($v instanceof stdClass)
-                    $v = (array) $v;
-                $property[$k] = $v;
+        try {
+            $query = $client->createSelect();
+            $request = $client->createRequest($query);
+            
+            $request->setHandler($url . $fieldName);
+            
+            $response = $client->executeRequest($request);
+            if ($response->getStatusCode() != 200)
+                return false;
+            
+            $result = json_decode($response->getBody());
+            foreach ($result as $data) {
+                foreach ($data as $k => $v) {
+                    if ($v instanceof stdClass)
+                        $v = (array) $v;
+                    $property[$k] = $v;
+                }
             }
+            
+            // lazy one-liner method : convert stdClass -> array()
+            $property = json_decode(json_encode($property), true);
+            return $property;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
+        } catch (\Solarium\Exception $e) {
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
-        
-        // lazy one-liner method : convert stdClass -> array()
-        $property = json_decode(json_encode($property), true);
-        return $property;
+        return false;
     }
 
     /**
@@ -400,12 +425,12 @@ class SolrAdminService
      * @param \Solarium\Client $client            
      * @param array $field            
      */
-    private static function createField(\Solarium\Client $client, $field)
+    private static function createField(\Solarium\Client $client, $field, &$ierror)
     {
         $data = array(
             'add-' . $field['type'] => $field['data']
         );
-        return self::solariumPostSchemaRequest($client, $data);
+        return self::solariumPostSchemaRequest($client, $data, $ierror);
     }
 
     /**
@@ -414,12 +439,12 @@ class SolrAdminService
      * @param \Solarium\Client $client            
      * @param array $field            
      */
-    private static function modifyField(\Solarium\Client $client, $field)
+    private static function modifyField(\Solarium\Client $client, $field, &$ierror)
     {
         $data = array(
             'replace-' . $field['type'] => $field['data']
         );
-        return self::solariumPostSchemaRequest($client, $data);
+        return self::solariumPostSchemaRequest($client, $data, $ierror);
     }
 
     /**
@@ -428,14 +453,14 @@ class SolrAdminService
      * @param \Solarium\Client $client            
      * @param array $field            
      */
-    private static function deleteField(\Solarium\Client $client, $field)
+    private static function deleteField(\Solarium\Client $client, $field, &$ierror)
     {
         $data = array(
             'delete-' . $field['type'] => array(
                 'name' => $field['data']['name']
             )
         );
-        return self::solariumPostSchemaRequest($client, $data);
+        return self::solariumPostSchemaRequest($client, $data, $ierror);
     }
 
     /**
@@ -445,7 +470,7 @@ class SolrAdminService
      * @param array $data            
      * @return boolean
      */
-    private static function solariumPostSchemaRequest(\Solarium\Client $client, $data)
+    private static function solariumPostSchemaRequest(\Solarium\Client $client, $data, &$ierror = '')
     {
         try {
             $query = $client->createSelect();
@@ -457,31 +482,37 @@ class SolrAdminService
             $request->setRawData(json_encode($data));
             $response = $client->executeRequest($request);
             
-            if ($response->getStatusCode() != 200)
+            if ($response->getStatusCode() != 200) {
+                $ierror = new ItemError(SolrService::EXCEPTION_SOLRURI, 'Status Code != 200');
                 return false;
-            
+            }
             return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_SOLRURI;
+                $ierror = new ItemError(SolrService::EXCEPTION_SOLRURI, $ehe->getStatusMessage());
             else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+                $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
+        
         return false;
     }
 
     /**
      * reset Solr Core
      *
-     * @param number $error            
+     * @param ITemError $ierror            
      * @return boolean
      */
-    public function clear(&$error = 0)
+    public function clear(&$ierror = 0)
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         $client = $this->solrService->getClient();
         
@@ -495,11 +526,13 @@ class SolrAdminService
             return true;
         } catch (\Solarium\Exception\HttpException $ehe) {
             if ($ehe->getStatusMessage() == 'OK')
-                $error = SolrService::EXCEPTION_SOLRURI;
+                $ierror = new ItemError(SolrService::EXCEPTION_SOLRURI, $ehe->getStatusMessage());
             else
-                $error = SolrService::EXCEPTION_HTTPEXCEPTION;
+                $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
-            $error = SolrService::EXCEPTION;
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
         
         return false;

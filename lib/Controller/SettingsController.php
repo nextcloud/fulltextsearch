@@ -89,7 +89,7 @@ class SettingsController extends Controller
         $response = array(
             'instant' => $instant,
             'configured' => $this->configService->getAppValue('configured'),
-            'ping' => $this->solrAdmin->ping($error),
+            'ping' => $this->solrAdmin->ping(),
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core'),
             'solr_timeout' => $this->configService->getAppValue('solr_timeout'),
@@ -218,23 +218,23 @@ class SettingsController extends Controller
     // Wiki Error 9
     private function test_ping(&$message)
     {
-        if ($this->solrAdmin->ping($error)) {
+        if ($this->solrAdmin->ping($ierror)) {
             $message = 'Apache Solr is up, running and responding to our ping query';
             return true;
         }
         
-        $message = 'Apache Solr is not responding to our ping query (Error #' . $error . ')';
+        $message = 'Apache Solr is not responding to our ping query (Error #' . $ierror->getCode() . ')';
         return false;
     }
 
     private function test_schema(&$message)
     {
-        if ($this->solrAdmin->checkSchema(true, $error)) {
+        if ($this->solrAdmin->checkSchema(true, $ierror)) {
             $message = 'Schema is fine';
             return true;
         }
         
-        $message = 'Were not able to verify/fix your schema integrity (Error #' . $error . ')';
+        $message = 'Were not able to verify/fix your schema integrity (Error #' . $ierror->getCode() . ')';
         return false;
     }
 
@@ -250,23 +250,23 @@ class SettingsController extends Controller
             $doc
         );
         $solrDocs = null;
-        $this->indexService->extract(ItemDocument::TYPE_TEST, '_nextant_test', $data, $solrDocs, true, $error);
+        $this->indexService->extract(ItemDocument::TYPE_TEST, '_nextant_test', $data, $solrDocs, true, $ierror);
         
         if ($doc->isProcessed()) {
             $message = 'Text successfully extracted';
             return true;
         }
         
-        $message = 'Extract failed. Please check the configuration of your Solr server (Error #' . $error . ')';
+        $message = 'Extract failed. Please check the configuration of your Solr server (Error #' . $ierror->getCode() . ')';
         return false;
     }
 
     private function test_update(&$message)
     {
-        $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $error);
+        $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $ierror);
         
-        if (sizeof($asource) != 1) {
-            $message('Error Updating field - Can\'t find original document');
+        if ($asource == false || sizeof($asource) != 1) {
+            $message('Error Updating field - Can\'t find original document - ' . $ierror->getCode());
             return false;
         }
         
@@ -285,7 +285,7 @@ class SettingsController extends Controller
         $this->solrTools->updateDocument($final, $source, true, $ierror);
         
         if (! $source->isUpdated()) {
-            $message = 'Error Updating field (Error #' . $error->getCode() . ')';
+            $message = 'Error Updating field (Error #' . $ierror->getCode() . ')';
             return false;
         }
         
@@ -322,13 +322,13 @@ class SettingsController extends Controller
     private function test_delete(&$message)
     {
         $doc = new ItemDocument(ItemDocument::TYPE_TEST, 1);
-        $this->solrTools->removeDocument($doc);
+        $this->solrTools->removeDocument($doc, $ierror);
         if ($doc->isRemoved()) {
             $message = 'Test document deleted';
             return true;
         }
         
-        $message = 'We could not delete our test document. Please check the configuration of your Solr server (Error #' . $error . ')';
+        $message = 'We could not delete our test document. Please check the configuration of your Solr server (Error #' . $ierror->getCode() . ')';
         return false;
     }
 

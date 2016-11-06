@@ -477,8 +477,10 @@ class IndexService
      */
     public function getDocuments($type = '', $userId = '', $fileId = 0, &$ierror = '')
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         $fileId = (int) $fileId;
         $client = $this->solrService->getClient();
@@ -621,10 +623,11 @@ class IndexService
             }
             sleep(30);
             
-            if (! $this->solrAdmin->ping()) {
+            if (! $this->solrAdmin->ping($ierror)) {
                 if ($this->output != null) {
                     $this->output->writeln('');
                     $this->output->writeln('');
+                    $this->output->writeln('Error #' . $ierror->getCode());
                     $this->output->writeln('Is Solr Up and Running ?');
                     $this->output->writeln('');
                 }

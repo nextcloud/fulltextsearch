@@ -32,6 +32,9 @@ use \OCA\Nextant\Service\ConfigService;
 class SolrService
 {
     
+    // no solr
+    const ERROR_SOLRSERVICE_DOWN = 2;
+    
     // Owner is not set - mostly a developper mistake
     const ERROR_OWNER_NOT_SET = 4;
     
@@ -51,6 +54,8 @@ class SolrService
     
     // can't reach solr - check uri
     const EXCEPTION_SOLRURI = 24;
+
+    const EXCEPTION_INDEX_FAILED = 31;
     
     // can't extract - check solr configuration for the solr-cell plugin
     const EXCEPTION_EXTRACT_FAILED = 41;
@@ -372,9 +377,12 @@ class SolrService
                 }
             }
         } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $ierror = new ItemError(self::EXCEPTION_EXTRACT_FAILED, $ehe->getStatusMessage());
-            else
+            if ($ehe->getStatusMessage() == 'OK') {
+                if ($document->isExtractable())
+                    $ierror = new ItemError(self::EXCEPTION_EXTRACT_FAILED, $ehe->getStatusMessage());
+                else
+                    $ierror = new ItemError(self::EXCEPTION_INDEX_FAILED, $ehe->getStatusMessage());
+            } else
                 $ierror = new ItemError(self::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
             $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getMessage());
