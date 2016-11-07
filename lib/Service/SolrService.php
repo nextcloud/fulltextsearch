@@ -326,6 +326,9 @@ class SolrService
             return false;
         }
         
+        // $document->failedExtract(false);
+        // $document->failedIndex(false);
+        
         try {
             $client = $this->getClient();
             
@@ -397,6 +400,7 @@ class SolrService
                     return true;
                 }
             } else {
+                $doc->text = '';
                 // $query->addCommit();
                 $query->addDocuments(array(
                     $doc
@@ -424,7 +428,10 @@ class SolrService
             $ierror = new ItemError(self::EXCEPTION, $e->getMessage());
         }
         
-        $document->failedExtract(true);
+        if ($document->isExtractable())
+            $document->failedExtract(true);
+        else
+            $document->failedIndex(true);
         
         return false;
     }

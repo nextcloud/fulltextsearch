@@ -215,12 +215,33 @@ class IndexService
             
             $this->solrService->indexDocument($entry, $ierror);
             
-            if ($entry->isFailedExtract() && ! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
-                return false;
+            // fail at extract, let's try just index
+            if ($entry->isFailedExtract()) {
+                if ($this->configService->getAppValue('index_files_tree') !== '1')
+                    $entry->invalid(true);
+                
+                if (! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
+                    return false;
+                
+                if ($this->configService->getAppValue('index_files_tree') === '1') {
+                    $entry->extractable(false);
+                    
+                    if (! $this->force && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
+                        continue;
+                    
+                    $this->solrService->indexDocument($entry, $ierror);
+                }
+            }
+            
+            if ($entry->isFailedIndex())
+                $entry->invalid(true);
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->destroyTempDocument($entry);
         }
+        
+        if (! $this->solrTools->commit($ierror))
+            return false;
         
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
@@ -240,7 +261,7 @@ class IndexService
      * @param ItemDocument[] $solrDocs            
      * @return boolean
      */
-    public function updateDocuments($type, $userId, &$data, &$solrDocs = null)
+    public function updateDocuments($type, $userId, &$data, &$solrDocs = null, &$ierror = '')
     {
         $this->solrService->setOwner($userId);
         
@@ -288,7 +309,7 @@ class IndexService
             $current = ItemDocument::getItem($solrDocs, $entry);
             $continue = false;
             
-            $this->solrTools->updateDocument($entry, $current, false);
+            $this->solrTools->updateDocument($entry, $current, false, $ierror);
             
             if ($progress != null) {
                 if ($entry->neededUpdate()) {
@@ -309,6 +330,9 @@ class IndexService
             }
         }
         
+        if (! $this->solrTools->commit($ierror))
+            return false;
+        
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
@@ -325,7 +349,7 @@ class IndexService
      * @param ItemDocument[] $data            
      * @return boolean
      */
-    public function removeDocuments(&$data)
+    public function removeDocuments(&$data, &$ierror)
     {
         if (sizeof($data) == 0)
             return false;
@@ -335,6 +359,9 @@ class IndexService
             $this->lockIndex(true);
             $this->solrTools->removeDocument($entry);
         }
+        
+        if (! $this->solrTools->commit($ierror))
+            return false;
         
         return true;
     }
@@ -374,7 +401,7 @@ class IndexService
         
         $docIds = array();
         foreach ($data as $entry) {
-            if (! $entry->isInvalid() && ! $entry->isFailedExtract())
+            if (! $entry->isInvalid())
                 array_push($docIds, (int) $entry->getId());
         }
         
@@ -533,6 +560,7 @@ class IndexService
                     'nextant_share',
                     'nextant_sharegroup',
                     'nextant_deleted',
+                    'nextant_extracted',
                     'nextant_source'
                 ));
                 
@@ -553,6 +581,7 @@ class IndexService
                     $doc->setShareGroup($document->nextant_sharegroup);
                     $doc->deleted($document->nextant_deleted);
                     $doc->setSource($document->nextant_source);
+                    $doc->extracted($document->nextant_extracted);
                     
                     $tick = false;
                     if (! in_array($doc->getId(), $docIds)) {

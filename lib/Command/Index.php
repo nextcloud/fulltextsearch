@@ -262,7 +262,7 @@ class Index extends Base
                     $extracted ++;
                 if ($doc->isProcessed())
                     $processed ++;
-                if ($doc->isFailedExtract())
+                if ($doc->isFailedExtract() || $doc->isFailedIndex())
                     $failed ++;
             }
             
@@ -379,7 +379,7 @@ class Index extends Base
                     $extracted ++;
                 if ($doc->isProcessed())
                     $processed ++;
-                if ($doc->isFailedExtract())
+                if ($doc->isFailedExtract() || $doc->isFailedIndex())
                     $failed ++;
             }
             
