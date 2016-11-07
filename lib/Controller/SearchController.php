@@ -269,4 +269,30 @@ class SearchController extends Controller
         
         return $results;
     }
+
+    /**
+     * @NoCSRFRequired
+     * @PublicPage
+     */
+    public function getSuggestionsShareLink($query)
+    {
+        if (! $this->solrService)
+            return false;
+        
+        if ($this->configService->getAppValue('index_files_sharelink') !== '1')
+            return array();
+        
+        if ($query == null || $query === '')
+            return array();
+        
+        $ierror = null;
+        $suggest = $this->solrService->suggest($query, $ierror);
+        
+        $err = ($ierror == null) ? 0 : $ierror->getCode();
+        
+        return array(
+            'status' => $err,
+            'result' => $suggest
+        );
+    }
 }
