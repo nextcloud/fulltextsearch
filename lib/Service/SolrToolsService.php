@@ -110,6 +110,39 @@ class SolrToolsService
     }
 
     /**
+     * commit
+     *
+     * @param ItemError $ierror            
+     * @return boolean|Solarium\Core\Query\Result
+     */
+    public function commit(&$ierror = 0)
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
+            return false;
+        }
+        
+        try {
+            $client = $this->solrService->getClient();
+            
+            $update = $client->createUpdate();
+            // $update->addOptimize(true, true, 5);
+            $update->addCommit();
+            $result = $client->update($update);
+            
+            return $result;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
+        } catch (\Solarium\Exception $e) {
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
+        }
+        
+        return false;
+    }
+
+    /**
      *
      * @param ItemDocument $final            
      * @param ItemDocument $current            
@@ -124,8 +157,10 @@ class SolrToolsService
         }
         
         try {
-            if ($final == null || $current == null)
+            if ($final == null || $current == null) {
+                $ierror = new ItemError(SolrService::ERROR_DOCUMENT_NOT_EXIST);
                 return false;
+            }
             
             $modifs = false;
             if (! MiscService::arraysIdentical($final->getShare(), $current->getShare()))
@@ -137,6 +172,8 @@ class SolrToolsService
             if ($final->getOwner() !== $current->getOwner())
                 $modifs = true;
             if ($final->isDeleted() != $current->isDeleted())
+                $modifs = true;
+            if (! $final->isExtractable() && $current->isExtracted())
                 $modifs = true;
             
             if (! $modifs)
@@ -192,9 +229,17 @@ class SolrToolsService
                 $doc->setFieldModifier('nextant_deleted', 'set');
             }
             
+            if (! $final->isExtractable() && $current->isExtracted()) {
+                $doc->setField('text', '');
+                $doc->setFieldModifier('text', 'set');
+                $doc->setField('nextant_extracted', false);
+                $doc->setFieldModifier('nextant_extracted', 'set');
+            }
+            
             $query->addDocuments(array(
                 $doc
-            ))->addCommit();
+            ));
+            // $query->addCommit();
             
             if ($request = $client->update($query)) {
                 // fixing solrDocs' data
@@ -247,7 +292,7 @@ class SolrToolsService
             $update = $client->createUpdate();
             
             $update->addDeleteById($doc->getType() . '_' . $doc->getId());
-            $update->addCommit();
+            // $update->addCommit();
             
             $ret = $client->update($update);
             
@@ -280,10 +325,16 @@ class SolrToolsService
             return false;
         
         if ($solr != null && $solr != '' && ($document->getMTime() == $solr->getMTime())) {
-            if ($document->isExtractable())
-                $document->extracted(true);
             $document->indexed(true);
-            return true;
+            if (! $document->isExtractable())
+                return true;
+            
+            if ($solr->isExtracted()) {
+                $document->extracted(true);
+                return true;
+            }
+            
+            return false;
         }
         
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
@@ -298,7 +349,8 @@ class SolrToolsService
             $query = $client->createSelect();
             $query->setQuery('id:' . $document->getType() . '_' . $document->getId());
             $query->setFields(array(
-                'nextant_mtime'
+                'nextant_mtime',
+                'nextant_extracted'
             ));
             
             $resultset = $client->select($query);
@@ -308,7 +360,7 @@ class SolrToolsService
             
             foreach ($resultset as $doc) {
                 if ($document->getMTime() == $doc->nextant_mtime) {
-                    if ($document->isExtractable())
+                    if ($doc->nextant_extracted)
                         $document->extracted(true);
                     $document->indexed(true);
                     return true;
