@@ -45,6 +45,7 @@ class ConfigService
         'solr_core' => 'nextant',
         'solr_timeout' => 30,
         'display_result' => 1,
+        'replace_core_search' => 0,
         
         'index_delay' => 2,
         'index_locked' => 0,
@@ -60,6 +61,12 @@ class ConfigService
         'index_files_encrypted' => 0,
         'index_files_live' => 1,
         'index_files_max_size' => 40,
+        'index_files_filters_text' => 1,
+        'index_files_filters_pdf' => 1,
+        'index_files_filters_office' => 1,
+        'index_files_filters_image' => 0,
+        'index_files_filters_audio' => 0,
+        'index_files_filters_extensions' => '',
         
         'index_bookmarks' => 0,
         'index_bookmarks_needed' => 1

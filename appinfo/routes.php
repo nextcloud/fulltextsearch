@@ -36,6 +36,11 @@ return [
             'verb' => 'POST'
         ],
         [
+            'name' => 'settings#setOptionsFilesFilters',
+            'url' => 'ajax/settings/option_files_filters.php',
+            'verb' => 'POST'
+        ],
+        [
             'name' => 'settings#setOptionsBookmarks',
             'url' => 'ajax/settings/option_bookmarks.php',
             'verb' => 'POST'

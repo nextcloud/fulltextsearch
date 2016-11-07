@@ -85,7 +85,7 @@ style('nextant', 'admin');
 						</tr>
 						<tr class="nextant_admin_head" id="solr_index_files_cont">
 							<td><div id="nextant_saving_files">Saving</div></td>
-							<td class="nextant_admin_head"><input type="checkbox"
+							<td colspan="2" class="nextant_admin_head"><input type="checkbox"
 								name="solr_index_files" id="solr_index_files" value="1"
 								style="margin: 5px; margin-right: 15px;">Indexing Files</td>
 						</tr>
@@ -98,6 +98,10 @@ style('nextant', 'admin');
 	    <?php p($l->t('Maximum File Size (Mb) :')) ?></td>
 								<td><input type="text" id="solr_index_files_max_size"
 									style="width: 100px;"></td>
+								<td style="width: 60px; padding-right: 10px;">[<span
+									style="font-size: 12px;" id="solr_switch_filters">Edit your
+										filters</span>]
+								</td>
 							</tr>
 
 
@@ -105,9 +109,9 @@ style('nextant', 'admin');
 								<td class="nextant_admin_left">					
 	    <?php p($l->t('Live Index :')); ?>
 						</td>
-								<td><input type="checkbox" name="solr_index_files_live"
-									id="solr_index_files_live" value="1" style="margin: 10px;"> (<a
-									id="nextant_help_link"
+								<td colspan="2"><input type="checkbox"
+									name="solr_index_files_live" id="solr_index_files_live"
+									value="1" style="margin: 10px;"> (<a id="nextant_help_link"
 									href="https://github.com/daita/nextant/wiki/Extracting,-Live-Update"
 									target="_blank">help</a>)</td>
 							</tr>
@@ -115,37 +119,40 @@ style('nextant', 'admin');
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
 	    <?php p($l->t('Index Files Tree :')) ?></td>
-								<td><input type="checkbox" name="solr_index_files_tree"
-									id="solr_index_files_tree" value="1" style="margin: 10px;"></td>
+								<td colspan="2"><input type="checkbox"
+									name="solr_index_files_tree" id="solr_index_files_tree"
+									value="1" style="margin: 10px;"></td>
 							</tr>
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
 	    <?php p($l->t('Index Public Links :')) ?></td>
-								<td><input type="checkbox" name="solr_index_files_sharelink"
+								<td colspan="2"><input type="checkbox"
+									name="solr_index_files_sharelink"
 									id="solr_index_files_sharelink" value="1" style="margin: 10px;"></td>
 							</tr>
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
 	    <?php p($l->t('Index External Storage :')) ?></td>
-								<td><input type="checkbox" name="solr_index_files_external"
-									id="solr_index_files_external" value="1" style="margin: 10px;"></td>
+								<td colspan="2"><input type="checkbox"
+									name="solr_index_files_external" id="solr_index_files_external"
+									value="1" style="margin: 10px;"></td>
 							</tr>
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
 	    <?php p($l->t('Index Encrypted Files :')) ?></td>
-								<td><input type="checkbox" name="solr_index_files_encrypted"
+								<td colspan="2"><input type="checkbox"
+									name="solr_index_files_encrypted"
 									id="solr_index_files_encrypted" value="1" style="margin: 10px;"></td>
 							</tr>
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
 	    <?php p($l->t('Last index :')) ?></td>
-								<td><div id="solr_index_files_last"></div></td>
+								<td colspan="2"><div id="solr_index_files_last"></div></td>
 							</tr>
-
 
 						</table>
 					</div>
@@ -212,6 +219,17 @@ style('nextant', 'admin');
 							</select></td>
 						</tr>
 
+						<!-- 
+						<tr style="height: 30px;">
+							<td class="nextant_admin_left">
+	    <?php p($l->t('Fully Replace Core Search:')) ?></td>
+							<td id="solr_replace_core_search_td"><input type="checkbox"
+								name="solr_replace_core_search" id="solr_replace_core_search"
+								value="1" style="margin: 10px;"> (needs <b>Index Files Tree</b>
+								enabled)</td>
+						</tr>
+						-->
+
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">
 	    <?php p($l->t('Number of documents :')) ?></td>
@@ -250,7 +268,7 @@ style('nextant', 'admin');
 			</td>
 			<td
 				style="padding-left: 30px; padding-top: 40px; vertical-align: top">
-				<div id="nextant-display">
+				<div id="nextant-display" class="nextant-box">
 					<div id="ping" class="nextant-display-line">
 						<img id="icon_check" class="nextant_display_icon"
 							src="<?php print_unescaped(OCP\image_path('nextant', 'check.png')); ?>" />
@@ -259,7 +277,7 @@ style('nextant', 'admin');
 						<div id="text" class="nextant_display_text"></div>
 					</div>
 
-					<div id="schema" class="nextant-display-line" style="top: 30px;">
+					<div id="schema" class="nextant-display-line" style="top: 40px;">
 						<img id="icon_check" class="nextant_display_icon"
 							src="<?php print_unescaped(OCP\image_path('nextant', 'check.png')); ?>" />
 						<img id="icon_fail" class="nextant_display_icon"
@@ -267,7 +285,7 @@ style('nextant', 'admin');
 						<div id="text" class="nextant_display_text"></div>
 					</div>
 
-					<div id="extract" class="nextant-display-line" style="top: 60px;">
+					<div id="extract" class="nextant-display-line" style="top: 70px;">
 						<img id="icon_check" class="nextant_display_icon"
 							src="<?php print_unescaped(OCP\image_path('nextant', 'check.png')); ?>" />
 						<img id="icon_fail" class="nextant_display_icon"
@@ -275,7 +293,7 @@ style('nextant', 'admin');
 						<div id="text" class="nextant_display_text"></div>
 					</div>
 
-					<div id="update" class="nextant-display-line" style="top: 90px;">
+					<div id="update" class="nextant-display-line" style="top: 100px;">
 						<img id="icon_check" class="nextant_display_icon"
 							src="<?php print_unescaped(OCP\image_path('nextant', 'check.png')); ?>" />
 						<img id="icon_fail" class="nextant_display_icon"
@@ -283,7 +301,7 @@ style('nextant', 'admin');
 						<div id="text" class="nextant_display_text"></div>
 					</div>
 
-					<div id="search" class="nextant-display-line" style="top: 120px;">
+					<div id="search" class="nextant-display-line" style="top: 130px;">
 						<img id="icon_check" class="nextant_display_icon"
 							src="<?php print_unescaped(OCP\image_path('nextant', 'check.png')); ?>" />
 						<img id="icon_fail" class="nextant_display_icon"
@@ -291,7 +309,7 @@ style('nextant', 'admin');
 						<div id="text" class="nextant_display_text"></div>
 					</div>
 
-					<div id="delete" class="nextant-display-line" style="top: 150px;">
+					<div id="delete" class="nextant-display-line" style="top: 160px;">
 						<img id="icon_check" class="nextant_display_icon"
 							src="<?php print_unescaped(OCP\image_path('nextant', 'check.png')); ?>" />
 						<img id="icon_fail" class="nextant_display_icon"
@@ -299,7 +317,7 @@ style('nextant', 'admin');
 						<div id="text" class="nextant_display_text"></div>
 					</div>
 
-					<div id="save" class="nextant-display-line" style="top: 190px;">
+					<div id="save" class="nextant-display-line" style="top: 200px;">
 						<img id="icon_check" class="nextant_display_icon"
 							src="<?php print_unescaped(OCP\image_path('nextant', 'check.png')); ?>" />
 						<img id="icon_fail" class="nextant_display_icon"
@@ -308,6 +326,52 @@ style('nextant', 'admin');
 					</div>
 
 				</div>
+
+				<div id="nextant-filters" class="nextant-box">
+
+					<div id="nextant_saving_files_filters"
+						style="position: absolute; top: 10px; right: 25px;">Saving</div>
+
+					<div class="solr_filters_item_large solr_filters_title">Type of
+						files to extract</div>
+
+					<div class="solr_filters_item_large">
+						<input type="checkbox" name="solr_filters_text"
+							id="solr_filters_text" value="1" style="margin: 10px;"> Text File
+						(Text, Html, Source Code, ...)
+					</div>
+					<div class="solr_filters_item">
+						<input type="checkbox" name="solr_filters_pdf"
+							id="solr_filters_pdf" value="1" style="margin: 10px;"> E-pub /
+						PDF / rtf
+					</div>
+					<div class="solr_filters_item">
+						<input type="checkbox" name="solr_filters_office"
+							id="solr_filters_office" value="1" style="margin: 10px;"> Office
+						Documents
+					</div>
+					<div class="solr_filters_item">
+						<input type="checkbox" name="solr_filters_image"
+							id="solr_filters_image" value="1" style="margin: 10px;"> Image
+						(Jpeg, Tiff)
+					</div>
+					<div class="solr_filters_item">
+						<input type="checkbox" name="solr_filters_audio"
+							id="solr_filters_audio" value="1" style="margin: 10px;"> Audio
+						File (mp3, flac)
+					</div>
+
+					<div class="solr_filters_item_large solr_filters_title"
+						style="margin-top: 15px;">Extension you wish to ignore (.java
+						.xml)</div>
+					<div class="solr_filters_item_large">
+						<textarea name="" style="width: 435px; height: 75px;"
+							id="solr_filters_extensions"></textarea>
+					</div>
+
+				</div>
+
+
 			</td>
 		</tr>
 
