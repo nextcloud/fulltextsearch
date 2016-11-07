@@ -57,6 +57,14 @@ $(document)
 								nextant_share_link.searchTimer();
 							});
 
+							$('DIV.crumb.svg.last').live('click', function() {
+								$('#linksearchbox').val('');
+								nextant_share_link.search();
+							});
+							$('DIV.crumb.svg.ui-droppable').live('click', function() {
+								$('#linksearchbox').val('');
+								nextant_share_link.search();
+							});
 						},
 
 						searchTimer : function() {
@@ -131,7 +139,7 @@ $(document)
 										link += '/download?path='
 												+ entry.dirpath + '&files='
 												+ entry.filename;
-										
+
 										var row = nextant_share_link
 												.template_entry()
 												.replace(/%ID%/gi, entry.id)
