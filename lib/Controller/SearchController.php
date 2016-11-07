@@ -298,9 +298,11 @@ class SearchController extends Controller
         
         $err = ($ierror == null) ? 0 : $ierror->getCode();
         
-        return array(
+        $result = array(
             'status' => $err,
             'result' => $suggest
         );
+        
+        return $result;
     }
 }
