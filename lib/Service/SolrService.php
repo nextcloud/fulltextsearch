@@ -60,6 +60,8 @@ class SolrService
     // can't extract - check solr configuration for the solr-cell plugin
     const EXCEPTION_EXTRACT_FAILED = 41;
 
+    const ERROR_DOCUMENT_NOT_EXIST = 49;
+
     const EXCEPTION_UPDATE_FAILED = 51;
 
     const EXCEPTION_UPDATE_FIELD_FAILED = 61;
@@ -175,42 +177,62 @@ class SolrService
         $this->groups = $groups;
     }
 
-    public static function extractableFile($mimetype, $path = '')
-    {      
-//         switch (FileService::getBaseTypeFromMime($mimetype)) {
-//             case 'text':
-//                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
-//         }
+    public function extractableFile($mimetype, $path = '')
+    {
+        $filters = $this->configService->getFileFilters();
+        
+        if ($path !== '' && $pinfo = pathinfo($path)) {
+            if (key_exists('extension', $pinfo) && in_array('.' . $pinfo['extension'], $filters['extensions']))
+                return false;
+        }
+        
+        switch (FileService::getBaseTypeFromMime($mimetype)) {
+            case 'text':
+                if ($filters['text'] !== '1')
+                    return false;
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+        }
         
         switch ($mimetype) {
-            case 'text/plain':
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
-                
-//             case 'text/x-java-source':
-//                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
-                    
-            case 'image/jpeg':
-                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
-            
-            case 'image/tiff':
-                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
             
             case 'application/epub+zip':
+                if ($filters['pdf'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
             case 'application/pdf':
+                if ($filters['pdf'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/application-pdf.svg');
             
             case 'application/rtf':
+                if ($filters['pdf'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
             case 'application/msword':
+                if ($filters['office'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
+            case 'image/jpeg':
+                if ($filters['image'] !== '1')
+                    return false;
+                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+            
+            case 'image/tiff':
+                if ($filters['image'] !== '1')
+                    return false;
+                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+            
             case 'audio/mpeg':
+                if ($filters['audio'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
             
             case 'audio/flac':
+                if ($filters['audio'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
             
             case 'application/octet-stream':
@@ -224,7 +246,7 @@ class SolrService
                     
                     if ($tmpmime === 'application/octet-stream')
                         return false;
-                    return self::extractableFile($tmpmime);
+                    return $this->extractableFile($tmpmime);
                 }
                 
                 if (key_exists('extension', $pinfo))
@@ -245,8 +267,11 @@ class SolrService
         );
         
         foreach ($acceptedMimeType['vnd'] as $mt) {
-            if (substr($mimetype, 0, strlen($mt)) == $mt)
+            if (substr($mimetype, 0, strlen($mt)) == $mt) {
+                if ($filters['office'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+            }
         }
         
         return false;
@@ -260,6 +285,9 @@ class SolrService
     public static function extractableFileExtension($extension)
     {
         switch ($extension) {
+            case 'srt':
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+            
             case 'mid':
                 return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
         }
@@ -351,7 +379,7 @@ class SolrService
             if ($document->isExtractable()) {
                 $doc->nextant_extracted = true;
                 
-                $query->setCommit(true);
+                // $query->setCommit(true);
                 $query->setDocument($doc);
                 
                 // custom options
@@ -369,7 +397,7 @@ class SolrService
                     return true;
                 }
             } else {
-                $query->addCommit();
+                // $query->addCommit();
                 $query->addDocuments(array(
                     $doc
                 ));

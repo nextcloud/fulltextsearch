@@ -26,6 +26,7 @@
  */
 namespace OCA\Nextant\Service;
 
+use \OCA\Nextant\Controller\SettingsController;
 use OCP\IConfig;
 
 class ConfigService
@@ -77,6 +78,8 @@ class ConfigService
     private $config;
 
     private $miscService;
+
+    private $fileFilters = null;
 
     public function __construct($appName, IConfig $config, $miscService)
     {
@@ -233,7 +236,21 @@ class ConfigService
     // return ($this->getAppValue($action) == '1');
     // }
     // }
-    
+    public function getFileFilters()
+    {
+        if ($this->fileFilters == null)
+            $this->fileFilters = array(
+                'text' => $this->getAppValue('index_files_filters_text'),
+                'pdf' => $this->getAppValue('index_files_filters_pdf'),
+                'office' => $this->getAppValue('index_files_filters_office'),
+                'image' => $this->getAppValue('index_files_filters_image'),
+                'audio' => $this->getAppValue('index_files_filters_audio'),
+                'extensions' => SettingsController::FileFiltersExtensionsAsArray($this->getAppValue('index_files_filters_extensions'))
+            );
+        
+        return $this->fileFilters;
+    }
+
     /**
      * generate an array to pass config to Solarium
      *
