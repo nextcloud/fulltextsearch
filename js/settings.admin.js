@@ -120,7 +120,7 @@ $(document)
 								index_files_filters_extensions : $(
 										'#solr_filters_extensions').val()
 							}
-							
+
 							if (switched == 'index_files_filters_text')
 								data.index_files_filters_text = (data.index_files_filters_text == 1) ? 0
 										: 1;

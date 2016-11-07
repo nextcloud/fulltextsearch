@@ -338,7 +338,7 @@ style('nextant', 'admin');
 					<div class="solr_filters_item_large">
 						<input type="checkbox" name="solr_filters_text"
 							id="solr_filters_text" value="1" style="margin: 10px;"> Text File
-						(Text, Html, Source Code, ...)
+						(Text, Html, Subtitles, Source Code, ...)
 					</div>
 					<div class="solr_filters_item">
 						<input type="checkbox" name="solr_filters_pdf"
