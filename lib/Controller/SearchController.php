@@ -52,9 +52,13 @@ class SearchController extends Controller
 
     private $solrService;
 
+    private $fileService;
+
+    private $bookmarkService;
+
     private $miscService;
 
-    public function __construct($appName, IRequest $request, $userId, $groupManager, $configService, $solrService, $miscService)
+    public function __construct($appName, IRequest $request, $userId, $groupManager, $configService, $solrService, $fileService, $bookmarkService, $miscService)
     {
         parent::__construct($appName, $request);
         
@@ -63,6 +67,10 @@ class SearchController extends Controller
         $this->configService = $configService;
         
         $this->solrService = $solrService;
+        
+        $this->fileService = $fileService;
+        $this->bookmarkService = $bookmarkService;
+        
         $this->miscService = $miscService;
     }
 
@@ -114,11 +122,11 @@ class SearchController extends Controller
                 switch ($data['source']) {
                     
                     case 'files':
-                        FileService::getSearchResult($data);
+                        $this->fileService->getSearchResult($data);
                         break;
                     
                     case 'bookmarks':
-                        BookmarkService::getSearchResult($data);
+                        $this->bookmarkService->getSearchResult($data);
                         break;
                     
                     default:
@@ -231,7 +239,7 @@ class SearchController extends Controller
                 switch ($data['source']) {
                     
                     case 'files':
-                        FileService::getSearchResult($data, $share['file_target'], false);
+                        $this->fileService->getSearchResult($data, $share['file_target'], false);
                         break;
                     
                     // case 'bookmarks':

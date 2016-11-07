@@ -517,7 +517,7 @@ class FileService
      * @param boolean $trashbin            
      * @return array[]
      */
-    public static function getSearchResult(&$data, $base = '', $trashbin = true)
+    public function getSearchResult(&$data, $base = '', $trashbin = true)
     {
         Filesystem::init($data['userid'], '');
         $view = Filesystem::getView();
