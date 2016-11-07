@@ -203,6 +203,16 @@ class SolrAdminService
             )
         ));
         array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_unmounted',
+                'type' => 'int',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        array_push($fields, array(
             'type' => 'field-type',
             'data' => array(
                 'name' => 'text_general',
