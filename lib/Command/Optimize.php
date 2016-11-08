@@ -85,7 +85,7 @@ class Optimize extends Base
         if (! $result = $this->solrTools->commit(! $input->getOption('commit')))
             $output->writeln('Optimization failed');
         else
-            $output->writeln('Your index has been optimized (' . $result->getQueryTime() . 'ms)');
+            $output->writeln('Your index has been optimized (' . gmdate("H:i:s", floor($result->getQueryTime() / 1000)) . ')');
     }
 }
 
