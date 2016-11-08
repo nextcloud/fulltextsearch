@@ -36,10 +36,6 @@ class ConfigService
 
     const SEARCH_DISPLAY_FILES = 2;
 
-    const ACTION_LIVE_EXTRACT = 'index_files_live';
-
-    const ACTION_LIVE_DOCUPDATE = 'index_files_live';
-
     private $defaults = [
         'configured' => '0',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
@@ -48,6 +44,8 @@ class ConfigService
         'display_result' => 1,
         'replace_core_search' => 0,
         
+        'index_live' => 1,
+        'index_live_queuekey' => 19375,
         'index_delay' => 2,
         'index_locked' => 0,
         'index_files_last' => 0,
@@ -60,7 +58,6 @@ class ConfigService
         'undex_files_sharelink' => 0,
         'index_files_external' => 0,
         'index_files_encrypted' => 0,
-        'index_files_live' => 1,
         'index_files_max_size' => 40,
         'index_files_filters_text' => 1,
         'index_files_filters_pdf' => 1,
@@ -105,6 +102,7 @@ class ConfigService
         $this->deleteAppValue('max_size');
         $this->deleteAppValue('external_index');
         $this->deleteAppValue('index_files_live_extract');
+        $this->deleteAppValue('index_files_live');
         $this->deleteAppValue('index_files_live_update');
     }
 
@@ -218,24 +216,6 @@ class ConfigService
         return $this->config->deleteAppValue($this->appName, $key);
     }
 
-    /**
-     * return if config allow to perform action
-     *
-     * @param string $action            
-     * @return boolean
-     */
-    // public function shoudIContinue($action)
-    // {
-    // switch ($action) {
-    // case self::ACTION_LIVE_EXTRACT:
-    // return ($this->getAppValue($action) == '1');
-    
-    // case self::ACTION_LIVE_DOCUPDATE:
-    // if ($this->getAppValue(self::ACTION_LIVE_EXTRACT) != '1')
-    // return false;
-    // return ($this->getAppValue($action) == '1');
-    // }
-    // }
     public function getFileFilters()
     {
         if ($this->fileFilters == null)

@@ -78,7 +78,7 @@ class Application extends App
         });
         
         $container->registerService('QueueService', function ($c) {
-            return new QueueService($c->query('IndexService'), $c->query('FileService'), $c->query('MiscService'));
+            return new QueueService($c->query('ConfigService'), $c->query('IndexService'), $c->query('FileService'), $c->query('MiscService'));
         });
         
         $container->registerService('FileService', function ($c) {

@@ -60,8 +60,6 @@ $(document)
 							var data = {
 								index_files : ($('#solr_index_files')
 										.is(':checked')) ? 1 : 0,
-								index_files_live : ($('#solr_index_files_live')
-										.is(':checked')) ? 1 : 0,
 								index_files_max_size : $(
 										'#solr_index_files_max_size').val(),
 								index_files_tree : ($('#solr_index_files_tree')
@@ -76,9 +74,6 @@ $(document)
 
 							if (switched == 'index_files')
 								data.index_files = (data.index_files == 1) ? 0
-										: 1;
-							if (switched == 'index_files_live')
-								data.index_files_live = (data.index_files_live == 1) ? 0
 										: 1;
 
 							if (switched == 'index_files_tree')
@@ -168,6 +163,8 @@ $(document)
 								force_index = 1;
 
 							var data = {
+								index_live : ($('#solr_index_live')
+										.is(':checked')) ? 1 : 0,
 								index_delay : $('#solr_index_delay').val(),
 								display_result : $('#solr_display_result')
 										.val(),
@@ -178,6 +175,10 @@ $(document)
 
 							if (switched == 'replace_core_search')
 								data.replace_core_search = (data.replace_core_search == 1) ? 0
+										: 1;
+
+							if (switched == 'index_live')
+								data.index_live = (data.index_live == 1) ? 0
 										: 1;
 
 							$.post(OC.filePath('nextant', 'ajax/settings',
@@ -208,10 +209,12 @@ $(document)
 							$('#solr_timeout').val(response.solr_timeout);
 
 							if (response.configured > 0) {
-								$('#nextant_suboptions :input').attr(
-										"disabled", false);
+								$('#nextant_suboptions :input').prop(
+										'disabled', false);
 								$('#nextant_help_link').unbind('click');
 								$('#nextant_suboptions').fadeTo(delay, 1);
+								$('#solr_index_live_queuekey').prop('disabled', true);
+								$('#solr_index_live_queuekey').fadeTo(delay, 0.85);
 							} else {
 								$('#nextant_suboptions :input').attr(
 										"disabled", true);
@@ -224,8 +227,6 @@ $(document)
 
 							$('#solr_index_files').prop('checked',
 									(response.index_files == 1));
-							$('#solr_index_files_live').prop('checked',
-									(response.index_files_live == 1));
 							$('#solr_index_files_tree').prop('checked',
 									(response.index_files_tree == 1));
 							$('#solr_index_files_sharelink').prop('checked',
@@ -278,6 +279,10 @@ $(document)
 							else
 								$('#solr_sub_bookmarks').hide(delay);
 
+							$('#solr_index_live').prop('checked',
+									(response.index_live == 1));
+							$('#solr_index_live_queuekey').val(
+									response.index_live_queuekey);
 							$('#solr_index_delay').val(response.index_delay);
 
 							$(
@@ -570,12 +575,6 @@ $(document)
 
 					$('#nextant-filters').hide();
 
-					$('#solr_index_files_live')
-							.mousedown(
-									function() {
-										nextantSettings
-												.savesuboptions_files('index_files_live');
-									});
 					$('#solr_index_files_max_size').on('input', function(e) {
 						nextantSettings.savesuboptions_files();
 					});
@@ -656,6 +655,11 @@ $(document)
 					$('#nextant_force_first_index').on('click', function() {
 						nextantSettings.savesuboptions_status('force_index');
 					});
+
+					$('#solr_index_live').mousedown(function() {
+						nextantSettings.savesuboptions_status('index_live');
+					});
+
 					$('#solr_index_delay').on('input', function(e) {
 						nextantSettings.savesuboptions_status();
 					});

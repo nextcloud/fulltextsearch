@@ -97,7 +97,6 @@ class SettingsController extends Controller
             'index_files' => $this->configService->getAppValue('index_files'),
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
-            'index_files_live' => $this->configService->getAppValue('index_files_live'),
             'index_files_tree' => $this->configService->getAppValue('index_files_tree'),
             'index_files_sharelink' => $this->configService->getAppValue('index_files_sharelink'),
             'index_files_external' => $this->configService->getAppValue('index_files_external'),
@@ -114,6 +113,8 @@ class SettingsController extends Controller
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
             'index_bookmarks' => $this->configService->getAppValue('index_bookmarks'),
             'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
+            'index_live' => $this->configService->getAppValue('index_live'),
+            'index_live_queuekey' => $this->configService->getAppValue('index_live_queuekey'),
             'index_delay' => $this->configService->getAppValue('index_delay'),
             'index_locked' => $this->configService->getAppValue('index_locked'),
             'index_files_last' => $this->configService->getAppValue('index_files_last'),
@@ -126,10 +127,9 @@ class SettingsController extends Controller
         return $response;
     }
 
-    public function setOptionsFiles($index_files, $index_files_live, $index_files_max_size, $index_files_tree, $index_files_sharelink, $index_files_external, $index_files_encrypted, $index_files_filters)
+    public function setOptionsFiles($index_files, $index_files_max_size, $index_files_tree, $index_files_sharelink, $index_files_external, $index_files_encrypted, $index_files_filters)
     {
         $this->configService->setAppValue('index_files', $index_files);
-        $this->configService->setAppValue('index_files_live', $index_files_live);
         $this->configService->setAppValue('index_files_tree', $index_files_tree);
         $this->configService->setAppValue('index_files_sharelink', $index_files_sharelink);
         $this->configService->setAppValue('index_files_external', $index_files_external);
@@ -160,12 +160,17 @@ class SettingsController extends Controller
         return $this->updateSubOptions(false, 'bookmarks');
     }
 
-    public function setOptionsStatus($index_delay, $display_result, $replace_core_search, $force_index)
+    public function setOptionsStatus($index_live, $index_delay, $display_result, $replace_core_search, $force_index)
     {
+        if ($index_live === '1' && $this->configService->getAppValue('index_live') !== '1')
+            $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
+        
+        $this->configService->setAppValue('index_live', $index_live);
+        
         if ($index_delay > 0)
             $this->configService->setAppValue('index_delay', $index_delay);
         $this->configService->setAppValue('display_result', $display_result);
-    //    $this->configService->setAppValue('replace_core_search', $replace_core_search);
+        // $this->configService->setAppValue('replace_core_search', $replace_core_search);
         
         if ($force_index === '1') {
             $this->configService->setAppValue('configured', '1');

@@ -99,7 +99,7 @@ class Live extends Base
             return;
         }
         
-        if ($this->configService->getAppValue('index_files_live') !== '1')
+        if ($this->configService->getAppValue('index_live') !== '1')
         {
             $output->writeln('your nextant is not configured for Live Index');
             return;
