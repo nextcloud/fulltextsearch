@@ -305,7 +305,7 @@ class SettingsController extends Controller
         );
         $this->indexService->updateDocuments(ItemDocument::TYPE_TEST, '_nextant_test', $data, $asource, $ierror);
         
-        if (! $this->solrTools->commit($ierror)) {
+        if (! $this->solrTools->commit(false, $ierror)) {
             $message = 'Error during commit (Error #' . $ierror->getCode() . ')';
             return false;
         }
