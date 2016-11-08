@@ -36,13 +36,16 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class Optimize extends Base
 {
 
+    private $configService;
+
     private $solrService;
 
     private $solrTools;
 
-    public function __construct($solrService, $solrTools)
+    public function __construct($configService, $solrService, $solrTools)
     {
         parent::__construct();
+        $this->configService = $configService;
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
     }
@@ -50,7 +53,9 @@ class Optimize extends Base
     protected function configure()
     {
         parent::configure();
-        $this->setName('nextant:optimize')->setDescription('optimize your Solr core');
+        $this->setName('nextant:optimize')
+            ->setDescription('optimize your Solr core')
+            ->addOption('commit', 'm', InputOption::VALUE_NONE, 'Commit only ; Do not optimize.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -60,14 +65,24 @@ class Optimize extends Base
             return;
         }
         
-        $helper = $this->getHelper('question');
-        $question = new ConfirmationQuestion('<question>Your core will not be accessible while optimize is running. Continue with this action? (y/N) </question> ', false);
+        $toS = $this->configService->toSolarium($config);
+        if (! $toS)
+            return false;
         
-        if (! $helper->ask($input, $output, $question)) {
-            return;
+        $this->solrService->setClient(array(
+            'timeout' => 1800
+        ));
+        
+        $helper = $this->getHelper('question');
+        if (! $input->getOption('commit')) {
+            $question = new ConfirmationQuestion('<question>Your core will not be accessible while optimize is running. Continue with this action? (y/N) </question> ', false);
+            
+            if (! $helper->ask($input, $output, $question)) {
+                return;
+            }
         }
         
-        if (! $result = $this->solrTools->optimizeSolrIndex())
+        if (! $result = $this->solrTools->commit(! $input->getOption('commit')))
             $output->writeln('Optimization failed');
         else
             $output->writeln('Your index has been optimized (' . $result->getQueryTime() . 'ms)');

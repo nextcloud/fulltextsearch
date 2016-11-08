@@ -115,7 +115,7 @@ class SolrToolsService
      * @param ItemError $ierror            
      * @return boolean|Solarium\Core\Query\Result
      */
-    public function commit(&$ierror = 0)
+    public function commit($optimize = false, &$ierror = 0)
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
             $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
@@ -126,8 +126,9 @@ class SolrToolsService
             $client = $this->solrService->getClient();
             
             $update = $client->createUpdate();
-            // $update->addOptimize(true, true, 5);
             $update->addCommit();
+            if ($optimize)
+                $update->addOptimize(true, true, 5);
             $result = $client->update($update);
             
             return $result;
