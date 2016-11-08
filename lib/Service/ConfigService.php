@@ -258,11 +258,17 @@ class ConfigService
      */
     public function toSolarium($config = null)
     {
-        if ($config == null || ! key_exists('solr_url', $config))
+        if ($config == null)
+            $config = array();
+        
+        if (! key_exists('solr_url', $config))
             $config['solr_url'] = $this->getAppValue('solr_url');
         
-        if ($config == null || ! key_exists('solr_core', $config))
+        if (! key_exists('solr_core', $config))
             $config['solr_core'] = $this->getAppValue('solr_core');
+        
+        if (! key_exists('timeout', $config))
+            $config['timeout'] = $this->getAppValue('solr_timeout');
         
         $url = $config['solr_url'];
         $t = parse_url($url);
@@ -270,12 +276,10 @@ class ConfigService
         if (! key_exists('host', $t) || ! key_exists('port', $t) || ! key_exists('path', $t))
             return false;
         
-        $timeout = $this->getAppValue('solr_timeout');
-        
         return array(
             'endpoint' => array(
                 'localhost' => array(
-                    'timeout' => ($timeout < 5) ? 5 : $timeout,
+                    'timeout' => ($config['timeout'] < 5) ? 5 : $config['timeout'],
                     'host' => $t['host'],
                     'port' => $t['port'],
                     'core' => $config['solr_core'],
