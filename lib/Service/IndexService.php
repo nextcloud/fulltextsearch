@@ -40,7 +40,7 @@ class IndexService
 
     const REFRESH_COMMIT = 900;
 
-    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n    %duration:-9s% %infos:12s% %jvm:-30s%      ";
+    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      ";
 
     const PROGRESS_TEMPLATE_DEBUG = "\n %more%";
     // const PROGRESS_TEMPLATE_DEBUG = "";
@@ -73,6 +73,8 @@ class IndexService
     private $lastAverageTickCount;
 
     private $lastAverageTickValue;
+
+    private $lastCommitQueryTime = 0;
 
     private $debug = false;
 
@@ -230,7 +232,7 @@ class IndexService
             
             $atick = $this->generateAverageTick();
             if ($atick > - 1)
-                $progress->setMessage($atick . ' documents extracted in the last minute.', 'more');
+                $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . ($this->lastCommitQueryTime) . 'ms' : ''), 'more');
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->generateTempDocument($entry);
@@ -241,21 +243,12 @@ class IndexService
                 $progress->setMessage('@', 'job');
                 $progress->setMessage('[commiting]', 'infos');
                 $progress->display();
-                if ($this->output != null && $this->debug) {
-                    $this->output->writeln('');
-                    $this->output->writeln('');
-                    $this->output->writeln('Commiting ...');
-                }
                 
                 $commit = $this->solrTools->commit(false, $ierror);
                 if (! $commit)
                     $this->manageFailure($ierror, $progress, 'Failed to commit');
-                else 
-                    if ($this->output != null && $this->debug) {
-                        $this->output->writeln('Last commit took ' . $commit->getQueryTime() . ' ms');
-                        $this->output->writeln('');
-                        $this->output->writeln('');
-                    }
+                else
+                    $this->lastCommitQueryTime = $commit->getQueryTime();
                 
                 $this->lastCommitTick = time();
             }
@@ -287,8 +280,11 @@ class IndexService
         
         $this->resetAverageTick();
         
-        if (! $this->solrTools->commit(false, $ierror))
+        $commit = $this->solrTools->commit(false, $ierror);
+        if (! $commit)
             return false;
+        else
+            $this->lastCommitQueryTime = $commit->getQueryTime();
         
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
@@ -378,9 +374,23 @@ class IndexService
                 
                 $atick = $this->generateAverageTick();
                 if ($atick > - 1)
-                    $progress->setMessage($atick . ' documents updated in the last minute.', 'more');
+                    $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . $this->lastCommitQueryTime . 'ms' : ''), 'more');
                 
                 $this->solrTools->updateDocument($entry, $current, true, $ierror);
+                
+                if ((time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
+                    $progress->setMessage('@', 'job');
+                    $progress->setMessage('[commiting]', 'infos');
+                    $progress->display();
+                    
+                    $commit = $this->solrTools->commit(false, $ierror);
+                    if (! $commit)
+                        $this->manageFailure($ierror, $progress, 'Failed to commit');
+                    else
+                        $this->lastCommitQueryTime = $commit->getQueryTime();
+                    
+                    $this->lastCommitTick = time();
+                }
                 
                 if ($entry->isFailedUpdate() && ! $this->manageFailure($ierror, $progress, 'Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
                     return false;
@@ -389,8 +399,11 @@ class IndexService
         
         $this->resetAverageTick();
         
-        if (! $this->solrTools->commit(false, $ierror))
+        $commit = $this->solrTools->commit(false, $ierror);
+        if (! $commit)
             return false;
+        else
+            $this->lastCommitQueryTime = $commit->getQueryTime();
         
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
