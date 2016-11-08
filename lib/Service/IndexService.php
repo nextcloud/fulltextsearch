@@ -36,11 +36,15 @@ class IndexService
 
     const GETALL_ROWS = 100;
 
-    const REFRESH_LOCK = 10;
+    const REFRESH_LOCK = 20;
 
-    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:12s% %jvm:-30s%      ";
+    const REFRESH_COMMIT = 900;
 
-    const REFRESH_INFO_SYSTEM = 10;
+    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n    %duration:-9s% %infos:12s% %jvm:-30s%      ";
+
+    const PROGRESS_TEMPLATE_DEBUG = "\n %more%";
+    // const PROGRESS_TEMPLATE_DEBUG = "";
+    const REFRESH_INFO_SYSTEM = 20;
 
     private $solrService;
 
@@ -61,6 +65,14 @@ class IndexService
     private $output;
 
     private $lastProgressTick;
+
+    private $lastCommitTick;
+
+    private $lastAverageTick;
+
+    private $lastAverageTickCount;
+
+    private $lastAverageTickValue;
 
     private $debug = false;
 
@@ -159,12 +171,15 @@ class IndexService
         if ($progress != null) {
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'duration');
+            $progress->setMessage('', 'more');
             $progress->setMessage('/', 'job');
             $progress->setMessage('', 'infos');
-            $progress->setFormat(self::PROGRESS_TEMPLATE);
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->start();
         }
         
+        $this->lastCommitTick = time();
         foreach ($data as $entry) {
             
             if ($this->parent != null)
@@ -176,6 +191,9 @@ class IndexService
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
                 $progress->setMessage('/', 'job');
                 $progress->setMessage('[scanning]', 'infos');
+                
+                if ($this->parent != null)
+                    $progress->setMessage('(' . $this->parent->getIndexDuration() . ')', 'duration');
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
@@ -210,10 +228,37 @@ class IndexService
                 $progress->display();
             }
             
+            $atick = $this->generateAverageTick();
+            if ($atick > - 1)
+                $progress->setMessage($atick . ' documents extracted in the last minute.', 'more');
+            
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->generateTempDocument($entry);
             
             $this->solrService->indexDocument($entry, $ierror);
+            
+            if ((time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
+                $progress->setMessage('@', 'job');
+                $progress->setMessage('[commiting]', 'infos');
+                $progress->display();
+                if ($this->output != null && $this->debug) {
+                    $this->output->writeln('');
+                    $this->output->writeln('');
+                    $this->output->writeln('Commiting ...');
+                }
+                
+                $commit = $this->solrTools->commit(false, $ierror);
+                if (! $commit)
+                    $this->manageFailure($ierror, $progress, 'Failed to commit');
+                else 
+                    if ($this->output != null && $this->debug) {
+                        $this->output->writeln('Last commit took ' . $commit->getQueryTime() . ' ms');
+                        $this->output->writeln('');
+                        $this->output->writeln('');
+                    }
+                
+                $this->lastCommitTick = time();
+            }
             
             // fail at extract, let's try just index
             if ($entry->isFailedExtract()) {
@@ -240,7 +285,9 @@ class IndexService
                 $this->fileService->destroyTempDocument($entry);
         }
         
-        if (! $this->solrTools->commit($ierror))
+        $this->resetAverageTick();
+        
+        if (! $this->solrTools->commit(false, $ierror))
             return false;
         
         if ($progress != null) {
@@ -281,9 +328,11 @@ class IndexService
         if ($progress !== null) {
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'duration');
+            $progress->setMessage('', 'more');
             $progress->setMessage('/', 'job');
             $progress->setMessage('[comparing]', 'infos');
-            $progress->setFormat(self::PROGRESS_TEMPLATE);
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->start();
         }
         
@@ -296,6 +345,9 @@ class IndexService
             
             if ($progress !== null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
+                
+                if ($this->parent != null)
+                    $progress->setMessage('(' . $this->parent->getIndexDuration() . ')', 'duration');
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
@@ -323,6 +375,11 @@ class IndexService
             }
             
             if ($entry->neededUpdate()) {
+                
+                $atick = $this->generateAverageTick();
+                if ($atick > - 1)
+                    $progress->setMessage($atick . ' documents updated in the last minute.', 'more');
+                
                 $this->solrTools->updateDocument($entry, $current, true, $ierror);
                 
                 if ($entry->isFailedUpdate() && ! $this->manageFailure($ierror, $progress, 'Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
@@ -330,7 +387,9 @@ class IndexService
             }
         }
         
-        if (! $this->solrTools->commit($ierror))
+        $this->resetAverageTick();
+        
+        if (! $this->solrTools->commit(false, $ierror))
             return false;
         
         if ($progress != null) {
@@ -360,7 +419,7 @@ class IndexService
             $this->solrTools->removeDocument($entry);
         }
         
-        if (! $this->solrTools->commit($ierror))
+        if (! $this->solrTools->commit(false, $ierror))
             return false;
         
         return true;
@@ -391,9 +450,11 @@ class IndexService
             $progress = new ProgressBar($this->output, sizeof($data));
         
         if ($progress != null) {
-            $progress->setFormat(self::PROGRESS_TEMPLATE);
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('/', 'job');
+            $progress->setMessage('', 'duration');
+            $progress->setMessage('', 'more');
             $progress->setMessage('', 'jvm');
             $progress->setMessage('[spoting orphans]', 'infos');
             $progress->start();
@@ -422,6 +483,9 @@ class IndexService
             if ($progress != null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $doc->getType());
                 
+                if ($this->parent != null)
+                    $progress->setMessage('(' . $this->parent->getIndexDuration() . ')', 'duration');
+                
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
                         $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
@@ -447,7 +511,7 @@ class IndexService
             }
             
             if ($progress != null) {
-                $progress->setFormat(self::PROGRESS_TEMPLATE);
+                $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
                 $progress->setMessage('<info>' . $userId . '</info>/' . $type);
                 $progress->setMessage('-', 'job');
                 $progress->setMessage('', 'jvm');
@@ -525,9 +589,11 @@ class IndexService
             if ($progress != null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $type);
                 $progress->setMessage('', 'jvm');
+                $progress->setMessage('', 'duration');
+                $progress->setMessage('', 'more');
                 $progress->setMessage('%', 'job');
                 $progress->setMessage('[preparing]', 'infos');
-                $progress->setFormat(self::PROGRESS_TEMPLATE);
+                $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
                 $progress->start();
             }
             
@@ -591,6 +657,9 @@ class IndexService
                     }
                     
                     if ($progress != null) {
+                        
+                        if ($this->parent != null)
+                            $progress->setMessage('(' . $this->parent->getIndexDuration() . ')', 'duration');
                         
                         if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                             if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
@@ -659,6 +728,7 @@ class IndexService
                     $this->output->writeln('Error #' . $ierror->getCode());
                     $this->output->writeln('Is Solr Up and Running ?');
                     $this->output->writeln('');
+                    $this->output->writeln('');
                 }
                 
                 if ($this->parent != null)
@@ -670,6 +740,31 @@ class IndexService
         }
         
         return true;
+    }
+
+    private function generateAverageTick()
+    {
+        if (! $this->debug)
+            return - 1;
+        
+        if ($this->lastAverageTick == 0) {
+            $this->resetAverageTick();
+            return - 1;
+        }
+        
+        $this->lastAverageTickCount ++;
+        
+        if ((time() - $this->lastAverageTick) > 60) {
+            $this->lastAverageTickValue = $this->lastAverageTickCount;
+            $this->resetAverageTick();
+            return $this->lastAverageTickValue;
+        }
+    }
+
+    private function resetAverageTick()
+    {
+        $this->lastAverageTick = time();
+        $this->lastAverageTickCount = 0;
     }
 }
 
