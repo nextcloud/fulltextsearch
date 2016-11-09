@@ -65,12 +65,8 @@ class Optimize extends Base
             return;
         }
         
-        $toS = $this->configService->toSolarium($config);
-        if (! $toS)
-            return false;
-        
         $this->solrService->setClient(array(
-            'timeout' => 1800
+            'timeout' => 36000
         ));
         
         $infos = $this->solrTools->getInfoCore();
