@@ -146,7 +146,9 @@ class ConfigService
     {
         if ($delay == 0)
             $delay = $this->getAppValue('index_delay');
-        
+            
+            // Uncomment this line to force index each tick of backgroundjob
+            // $delay = 0;
         return ($this->getAppValue('index_' . $type . '_last') < (time() - (3600 * $delay)));
     }
 
