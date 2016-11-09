@@ -197,7 +197,8 @@ style('nextant', 'admin');
 						</td>
 							<td colspan="2"><input type="checkbox" name="solr_index_live"
 								id="solr_index_live" value="1" style="margin: 10px;"> <input
-								type="text" id="solr_index_live_queuekey" style="width: 100px; font-size: 12px;" /></td>
+								type="text" id="solr_index_live_queuekey"
+								style="width: 100px; font-size: 12px;" /></td>
 						</tr>
 
 						<tr style="height: 30px;">
@@ -232,7 +233,11 @@ style('nextant', 'admin');
 	    <?php p($l->t('Number of documents :')) ?></td>
 							<td><div id="solr_current_docs"></div></td>
 						</tr>
-
+						<tr style="height: 30px;">
+							<td class="nextant_admin_left">
+	    <?php p($l->t('Number of segments :')) ?></td>
+							<td><div id="solr_current_segments"></div></td>
+						</tr>
 						<tr>
 							<td>&nbsp;</td>
 						</tr>

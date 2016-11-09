@@ -110,6 +110,7 @@ class SettingsController extends Controller
             'display_result' => $this->configService->getAppValue('display_result'),
             'replace_core_search' => $this->configService->getAppValue('replace_core_search'),
             'current_docs' => $this->solrTools->count('files'),
+            'current_segments' => $this->solrTools->getInfoCore()->index->segmentCount,
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
             'index_bookmarks' => $this->configService->getAppValue('index_bookmarks'),
             'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
