@@ -1,4 +1,14 @@
-*v0.6.4**
+**v0.6.5**
+- Optimized Index/Extract/Commit
+- complete debug information while indexing
+- better nextant:optimize
+- live queueID is now unique and generated on-the-fly, fixing an issue when more than one cloud is running on the same server.
+- File Filters (#58)
+- fixed home link (#60)
+- search suggestion in public link (#59)
+
+
+**v0.6.4**
 - better error and debug information
 - bugfixes
  

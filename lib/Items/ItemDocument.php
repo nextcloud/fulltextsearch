@@ -79,6 +79,8 @@ class ItemDocument
 
     private $updated = false;
 
+    private $failedIndex = false;
+
     private $failedExtract = false;
 
     private $failedUpdate = false;
@@ -292,9 +294,9 @@ class ItemDocument
         return $this->extracted;
     }
 
-    public function processed($extracted)
+    public function processed($processed)
     {
-        $this->processed = $extracted;
+        $this->processed = $processed;
     }
 
     public function isProcessed()
@@ -332,6 +334,16 @@ class ItemDocument
         return $this->updated;
     }
 
+    public function failedIndex($index)
+    {
+        $this->failedIndex = $index;
+    }
+
+    public function isFailedIndex()
+    {
+        return $this->failedIndex;
+    }
+
     public function failedExtract($failed)
     {
         $this->failedExtract = $failed;
@@ -366,17 +378,16 @@ class ItemDocument
     {
         return $this->temp;
     }
-
-//     public function sharelink($link)
-//     {
-//         $this->link = $link;
-//     }
-
-//     public function isSharelink()
-//     {
-//         return $this->link;
-//     }
-
+    
+    // public function sharelink($link)
+    // {
+    // $this->link = $link;
+    // }
+    
+    // public function isSharelink()
+    // {
+    // return $this->link;
+    // }
     public function invalid($invalid)
     {
         $this->invalid = $invalid;

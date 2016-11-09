@@ -78,7 +78,7 @@ class Application extends App
         });
         
         $container->registerService('QueueService', function ($c) {
-            return new QueueService($c->query('IndexService'), $c->query('FileService'), $c->query('MiscService'));
+            return new QueueService($c->query('ConfigService'), $c->query('IndexService'), $c->query('FileService'), $c->query('MiscService'));
         });
         
         $container->registerService('FileService', function ($c) {
@@ -117,7 +117,7 @@ class Application extends App
         // $container->query('IndexMapper')->insert(new IndexEntity(array(userid => 2, 'path' => '/toto', 'clef' => 'CLEFCLEF')));
         
         $container->registerService('SearchController', function ($c) {
-            return new SearchController($c->query('AppName'), $c->query('Request'), $c->query('UserId'), $c->query('GroupManager'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('MiscService'));
+            return new SearchController($c->query('AppName'), $c->query('Request'), $c->query('UserId'), $c->query('GroupManager'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('FileService'), $c->query('BookmarkService'), $c->query('MiscService'));
         });
         
         $container->registerService('SettingsController', function ($c) {

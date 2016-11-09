@@ -32,6 +32,9 @@ use \OCA\Nextant\Service\ConfigService;
 class SolrService
 {
     
+    // no solr
+    const ERROR_SOLRSERVICE_DOWN = 2;
+    
     // Owner is not set - mostly a developper mistake
     const ERROR_OWNER_NOT_SET = 4;
     
@@ -51,9 +54,13 @@ class SolrService
     
     // can't reach solr - check uri
     const EXCEPTION_SOLRURI = 24;
+
+    const EXCEPTION_INDEX_FAILED = 31;
     
     // can't extract - check solr configuration for the solr-cell plugin
     const EXCEPTION_EXTRACT_FAILED = 41;
+
+    const ERROR_DOCUMENT_NOT_EXIST = 49;
 
     const EXCEPTION_UPDATE_FAILED = 51;
 
@@ -126,6 +133,7 @@ class SolrService
         }
         return $this->configured;
     }
+    
     // If $config == null, reset config to the one set in the admin
     public function setClient($config)
     {
@@ -170,36 +178,62 @@ class SolrService
         $this->groups = $groups;
     }
 
-    public static function extractableFile($mimetype, $path = '')
+    public function extractableFile($mimetype, $path = '')
     {
+        $filters = $this->configService->getFileFilters();
+        
+        if ($path !== '' && $pinfo = pathinfo($path)) {
+            if (key_exists('extension', $pinfo) && in_array('.' . $pinfo['extension'], $filters['extensions']))
+                return false;
+        }
+        
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
+                if ($filters['text'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
         }
         
         switch ($mimetype) {
-            case 'image/jpeg':
-                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
-            
-            case 'image/tiff':
-                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
             
             case 'application/epub+zip':
+                if ($filters['pdf'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
             case 'application/pdf':
+                if ($filters['pdf'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/application-pdf.svg');
             
             case 'application/rtf':
+                if ($filters['pdf'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
             case 'application/msword':
+                if ($filters['office'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
             
+            case 'image/jpeg':
+                if ($filters['image'] !== '1')
+                    return false;
+                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+            
+            case 'image/tiff':
+                if ($filters['image'] !== '1')
+                    return false;
+                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+            
             case 'audio/mpeg':
+                if ($filters['audio'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
             
             case 'audio/flac':
+                if ($filters['audio'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
             
             case 'application/octet-stream':
@@ -213,7 +247,7 @@ class SolrService
                     
                     if ($tmpmime === 'application/octet-stream')
                         return false;
-                    return self::extractableFile($tmpmime);
+                    return $this->extractableFile($tmpmime);
                 }
                 
                 if (key_exists('extension', $pinfo))
@@ -234,8 +268,11 @@ class SolrService
         );
         
         foreach ($acceptedMimeType['vnd'] as $mt) {
-            if (substr($mimetype, 0, strlen($mt)) == $mt)
+            if (substr($mimetype, 0, strlen($mt)) == $mt) {
+                if ($filters['office'] !== '1')
+                    return false;
                 return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+            }
         }
         
         return false;
@@ -249,6 +286,9 @@ class SolrService
     public static function extractableFileExtension($extension)
     {
         switch ($extension) {
+            case 'srt':
+                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+            
             case 'mid':
                 return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
         }
@@ -286,6 +326,9 @@ class SolrService
             $ierror = new ItemError(self::ERROR_SOLR_CONFIG);
             return false;
         }
+        
+        // $document->failedExtract(false);
+        // $document->failedIndex(false);
         
         try {
             $client = $this->getClient();
@@ -340,7 +383,7 @@ class SolrService
             if ($document->isExtractable()) {
                 $doc->nextant_extracted = true;
                 
-                $query->setCommit(true);
+                // $query->setCommit(true);
                 $query->setDocument($doc);
                 
                 // custom options
@@ -358,7 +401,8 @@ class SolrService
                     return true;
                 }
             } else {
-                $query->addCommit();
+                $doc->text = '';
+                // $query->addCommit();
                 $query->addDocuments(array(
                     $doc
                 ));
@@ -372,9 +416,12 @@ class SolrService
                 }
             }
         } catch (\Solarium\Exception\HttpException $ehe) {
-            if ($ehe->getStatusMessage() == 'OK')
-                $ierror = new ItemError(self::EXCEPTION_EXTRACT_FAILED, $ehe->getStatusMessage());
-            else
+            if ($ehe->getStatusMessage() == 'OK') {
+                if ($document->isExtractable())
+                    $ierror = new ItemError(self::EXCEPTION_EXTRACT_FAILED, $ehe->getStatusMessage());
+                else
+                    $ierror = new ItemError(self::EXCEPTION_INDEX_FAILED, $ehe->getStatusMessage());
+            } else
                 $ierror = new ItemError(self::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
         } catch (\Solarium\Exception\RuntimeException $re) {
             $ierror = new ItemError(self::EXCEPTION_RUNTIME, $re->getMessage());
@@ -382,7 +429,10 @@ class SolrService
             $ierror = new ItemError(self::EXCEPTION, $e->getMessage());
         }
         
-        $document->failedExtract(true);
+        if ($document->isExtractable())
+            $document->failedExtract(true);
+        else
+            $document->failedIndex(true);
         
         return false;
     }
@@ -396,7 +446,7 @@ class SolrService
             return false;
         
         $string = str_replace('  ', ' ', trim($string));
-        $astring = explode(' ', $string);
+        $astring = preg_split("/(\ )(?=(?:[^\"]|\"[^\"]*\")*$)/m", $string);
         
         if ($string == '')
             return false;
@@ -421,14 +471,33 @@ class SolrService
             $query->setRows(25);
             
             // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
-            
             array_push($options, 'complete_words');
-            $q = 'text:' . $helper->escapeTerm(implode(' AND ', $astring)) . "\n";
-            $words = explode(' ', $string);
-            foreach ($words as $word)
-                $q .= 'nextant_path:*' . $helper->escapeTerm($word) . '*' . "\n";
+            
+            $q = '';
+            $path = '';
+            $special = '+-';
+            foreach ($astring as $qstr) {
                 
-                // $this->miscService->log($q);
+                $oper = '';
+                $value = 1;
+                
+                if (strpos($special, substr($qstr, 0, 1)) !== false) {
+                    $oper = substr($qstr, 0, 1);
+                    $qstr = substr($qstr, 1);
+                }
+                
+                $path .= 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^10 ' . "\n";
+                
+                if (substr($qstr, 0, 1) == '"')
+                    $value *= 30;
+                
+                $q .= $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ' ';
+            }
+            
+            $q .= "\n" . $path;
+            
+            // Uncomment to display the request sent to solr
+            // $this->miscService->log($q);
             $query->setQuery($q);
             
             $query->createFilterQuery('owner')->setQuery($ownerQuery);

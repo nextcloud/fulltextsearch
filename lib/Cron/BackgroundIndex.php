@@ -35,6 +35,8 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 
     private $configService;
 
+    private $solrAdmin;
+
     private $miscService;
 
     public function __construct()
@@ -52,6 +54,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->userManager = $c->query('UserManager');
         $this->solrService = $c->query('SolrService');
         $this->solrTools = $c->query('SolrToolsService');
+        $this->solrAdmin = $c->query('SolrAdminService');
         $this->fileService = $c->query('FileService');
         $this->indexService = $c->query('IndexService');
         $this->bookmarkService = $c->query('BookmarkService');
@@ -61,10 +64,13 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         if (! $this->solrService->configured(false))
             return;
         
+        if (! $this->solrAdmin->ping())
+            return;
+        
         if ($this->configService->isLockedIndex())
             return;
         
-        $this->indexService->lockActive(true);            
+        $this->indexService->lockActive(true);
         $this->configService->lockIndex(true);
         
         $this->liveIndex();

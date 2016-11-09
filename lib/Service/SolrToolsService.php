@@ -80,19 +80,55 @@ class SolrToolsService
     /**
      * optimize the Solr Core
      *
-     * @param number $error            
+     * @param ItemError $ierror            
      * @return boolean|Solarium\Core\Query\Result
      */
     public function optimizeSolrIndex(&$ierror = 0)
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         try {
             $client = $this->solrService->getClient();
             
             $update = $client->createUpdate();
             $update->addOptimize(true, true, 5);
+            $result = $client->update($update);
+            
+            return $result;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
+        } catch (\Solarium\Exception $e) {
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
+        }
+        
+        return false;
+    }
+
+    /**
+     * commit
+     *
+     * @param ItemError $ierror            
+     * @return boolean|Solarium\Core\Query\Result
+     */
+    public function commit($optimize = false, &$ierror = 0)
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
+            return false;
+        }
+        
+        try {
+            $client = $this->solrService->getClient();
+            
+            $update = $client->createUpdate();
+            $update->addCommit();
+            if ($optimize)
+                $update->addOptimize(true, true, 5);
             $result = $client->update($update);
             
             return $result;
@@ -116,12 +152,16 @@ class SolrToolsService
      */
     public function updateDocument(&$final, &$current, $update = true, &$ierror = '')
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         try {
-            if ($final == null || $current == null)
+            if ($final == null || $current == null) {
+                $ierror = new ItemError(SolrService::ERROR_DOCUMENT_NOT_EXIST);
                 return false;
+            }
             
             $modifs = false;
             if (! MiscService::arraysIdentical($final->getShare(), $current->getShare()))
@@ -133,6 +173,8 @@ class SolrToolsService
             if ($final->getOwner() !== $current->getOwner())
                 $modifs = true;
             if ($final->isDeleted() != $current->isDeleted())
+                $modifs = true;
+            if (! $final->isExtractable() && $current->isExtracted())
                 $modifs = true;
             
             if (! $modifs)
@@ -188,9 +230,17 @@ class SolrToolsService
                 $doc->setFieldModifier('nextant_deleted', 'set');
             }
             
+            if (! $final->isExtractable() && $current->isExtracted()) {
+                $doc->setField('text', '');
+                $doc->setFieldModifier('text', 'set');
+                $doc->setField('nextant_extracted', false);
+                $doc->setFieldModifier('nextant_extracted', 'set');
+            }
+            
             $query->addDocuments(array(
                 $doc
-            ))->addCommit();
+            ));
+            // $query->addCommit();
             
             if ($request = $client->update($query)) {
                 // fixing solrDocs' data
@@ -225,13 +275,15 @@ class SolrToolsService
      * remove document by its id
      *
      * @param number $docid            
-     * @param number $error            
+     * @param ItemError $ierror            
      * @return boolean
      */
-    public function removeDocument(&$doc, $ierror)
+    public function removeDocument(&$doc, &$ierror = '')
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         if ($doc == null)
             return false;
@@ -241,7 +293,7 @@ class SolrToolsService
             $update = $client->createUpdate();
             
             $update->addDeleteById($doc->getType() . '_' . $doc->getId());
-            $update->addCommit();
+            // $update->addCommit();
             
             $ret = $client->update($update);
             
@@ -263,9 +315,9 @@ class SolrToolsService
     /**
      * Check the mtime of a file and return if document is up to date
      *
-     * @param number $docid            
-     * @param number $mtime            
-     * @param number $error            
+     * @param ItemDocument $document            
+     * @param ItemDocument $solr            
+     * @param ItemError $ierror            
      * @return boolean
      */
     public function isDocumentUpToDate(&$document, $solr = null, &$ierror = 0)
@@ -274,23 +326,32 @@ class SolrToolsService
             return false;
         
         if ($solr != null && $solr != '' && ($document->getMTime() == $solr->getMTime())) {
-            if ($document->isExtractable())
-                $document->extracted(true);
             $document->indexed(true);
-            return true;
+            if (! $document->isExtractable())
+                return true;
+            
+            if ($solr->isExtracted()) {
+                $document->extracted(true);
+                return true;
+            }
+            
+            return false;
+        }
+        
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
+            return false;
         }
         
         try {
-            
-            if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
-                return false;
             
             $client = $this->solrService->getClient();
             
             $query = $client->createSelect();
             $query->setQuery('id:' . $document->getType() . '_' . $document->getId());
             $query->setFields(array(
-                'nextant_mtime'
+                'nextant_mtime',
+                'nextant_extracted'
             ));
             
             $resultset = $client->select($query);
@@ -300,7 +361,7 @@ class SolrToolsService
             
             foreach ($resultset as $doc) {
                 if ($document->getMTime() == $doc->nextant_mtime) {
-                    if ($document->isExtractable())
+                    if ($doc->nextant_extracted)
                         $document->extracted(true);
                     $document->indexed(true);
                     return true;
@@ -320,13 +381,15 @@ class SolrToolsService
     /**
      * return information about the current status of the Solr servlet.
      *
-     * @param number $error            
+     * @param ItemError $ierror            
      * @return boolean|Solarium\Core\Query\Result
      */
     public function getInfoSystem(&$ierror = '')
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         try {
             $client = $this->solrService->getAdminClient();
@@ -335,6 +398,45 @@ class SolrToolsService
             $request = $client->createRequest($query);
             
             $request->setHandler('admin/info/system');
+            
+            $response = $client->executeRequest($request);
+            if ($response->getStatusCode() != 200)
+                return false;
+            
+            $result = json_decode($response->getBody());
+            
+            return $result;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
+        } catch (\Solarium\Exception $e) {
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
+        }
+        
+        return false;
+    }
+
+    /**
+     * return information about the current status of the solr core.
+     *
+     * @param ItemError $ierror            
+     * @return boolean|Solarium\Core\Query\Result
+     */
+    public function getInfoCore(&$ierror = '')
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
+            return false;
+        }
+        
+        try {
+            $client = $this->solrService->getClient();
+            
+            $query = $client->createSelect();
+            $request = $client->createRequest($query);
+            
+            $request->setHandler('admin/luke');
             
             $response = $client->executeRequest($request);
             if ($response->getStatusCode() != 200)
@@ -364,8 +466,10 @@ class SolrToolsService
      */
     public function count($type = '', $userId = '', &$ierror = '')
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         $client = $this->solrService->getClient();
         

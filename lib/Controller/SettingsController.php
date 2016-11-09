@@ -89,7 +89,7 @@ class SettingsController extends Controller
         $response = array(
             'instant' => $instant,
             'configured' => $this->configService->getAppValue('configured'),
-            'ping' => $this->solrAdmin->ping($error),
+            'ping' => $this->solrAdmin->ping(),
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core'),
             'solr_timeout' => $this->configService->getAppValue('solr_timeout'),
@@ -97,16 +97,25 @@ class SettingsController extends Controller
             'index_files' => $this->configService->getAppValue('index_files'),
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
-            'index_files_live' => $this->configService->getAppValue('index_files_live'),
             'index_files_tree' => $this->configService->getAppValue('index_files_tree'),
             'index_files_sharelink' => $this->configService->getAppValue('index_files_sharelink'),
             'index_files_external' => $this->configService->getAppValue('index_files_external'),
             'index_files_encrypted' => $this->configService->getAppValue('index_files_encrypted'),
+            'index_files_filters_text' => $this->configService->getAppValue('index_files_filters_text'),
+            'index_files_filters_pdf' => $this->configService->getAppValue('index_files_filters_pdf'),
+            'index_files_filters_office' => $this->configService->getAppValue('index_files_filters_office'),
+            'index_files_filters_image' => $this->configService->getAppValue('index_files_filters_image'),
+            'index_files_filters_audio' => $this->configService->getAppValue('index_files_filters_audio'),
+            'index_files_filters_extensions' => self::FileFiltersExtensionsAsList($this->configService->getAppValue('index_files_filters_extensions')),
             'display_result' => $this->configService->getAppValue('display_result'),
+            'replace_core_search' => $this->configService->getAppValue('replace_core_search'),
             'current_docs' => $this->solrTools->count('files'),
+            'current_segments' => $this->solrTools->getInfoCore()->index->segmentCount,
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
             'index_bookmarks' => $this->configService->getAppValue('index_bookmarks'),
             'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
+            'index_live' => $this->configService->getAppValue('index_live'),
+            'index_live_queuekey' => $this->configService->getAppValue('index_live_queuekey'),
             'index_delay' => $this->configService->getAppValue('index_delay'),
             'index_locked' => $this->configService->getAppValue('index_locked'),
             'index_files_last' => $this->configService->getAppValue('index_files_last'),
@@ -119,17 +128,30 @@ class SettingsController extends Controller
         return $response;
     }
 
-    public function setOptionsFiles($index_files, $index_files_live, $index_files_max_size, $index_files_tree, $index_files_sharelink, $index_files_external, $index_files_encrypted)
+    public function setOptionsFiles($index_files, $index_files_max_size, $index_files_tree, $index_files_sharelink, $index_files_external, $index_files_encrypted, $index_files_filters)
     {
         $this->configService->setAppValue('index_files', $index_files);
-        $this->configService->setAppValue('index_files_live', $index_files_live);
         $this->configService->setAppValue('index_files_tree', $index_files_tree);
         $this->configService->setAppValue('index_files_sharelink', $index_files_sharelink);
         $this->configService->setAppValue('index_files_external', $index_files_external);
         $this->configService->setAppValue('index_files_encrypted', $index_files_encrypted);
         $this->configService->setAppValue('index_files_max_size', $index_files_max_size);
+        $this->configService->setAppValue('index_files_filters', $index_files_filters);
         
         return $this->updateSubOptions(false, 'files');
+    }
+
+    public function setOptionsFilesFilters($index_files_filters_text, $index_files_filters_pdf, $index_files_filters_office, $index_files_filters_image, $index_files_filters_audio, $index_files_filters_extensions)
+    {
+        $this->configService->setAppValue('index_files_filters_text', $index_files_filters_text);
+        $this->configService->setAppValue('index_files_filters_pdf', $index_files_filters_pdf);
+        $this->configService->setAppValue('index_files_filters_office', $index_files_filters_office);
+        $this->configService->setAppValue('index_files_filters_image', $index_files_filters_image);
+        $this->configService->setAppValue('index_files_filters_audio', $index_files_filters_audio);
+        
+        $this->configService->setAppValue('index_files_filters_extensions', self::FileFiltersExtensionsAsString($index_files_filters_extensions));
+        
+        return $this->updateSubOptions(false, 'files_filters');
     }
 
     public function setOptionsBookmarks($index_bookmarks)
@@ -139,11 +161,18 @@ class SettingsController extends Controller
         return $this->updateSubOptions(false, 'bookmarks');
     }
 
-    public function setOptionsStatus($index_delay, $display_result, $force_index)
+    public function setOptionsStatus($index_live, $index_delay, $display_result, $replace_core_search, $force_index)
     {
+        if ($index_live === '1' && $this->configService->getAppValue('index_live') !== '1')
+            $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
+        
+        $this->configService->setAppValue('index_live', $index_live);
+        
         if ($index_delay > 0)
             $this->configService->setAppValue('index_delay', $index_delay);
         $this->configService->setAppValue('display_result', $display_result);
+        // $this->configService->setAppValue('replace_core_search', $replace_core_search);
+        
         if ($force_index === '1') {
             $this->configService->setAppValue('configured', '1');
             $this->configService->needIndexFiles(true);
@@ -218,74 +247,77 @@ class SettingsController extends Controller
     // Wiki Error 9
     private function test_ping(&$message)
     {
-        if ($this->solrAdmin->ping($error)) {
+        if ($this->solrAdmin->ping($ierror)) {
             $message = 'Apache Solr is up, running and responding to our ping query';
             return true;
         }
         
-        $message = 'Apache Solr is not responding to our ping query (Error #' . $error . ')';
+        $message = 'Apache Solr is not responding to our ping query (Error #' . $ierror->getCode() . ')';
         return false;
     }
 
     private function test_schema(&$message)
     {
-        if ($this->solrAdmin->checkSchema(true, $error)) {
+        if ($this->solrAdmin->checkSchema(true, $ierror)) {
             $message = 'Schema is fine';
             return true;
         }
         
-        $message = 'Were not able to verify/fix your schema integrity (Error #' . $error . ')';
+        $message = 'Were not able to verify/fix your schema integrity (Error #' . $ierror->getCode() . ')';
         return false;
     }
 
     private function test_extract(&$message)
     {
-        $testFile = __DIR__ . '/../../LICENSE';
-        $doc = new ItemDocument(ItemDocument::TYPE_TEST, 1);
-        $doc->setAbsolutePath($testFile);
-        $doc->setPath('/LICENSE');
-        $doc->setMTime(time());
+        $doc = self::generateTestDocument(1, __DIR__ . '/../../LICENSE', '/LICENSE');
         
         $data = array(
             $doc
         );
         $solrDocs = null;
-        $this->indexService->extract(ItemDocument::TYPE_TEST, '_nextant_test', $data, $solrDocs, true, $error);
+        $this->indexService->extract(ItemDocument::TYPE_TEST, '_nextant_test', $data, $solrDocs, true, $ierror);
         
         if ($doc->isProcessed()) {
             $message = 'Text successfully extracted';
             return true;
         }
         
-        $message = 'Extract failed. Please check the configuration of your Solr server (Error #' . $error . ')';
+        $message = 'Extract failed. Please check the configuration of your Solr server (Error #' . $ierror->getCode() . ')';
         return false;
     }
 
     private function test_update(&$message)
     {
-        $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $error);
+        $doc = self::generateTestDocument(1, __DIR__ . '/../../LICENSE', '/LICENSE2');
+        $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $ierror);
         
-        if (sizeof($asource) != 1) {
-            $message('Error Updating field - Can\'t find original document');
+        if ($asource == false || sizeof($asource) != 1) {
+            $message('Error Updating field - Can\'t find original document - ' . $ierror->getCode());
             return false;
         }
         
         $source = $asource[0];
-        $final = new ItemDocument(ItemDocument::TYPE_TEST, 1);
-        $final->setOwner('_nextant_test');
-        $final->setPath('/LICENSE2');
-        $final->setShare(array(
+        $doc->setPath('/LICENSE2');
+        $doc->setShare(array(
             'nextant_test_share'
         ));
-        $final->setShareGroup(array(
+        $doc->setShareGroup(array(
             'nextant_test_share_group'
         ));
-        $final->deleted(false);
+        $doc->deleted(false);
         
-        $this->solrTools->updateDocument($final, $source, true, $ierror);
+        $data = array(
+            $doc
+        );
+        $this->indexService->updateDocuments(ItemDocument::TYPE_TEST, '_nextant_test', $data, $asource, $ierror);
+        
+        if (! $this->solrTools->commit(false, $ierror)) {
+            $message = 'Error during commit (Error #' . $ierror->getCode() . ')';
+            return false;
+        }
         
         if (! $source->isUpdated()) {
-            $message = 'Error Updating field (Error #' . $error->getCode() . ')';
+            $message = 'Error Updating field (Error #' . $ierror->getCode() . ')';
             return false;
         }
         
@@ -322,13 +354,16 @@ class SettingsController extends Controller
     private function test_delete(&$message)
     {
         $doc = new ItemDocument(ItemDocument::TYPE_TEST, 1);
-        $this->solrTools->removeDocument($doc);
+        $data = array(
+            $doc
+        );
+        $this->indexService->removeDocuments($data, $ierror);
         if ($doc->isRemoved()) {
             $message = 'Test document deleted';
             return true;
         }
         
-        $message = 'We could not delete our test document. Please check the configuration of your Solr server (Error #' . $error . ')';
+        $message = 'We could not delete our test document. Please check the configuration of your Solr server (Error #' . $ierror->getCode() . ')';
         return false;
     }
 
@@ -351,5 +386,54 @@ class SettingsController extends Controller
         
         $message = 'Configuration failed to be saved. Please reload this page.';
         return false;
+    }
+
+    private static function generateTestDocument($docid, $absolutePath, $path)
+    {
+        $doc = new ItemDocument(ItemDocument::TYPE_TEST, $docid);
+        $doc->setAbsolutePath($absolutePath);
+        $doc->setPath($path);
+        $doc->setMTime(time());
+        
+        return $doc;
+    }
+
+    public static function FileFiltersExtensionsAsArray($text)
+    {
+        $extensions = array();
+        if ($text == '')
+            return $extensions;
+        
+        $lines = explode("\n", $text);
+        foreach ($lines as $line) {
+            $exts = explode(' ', $line);
+            foreach ($exts as $ext) {
+                $ext = trim($ext);
+                if (strlen($ext) > 1 && substr($ext, 0, 1) === '.' && ! in_array($ext, $extensions))
+                    $extensions[] = $ext;
+            }
+        }
+        
+        return $extensions;
+    }
+
+    public static function FileFiltersExtensionsAsString($arr)
+    {
+        if (! is_array($arr))
+            $arr = self::FileFiltersExtensionsAsArray($arr);
+        return implode(' ', $arr);
+    }
+
+    public static function FileFiltersExtensionsAsList($text)
+    {
+        $a = self::FileFiltersExtensionsAsArray($text);
+        
+        $lines = array();
+        $chunk = array_chunk($a, 6);
+        foreach ($chunk as $c) {
+            $lines[] = self::FileFiltersExtensionsAsString($c);
+        }
+        
+        return implode("\n", $lines);
     }
 }

@@ -33,9 +33,9 @@ use \OCA\Nextant\Items\ItemDocument;
 class QueueService
 {
 
-    const QUEUE_ID = 19375;
-
     private $userId;
+
+    private $configService;
 
     private $indexService;
 
@@ -45,9 +45,9 @@ class QueueService
 
     private $queue = null;
 
-    public function __construct($indexService, $fileService, $miscService)
+    public function __construct($configService, $indexService, $fileService, $miscService)
     {
-        // $this->configService = $configService;\
+        $this->configService = $configService;
         $this->indexService = $indexService;
         $this->fileService = $fileService;
         $this->miscService = $miscService;
@@ -55,7 +55,7 @@ class QueueService
 
     public function liveIndex($item)
     {
-        $queue = msg_get_queue(self::QUEUE_ID);
+        $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
         $msg = ItemQueue::toJson($item);
         
         if (! msg_send($queue, 1, $msg))
@@ -64,12 +64,12 @@ class QueueService
 
     public function emptyQueue()
     {
-        msg_remove_queue(msg_get_queue(self::QUEUE_ID));
+        msg_remove_queue(msg_get_queue($this->configService->getAppValue('index_live_queuekey')));
     }
 
     public function readQueue($standby = false)
     {
-        $queue = msg_get_queue(self::QUEUE_ID);
+        $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
         
         $msg_type = NULL;
         $msg = NULL;

@@ -26,6 +26,7 @@
  */
 namespace OCA\Nextant\Service;
 
+use \OCA\Nextant\Controller\SettingsController;
 use OCP\IConfig;
 
 class ConfigService
@@ -35,17 +36,16 @@ class ConfigService
 
     const SEARCH_DISPLAY_FILES = 2;
 
-    const ACTION_LIVE_EXTRACT = 'index_files_live';
-
-    const ACTION_LIVE_DOCUPDATE = 'index_files_live';
-
     private $defaults = [
         'configured' => '0',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
         'solr_timeout' => 30,
         'display_result' => 1,
+        'replace_core_search' => 0,
         
+        'index_live' => 1,
+        'index_live_queuekey' => 19375,
         'index_delay' => 2,
         'index_locked' => 0,
         'index_files_last' => 0,
@@ -58,8 +58,13 @@ class ConfigService
         'undex_files_sharelink' => 0,
         'index_files_external' => 0,
         'index_files_encrypted' => 0,
-        'index_files_live' => 1,
         'index_files_max_size' => 40,
+        'index_files_filters_text' => 1,
+        'index_files_filters_pdf' => 1,
+        'index_files_filters_office' => 1,
+        'index_files_filters_image' => 0,
+        'index_files_filters_audio' => 0,
+        'index_files_filters_extensions' => '',
         
         'index_bookmarks' => 0,
         'index_bookmarks_needed' => 1
@@ -70,6 +75,8 @@ class ConfigService
     private $config;
 
     private $miscService;
+
+    private $fileFilters = null;
 
     public function __construct($appName, IConfig $config, $miscService)
     {
@@ -95,6 +102,7 @@ class ConfigService
         $this->deleteAppValue('max_size');
         $this->deleteAppValue('external_index');
         $this->deleteAppValue('index_files_live_extract');
+        $this->deleteAppValue('index_files_live');
         $this->deleteAppValue('index_files_live_update');
     }
 
@@ -138,7 +146,9 @@ class ConfigService
     {
         if ($delay == 0)
             $delay = $this->getAppValue('index_delay');
-        
+            
+            // Uncomment this line to force index each tick of backgroundjob
+            // $delay = 0;
         return ($this->getAppValue('index_' . $type . '_last') < (time() - (3600 * $delay)));
     }
 
@@ -208,25 +218,21 @@ class ConfigService
         return $this->config->deleteAppValue($this->appName, $key);
     }
 
-    /**
-     * return if config allow to perform action
-     *
-     * @param string $action            
-     * @return boolean
-     */
-    // public function shoudIContinue($action)
-    // {
-    // switch ($action) {
-    // case self::ACTION_LIVE_EXTRACT:
-    // return ($this->getAppValue($action) == '1');
-    
-    // case self::ACTION_LIVE_DOCUPDATE:
-    // if ($this->getAppValue(self::ACTION_LIVE_EXTRACT) != '1')
-    // return false;
-    // return ($this->getAppValue($action) == '1');
-    // }
-    // }
-    
+    public function getFileFilters()
+    {
+        if ($this->fileFilters == null)
+            $this->fileFilters = array(
+                'text' => $this->getAppValue('index_files_filters_text'),
+                'pdf' => $this->getAppValue('index_files_filters_pdf'),
+                'office' => $this->getAppValue('index_files_filters_office'),
+                'image' => $this->getAppValue('index_files_filters_image'),
+                'audio' => $this->getAppValue('index_files_filters_audio'),
+                'extensions' => SettingsController::FileFiltersExtensionsAsArray($this->getAppValue('index_files_filters_extensions'))
+            );
+        
+        return $this->fileFilters;
+    }
+
     /**
      * generate an array to pass config to Solarium
      *
@@ -234,11 +240,17 @@ class ConfigService
      */
     public function toSolarium($config = null)
     {
-        if ($config == null || ! key_exists('solr_url', $config))
+        if ($config == null)
+            $config = array();
+        
+        if (! key_exists('solr_url', $config))
             $config['solr_url'] = $this->getAppValue('solr_url');
         
-        if ($config == null || ! key_exists('solr_core', $config))
+        if (! key_exists('solr_core', $config))
             $config['solr_core'] = $this->getAppValue('solr_core');
+        
+        if (! key_exists('timeout', $config))
+            $config['timeout'] = $this->getAppValue('solr_timeout');
         
         $url = $config['solr_url'];
         $t = parse_url($url);
@@ -246,12 +258,10 @@ class ConfigService
         if (! key_exists('host', $t) || ! key_exists('port', $t) || ! key_exists('path', $t))
             return false;
         
-        $timeout = $this->getAppValue('solr_timeout');
-        
         return array(
             'endpoint' => array(
                 'localhost' => array(
-                    'timeout' => ($timeout < 5) ? 5 : $timeout,
+                    'timeout' => ($config['timeout'] < 5) ? 5 : $config['timeout'],
                     'host' => $t['host'],
                     'port' => $t['port'],
                     'core' => $config['solr_core'],

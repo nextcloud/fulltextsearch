@@ -36,11 +36,15 @@ class IndexService
 
     const GETALL_ROWS = 100;
 
-    const REFRESH_LOCK = 10;
+    const REFRESH_LOCK = 20;
 
-    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:5s%/%max:5s% [%bar%] %percent:3s%% \n    %infos:12s% %jvm:-30s%      ";
+    const REFRESH_COMMIT = 900;
 
-    const REFRESH_INFO_SYSTEM = 10;
+    const PROGRESS_TEMPLATE = "%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      ";
+
+    const PROGRESS_TEMPLATE_DEBUG = "\n %more%";
+    // const PROGRESS_TEMPLATE_DEBUG = "";
+    const REFRESH_INFO_SYSTEM = 20;
 
     private $solrService;
 
@@ -62,6 +66,16 @@ class IndexService
 
     private $lastProgressTick;
 
+    private $lastCommitTick;
+
+    private $lastAverageTick;
+
+    private $lastAverageTickCount;
+
+    private $lastAverageTickValue;
+
+    private $lastCommitQueryTime = 0;
+
     private $debug = false;
 
     private $force = false;
@@ -69,6 +83,8 @@ class IndexService
     private $last_lock = 0;
 
     private $active_lock = false;
+
+    private $initTime = 0;
 
     public function __construct($configService, $fileService, $bookmarkService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
@@ -111,6 +127,18 @@ class IndexService
     {
         if ($this->output != null)
             $this->output->writeln($line);
+    }
+
+    public function init()
+    {
+        $this->initTime = time();
+    }
+
+    public function getIndexDuration()
+    {
+        if ($this->initTime == 0)
+            return - 1;
+        return gmdate("H:i:s", (time() - $this->initTime));
     }
 
     public function lockActive($active)
@@ -159,12 +187,15 @@ class IndexService
         if ($progress != null) {
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'duration');
+            $progress->setMessage('', 'more');
             $progress->setMessage('/', 'job');
             $progress->setMessage('', 'infos');
-            $progress->setFormat(self::PROGRESS_TEMPLATE);
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->start();
         }
         
+        $this->lastCommitTick = time();
         foreach ($data as $entry) {
             
             if ($this->parent != null)
@@ -176,6 +207,9 @@ class IndexService
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
                 $progress->setMessage('/', 'job');
                 $progress->setMessage('[scanning]', 'infos');
+                
+                if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                    $progress->setMessage('(' . $dura . ')', 'duration');
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
@@ -210,21 +244,66 @@ class IndexService
                 $progress->display();
             }
             
+            $atick = $this->generateAverageTick();
+            if ($atick > - 1)
+                $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . ($this->lastCommitQueryTime) . 'ms' : ''), 'more');
+            
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->generateTempDocument($entry);
             
             $this->solrService->indexDocument($entry, $ierror);
             
-            if ($entry->isFailedExtract() && ! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
-                return false;
+            if ((time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
+                $progress->setMessage('@', 'job');
+                $progress->setMessage('[commiting]', 'infos');
+                $progress->display();
+                
+                $commit = $this->solrTools->commit(false, $ierror);
+                if (! $commit)
+                    $this->manageFailure($ierror, $progress, 'Failed to commit');
+                else
+                    $this->lastCommitQueryTime = $commit->getQueryTime();
+                
+                $this->lastCommitTick = time();
+            }
+            
+            // fail at extract, let's try just index
+            if ($entry->isFailedExtract()) {
+                if ($this->configService->getAppValue('index_files_tree') !== '1')
+                    $entry->invalid(true);
+                
+                if (! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
+                    return false;
+                
+                if ($this->configService->getAppValue('index_files_tree') === '1') {
+                    $entry->extractable(false);
+                    
+                    if (! $this->force && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
+                        continue;
+                    
+                    $this->solrService->indexDocument($entry, $ierror);
+                }
+            }
+            
+            if ($entry->isFailedIndex())
+                $entry->invalid(true);
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->destroyTempDocument($entry);
         }
         
+        $this->resetAverageTick();
+        
+        $commit = $this->solrTools->commit(false, $ierror);
+        if (! $commit)
+            return false;
+        else
+            $this->lastCommitQueryTime = $commit->getQueryTime();
+        
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
             $progress->finish();
         }
         
@@ -240,7 +319,7 @@ class IndexService
      * @param ItemDocument[] $solrDocs            
      * @return boolean
      */
-    public function updateDocuments($type, $userId, &$data, &$solrDocs = null)
+    public function updateDocuments($type, $userId, &$data, &$solrDocs = null, &$ierror = '')
     {
         $this->solrService->setOwner($userId);
         
@@ -260,9 +339,11 @@ class IndexService
         if ($progress !== null) {
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'duration');
+            $progress->setMessage('', 'more');
             $progress->setMessage('/', 'job');
             $progress->setMessage('[comparing]', 'infos');
-            $progress->setFormat(self::PROGRESS_TEMPLATE);
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->start();
         }
         
@@ -276,6 +357,9 @@ class IndexService
             if ($progress !== null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
                 
+                if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                    $progress->setMessage('(' . $dura . ')', 'duration');
+                
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
                         $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
@@ -288,7 +372,7 @@ class IndexService
             $current = ItemDocument::getItem($solrDocs, $entry);
             $continue = false;
             
-            $this->solrTools->updateDocument($entry, $current, false);
+            $this->solrTools->updateDocument($entry, $current, false, $ierror);
             
             if ($progress != null) {
                 if ($entry->neededUpdate()) {
@@ -302,16 +386,44 @@ class IndexService
             }
             
             if ($entry->neededUpdate()) {
+                
+                $atick = $this->generateAverageTick();
+                if ($atick > - 1)
+                    $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . $this->lastCommitQueryTime . 'ms' : ''), 'more');
+                
                 $this->solrTools->updateDocument($entry, $current, true, $ierror);
+                
+                if ((time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
+                    $progress->setMessage('@', 'job');
+                    $progress->setMessage('[commiting]', 'infos');
+                    $progress->display();
+                    
+                    $commit = $this->solrTools->commit(false, $ierror);
+                    if (! $commit)
+                        $this->manageFailure($ierror, $progress, 'Failed to commit');
+                    else
+                        $this->lastCommitQueryTime = $commit->getQueryTime();
+                    
+                    $this->lastCommitTick = time();
+                }
                 
                 if ($entry->isFailedUpdate() && ! $this->manageFailure($ierror, $progress, 'Failed to update document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
                     return false;
             }
         }
         
+        $this->resetAverageTick();
+        
+        $commit = $this->solrTools->commit(false, $ierror);
+        if (! $commit)
+            return false;
+        else
+            $this->lastCommitQueryTime = $commit->getQueryTime();
+        
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
             $progress->finish();
         }
         
@@ -325,7 +437,7 @@ class IndexService
      * @param ItemDocument[] $data            
      * @return boolean
      */
-    public function removeDocuments(&$data)
+    public function removeDocuments(&$data, &$ierror)
     {
         if (sizeof($data) == 0)
             return false;
@@ -335,6 +447,9 @@ class IndexService
             $this->lockIndex(true);
             $this->solrTools->removeDocument($entry);
         }
+        
+        if (! $this->solrTools->commit(false, $ierror))
+            return false;
         
         return true;
     }
@@ -364,9 +479,11 @@ class IndexService
             $progress = new ProgressBar($this->output, sizeof($data));
         
         if ($progress != null) {
-            $progress->setFormat(self::PROGRESS_TEMPLATE);
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('/', 'job');
+            $progress->setMessage('', 'duration');
+            $progress->setMessage('', 'more');
             $progress->setMessage('', 'jvm');
             $progress->setMessage('[spoting orphans]', 'infos');
             $progress->start();
@@ -374,7 +491,7 @@ class IndexService
         
         $docIds = array();
         foreach ($data as $entry) {
-            if (! $entry->isInvalid() && ! $entry->isFailedExtract())
+            if (! $entry->isInvalid())
                 array_push($docIds, (int) $entry->getId());
         }
         
@@ -395,6 +512,9 @@ class IndexService
             if ($progress != null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $doc->getType());
                 
+                if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                    $progress->setMessage('(' . $dura . ')', 'duration');
+                
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
                         $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
@@ -409,6 +529,7 @@ class IndexService
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
             $progress->finish();
         }
         
@@ -420,7 +541,7 @@ class IndexService
             }
             
             if ($progress != null) {
-                $progress->setFormat(self::PROGRESS_TEMPLATE);
+                $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
                 $progress->setMessage('<info>' . $userId . '</info>/' . $type);
                 $progress->setMessage('-', 'job');
                 $progress->setMessage('', 'jvm');
@@ -461,6 +582,7 @@ class IndexService
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
             $progress->finish();
         }
     }
@@ -477,8 +599,10 @@ class IndexService
      */
     public function getDocuments($type = '', $userId = '', $fileId = 0, &$ierror = '')
     {
-        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient())
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
+        }
         
         $fileId = (int) $fileId;
         $client = $this->solrService->getClient();
@@ -496,9 +620,11 @@ class IndexService
             if ($progress != null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $type);
                 $progress->setMessage('', 'jvm');
+                $progress->setMessage('', 'duration');
+                $progress->setMessage('', 'more');
                 $progress->setMessage('%', 'job');
                 $progress->setMessage('[preparing]', 'infos');
-                $progress->setFormat(self::PROGRESS_TEMPLATE);
+                $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
                 $progress->start();
             }
             
@@ -531,6 +657,7 @@ class IndexService
                     'nextant_share',
                     'nextant_sharegroup',
                     'nextant_deleted',
+                    'nextant_extracted',
                     'nextant_source'
                 ));
                 
@@ -551,6 +678,7 @@ class IndexService
                     $doc->setShareGroup($document->nextant_sharegroup);
                     $doc->deleted($document->nextant_deleted);
                     $doc->setSource($document->nextant_source);
+                    $doc->extracted($document->nextant_extracted);
                     
                     $tick = false;
                     if (! in_array($doc->getId(), $docIds)) {
@@ -560,6 +688,9 @@ class IndexService
                     }
                     
                     if ($progress != null) {
+                        
+                        if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                            $progress->setMessage('(' . $dura . ')', 'duration');
                         
                         if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                             if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
@@ -581,6 +712,7 @@ class IndexService
             if ($progress != null) {
                 $progress->setMessage('', 'jvm');
                 $progress->setMessage('', 'infos');
+                $progress->setMessage('', 'duration');
                 $progress->finish();
             }
             
@@ -602,7 +734,6 @@ class IndexService
         
         if ($this->output != null && $this->debug) {
             $this->output->writeln('');
-            $this->output->writeln('');
             if ($ierror->getCode() > 0)
                 $this->output->writeln('*** Error #' . $ierror->getCode() . ' (' . $ierror->getMessage() . ')');
             $this->output->writeln('*** ' . $message);
@@ -621,11 +752,13 @@ class IndexService
             }
             sleep(30);
             
-            if (! $this->solrAdmin->ping()) {
+            if (! $this->solrAdmin->ping($ierror)) {
                 if ($this->output != null) {
                     $this->output->writeln('');
                     $this->output->writeln('');
+                    $this->output->writeln('Error #' . $ierror->getCode());
                     $this->output->writeln('Is Solr Up and Running ?');
+                    $this->output->writeln('');
                     $this->output->writeln('');
                 }
                 
@@ -638,6 +771,31 @@ class IndexService
         }
         
         return true;
+    }
+
+    private function generateAverageTick()
+    {
+        if (! $this->debug)
+            return - 1;
+        
+        if ($this->lastAverageTick == 0) {
+            $this->resetAverageTick();
+            return - 1;
+        }
+        
+        $this->lastAverageTickCount ++;
+        
+        if ((time() - $this->lastAverageTick) > 60) {
+            $this->lastAverageTickValue = $this->lastAverageTickCount;
+            $this->resetAverageTick();
+            return $this->lastAverageTickValue;
+        }
+    }
+
+    private function resetAverageTick()
+    {
+        $this->lastAverageTick = time();
+        $this->lastAverageTickCount = 0;
     }
 }
 

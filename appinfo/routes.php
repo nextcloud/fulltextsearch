@@ -36,6 +36,11 @@ return [
             'verb' => 'POST'
         ],
         [
+            'name' => 'settings#setOptionsFilesFilters',
+            'url' => 'ajax/settings/option_files_filters.php',
+            'verb' => 'POST'
+        ],
+        [
             'name' => 'settings#setOptionsBookmarks',
             'url' => 'ajax/settings/option_bookmarks.php',
             'verb' => 'POST'
@@ -64,9 +69,15 @@ return [
             'name' => 'search#searchRequestShareLink',
             'url' => 'ajax/search_sharelink.php',
             'verb' => 'POST'
+        ],
+        [
+            'name' => 'search#getSuggestionsShareLink',
+            'url' => 'ajax/suggest_sharelink.php',
+            'verb' => 'POST'
         ]
     ]
-];
+]
+;
 
 /*
  * This route is now useless. It was used with navigate.js + SearchController

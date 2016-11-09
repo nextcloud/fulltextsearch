@@ -34,10 +34,18 @@ $(document)
 							return nextant_share_link.search(true);
 					});
 
+					$(window).resize(function() {
+						nextant_share_link.suggestShow();
+					});
+
 					var nextantCurrentSearch = '';
 					var nextantSearchDelayTimer = null;
 					var nextantSearchDisplayed = false;
 					var nextantCurrentFocus = false;
+					var nextantSuggestDelayTimer = null;
+					var nextantSuggestNoSpam = false;
+					var nextantSuggestSelected = 0;
+					var nextantSuggestResults = null;
 
 					var nextant_share_link = {
 
@@ -55,6 +63,27 @@ $(document)
 
 							$('#linksearchbox').on('input', function(e) {
 								nextant_share_link.searchTimer();
+								nextant_share_link.suggestTimer();
+							});
+
+							$('DIV.crumb.svg.last').live('click', function() {
+								$('#linksearchbox').val('');
+								nextant_share_link.search();
+							});
+							$('DIV.crumb.svg.ui-droppable').live('click',
+									function() {
+										$('#linksearchbox').val('');
+										nextant_share_link.search();
+									});
+
+							$('#linksearchbox').focusout(function() {
+								nextantCurrentFocus = false;
+								nextant_share_link.suggestShow();
+							});
+
+							$('#linksearchbox').focusin(function() {
+								nextantCurrentFocus = true;
+								nextant_share_link.suggestShow();
 							});
 
 						},
@@ -66,6 +95,15 @@ $(document)
 							nextantSearchDelayTimer = setTimeout(function() {
 								nextant_share_link.search(false);
 							}, 250);
+						},
+
+						suggestTimer : function() {
+							if (nextantSuggestDelayTimer != null)
+								clearTimeout(nextantSuggestDelayTimer);
+
+							nextantSuggestDelayTimer = setTimeout(function() {
+								nextant_share_link.suggest();
+							}, 50);
 						},
 
 						search : function(force) {
@@ -131,7 +169,7 @@ $(document)
 										link += '/download?path='
 												+ entry.dirpath + '&files='
 												+ entry.filename;
-										
+
 										var row = nextant_share_link
 												.template_entry()
 												.replace(/%ID%/gi, entry.id)
@@ -199,6 +237,97 @@ $(document)
 
 							return $tmpl;
 
+						},
+
+						suggest : function() {
+							nextantSuggestDelayTimer = null;
+							var query = $('#linksearchbox').val();
+							var data = {
+								query : query
+							}
+							nextant_share_link.suggestRequest(data);
+						},
+
+						suggestRequest : function(data) {
+							if (nextantSuggestNoSpam)
+								return;
+							$.post(OC.filePath('nextant', 'ajax',
+									'suggest_sharelink.php'), data,
+									nextant_share_link.suggestResult);
+						},
+
+						suggestResult : function(response) {
+
+							if (response == null || response.status > 0
+									|| response.result.length == 0) {
+
+								if (response.status > 0) {
+									nextantSuggestNoSpam = true;
+									setTimeout(function() {
+										nextantSuggestNoSpam = false;
+									}, 60000);
+								}
+								if ($('#nextantSugg_list').length)
+									$('#nextantSugg_list').hide(200);
+								return;
+							}
+
+							if (!$('#nextantSugg_list').length)
+								$('#body-public').append(
+										'<div id="nextantSugg_list"></div>');
+
+							nextant_share_link.suggestShow();
+
+							$('#nextantSugg_list').empty();
+
+							var result = response.result;
+							nextantSuggestResult = result;
+							for (var i = 0; i < result.length; i++) {
+								var first = '';
+								if (i == 0)
+									first = 'nextantSugg_firstitem';
+
+								$('#nextantSugg_list').append(
+										'<div id="nextant_sugg_' + i
+												+ '" class="nextantSugg_item '
+												+ first + '">'
+												+ result[i].suggestion
+												+ '</div>');
+							}
+
+							$('.nextantSugg_item').click(
+									function() {
+										nextant_share_link.suggestReplace($(
+												this).text());
+										nextant_share_link.search();
+									});
+
+						},
+
+						suggestShow : function() {
+
+							var offset = $('#linksearchbox').offset();
+							var height = $('#linksearchbox').height();
+							var top = offset.top + height + "px";
+							var left = offset.left + "px";
+
+							$('#nextantSugg_list').css({
+								'position' : 'absolute',
+								'left' : left,
+								'top' : top
+							});
+
+							if (!$('#nextantSugg_list').length)
+								return;
+							if (nextantCurrentFocus)
+								$('#nextantSugg_list').show(200);
+							else
+								$('#nextantSugg_list').hide(200);
+						},
+
+						suggestReplace : function(txt) {
+							$('#linksearchbox').val(txt + ' ');
+							$('#linksearchbox').focus();
 						},
 
 						getKey : function() {

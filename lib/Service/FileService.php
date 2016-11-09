@@ -188,8 +188,8 @@ class FileService
             return false;
         }
         
-        // $this->miscService->log('__' . $item->getMimeType());
-        if (! SolrService::extractableFile($item->getMimeType(), $item->getPath())) {
+        // $this->miscService->log('__' . $item->getPath() . ' __ ' . $item->getId() . ' ___ ' . $item->getMimeType());
+        if (! $this->solrService->extractableFile($item->getMimeType(), $item->getPath())) {
             $item->extractable(false);
             
             if ($this->configService->getAppValue('index_files_tree') !== '1')
@@ -517,7 +517,7 @@ class FileService
      * @param boolean $trashbin            
      * @return array[]
      */
-    public static function getSearchResult(&$data, $base = '', $trashbin = true)
+    public function getSearchResult(&$data, $base = '', $trashbin = true)
     {
         Filesystem::init($data['userid'], '');
         $view = Filesystem::getView();
@@ -562,7 +562,7 @@ class FileService
         $data = array_merge($data, array(
             'size' => $fileData->getSize(),
             'title' => $path,
-            'icon' => SolrService::extractableFile($fileData->getMimeType(), $path),
+            'icon' => $this->solrService->extractableFile($fileData->getMimeType(), $path),
             'filename' => ((key_exists('extension', $pathParts)) ? ($pathParts['filename'] . '.' . $pathParts['extension']) : $pathParts['filename']),
             'dirpath' => $dirpath,
             'mimetype' => $fileData->getMimeType(),

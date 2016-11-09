@@ -75,15 +75,19 @@ class Check extends Base
             return false;
         }
         
-        $check = $this->solrAdmin->checkSchema(($input->getOption('fix')), $error);
+        if (! $this->solrAdmin->checkSchema(($input->getOption('fix')), $ierror)) {
+            if ($ierror->getCode() > 0) {
+                $this->output->writeln('*** Error #' . $ierror->getCode() . ' (' . $ierror->getMessage() . ')');
+                return;
+            }
+        }
         
         $output->writeln('');
         $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents :');
         $output->writeln(' - ' . $this->solrTools->count('files') . ' files');
         $output->writeln(' - ' . $this->solrTools->count('bookmarks') . ' bookmarks');
         
-        if ($input->getOption('fix'))
-            $output->writeln('Error: ' . $error);
+        $output->writeln(' - ' .  $this->solrTools->getInfoCore()->index->segmentCount . ' segments');
     }
 }
 
