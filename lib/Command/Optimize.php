@@ -73,6 +73,9 @@ class Optimize extends Base
             'timeout' => 1800
         ));
         
+        $infos = $this->solrTools->getInfoCore();
+        $output->writeln('Your index contains ' . $infos->index->segmentCount . ' segments.');
+        
         $helper = $this->getHelper('question');
         if (! $input->getOption('commit')) {
             $question = new ConfirmationQuestion('<question>Your core will not be accessible while optimize is running. Continue with this action? (y/N) </question> ', false);
@@ -83,9 +86,9 @@ class Optimize extends Base
         }
         
         if (! $result = $this->solrTools->commit(! $input->getOption('commit')))
-            $output->writeln('Optimization failed');
+            $output->writeln('Operation failed');
         else
-            $output->writeln('Your index has been optimized (' . gmdate("H:i:s", floor($result->getQueryTime() / 1000)) . ')');
+            $output->writeln('Operation success (' . gmdate("H:i:s", floor($result->getQueryTime() / 1000)) . ')');
     }
 }
 

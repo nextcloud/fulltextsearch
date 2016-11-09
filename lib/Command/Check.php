@@ -86,6 +86,9 @@ class Check extends Base
         $output->writeln('Your solr contains ' . $this->solrTools->count() . ' documents :');
         $output->writeln(' - ' . $this->solrTools->count('files') . ' files');
         $output->writeln(' - ' . $this->solrTools->count('bookmarks') . ' bookmarks');
+        
+        $infos = $this->solrTools->getInfoCore();
+        $output->writeln(' - ' . $infos->index->segmentCount . ' segments');
     }
 }
 

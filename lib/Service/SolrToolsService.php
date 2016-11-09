@@ -418,6 +418,45 @@ class SolrToolsService
     }
 
     /**
+     * return information about the current status of the solr core.
+     *
+     * @param ItemError $ierror            
+     * @return boolean|Solarium\Core\Query\Result
+     */
+    public function getInfoCore(&$ierror = '')
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
+            return false;
+        }
+        
+        try {
+            $client = $this->solrService->getClient();
+            
+            $query = $client->createSelect();
+            $request = $client->createRequest($query);
+            
+            $request->setHandler('admin/luke');
+            
+            $response = $client->executeRequest($request);
+            if ($response->getStatusCode() != 200)
+                return false;
+            
+            $result = json_decode($response->getBody());
+            
+            return $result;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
+        } catch (\Solarium\Exception $e) {
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
+        }
+        
+        return false;
+    }
+
+    /**
      * Count document on Solr Core
      *
      * @param number $type            
