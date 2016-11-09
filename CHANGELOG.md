@@ -6,6 +6,8 @@
 - File Filters (#58)
 - fixed home link (#60)
 - search suggestion in public link (#59)
+- "double-quote in search"
+- -exclude +force_include in search.
 
 
 **v0.6.4**
