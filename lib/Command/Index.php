@@ -213,8 +213,8 @@ class Index extends Base
         $this->configService->setAppValue('configured', '1');
         
         $output->writeln('');
-        $output->writeln('Indexing took ' . $this->indexService->getIndexDuration());
-        $output->writeln('You index now contains ' . $this->solrTools->getInfoCore()->index->segmentCount . ' segments');
+        $output->writeln('Time spent: ' . $this->indexService->getIndexDuration());
+        $output->writeln('Your index now contains ' . $this->solrTools->getInfoCore()->index->segmentCount . ' segments');
     }
 
     /**
