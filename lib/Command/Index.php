@@ -64,7 +64,6 @@ class Index extends Base
 
     private $currentIndexStatus = array();
 
-    private $initTime;
 
     public function __construct(IUserManager $userManager, $rootFolder, $indexService, $queueService, $solrService, $solrAdmin, $configService, $fileService, $bookmarkService, $miscService)
     {
@@ -117,15 +116,8 @@ class Index extends Base
             exit();
     }
 
-    public function getIndexDuration()
-    {
-        return gmdate("H:i:s", (time() - $this->initTime));
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->initTime = time();
-        
         $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (beta)</comment>');
         // $output->writeln('<comment>discussion forum:</comment> https://help.nextcloud.com/c/apps/nextant');
         // $output->writeln('');
@@ -178,6 +170,7 @@ class Index extends Base
             return false;
         }
         
+        $this->indexService->init();
         $this->indexService->lockActive(true);
         $this->configService->lockIndex(true);
         
@@ -218,7 +211,7 @@ class Index extends Base
         $this->configService->setAppValue('configured', '1');
         
         $output->writeln('');
-        $output->writeln('Indexing took ' . $this->getIndexDuration() . 's.');
+        $output->writeln('Indexing took ' . $this->indexService->getIndexDuration() . 's.');
     }
 
     /**

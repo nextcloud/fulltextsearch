@@ -84,6 +84,8 @@ class IndexService
 
     private $active_lock = false;
 
+    private $initTime = 0;
+
     public function __construct($configService, $fileService, $bookmarkService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
         $this->configService = $configService;
@@ -125,6 +127,18 @@ class IndexService
     {
         if ($this->output != null)
             $this->output->writeln($line);
+    }
+
+    public function init()
+    {
+        $this->initTime = time();
+    }
+
+    public function getIndexDuration()
+    {
+        if ($this->initTime == 0)
+            return - 1;
+        return gmdate("H:i:s", (time() - $this->initTime));
     }
 
     public function lockActive($active)
@@ -194,8 +208,8 @@ class IndexService
                 $progress->setMessage('/', 'job');
                 $progress->setMessage('[scanning]', 'infos');
                 
-                if ($this->parent != null)
-                    $progress->setMessage('(' . $this->parent->getIndexDuration() . ')', 'duration');
+                if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                    $progress->setMessage('(' . $dura . ')', 'duration');
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
@@ -342,8 +356,8 @@ class IndexService
             if ($progress !== null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
                 
-                if ($this->parent != null)
-                    $progress->setMessage('(' . $this->parent->getIndexDuration() . ')', 'duration');
+                if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                    $progress->setMessage('(' . $dura . ')', 'duration');
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
@@ -496,8 +510,8 @@ class IndexService
             if ($progress != null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $doc->getType());
                 
-                if ($this->parent != null)
-                    $progress->setMessage('(' . $this->parent->getIndexDuration() . ')', 'duration');
+                if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                    $progress->setMessage('(' . $dura . ')', 'duration');
                 
                 if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                     if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
@@ -671,8 +685,8 @@ class IndexService
                     
                     if ($progress != null) {
                         
-                        if ($this->parent != null)
-                            $progress->setMessage('(' . $this->parent->getIndexDuration() . ')', 'duration');
+                        if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                            $progress->setMessage('(' . $dura . ')', 'duration');
                         
                         if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
                             if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
