@@ -52,6 +52,8 @@ class Index extends Base
 
     private $solrService;
 
+    private $solrTools;
+
     private $solrAdmin;
 
     private $configService;
@@ -64,8 +66,7 @@ class Index extends Base
 
     private $currentIndexStatus = array();
 
-
-    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $queueService, $solrService, $solrAdmin, $configService, $fileService, $bookmarkService, $miscService)
+    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $queueService, $solrService, $solrTools, $solrAdmin, $configService, $fileService, $bookmarkService, $miscService)
     {
         parent::__construct();
         $this->userManager = $userManager;
@@ -73,6 +74,7 @@ class Index extends Base
         $this->indexService = $indexService;
         $this->queueService = $queueService;
         $this->solrService = $solrService;
+        $this->solrTools = $solrTools;
         $this->solrAdmin = $solrAdmin;
         $this->configService = $configService;
         $this->fileService = $fileService;
@@ -211,7 +213,8 @@ class Index extends Base
         $this->configService->setAppValue('configured', '1');
         
         $output->writeln('');
-        $output->writeln('Indexing took ' . $this->indexService->getIndexDuration() . 's.');
+        $output->writeln('Indexing took ' . $this->indexService->getIndexDuration());
+        $output->writeln('You index now contains ' . $this->solrTools->getInfoCore()->index->segmentCount . ' segments');
     }
 
     /**

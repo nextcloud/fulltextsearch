@@ -303,6 +303,7 @@ class IndexService
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
             $progress->finish();
         }
         
@@ -422,6 +423,7 @@ class IndexService
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
             $progress->finish();
         }
         
@@ -527,6 +529,7 @@ class IndexService
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
             $progress->finish();
         }
         
@@ -579,6 +582,7 @@ class IndexService
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
             $progress->finish();
         }
     }
@@ -708,6 +712,7 @@ class IndexService
             if ($progress != null) {
                 $progress->setMessage('', 'jvm');
                 $progress->setMessage('', 'infos');
+                $progress->setMessage('', 'duration');
                 $progress->finish();
             }
             
@@ -728,7 +733,6 @@ class IndexService
             $ierror = new ItemError();
         
         if ($this->output != null && $this->debug) {
-            $this->output->writeln('');
             $this->output->writeln('');
             if ($ierror->getCode() > 0)
                 $this->output->writeln('*** Error #' . $ierror->getCode() . ' (' . $ierror->getMessage() . ')');
