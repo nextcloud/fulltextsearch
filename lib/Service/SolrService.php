@@ -133,6 +133,7 @@ class SolrService
         }
         return $this->configured;
     }
+    
     // If $config == null, reset config to the one set in the admin
     public function setClient($config)
     {
@@ -445,7 +446,7 @@ class SolrService
             return false;
         
         $string = str_replace('  ', ' ', trim($string));
-        $astring = explode(' ', $string);
+        $astring = preg_split("/(\ )(?=(?:[^\"]|\"[^\"]*\")*$)/m", $string);
         
         if ($string == '')
             return false;
@@ -470,14 +471,33 @@ class SolrService
             $query->setRows(25);
             
             // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
-            
             array_push($options, 'complete_words');
-            $q = 'text:' . $helper->escapeTerm(implode(' AND ', $astring)) . "\n";
-            $words = explode(' ', $string);
-            foreach ($words as $word)
-                $q .= 'nextant_path:*' . $helper->escapeTerm($word) . '*' . "\n";
+            
+            $q = '';
+            $path = '';
+            $special = '+-';
+            foreach ($astring as $qstr) {
                 
-                // $this->miscService->log($q);
+                $oper = '';
+                $value = 1;
+                
+                if (strpos($special, substr($qstr, 0, 1)) !== false) {
+                    $oper = substr($qstr, 0, 1);
+                    $qstr = substr($qstr, 1);
+                }
+                
+                $path .= 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^10 ' . "\n";
+                
+                if (substr($qstr, 0, 1) == '"')
+                    $value *= 30;
+                
+                $q .= $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ' ';
+            }
+            
+            $q .= "\n" . $path;
+            
+            // Uncomment to display the request sent to solr
+            // $this->miscService->log($q);
             $query->setQuery($q);
             
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
