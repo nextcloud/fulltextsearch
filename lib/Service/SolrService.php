@@ -468,10 +468,8 @@ class SolrService
                 return false;
             }
             
-            $query->setRows(25);
-            
-            // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
             array_push($options, 'complete_words');
+            // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
             
             $q = '';
             $path = '';
@@ -479,29 +477,29 @@ class SolrService
             foreach ($astring as $qstr) {
                 
                 $oper = '';
-                $value = 1;
+                $value = 15;
                 
                 if (strpos($special, substr($qstr, 0, 1)) !== false) {
                     $oper = substr($qstr, 0, 1);
                     $qstr = substr($qstr, 1);
                 }
                 
-                $path .= 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^10 ' . "\n";
+                $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^30 ' . "\n";
                 
                 if (substr($qstr, 0, 1) == '"')
-                    $value *= 30;
+                    $value = 150;
                 
                 $q .= $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ' ';
             }
             
-            $q .= "\n" . $path;
-            
-            // Uncomment to display the request sent to solr
-            // $this->miscService->log($q);
+            if ($path !== '')
+                $q = '(' . $q . ")\n OR (" . $path . ')';
+                
+                // Uncomment to display the request sent to solr
+                // $this->miscService->log($q);
+            $query->setRows(25);
             $query->setQuery($q);
-            
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
-            
             $query->setFields(array(
                 'id',
                 'nextant_deleted',
@@ -517,6 +515,7 @@ class SolrService
             $hl->setFields(array(
                 'text'
             ));
+            // 'nextant_path'
             
             if ($this->configService->getAppValue('display_result') == ConfigService::SEARCH_DISPLAY_NEXTANT) {
                 $hl->setSimplePrefix('<span class="nextant_hl">');
@@ -525,7 +524,10 @@ class SolrService
                 $hl->setSimplePrefix('');
                 $hl->setSimplePostfix('');
             }
-            $hl->setSnippets(3);
+            $hl->setSnippets(5);
+            // $hl->setAlternateField('nextant_path');
+            $hl->setFragSize(70);
+            $hl->setMaxAnalyzedChars(50000000);
             
             $resultset = $client->select($query);
             $highlighting = $resultset->getHighlighting();
@@ -536,6 +538,7 @@ class SolrService
                 // highlight
                 $hlDoc = $highlighting->getResult($document->id);
                 list ($type, $docid) = explode('_', $document->id, 2);
+                
                 array_push($return, array(
                     'id' => $docid,
                     'type' => $type,
@@ -544,7 +547,8 @@ class SolrService
                     'shared' => ($document->nextant_owner != $this->owner),
                     'deleted' => $document->nextant_deleted,
                     'owner' => $document->nextant_owner,
-                    'highlight' => $hlDoc->getField('text'),
+                    'highlight_text' => $hlDoc->getField('text'),
+                    'highlight_path' => $hlDoc->getField('nextant_path'),
                     'score' => $document->score
                 ));
             }
