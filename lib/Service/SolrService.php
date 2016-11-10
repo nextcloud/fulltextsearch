@@ -592,13 +592,14 @@ class SolrService
                 
                 $t ++;
                 if ($t == $suggTotal) {
-                    foreach ($termResult as $result)
+                    foreach ($termResult as $result) {
                         $suggest = '<b>' . $string . '</b>' . (($termResult->getEndOffset() >= strlen($string)) ? substr($result, strlen($term)) : '');
-                    
-                    if (! self::suggestionAlreadyKnown($suggestions, $suggest))
-                        $suggestions[] = array(
-                            'suggestion' => $suggest
-                        );
+                        
+                        if (! self::suggestionAlreadyKnown($suggestions, $suggest))
+                            $suggestions[] = array(
+                                'suggestion' => $suggest
+                            );
+                    }
                 }
             }
             
