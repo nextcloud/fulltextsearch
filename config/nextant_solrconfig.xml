@@ -4,7 +4,7 @@
 	<lst name="spellchecker">
 		<str name="name">suggest</str>
 		<str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
-		<str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookupFactory</str>
+		<str name="lookupImpl">org.apache.solr.spelling.suggest.fst.FSTLookupFactory</str>
 		<str name="field">text</str>
 		<str name="buildOnCommit">true</str>
 	</lst>
