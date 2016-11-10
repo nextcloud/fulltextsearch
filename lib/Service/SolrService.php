@@ -593,8 +593,11 @@ class SolrService
                 $t ++;
                 if ($t == $suggTotal) {
                     foreach ($termResult as $result)
+                        $suggest = '<b>' . $string . '</b>' . (($termResult->getEndOffset() >= strlen($string)) ? substr($result, strlen($term)) : '');
+                    
+                    if (! self::suggestionAlreadyKnown($suggestions, $suggest))
                         $suggestions[] = array(
-                            'suggestion' => '<b>' . $string . '</b>' . (($termResult->getEndOffset() >= strlen($string)) ? substr($result, strlen($term)) : '')
+                            'suggestion' => $suggest
                         );
                 }
             }
@@ -660,6 +663,15 @@ class SolrService
                 $this->output->write($line);
         } else
             $this->lastMessage = $line;
+    }
+
+    private static function suggestionAlreadyKnown($list, $suggest)
+    {
+        foreach ($list as $item) {
+            if ($item['suggestion'] === $suggest)
+                return true;
+        }
+        return false;
     }
 }
 
