@@ -57,6 +57,10 @@ class ItemDocument
 
     private $storage;
 
+    private $score;
+
+    private $highlighting;
+
     private $needExtract = false;
 
     private $needUpdate = false;
@@ -212,6 +216,26 @@ class ItemDocument
     public function getShareGroup()
     {
         return $this->sharegroup;
+    }
+
+    public function setHighlighting($high)
+    {
+        $this->highlighting = $high;
+    }
+
+    public function getHighlighting()
+    {
+        return $this->highlighting;
+    }
+
+    public function setScore($score)
+    {
+        $this->score = $score;
+    }
+
+    public function getScore()
+    {
+        return $this->score;
     }
 
     public function setStorage($storage)
@@ -402,6 +426,16 @@ class ItemDocument
     {
         list ($type, $id) = explode('_', $str, 2);
         return new ItemDocument($type, $id);
+    }
+
+    public static function fromSolr($document)
+    {
+        $item = self::fromCompleteId($document->id);
+        $item->setPath($document->nextant_path);
+        $item->setSource($document->nextant_source);
+        $item->isDeleted($document->nextant_deleted);
+        $item->setOwner($document->nextant_owner);
+        $item->setScore($document->score);
     }
 
     public static function getItem(&$list, $item)

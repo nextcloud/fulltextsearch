@@ -514,18 +514,12 @@ class SolrService
             // $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
             
             $hl = $query->getHighlighting();
+            $hl->setSimplePrefix('<span class="nextant_hl">');
+            $hl->setSimplePostfix('</span>');
+            $hl->setSnippets(3);
             $hl->setFields(array(
                 'text'
             ));
-            
-            if ($this->configService->getAppValue('display_result') == ConfigService::SEARCH_DISPLAY_NEXTANT) {
-                $hl->setSimplePrefix('<span class="nextant_hl">');
-                $hl->setSimplePostfix('</span>');
-            } else {
-                $hl->setSimplePrefix('');
-                $hl->setSimplePostfix('');
-            }
-            $hl->setSnippets(3);
             
             $resultset = $client->select($query);
             $highlighting = $resultset->getHighlighting();
@@ -533,20 +527,14 @@ class SolrService
             $return = array();
             foreach ($resultset as $document) {
                 
-                // highlight
+                $item = ItemDocument::fromSolr($document);
+                $item->isShared(($document->nextant_owner != $this->owner));
+                
+                // highlighting
                 $hlDoc = $highlighting->getResult($document->id);
-                list ($type, $docid) = explode('_', $document->id, 2);
-                array_push($return, array(
-                    'id' => $docid,
-                    'type' => $type,
-                    'path' => $document->nextant_path,
-                    'source' => $document->nextant_source,
-                    'shared' => ($document->nextant_owner != $this->owner),
-                    'deleted' => $document->nextant_deleted,
-                    'owner' => $document->nextant_owner,
-                    'highlight' => $hlDoc->getField('text'),
-                    'score' => $document->score
-                ));
+                $item->setHighlighting($hlDoc->getField('text'));
+                
+                $return[] = $item;
             }
             
             return $return;
