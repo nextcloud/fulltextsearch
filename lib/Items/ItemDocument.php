@@ -93,7 +93,7 @@ class ItemDocument
 
     private $link = false;
 
-    private $invalid = false;
+    private $valid = false;
 
     private $synced = false;
 
@@ -412,14 +412,14 @@ class ItemDocument
     // {
     // return $this->link;
     // }
-    public function invalid($invalid)
+    public function valid($valid)
     {
-        $this->invalid = $invalid;
+        $this->valid = $valid;
     }
 
-    public function isInvalid()
+    public function isValid()
     {
-        return $this->invalid;
+        return $this->valid;
     }
 
     public static function fromCompleteId($str)

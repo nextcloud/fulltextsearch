@@ -269,8 +269,8 @@ class IndexService
             
             // fail at extract, let's try just index
             if ($entry->isFailedExtract()) {
-                if ($this->configService->getAppValue('index_files_tree') !== '1')
-                    $entry->invalid(true);
+                if ($this->configService->getAppValue('index_files_tree') === '1')
+                    $entry->valid(true);
                 
                 if (! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
                     return false;
@@ -285,8 +285,8 @@ class IndexService
                 }
             }
             
-            if ($entry->isFailedIndex())
-                $entry->invalid(true);
+            if (! $entry->isFailedIndex())
+                $entry->valid(true);
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->destroyTempDocument($entry);
@@ -491,7 +491,7 @@ class IndexService
         
         $docIds = array();
         foreach ($data as $entry) {
-            if (! $entry->isInvalid())
+            if ($entry->isValid())
                 array_push($docIds, (int) $entry->getId());
         }
         

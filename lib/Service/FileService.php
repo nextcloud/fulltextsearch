@@ -172,15 +172,11 @@ class FileService
     {
         $item->synced(true);
         
-        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') !== '1') {
-            $item->invalid(true);
+        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') !== '1')
             return false;
-        }
         
-        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') !== '1') {
-            $item->invalid(true);
-            return false;
-        }
+        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') !== '1')
+            return false;        
         
         $size = round($item->getSize() / 1024 / 1024, 1);
         if ($size > $this->configService->getAppValue('index_files_max_size')) {
@@ -192,10 +188,13 @@ class FileService
         if (! $this->solrService->extractableFile($item->getMimeType(), $item->getPath())) {
             $item->extractable(false);
             
-            if ($this->configService->getAppValue('index_files_tree') !== '1')
-                $item->invalid(true);
+            if ($this->configService->getAppValue('index_files_tree') === '1')
+                $item->valid(true);
         } else
+        {
+            $item->valid(true);
             $item->extractable(true);
+        }
         
         $this->setShareRights($item);
         
