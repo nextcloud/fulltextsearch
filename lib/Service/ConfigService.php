@@ -41,7 +41,6 @@ class ConfigService
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
         'solr_timeout' => 30,
-        'display_result' => 1,
         'replace_core_search' => 0,
         
         'index_live' => 1,
