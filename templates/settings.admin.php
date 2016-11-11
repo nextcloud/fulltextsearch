@@ -208,14 +208,6 @@ style('nextant', 'admin');
 								id="solr_index_delay" value="2" style="width: 50px;" /> hours</td>
 						</tr>
 
-						<tr style="height: 30px;">
-							<td class="nextant_admin_left">
-	    <?php p($l->t('Display result :')) ?></td>
-							<td><select id="solr_display_result" style="width: 260px;">
-									<option value="1">Nextant style</option>
-									<option value="2">Integrated to Files</option>
-							</select></td>
-						</tr>
 
 						<!-- 
 						<tr style="height: 30px;">

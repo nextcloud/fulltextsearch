@@ -166,8 +166,6 @@ $(document)
 								index_live : ($('#solr_index_live')
 										.is(':checked')) ? 1 : 0,
 								index_delay : $('#solr_index_delay').val(),
-								display_result : $('#solr_display_result')
-										.val(),
 								replace_core_search : ($('#solr_replace_core_search')
 										.is(':checked')) ? 1 : 0,
 								force_index : force_index
@@ -286,12 +284,7 @@ $(document)
 							$('#solr_index_live_queuekey').val(
 									response.index_live_queuekey);
 							$('#solr_index_delay').val(response.index_delay);
-
-							$(
-									'#solr_display_result option[value="'
-											+ response.display_result + '"]')
-									.prop('selected', true);
-
+							
 							$('#solr_replace_core_search').prop('checked',
 									(response.replace_core_search == 1));
 							if (response.index_files_tree == 1) {
@@ -669,9 +662,7 @@ $(document)
 					$('#solr_index_delay').on('input', function(e) {
 						nextantSettings.savesuboptions_status();
 					});
-					$('#solr_display_result').on('change', function() {
-						nextantSettings.savesuboptions_status();
-					});
+					
 					$('#solr_replace_core_search')
 							.mousedown(
 									function() {

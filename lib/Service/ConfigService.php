@@ -94,6 +94,7 @@ class ConfigService
 
     public function removeOldConfig()
     {
+        $this->deleteAppValue('display_result');
         $this->deleteAppValue('solr_lock');
         $this->deleteAppValue('needed_index');
         $this->deleteAppValue('last_index');
