@@ -80,8 +80,10 @@ class SearchController extends Controller
      */
     public function searchRequest($query, $current_dir)
     {
-        $results = array();
-        
+        // $results = array(
+        // 'filelist' => array(),
+        // 'data' => array()
+        // );
         if (! $this->solrService)
             return $results;
         
@@ -102,63 +104,81 @@ class SearchController extends Controller
             if (! $solrResult)
                 return $results;
             
-            foreach ($solrResult as $data) {
+            $this->fileService->initUser($this->userId, false);
+            
+            $files = array();
+            foreach ($solrResult as $item) {
                 
-                $path = '';
-                $data = array_merge($data, array(
-                    'userid' => $this->userId,
-                    'title' => '',
-                    'link_main' => '',
-                    'link_sub' => '',
-                    'filename' => '',
-                    'dirpath' => '',
-                    'size' => '',
-                    'mtime' => '',
-                    'icon' => '',
-                    'mimetype' => '',
-                    'valid' => false
-                ));
-                
-                switch ($data['source']) {
+                // $result = ItemDocument::fromSolr($data);
+                // $item
+                //
+                //
+                //
+                //
+                //
+                // $data = array_merge($data, array(
+                // 'userid' => $this->userId,
+                // 'title' => '',
+                // 'entry' => '',
+                // 'link_main' => '',
+                // 'link_sub' => '',
+                // 'filename' => '',
+                // 'dirpath' => '',
+                // 'size' => '',
+                // 'mtime' => '',
+                // 'icon' => '',
+                // 'mimetype' => '',
+                // 'valid' => false
+                // ));
+                switch ($item->getSource()) {
                     
                     case 'files':
-                        $this->fileService->getSearchResult($data);
+                        $this->fileService->getSearchResult($item);
                         break;
                     
                     case 'bookmarks':
-                        $this->bookmarkService->getSearchResult($data);
+                        $this->bookmarkService->getSearchResult($item);
                         break;
                     
                     default:
                         continue;
                 }
                 
-                if (! $data['valid'])
+                if (! $item->isValid())
                     continue;
+                    
+                    // if ($item->getEntry() !== null)
+                    // $files[] = $item->getEntry();
                 
                 $hl1 = '';
                 $hl2 = '';
-                if (key_exists('highlight', $data) && is_array($data['highlight'])) {
-                    if (sizeof($data['highlight']) >= 1)
-                        $hl1 = '... ' . $data['highlight'][0] . ' ...';
-                    if (sizeof($data['highlight']) > 1)
-                        $hl2 = '... ' . $data['highlight'][1] . ' ...';
-                }
+                // if (key_exists('highlight', $data) && is_array($data['highlight'])) {
+                // if (sizeof($data['highlight']) >= 1)
+                // $hl1 = '... ' . $data['highlight'][0] . ' ...';
+                // if (sizeof($data['highlight']) > 1)
+                // $hl2 = '... ' . $data['highlight'][1] . ' ...';
+                // }
                 
                 if ($hl1 === '' || $hl1 === null)
                     $hl1 = '';
                 if ($hl2 === '' || $hl2 === null)
                     $hl2 = '';
-                
-                $data['highlight1'] = $hl1;
-                $data['highlight2'] = $hl2;
-                
-                $data['size_readable'] = ($data['size'] > 0) ? \OC_Helper::humanFileSize($data['size']) : '';
-                $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
-                $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
-                
-                array_push($results, $data);
+                    
+                    // $data['highlight1'] = $hl1;
+                    // $data['highlight2'] = $hl2;
+                    
+                // $data['size_readable'] = ($data['size'] > 0) ? \OC_Helper::humanFileSize($data['size']) : '';
+                    // $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
+                    // $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
+                    
+                // array_push($results['data'], $data);
+                $results[] = $item->toArray();
             }
+            
+            $this->fileService->endUser();
+            // $results['filelist'] = $files;
+            
+            $this->miscService->log('>> ' . var_export($results, true));
         }
         
         return $results;
