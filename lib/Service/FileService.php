@@ -64,8 +64,6 @@ class FileService
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->miscService = $miscService;
-        
-        // $this->view = Filesystem::getView();
     }
 
     public function setDebug($debug)
@@ -129,16 +127,19 @@ class FileService
         return substr($mimetype, 0, strpos($mimetype, '/'));
     }
 
-    public function initUser($userId)
+    public function initUser($userId, $complete = false)
     {
         $this->userId = $userId;
         Filesystem::init($this->userId, '');
+        $this->view = Filesystem::getView();
         
-        $this->initUserExternalMountPoints();
+        if ($complete)
+            $this->initUserExternalMountPoints();
     }
 
     public function endUser()
     {
+        $this->view = null;
         $this->userId = '';
         // $this->externalMountPoint = array();
     }
@@ -176,7 +177,7 @@ class FileService
             return false;
         
         if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') !== '1')
-            return false;        
+            return false;
         
         $size = round($item->getSize() / 1024 / 1024, 1);
         if ($size > $this->configService->getAppValue('index_files_max_size')) {
@@ -190,8 +191,7 @@ class FileService
             
             if ($this->configService->getAppValue('index_files_tree') === '1')
                 $item->valid(true);
-        } else
-        {
+        } else {
             $item->valid(true);
             $item->extractable(true);
         }
@@ -518,15 +518,15 @@ class FileService
      */
     public function getSearchResult(&$data, $base = '', $trashbin = true)
     {
-        Filesystem::init($data['userid'], '');
-        $view = Filesystem::getView();
+        if ($this->view === null || $this->userId === '')
+            return false;
         
         $path = '';
         $deleted = false;
         $fileData = null;
         try {
-            $path = $view->getPath($data['id']);
-            $fileData = $view->getFileInfo($path);
+            $path = $this->view->getPath($item->getId());
+            $fileData = $this->view->getFileInfo($path);
         } catch (NotFoundException $e) {
             $fileData = null;
         }

@@ -99,7 +99,7 @@ class QueueService
                 array_push($options, 'forceshared');
             
             case FilesEvents::FILE_CREATE:
-                $this->fileService->initUser($item->getUserId());
+                $this->fileService->initUser($item->getUserId(), true);
                 $files = $this->fileService->getFilesPerFileId($item->getFileId(), $options);
                 if ($files != false && sizeof($files) > 0) {
                     $ispack = (sizeof($files) != 1);
@@ -117,7 +117,7 @@ class QueueService
             case FilesEvents::FILE_UNSHARE:
                 array_push($options, 'forceshared');
                 
-                $this->fileService->initUser($item->getUserId());
+                $this->fileService->initUser($item->getUserId(), true);
                 $files = $this->fileService->getFilesPerFileId($item->getFileId(), $options);
                 if (is_array($files) && sizeof($files) > 0) {
                     $ispack = (sizeof($files) != 1);
@@ -130,7 +130,7 @@ class QueueService
                 
                 if ($item->getFolder()) {
                     
-                    $this->fileService->initUser($item->getUserId());
+                    $this->fileService->initUser($item->getUserId(), true);
                     $files = $this->fileService->getFilesPerUserId('/files', array());
                     $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
                         'deleted'
