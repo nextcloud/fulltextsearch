@@ -205,6 +205,11 @@ class Application extends App
         if ($config->getAppValue('configured') !== '1')
             return;
         
+        \OC::$server->getEventDispatcher()->addListener('OCA\Files::loadAdditionalScripts', function () {
+            \OCP\Util::addScript('nextant', 'navigate');
+            \OCP\Util::addStyle('nextant', 'navigate');
+        });
+        
         if ($config->getAppValue('index_files_sharelink') === '1')
             \OC::$server->getEventDispatcher()->addListener('OCA\Files_Sharing::loadAdditionalScripts', function () {
                 \OCP\Util::addScript('nextant', 'navigate_sharelink');
