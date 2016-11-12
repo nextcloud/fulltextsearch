@@ -104,36 +104,15 @@ class SearchController extends Controller
             if (! $solrResult)
                 return $results;
             
-            $this->fileService->initUser($this->userId, false);
-            
             $files = array();
             foreach ($solrResult as $item) {
                 
-                // $result = ItemDocument::fromSolr($data);
-                // $item
-                //
-                //
-                //
-                //
-                //
-                // $data = array_merge($data, array(
-                // 'userid' => $this->userId,
-                // 'title' => '',
-                // 'entry' => '',
-                // 'link_main' => '',
-                // 'link_sub' => '',
-                // 'filename' => '',
-                // 'dirpath' => '',
-                // 'size' => '',
-                // 'mtime' => '',
-                // 'icon' => '',
-                // 'mimetype' => '',
-                // 'valid' => false
-                // ));
                 switch ($item->getSource()) {
                     
                     case 'files':
+                        $this->fileService->initUser($this->userId, false);
                         $this->fileService->getSearchResult($item);
+                        $this->fileService->endUser();
                         break;
                     
                     case 'bookmarks':
@@ -146,37 +125,24 @@ class SearchController extends Controller
                 
                 if (! $item->isValid())
                     continue;
-                    
-                    // if ($item->getEntry() !== null)
-                    // $files[] = $item->getEntry();
                 
                 $hl1 = '';
                 $hl2 = '';
-                // if (key_exists('highlight', $data) && is_array($data['highlight'])) {
-                // if (sizeof($data['highlight']) >= 1)
-                // $hl1 = '... ' . $data['highlight'][0] . ' ...';
-                // if (sizeof($data['highlight']) > 1)
-                // $hl2 = '... ' . $data['highlight'][1] . ' ...';
-                // }
+                if ($item->getHighlighting() !== null && is_array($item->getHighlighting())) {
+                    if (sizeof($item->getHighlighting()) >= 1)
+                        $hl1 = '... ' . $item->getHighlighting()[0] . ' ...';
+                    if (sizeof($item->getHighlighting()) > 1)
+                        $hl2 = '... ' . $item->getHighlighting()[1] . ' ...';
+                }
                 
-                if ($hl1 === '' || $hl1 === null)
-                    $hl1 = '';
-                if ($hl2 === '' || $hl2 === null)
-                    $hl2 = '';
-                    
-                    // $data['highlight1'] = $hl1;
-                    // $data['highlight2'] = $hl2;
-                    
-                // $data['size_readable'] = ($data['size'] > 0) ? \OC_Helper::humanFileSize($data['size']) : '';
-                    // $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
-                    // $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
-                    
-                // array_push($results['data'], $data);
+                $item->setLine(1, $item->getPath());
+                $item->setLine(2, $hl1);
+                $item->setLine(3, $hl2);
+                
+                // $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
+                // $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
                 $results[] = $item->toArray();
             }
-            
-            $this->fileService->endUser();
-            // $results['filelist'] = $files;
             
             $this->miscService->log('>> ' . var_export($results, true));
         }

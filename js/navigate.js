@@ -49,7 +49,7 @@
 
 			// search request
 			this.searchRequest = function(data) {
-				$.post(OC.filePath('nextant', 'ajax', 'search2.php'), data,
+				$.post(OC.filePath('nextant', 'ajax', 'search.php'), data,
 						self.searchResult);
 			};
 
@@ -76,11 +76,28 @@
 					if (!$(tr).length)
 						return;
 
+					// fix the deep-folder link
 					var elemhref = $(tr).find('td.filename').find('a.name');
 					if ($(elemhref).length)
 						$(elemhref).attr('href',
 								$(elemhref).attr('href').replace(/%2F/g, '/'));
 
+					// fix the display and add few lines
+					$(elemhref).empty();
+					var displaydiv = $('<div></div>');
+
+					if (item.data.lines[1])
+						displaydiv.append($('<span></span>').attr('class',
+								'nextant_line nextant_line1').html(
+								item.data.lines[1]));
+					if (item.data.lines[2])
+						displaydiv.append($('<span></span>').attr('class',
+								'nextant_line nextant_line2').html(
+								item.data.lines[2]));
+
+					$(elemhref).append(displaydiv);
+
+					// We're done modifying the row
 				});
 
 			};

@@ -59,6 +59,8 @@ class ItemDocument
 
     private $score;
 
+    private $lines = array();
+
     private $highlighting;
 
     private $needExtract = false;
@@ -250,6 +252,19 @@ class ItemDocument
     public function getScore()
     {
         return $this->score;
+    }
+
+    public function setLine($nb, $html)
+    {
+        $this->lines[$nb] = $html;
+    }
+
+    public function getLine($nb)
+    {
+        if (key_exists($nb, $this->lines))
+            return $this->lines[$nb];
+        
+        return '';
     }
 
     public function setStorage($storage)
@@ -479,7 +494,12 @@ class ItemDocument
     public function toArray()
     {
         return array(
-            'entry' => $this->getEntry()
+            'entry' => $this->getEntry(),
+            'data' => array(
+                'deleted' => $this->isDeleted(),
+                'shared' => $this->isShared(),
+                'lines' => $this->lines
+            )
         );
     }
 
