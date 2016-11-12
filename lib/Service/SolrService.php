@@ -28,6 +28,7 @@ namespace OCA\Nextant\Service;
 use \OCA\Nextant\Items\ItemError;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\ConfigService;
+use \OCA\Nextant\Items\ItemDocument;
 
 class SolrService
 {
@@ -528,7 +529,7 @@ class SolrService
             foreach ($resultset as $document) {
                 
                 $item = ItemDocument::fromSolr($document);
-                $item->isShared(($document->nextant_owner != $this->owner));
+                $item->shared(($document->nextant_owner != $this->owner));
                 
                 // highlighting
                 $hlDoc = $highlighting->getResult($document->id);
