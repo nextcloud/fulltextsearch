@@ -516,7 +516,7 @@ class FileService
      * @param boolean $trashbin            
      * @return array[]
      */
-    public function getSearchResult(&$data, $base = '', $trashbin = true)
+    public function getSearchResult(&$item, $base = '', $trashbin = true)
     {
         if ($this->view === null || $this->userId === '')
             return false;
@@ -533,8 +533,8 @@ class FileService
         
         if ($fileData == null && $trashbin) {
             try {
-                $trashview = new View('/' . $data['userid'] . '/files_trashbin/files');
-                $path = $trashview->getPath($data['id']);
+                $trashview = new View('/' . $this->userId . '/files_trashbin/files');
+                $path = $trashview->getPath($item->getId());
                 $fileData = $trashview->getFileInfo($path);
                 $deleted = true;
             } catch (NotFoundException $e) {
@@ -558,20 +558,26 @@ class FileService
             $dirpath = substr($dirpath, strpos($dirpath, $base) + strlen($base)) . '/';
         }
         
-        $data = array_merge($data, array(
-            'size' => $fileData->getSize(),
-            'title' => $path,
-            'icon' => $this->solrService->extractableFile($fileData->getMimeType(), $path),
-            'filename' => ((key_exists('extension', $pathParts)) ? ($pathParts['filename'] . '.' . $pathParts['extension']) : $pathParts['filename']),
-            'dirpath' => $dirpath,
-            'mimetype' => $fileData->getMimeType(),
-            'deleted' => $deleted,
-            'etag' => $fileData->getETag(),
-            'link_main' => ((! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename']),
-            'link_sub' => '',
-            'valid' => true,
-            'mtime' => $fileData->getMTime()
-        ));
+        $entry = \OCA\Files\Helper::formatFileInfo($fileData);
+        $entry['name'] = ((substr($path, 0, 1) === '/') ? substr($path, 1) : $path);
+        
+        $item->setEntry($entry);
+        $item->valid(true);
+        // $data = array_merge($data, array(
+        // 'entry' => $entry,
+        // 'size' => $fileData->getSize(),
+        // 'title' => $path,
+        // 'icon' => $this->solrService->extractableFile($fileData->getMimeType(), $path),
+        // 'filename' => ((key_exists('extension', $pathParts)) ? ($pathParts['filename'] . '.' . $pathParts['extension']) : $pathParts['filename']),
+        // 'dirpath' => $dirpath,
+        // 'mimetype' => $fileData->getMimeType(),
+        // 'deleted' => $deleted,
+        // 'etag' => $fileData->getETag(),
+        // 'link_main' => ((! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename']),
+        // 'link_sub' => '',
+        // 'valid' => true,
+        // 'mtime' => $fileData->getMTime()
+        // ));
         
         return true;
     }

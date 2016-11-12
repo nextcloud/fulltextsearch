@@ -92,10 +92,11 @@ class BookmarkService
 
     public static function getSearchResult(&$data)
     {
-        $data['link_main'] = $data['path'];
-        $data['title'] = $data['path'];
-        $data['valid'] = true;
-        $data['icon'] = \OCP\Util::imagePath('nextant', 'bookmarks.svg');
+        $data->valid(true);
+        // $data['link_main'] = $data['path'];
+        // $data['title'] = $data['path'];
+        // $data['valid'] = true;
+        // $data['icon'] = \OCP\Util::imagePath('nextant', 'bookmarks.svg');
         
         return true;
     }

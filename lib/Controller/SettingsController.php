@@ -107,7 +107,6 @@ class SettingsController extends Controller
             'index_files_filters_image' => $this->configService->getAppValue('index_files_filters_image'),
             'index_files_filters_audio' => $this->configService->getAppValue('index_files_filters_audio'),
             'index_files_filters_extensions' => self::FileFiltersExtensionsAsList($this->configService->getAppValue('index_files_filters_extensions')),
-            'display_result' => $this->configService->getAppValue('display_result'),
             'replace_core_search' => $this->configService->getAppValue('replace_core_search'),
             'current_docs' => $this->solrTools->count('files'),
             'current_segments' => $this->solrTools->getInfoCore()->index->segmentCount,
@@ -161,7 +160,7 @@ class SettingsController extends Controller
         return $this->updateSubOptions(false, 'bookmarks');
     }
 
-    public function setOptionsStatus($index_live, $index_delay, $display_result, $replace_core_search, $force_index)
+    public function setOptionsStatus($index_live, $index_delay, $replace_core_search, $force_index)
     {
         if ($index_live === '1' && $this->configService->getAppValue('index_live') !== '1')
             $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
@@ -170,8 +169,6 @@ class SettingsController extends Controller
         
         if ($index_delay > 0)
             $this->configService->setAppValue('index_delay', $index_delay);
-        $this->configService->setAppValue('display_result', $display_result);
-        // $this->configService->setAppValue('replace_core_search', $replace_core_search);
         
         if ($force_index === '1') {
             $this->configService->setAppValue('configured', '1');
@@ -333,7 +330,7 @@ class SettingsController extends Controller
             if (sizeof($result) > 0) {
                 
                 foreach ($result as $doc) {
-                    if ($doc['type'] === ItemDocument::TYPE_TEST && $doc['id'] === '1') {
+                    if ($doc->getType() === ItemDocument::TYPE_TEST && $doc->getId() === 1) {
                         $message = 'Found exactly what we were looking for';
                         return true;
                     }

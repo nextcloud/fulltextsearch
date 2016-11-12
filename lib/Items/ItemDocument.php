@@ -67,6 +67,8 @@ class ItemDocument
 
     private $remote = false;
 
+    private $shared = false;
+
     private $encrypted = false;
 
     private $extractable = false;
@@ -88,6 +90,8 @@ class ItemDocument
     private $failedExtract = false;
 
     private $failedUpdate = false;
+
+    private $entry = null;
 
     private $temp = false;
 
@@ -171,6 +175,16 @@ class ItemDocument
     public function getSize()
     {
         return $this->size;
+    }
+
+    public function setEntry($entry)
+    {
+        $this->entry = $entry;
+    }
+
+    public function getEntry()
+    {
+        return $this->entry;
     }
 
     public function setAbsolutePath($absolutePath, $temp = false)
@@ -286,6 +300,16 @@ class ItemDocument
     public function isEncrypted()
     {
         return $this->encrypted;
+    }
+
+    public function shared($shared)
+    {
+        $this->shared = $shared;
+    }
+
+    public function isShared()
+    {
+        return $this->shared;
     }
 
     public function extractable($extractable)
@@ -436,6 +460,8 @@ class ItemDocument
         $item->isDeleted($document->nextant_deleted);
         $item->setOwner($document->nextant_owner);
         $item->setScore($document->score);
+        
+        return $item;
     }
 
     public static function getItem(&$list, $item)
@@ -448,5 +474,17 @@ class ItemDocument
                 return $entry;
         
         return null;
+    }
+
+    public function toArray()
+    {
+        return array(
+            'entry' => $this->getEntry()
+        );
+    }
+
+    public function toString()
+    {
+        return json_encode($this->toArray());
     }
 }
