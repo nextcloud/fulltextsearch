@@ -560,24 +560,11 @@ class FileService
         
         $entry = \OCA\Files\Helper::formatFileInfo($fileData);
         $entry['name'] = ((substr($path, 0, 1) === '/') ? substr($path, 1) : $path);
-        
         $item->setEntry($entry);
+        
+        $item->setPath($path);
+        
         $item->valid(true);
-        // $data = array_merge($data, array(
-        // 'entry' => $entry,
-        // 'size' => $fileData->getSize(),
-        // 'title' => $path,
-        // 'icon' => $this->solrService->extractableFile($fileData->getMimeType(), $path),
-        // 'filename' => ((key_exists('extension', $pathParts)) ? ($pathParts['filename'] . '.' . $pathParts['extension']) : $pathParts['filename']),
-        // 'dirpath' => $dirpath,
-        // 'mimetype' => $fileData->getMimeType(),
-        // 'deleted' => $deleted,
-        // 'etag' => $fileData->getETag(),
-        // 'link_main' => ((! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename']),
-        // 'link_sub' => '',
-        // 'valid' => true,
-        // 'mtime' => $fileData->getMTime()
-        // ));
         
         return true;
     }
