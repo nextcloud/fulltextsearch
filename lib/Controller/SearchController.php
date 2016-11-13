@@ -139,12 +139,10 @@ class SearchController extends Controller
                 $item->setLine(2, $hl1);
                 $item->setLine(3, $hl2);
                 
-                // $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
-                // $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
                 $results[] = $item->toArray();
             }
             
-            $this->miscService->log('>> ' . var_export($results, true));
+            // $this->miscService->log('>> ' . var_export($results, true));
         }
         
         return $results;

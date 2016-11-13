@@ -83,8 +83,10 @@
 								$(elemhref).attr('href').replace(/%2F/g, '/'));
 
 					// fix the display and add few lines
-					$(elemhref).empty();
-					var displaydiv = $('<div></div>');
+					var elemname = $(tr).find('td.filename').find('a.name')
+							.find('span.nametext');
+					$(elemname).empty();
+					var displaydiv = $('<span></span>');
 
 					if (item.data.lines[1])
 						displaydiv.append($('<span></span>').attr('class',
@@ -95,8 +97,33 @@
 								'nextant_line nextant_line2').html(
 								item.data.lines[2]));
 
-					$(elemhref).append(displaydiv);
+					$(elemname).append(displaydiv);
+					$(elemname).css('width', '800px');
 
+					// Add overlay icon
+					var elemicon = $(tr).find('td.filename').find(
+							'div.thumbnail');
+
+					if (item.data.shared)
+						elemicon.append($('<div></div>').attr(
+								{
+									'class' : 'nextant_details',
+									'style' : "background-image: url('"
+											+ OC.imagePath('core',
+													'actions/shared.svg')
+											+ "')"
+								}));
+					if (item.data.deleted)
+						elemicon.append($('<div></div>').attr(
+								{
+									'class' : 'nextant_details',
+									'style' : "background-image: url('"
+											+ OC.imagePath('core',
+													'actions/delete.svg')
+											+ "')"
+								}));
+
+					//
 					// We're done modifying the row
 				});
 
