@@ -522,7 +522,6 @@ class FileService
             return false;
         
         $path = '';
-        $deleted = false;
         $fileData = null;
         try {
             $path = $this->view->getPath($item->getId());
@@ -536,7 +535,7 @@ class FileService
                 $trashview = new View('/' . $this->userId . '/files_trashbin/files');
                 $path = $trashview->getPath($item->getId());
                 $fileData = $trashview->getFileInfo($path);
-                $deleted = true;
+                $item->deleted(true);
             } catch (NotFoundException $e) {
                 return false;
             }
