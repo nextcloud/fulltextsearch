@@ -289,7 +289,7 @@ class FileService
         $files = $folder->search('');
         
         foreach ($files as $file) {
-            if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER)
+            if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER && $this->configService->getAppValue('index_files_tree') !== '1')
                 continue;
             
             if ($file->isShared() && $file->getStorage()->isLocal() && ! in_array('forceshared', $options))
