@@ -47,13 +47,45 @@
 				return !!OCA.Files && !!OCA.Files.App;
 			};
 
+			this.initFileList = function() {
+				_.each(OC.Plugins.getPlugins('OCA.Search'), function(plugin) {
+					if (plugin instanceof OCA.Search.Files)
+						self.fileList = plugin.fileList;
+				});
+
+				if (!self.fileAppLoaded())
+					return;
+
+				/**
+				 * Haven't found a way to include (or remove) a fileAction only
+				 * in a specific place (only in search result)
+				 */
+				OCA.Files.fileActions.registerAction({
+					name : 'nextant_gotofolder',
+					displayName : 'Go To Folder',
+					mime : 'all',
+					permissions : OC.PERMISSION_READ,
+					type : OCA.Files.FileActions.TYPE_DROPDOWN,
+					icon : function() {
+						return OC.imagePath('core', 'filetypes/folder');
+					},
+					actionHandler : function(filename, context) {
+						self.onGoToFolder(filename, context);
+					}
+				});
+			}
+
 			// search request
 			this.searchRequest = function(data) {
 				$.post(OC.filePath('nextant', 'ajax', 'search.php'), data,
 						self.searchResult);
 			};
 
-			// display search result
+			/**
+			 * 
+			 * display search result
+			 * 
+			 */
 			this.searchResult = function(result) {
 
 				if (self.fileList == null)
@@ -71,6 +103,9 @@
 
 				// We edit each row
 				_.each(result, function(item) {
+					if (item.entry == null)
+						return;
+
 					tr = self.getElem(item.entry.name);
 
 					if (!$(tr).length)
@@ -129,6 +164,28 @@
 
 			};
 
+			// Go To Folder. Called on FileActions
+			this.onGoToFolder = function(path, context) {
+				var apath = path.split('/');
+
+				var dir = '';
+				var filename = '';
+				for (var i = 0; i < apath.length; i++) {
+					filename = apath[i];
+					dir += '/';
+					if (i < (apath.length - 1))
+						dir += filename;
+				}
+
+				window.location = OC.generateUrl(
+						'/apps/files/?dir={dir}&scrollto={scrollto}', {
+							dir : dir,
+							scrollto : filename
+						})
+
+				// window.alert('DIR: ' + dir + ' - FILENAME: ' + filename);
+			};
+
 			// get TR elem from filelist
 			this.getElem = function(file) {
 				var list = $('#fileList').children('tr');
@@ -166,13 +223,8 @@
 				if (self.fileAppLoaded()) {
 
 					// init Search/FileList if needed
-					if (self.fileList == null) {
-						_.each(OC.Plugins.getPlugins('OCA.Search'), function(
-								plugin) {
-							if (plugin instanceof OCA.Search.Files)
-								self.fileList = plugin.fileList;
-						});
-					}
+					if (self.fileList == null)
+						self.initFileList();
 
 					// sending the ajax request
 					var data = {
