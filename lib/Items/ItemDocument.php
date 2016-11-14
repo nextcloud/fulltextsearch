@@ -496,8 +496,11 @@ class ItemDocument
         return array(
             'entry' => $this->getEntry(),
             'data' => array(
+                'id' => $this->getId(),
+                'type' => $this->getType(),
                 'deleted' => $this->isDeleted(),
                 'shared' => $this->isShared(),
+                'score' => $this->getScore(),
                 'lines' => $this->lines
             )
         );

@@ -508,7 +508,8 @@ class SolrService
                 'nextant_deleted',
                 'nextant_path',
                 'nextant_source',
-                'nextant_owner'
+                'nextant_owner',
+                'score'
             ));
             
             // if (key_exists('current_directory', $options))
