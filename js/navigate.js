@@ -34,6 +34,8 @@
 	Nextant.prototype = {
 
 		fileList : null,
+		searchResult : [],
+		locked : false,
 
 		/**
 		 * Initialize the file search
@@ -78,7 +80,7 @@
 			// search request
 			this.searchRequest = function(data) {
 				$.post(OC.filePath('nextant', 'ajax', 'search.php'), data,
-						self.searchResult);
+						self.searchRequestResult);
 			};
 
 			/**
@@ -86,20 +88,32 @@
 			 * display search result
 			 * 
 			 */
-			this.searchResult = function(result) {
+			this.searchRequestResult = function(result) {
 
 				if (self.fileList == null)
 					return;
 
-				var data = [];
-				_.each(result, function(item) {
-					data.push(item.entry);
-				});
+				self.searchResult = result;
 
-				try {
-					self.fileList.setFiles(data);
-				} catch (e) {
+				var data = [];
+				for (var i = 0; i < result.length; i++) {
+					if (result[i].entry == null)
+						continue;
+
+					result[i].entry.score = 3;
+					data.push(result[i].entry);
 				}
+
+				self.fileList.setSort('score', 'desc', false, false);
+				self.fileList.setFiles(data);
+
+				self.updateSearchResult();
+			};
+
+			this.updateSearchResult = function() {
+				self.locked = false;
+
+				var result = self.searchResult;
 
 				// We edit each row
 				_.each(result, function(item) {
@@ -162,6 +176,12 @@
 					// We're done modifying the row
 				});
 
+				self.locked = true;
+			};
+
+			this.mutationFileList = function(mutations, observer) {
+				if (self.locked)
+					self.updateSearchResult();
 			};
 
 			// Go To Folder. Called on FileActions
@@ -236,8 +256,55 @@
 				}
 			});
 
+			// Mutations
+			MutationObserver = window.MutationObserver
+					|| window.WebKitMutationObserver;
+
+			var observerFileList = new MutationObserver(function(mutations,
+					observer) {
+				self.mutationFileList(mutations, observer);
+			});
+
+			observerFileList.observe($('#fileList')[0], {
+				childList : true,
+				attributes : true
+			});
+
 		}
 	};
 	OCA.Search.Nextant = Nextant;
 	OCA.Search.nextant = new Nextant();
+
+	// Sort per score (also index if score is identical)
+	OCA.Files.FileList.Comparators.score = function(f1, f2) {
+		result = OCA.Search.nextant.searchResult;
+
+		var s1 = 0;
+		var s2 = 0;
+		var i1 = 99;
+		var i2 = 99;
+		for (var i = 0; i < result.length; i++) {
+
+			if (result[i].data.id == f1.id)
+				i1 = i;
+			if (result[i].data.id == f2.id)
+				i2 = i;
+			if (result[i].data.id == f1.id)
+				s1 = result[i].data.score;
+			if (result[i].data.id == f2.id)
+				s2 = result[i].data.score;
+		}
+
+		if (s1 < s2)
+			return -1;
+		else if (s1 > s2)
+			return 1;
+		else {
+			if (i1 > i2)
+				return -1;
+			else
+				return 1;
+		}
+	};
+
 })();
