@@ -59,6 +59,10 @@ class ItemDocument
 
     private $content_type;
 
+    private $content_type_mime;
+
+    private $content_type_charset;
+
     private $score;
 
     private $lines = array();
@@ -249,11 +253,28 @@ class ItemDocument
     public function setContentType($type)
     {
         $this->content_type = $type;
+        
+        if (strpos($type, ';') === false) {
+            $this->content_type_mime = $type;
+            return;
+        }
+        
+        list ($this->content_type_mime, $this->content_type_charset) = explode(';', $type);
     }
 
     public function getContentType()
     {
         return $this->content_type;
+    }
+
+    public function getContentMime()
+    {
+        return $this->content_type_mime;
+    }
+
+    public function getContentCharset()
+    {
+        return $this->content_type_charset;
     }
 
     public function setScore($score)
