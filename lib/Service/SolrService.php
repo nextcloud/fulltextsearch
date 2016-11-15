@@ -192,7 +192,7 @@ class SolrService
             case 'text':
                 if ($filters['text'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
         }
         
         switch ($mimetype) {
@@ -200,42 +200,42 @@ class SolrService
             case 'application/epub+zip':
                 if ($filters['pdf'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             
             case 'application/pdf':
                 if ($filters['pdf'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/application-pdf.svg');
+                return true;
             
             case 'application/rtf':
                 if ($filters['pdf'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             
             case 'application/msword':
                 if ($filters['office'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             
             case 'image/jpeg':
                 if ($filters['image'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+                return true;
             
             case 'image/tiff':
                 if ($filters['image'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+                return true;
             
             case 'audio/mpeg':
                 if ($filters['audio'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
+                return true;
             
             case 'audio/flac':
                 if ($filters['audio'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
+                return true;
             
             case 'application/octet-stream':
                 if ($path === '')
@@ -252,7 +252,7 @@ class SolrService
                 }
                 
                 if (key_exists('extension', $pinfo))
-                    return self::extractableFileExtension($pinfo['extension']);
+                    return true;
                 
                 return false;
         }
@@ -272,7 +272,7 @@ class SolrService
             if (substr($mimetype, 0, strlen($mt)) == $mt) {
                 if ($filters['office'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             }
         }
         
@@ -288,10 +288,10 @@ class SolrService
     {
         switch ($extension) {
             case 'srt':
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             
             case 'mid':
-                return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
+                return true;
         }
         
         return false;
