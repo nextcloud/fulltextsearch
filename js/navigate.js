@@ -114,7 +114,7 @@
 				self.locked = false;
 
 				var result = self.searchResult;
-
+				var countBookmarks = 0;
 				// We edit each row
 				_.each(result, function(item) {
 					if (item.entry == null)
@@ -125,89 +125,18 @@
 					if (!$(tr).length)
 						return;
 
-					// fix the subfolder link
-					var elemhref = $(tr).find('td.filename').find('a.name');
-					if ($(elemhref).length)
-						$(elemhref).attr('href',
-								$(elemhref).attr('href').replace(/%2F/g, '/'));
-
-					// fix bookmark link
-					if ($(elemhref).length)
-						$(elemhref).attr('href', item.data.path);
-
-					// fix the display and add few lines
-					var elemname = $(tr).find('td.filename').find('a.name')
-							.find('span.nametext');
-					$(elemname).empty();
-					var displaydiv = $('<span></span>');
-
-					if (item.data.lines[1])
-						displaydiv.append($('<span></span>').attr('class',
-								'nextant_line nextant_line1').html(
-								item.data.lines[1]));
-					if (item.data.lines[2])
-						displaydiv.append($('<span></span>').attr('class',
-								'nextant_line nextant_line2').html(
-								item.data.lines[2]));
-
-					$(elemname).append(displaydiv);
-					$(elemname).css('width', '800px');
-
-					// Add overlay icon
-					var elemicon = $(tr).find('td.filename').find(
-							'div.thumbnail');
-
 					if (item.data.type == 'bookmarks')
-						elemicon.append($('<div></div>').attr(
-								{
-									'class' : 'nextant_details',
-									'style' : "background-image: url('"
-											+ OC.imagePath('nextant',
-													'bookmarks.svg') + "')"
-								}));
-					if (item.data.shared)
-						elemicon.append($('<div></div>').attr(
-								{
-									'class' : 'nextant_details',
-									'style' : "background-image: url('"
-											+ OC.imagePath('core',
-													'actions/shared.svg')
-											+ "')"
-								}));
-					if (item.data.deleted)
-						elemicon.append($('<div></div>').attr(
-								{
-									'class' : 'nextant_details',
-									'style' : "background-image: url('"
-											+ OC.imagePath('core',
-													'actions/delete.svg')
-											+ "')"
-								}));
+						countBookmarks++;
 
-					// removing fileaction on bookmarks
-					if (item.data.type != 'files') {
-						$(tr).find('.fileactions').empty().on('click',
-								function(e) {
-									e.stopPropagation();
-								});
-						$(tr).find('.filesize').empty().on('click',
-								function(e) {
-									e.stopPropagation();
-								});
-						$(tr).find('.date').on('click', function(e) {
-							e.stopPropagation();
-						});
-					}
-					//
-					// We're done modifying the row
+					self.__morphLink(tr, item);
+					self.__morphResultDisplay(tr, item);
+					self.__morphOverlayIcon(tr, item);
+					self.__morphBookmarksFileAction(tr, item);
 				});
 
-				// We edit the summary
-				var elemsumm = $('span.info').find('.fileinfo');
-				if (elemsumm.length) {
-					var currsumm = elemsumm.text();
-					// window.alert(currsumm);
-				}
+				self.__morphSummary(countBookmarks);
+				self.__morphEmptyContent(result);
+
 				//
 				// done
 				self.locked = true;
@@ -266,6 +195,156 @@
 				return decodeURIComponent(results[2].replace(/\+/g, ' '));
 			};
 
+			//
+			// MORPH
+			//
+
+			//
+			// fix the subfolder link
+			//
+			this.__morphLink = function(tr, item) {
+				var elemhref = $(tr).find('td.filename').find('a.name');
+				if (!$(elemhref).length)
+					return;
+
+				$(elemhref).attr('href',
+						$(elemhref).attr('href').replace(/%2F/g, '/'));
+
+				// fix bookmark link
+				if (item.data.type == 'bookmarks') {
+					$(elemhref).attr('href', item.data.path);
+					if (item.entry.mimetype == 'text/html')
+						$(elemhref).attr('target', '_top');
+				}
+			};
+
+			//
+			// fix the display and add few lines
+			//
+			this.__morphResultDisplay = function(tr, item) {
+				var elemname = $(tr).find('td.filename').find('a.name').find(
+						'span.nametext');
+
+				$(elemname).empty();
+				var displaydiv = $('<span></span>');
+
+				if (item.data.lines[1])
+					displaydiv.append($('<span></span>').attr('class',
+							'nextant_line nextant_line1').html(
+							item.data.lines[1]));
+				if (item.data.lines[2])
+					displaydiv.append($('<span></span>').attr('class',
+							'nextant_line nextant_line2').html(
+							item.data.lines[2]));
+
+				$(elemname).append(displaydiv);
+				$(elemname).css('width', '800px');
+
+			};
+
+			//
+			// Add overlay icon
+			//
+			this.__morphOverlayIcon = function(tr, item) {
+
+				var elemicon = $(tr).find('td.filename').find('div.thumbnail');
+
+				if (item.data.type == 'bookmarks')
+					elemicon.append($('<div></div>').attr(
+							{
+								'class' : 'nextant_details',
+								'style' : "background-image: url('"
+										+ OC.imagePath('nextant',
+												'bookmarks.svg') + "')"
+							}));
+				if (item.data.shared)
+					elemicon.append($('<div></div>').attr(
+							{
+								'class' : 'nextant_details',
+								'style' : "background-image: url('"
+										+ OC.imagePath('core',
+												'actions/shared.svg') + "')"
+							}));
+				if (item.data.deleted)
+					elemicon.append($('<div></div>').attr(
+							{
+								'class' : 'nextant_details',
+								'style' : "background-image: url('"
+										+ OC.imagePath('core',
+												'actions/delete.svg') + "')"
+							}));
+			};
+
+			//
+			// removing fileaction on bookmarks
+			//
+			this.__morphBookmarksFileAction = function(tr, item) {
+				if (item.data.type != 'bookmarks')
+					return;
+
+				$(tr).find('.fileactions').empty().on('click', function(e) {
+					e.stopPropagation();
+				});
+				$(tr).find('.filesize').empty().on('click', function(e) {
+					e.stopPropagation();
+				});
+				$(tr).find('.date').on('click', function(e) {
+					e.stopPropagation();
+				});
+			};
+
+			//		
+			// fix Summary
+			//
+			this.__morphSummary = function(countBookmarks) {
+
+				var elemsumm = $('tr.summary').find('span.info');
+				if (!elemsumm.length)
+					return;
+
+				// First, fix the current cummary
+				self.fileList.fileSummary.calculate(self.fileList.files);
+				self.fileList.fileSummary.summary.totalFiles -= countBookmarks;
+				self.fileList.fileSummary.update();
+
+				// Then, add a summary for bookmarks
+				elemsumm.find('span.bminfo').text(
+						countBookmarks + ' bookmark'
+								+ ((countBookmarks > 1) ? 's' : ''));
+
+				if (countBookmarks == 0) {
+					elemsumm.find('span.bminfo').addClass('hidden');
+					elemsumm.find('span.bmconnector').addClass('hidden');
+				} else {
+
+					elemsumm.find('span.bminfo').removeClass('hidden');
+					elemsumm.find('span.bmconnector').removeClass('hidden');
+
+					if (elemsumm.find('span.fileinfo.hidden').length
+							&& elemsumm.find('span.dirinfo.hidden').length) {
+
+						elemsumm.find('span.bmconnector').addClass('hidden');
+
+					} else if (elemsumm.find('span.fileinfo.hidden').length
+							|| elemsumm.find('span.dirinfo.hidden').length) {
+					} else
+						elemsumm.find('span.connector').text(', ');
+				}
+			};
+
+			//
+			// fix empty result div
+			//
+			this.__morphEmptyContent = function(files) {
+				if (files.length > 0) {
+					setTimeout(function() {
+						$('#searchresults').find('div.emptycontent').addClass(
+								'hidden')
+					}, 500);
+				}
+			};
+
+			// register
 			OC.Plugins.register('OCA.Search', this);
 		},
 
@@ -290,6 +369,20 @@
 				}
 			});
 
+			//
+			// Add few elem Summary
+			var elemsumm = $('tr.summary').find('span.info');
+			elemsumm.find('span.fileinfo').after(function() {
+				return $('<span></span>').attr('class', 'bminfo hidden');
+			});
+			elemsumm.find('span.fileinfo').after(
+					function() {
+						return $('<span></span>').attr('class',
+								'bmconnector hidden').text(
+								elemsumm.find('span.connector').text())
+					});
+
+			//
 			// Mutations
 			MutationObserver = window.MutationObserver
 					|| window.WebKitMutationObserver;
