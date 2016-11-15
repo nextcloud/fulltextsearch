@@ -57,6 +57,8 @@ class ItemDocument
 
     private $storage;
 
+    private $content_type;
+
     private $score;
 
     private $lines = array();
@@ -242,6 +244,16 @@ class ItemDocument
     public function getHighlighting()
     {
         return $this->highlighting;
+    }
+
+    public function setContentType($type)
+    {
+        $this->content_type = $type;
+    }
+
+    public function getContentType()
+    {
+        return $this->content_type;
     }
 
     public function setScore($score)
@@ -471,10 +483,13 @@ class ItemDocument
     {
         $item = self::fromCompleteId($document->id);
         $item->setPath($document->nextant_path);
+        $item->setMTime($document->nextant_mtime);
         $item->setSource($document->nextant_source);
         $item->isDeleted($document->nextant_deleted);
         $item->setOwner($document->nextant_owner);
         $item->setScore($document->score);
+        if (is_array($document->nextant_attr_content_type) && sizeof($document->nextant_attr_content_type) > 0)
+            $item->setContentType($document->nextant_attr_content_type[0]);
         
         return $item;
     }
@@ -498,6 +513,7 @@ class ItemDocument
             'data' => array(
                 'id' => $this->getId(),
                 'type' => $this->getType(),
+                'path' => $this->getPath(),
                 'deleted' => $this->isDeleted(),
                 'shared' => $this->isShared(),
                 'score' => $this->getScore(),

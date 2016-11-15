@@ -509,6 +509,8 @@ class SolrService
                 'nextant_path',
                 'nextant_source',
                 'nextant_owner',
+                'nextant_mtime',
+                'nextant_attr_content_type',
                 'score'
             ));
             
