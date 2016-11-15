@@ -92,7 +92,20 @@ class BookmarkService
 
     public static function getSearchResult(&$data)
     {
+        $mime = $data->getContentType();
+        
+        $entry = array(
+            'id' => $data->getId(),
+            'mtime' => $data->getMTime() * 1000,
+            'name' => $data->getPath(),
+            'permissions' => 27,
+            'mimetype' => (($mime !== '') ? $mime : 'text/html'),
+            'type' => 'bookmark'
+        );
+        
+        $data->setEntry($entry);
         $data->valid(true);
+        
         // $data['link_main'] = $data['path'];
         // $data['title'] = $data['path'];
         // $data['valid'] = true;
