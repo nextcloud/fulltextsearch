@@ -557,6 +557,7 @@ class FileService
             $dirpath = substr($dirpath, strpos($dirpath, $base) + strlen($base)) . '/';
         }
         
+        // fileinfo entry
         $entry = \OCA\Files\Helper::formatFileInfo($fileData);
         $entry['name'] = ((substr($path, 0, 1) === '/') ? substr($path, 1) : $path);
         $item->setEntry($entry);
