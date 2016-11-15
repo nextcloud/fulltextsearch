@@ -76,14 +76,11 @@ class SearchController extends Controller
 
     /**
      * @NoAdminRequired
-     * @NoCSRFRequired
      */
     public function searchRequest($query, $current_dir)
     {
-        // $results = array(
-        // 'filelist' => array(),
-        // 'data' => array()
-        // );
+        $results = array();
+        
         if (! $this->solrService)
             return $results;
         
