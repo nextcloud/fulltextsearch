@@ -105,6 +105,7 @@
 				}
 
 				self.fileList.setSort('score', 'desc', false, false);
+				// self.fileList.setFiles(self.fileList.files.concat(data));
 				self.fileList.setFiles(data);
 
 				self.updateSearchResult();
@@ -114,7 +115,6 @@
 				self.locked = false;
 
 				var result = self.searchResult;
-				var countBookmarks = 0;
 				// We edit each row
 				_.each(result, function(item) {
 					if (item.entry == null)
@@ -125,16 +125,13 @@
 					if (!$(tr).length)
 						return;
 
-					if (item.data.type == 'bookmarks')
-						countBookmarks++;
-
 					self.__morphLink(tr, item);
 					self.__morphResultDisplay(tr, item);
 					self.__morphOverlayIcon(tr, item);
 					self.__morphBookmarksFileAction(tr, item);
 				});
 
-				self.__morphSummary(countBookmarks);
+				self.__morphSummary(result);
 				self.__morphEmptyContent(result);
 
 				//
@@ -207,15 +204,13 @@
 				if (!$(elemhref).length)
 					return;
 
-				$(elemhref).attr('href',
-						$(elemhref).attr('href').replace(/%2F/g, '/'));
+				if (item.data.type == 'files')
+					$(elemhref).attr('href',
+							$(elemhref).attr('href').replace(/%2F/g, '/'));
 
 				// fix bookmark link
-				if (item.data.type == 'bookmarks') {
+				if (item.data.type == 'bookmarks')
 					$(elemhref).attr('href', item.data.path);
-					if (item.entry.mimetype == 'text/html')
-						$(elemhref).attr('target', '_top');
-				}
 			};
 
 			//
@@ -296,7 +291,13 @@
 			//		
 			// fix Summary
 			//
-			this.__morphSummary = function(countBookmarks) {
+			this.__morphSummary = function(files) {
+
+				var cBookmarks = 0;
+				for (var i = 0; i < files.length; i++) {
+					if (files[i].data.type == 'bookmarks')
+						cBookmarks++;
+				}
 
 				var elemsumm = $('tr.summary').find('span.info');
 				if (!elemsumm.length)
@@ -304,15 +305,15 @@
 
 				// First, fix the current cummary
 				self.fileList.fileSummary.calculate(self.fileList.files);
-				self.fileList.fileSummary.summary.totalFiles -= countBookmarks;
+				self.fileList.fileSummary.summary.totalFiles -= cBookmarks;
 				self.fileList.fileSummary.update();
 
 				// Then, add a summary for bookmarks
 				elemsumm.find('span.bminfo').text(
-						countBookmarks + ' bookmark'
-								+ ((countBookmarks > 1) ? 's' : ''));
+						cBookmarks + ' bookmark'
+								+ ((cBookmarks > 1) ? 's' : ''));
 
-				if (countBookmarks == 0) {
+				if (cBookmarks == 0) {
 					elemsumm.find('span.bminfo').addClass('hidden');
 					elemsumm.find('span.bmconnector').addClass('hidden');
 				} else {
@@ -320,9 +321,11 @@
 					elemsumm.find('span.bminfo').removeClass('hidden');
 					elemsumm.find('span.bmconnector').removeClass('hidden');
 
-					if (elemsumm.find('span.fileinfo.hidden').length
-							&& elemsumm.find('span.dirinfo.hidden').length) {
-
+					if (files.length == cBookmarks) {
+						$('tr.summary').removeClass('hidden');
+						elemsumm.find('span.dirinfo').addClass('hidden');
+						elemsumm.find('span.connector').addClass('hidden');
+						elemsumm.find('span.fileinfo').addClass('hidden');
 						elemsumm.find('span.bmconnector').addClass('hidden');
 
 					} else if (elemsumm.find('span.fileinfo.hidden').length
@@ -336,12 +339,11 @@
 			// fix empty result div
 			//
 			this.__morphEmptyContent = function(files) {
-				if (files.length > 0) {
+				if (files.length > 0)
 					setTimeout(function() {
 						$('#searchresults').find('div.emptycontent').addClass(
 								'hidden')
-					}, 500);
-				}
+					}, 200);
 			};
 
 			// register
@@ -358,6 +360,18 @@
 					// init Search/FileList if needed
 					if (self.fileList == null)
 						self.initFileList();
+
+					/**
+					 * from apps/files/js/search.js
+					 */
+					// self.fileList.setFilter(query);
+					// if (query.length > 2) {
+					// // search is not started until 500msec have passed
+					// window.setTimeout(function() {
+					// $('.nofilterresults').addClass('hidden');
+					// }, 500);
+					// }
+					/* end */
 
 					// sending the ajax request
 					var data = {
