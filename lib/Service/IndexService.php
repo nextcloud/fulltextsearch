@@ -229,6 +229,13 @@ class IndexService
                 $entry->extractable(true);
             }
             
+            if ($this->output != null && $this->debug == 2) {
+                $this->output->writeln('');
+                $this->output->writeln('### FILE ' . $entry->getPath());
+                $this->output->writeln('_current: ' . var_export($entry->toArray(), true));
+                $this->output->writeln('_solr: ' . var_export(ItemDocument::getItem($solrDocs, $entry), true));
+            }
+            
             if (! $entry->isExtractable() && $this->configService->getAppValue('index_files_tree') !== '1')
                 continue;
             
@@ -237,6 +244,9 @@ class IndexService
             
             if (! $this->force && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
                 continue;
+            
+            if ($this->output != null && $this->debug == 2)
+                $this->output->writeln('- Extracting!');
             
             if ($progress != null) {
                 $progress->setMessage('+', 'job');
@@ -253,7 +263,14 @@ class IndexService
             
             $this->solrService->indexDocument($entry, $ierror);
             
+            if ($this->output != null && $this->debug == 2)
+                $this->output->writeln('- Extracted: ' . (($entry->isFailedExtract()) ? 'n' : 'y') . '  ' . $ierror->getCode() . ' ' . $ierror->getMessage());
+            
             if ((time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
+                
+                if ($this->output != null && $this->debug == 2)
+                    $this->output->writeln('- Commiting!');
+                
                 $progress->setMessage('@', 'job');
                 $progress->setMessage('[commiting]', 'infos');
                 $progress->display();
@@ -269,6 +286,7 @@ class IndexService
             
             // fail at extract, let's try just index
             if ($entry->isFailedExtract()) {
+                
                 if ($this->configService->getAppValue('index_files_tree') !== '1')
                     $entry->invalid(true);
                 
