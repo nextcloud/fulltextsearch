@@ -130,6 +130,10 @@ class SearchController extends Controller
                         $hl1 = '... ' . $item->getHighlighting()[0] . ' ...';
                     if (sizeof($item->getHighlighting()) > 1)
                         $hl2 = '... ' . $item->getHighlighting()[1] . ' ...';
+                    if (sizeof($item->getHighlighting()) > 2)
+                        $hl1 .= '... ' . $item->getHighlighting()[2] . ' ...';
+                    if (sizeof($item->getHighlighting()) > 3)
+                        $hl2 .= '... ' . $item->getHighlighting()[3] . ' ...';
                 }
                 
                 $item->setLine(1, $item->getPath());
