@@ -57,7 +57,8 @@ class Check extends Base
         parent::configure();
         $this->setName('nextant:check')
             ->setDescription('check, fix and optimise your current Solr configuration')
-            ->addOption('info', 'i', InputOption::VALUE_NONE, 'display some info')
+            ->addOption('info', null, InputOption::VALUE_NONE, 'display some info')
+            ->addOption('infoall', null, InputOption::VALUE_NONE, 'display some info (also sensitive)')
             ->addOption('fix', 'f', InputOption::VALUE_NONE, 'fix');
     }
 
@@ -68,8 +69,18 @@ class Check extends Base
             return;
         }
         
-        if ($input->getOption('info')) {
-            $output->writeln(var_export($this->settingsController->updateSubOptions(true, 'check'), true));
+        if ($input->getOption('info') || $input->getOption('infoall')) {
+            $info = $this->settingsController->updateSubOptions(true, 'check');
+            
+            if (! $input->getOption('infoall')) {
+                $info['solr_url'] = '**HIDDEN**';
+                $info['solr_core'] = '**HIDDEN**';
+                
+                $qk = $info['index_live_queuekey'];
+                $info['index_live_queuekey'] = substr($qk, 0, - 3) . '???';
+            }
+            
+            $output->writeln(var_export($info, true));
         }
         
         $this->solrService->setOutput($output);

@@ -263,8 +263,11 @@ class IndexService
             
             $this->solrService->indexDocument($entry, $ierror);
             
-            if ($this->output != null && $this->debug == 2)
+            if ($this->output != null && $this->debug == 2) {
+                if ($ierror == null || $ierror === '')
+                    $ierror = new ItemError();
                 $this->output->writeln('- Extracted: ' . (($entry->isFailedExtract()) ? 'n' : 'y') . '  ' . $ierror->getCode() . ' ' . $ierror->getMessage());
+            }
             
             if ((time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
                 
