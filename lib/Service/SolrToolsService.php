@@ -423,7 +423,7 @@ class SolrToolsService
      * @param ItemError $ierror            
      * @return boolean|Solarium\Core\Query\Result
      */
-    public function getInfoCore(&$ierror = '')
+    public function getInfoCore($complete = false, &$ierror = '')
     {
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
             $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
@@ -434,8 +434,12 @@ class SolrToolsService
             $client = $this->solrService->getClient();
             
             $query = $client->createSelect();
-            $request = $client->createRequest($query);
+            if (! $complete)
+                $query->setFields(array(
+                    'index'
+                ));
             
+            $request = $client->createRequest($query);
             $request->setHandler('admin/luke');
             
             $response = $client->executeRequest($request);

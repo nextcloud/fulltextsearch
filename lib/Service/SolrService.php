@@ -469,10 +469,8 @@ class SolrService
                 return false;
             }
             
-            $query->setRows(25);
-            
-            // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
             array_push($options, 'complete_words');
+            // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
             
             $q = '';
             $path = '';
@@ -480,29 +478,29 @@ class SolrService
             foreach ($astring as $qstr) {
                 
                 $oper = '';
-                $value = 1;
+                $value = 15;
                 
                 if (strpos($special, substr($qstr, 0, 1)) !== false) {
                     $oper = substr($qstr, 0, 1);
                     $qstr = substr($qstr, 1);
                 }
                 
-                $path .= 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^10 ' . "\n";
+                $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^30 ' . "\n";
                 
                 if (substr($qstr, 0, 1) == '"')
-                    $value *= 30;
+                    $value = 150;
                 
                 $q .= $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ' ';
             }
             
-            $q .= "\n" . $path;
-            
-            // Uncomment to display the request sent to solr
-            // $this->miscService->log($q);
+            if ($path !== '')
+                $q = '(' . $q . ")\n OR (" . $path . ')';
+                
+                // Uncomment to display the request sent to solr
+                // $this->miscService->log($q);
+            $query->setRows(25);
             $query->setQuery($q);
-            
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
-            
             $query->setFields(array(
                 'id',
                 'nextant_deleted',
@@ -520,10 +518,14 @@ class SolrService
             $hl = $query->getHighlighting();
             $hl->setSimplePrefix('<span class="nextant_hl">');
             $hl->setSimplePostfix('</span>');
-            $hl->setSnippets(3);
+            $hl->setSnippets(5);
+            // $hl->setAlternateField('nextant_path');
+            $hl->setFragSize(70);
+            $hl->setMaxAnalyzedChars(50000000);
             $hl->setFields(array(
                 'text'
             ));
+            // 'nextant_path'
             
             $resultset = $client->select($query);
             $highlighting = $resultset->getHighlighting();
@@ -584,10 +586,14 @@ class SolrService
                 
                 $t ++;
                 if ($t == $suggTotal) {
-                    foreach ($termResult as $result)
-                        $suggestions[] = array(
-                            'suggestion' => '<b>' . $string . '</b>' . (($termResult->getEndOffset() >= strlen($string)) ? substr($result, strlen($term)) : '')
-                        );
+                    foreach ($termResult as $result) {
+                        $suggest = '<b>' . $string . '</b>' . (($termResult->getEndOffset() >= strlen($string)) ? substr($result, strlen($term)) : '');
+                        
+                        if (! self::suggestionAlreadyKnown($suggestions, $suggest))
+                            $suggestions[] = array(
+                                'suggestion' => $suggest
+                            );
+                    }
                 }
             }
             
@@ -652,6 +658,15 @@ class SolrService
                 $this->output->write($line);
         } else
             $this->lastMessage = $line;
+    }
+
+    private static function suggestionAlreadyKnown($list, $suggest)
+    {
+        foreach ($list as $item) {
+            if ($item['suggestion'] === $suggest)
+                return true;
+        }
+        return false;
     }
 }
 

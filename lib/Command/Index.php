@@ -87,7 +87,7 @@ class Index extends Base
         parent::configure();
         $this->setName('nextant:index')
             ->setDescription('scan users\' files, generate and index Solr documents')
-            ->addOption('debug', 'd', InputOption::VALUE_NONE, 'display more text')
+            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'display more text')
             ->addOption('unlock', 'k', InputOption::VALUE_NONE, 'unlock on Solr')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'force extract and update of all your documents')
             ->addOption('user', 'u', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'indexes file of the given user(s)')
