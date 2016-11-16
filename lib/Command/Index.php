@@ -87,7 +87,8 @@ class Index extends Base
         parent::configure();
         $this->setName('nextant:index')
             ->setDescription('scan users\' files, generate and index Solr documents')
-            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'display more text')
+            ->addOption('debug', null, InputOption::VALUE_NONE, 'display more text')
+            ->addOption('debugall', null, InputOption::VALUE_NONE, 'display a lot more text')
             ->addOption('unlock', 'k', InputOption::VALUE_NONE, 'unlock on Solr')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'force extract and update of all your documents')
             ->addOption('user', 'u', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'indexes file of the given user(s)')
@@ -129,9 +130,15 @@ class Index extends Base
             return;
         }
         
-        $this->miscService->setDebug($input->getOption('debug'));
-        $this->fileService->setDebug($input->getOption('debug'));
-        $this->indexService->setDebug($input->getOption('debug'));
+        $debug = 0;
+        if ($input->getOption('debug'))
+            $debug = 1;
+        if ($input->getOption('debugall'))
+            $debug = 2;
+        
+        $this->miscService->setDebug($debug);
+        $this->fileService->setDebug($debug);
+        $this->indexService->setDebug($debug);
         $this->indexService->setForcing($input->getOption('force'));
         
         $this->solrService->setOutput($output);
