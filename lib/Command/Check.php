@@ -41,12 +41,15 @@ class Check extends Base
 
     private $solrAdmin;
 
-    public function __construct($solrService, $solrTools, $solrAdmin)
+    private $settingsController;
+
+    public function __construct($solrService, $solrTools, $solrAdmin, $settingsController)
     {
         parent::__construct();
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->solrAdmin = $solrAdmin;
+        $this->settingsController = $settingsController;
     }
 
     protected function configure()
@@ -54,6 +57,7 @@ class Check extends Base
         parent::configure();
         $this->setName('nextant:check')
             ->setDescription('check, fix and optimise your current Solr configuration')
+            ->addOption('info', 'i', InputOption::VALUE_NONE, 'display some info')
             ->addOption('fix', 'f', InputOption::VALUE_NONE, 'fix');
     }
 
@@ -62,6 +66,10 @@ class Check extends Base
         if (! $this->solrService->configured(true)) {
             $output->writeln('Nextant is not yet configured');
             return;
+        }
+        
+        if ($input->getOption('info')) {
+            $output->writeln(var_export($this->settingsController->updateSubOptions(true, 'check'), true));
         }
         
         $this->solrService->setOutput($output);
@@ -87,7 +95,7 @@ class Check extends Base
         $output->writeln(' - ' . $this->solrTools->count('files') . ' files');
         $output->writeln(' - ' . $this->solrTools->count('bookmarks') . ' bookmarks');
         
-        $output->writeln(' - ' .  $this->solrTools->getInfoCore()->index->segmentCount . ' segments');
+        $output->writeln(' - ' . $this->solrTools->getInfoCore()->index->segmentCount . ' segments');
     }
 }
 

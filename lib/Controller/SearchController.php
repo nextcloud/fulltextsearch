@@ -138,12 +138,26 @@ class SearchController extends Controller
                 
                 $hl1 = '';
                 $hl2 = '';
-                if (key_exists('highlight', $data) && is_array($data['highlight'])) {
-                    if (sizeof($data['highlight']) >= 1)
-                        $hl1 = '... ' . $data['highlight'][0] . ' ...';
-                    if (sizeof($data['highlight']) > 1)
-                        $hl2 = '... ' . $data['highlight'][1] . ' ...';
+                
+                if (key_exists('highlight_text', $data) && is_array($data['highlight_text'])) {
+                    if (sizeof($data['highlight_text']) >= 1)
+                        $hl1 = '... ' . $data['highlight_text'][0] . ' ...';
+                    if (sizeof($data['highlight_text']) > 1)
+                        $hl2 = '... ' . $data['highlight_text'][1] . ' ...';
+                    if (sizeof($data['highlight_text']) > 2)
+                        $hl1 .= $data['highlight_text'][2] . ' ...';
+                    if (sizeof($data['highlight_text']) > 3)
+                        $hl2 = $data['highlight_text'][3] . ' ...';
                 }
+                
+                // if ($hl2 === '') {
+                // if (key_exists('highlight_path', $data) && is_array($data['highlight_path']) && sizeof($data['highlight_path']) >= 1) {
+                // $hl2 = $hl1;
+                // $hl1 = $data['highlight_path'][0];
+                // if ($hl2 === '' && sizeof($data['highlight_path']) > 1)
+                // $hl2 = $data['highlight_path'][1];
+                // }
+                // }
                 
                 if ($hl1 === '' || $hl1 === null)
                     $hl1 = '';

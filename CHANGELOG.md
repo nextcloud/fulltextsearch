@@ -1,3 +1,7 @@
+**v0.6.6**
+- Minor bugfixes.
+
+
 **v0.6.5**
 - Optimized Index/Extract/Commit
 - complete debug information while indexing

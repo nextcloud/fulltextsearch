@@ -404,6 +404,49 @@ class ItemDocument
         return new ItemDocument($type, $id);
     }
 
+    public function toArray($complete = false)
+    {
+        $complete = array(
+            'type' => $this->getType(),
+            'source' => $this->getSource(),
+            'owner' => $this->getOwner(),
+            'path' => $this->getPath(),
+            'mimetype' => $this->getMimetype(),
+            'size' => $this->getSize(),
+            'absolutepath' => $this->getAbsolutePath(),
+            'mtime' => $this->getMTime(),
+            'share' => $this->getShare(),
+            'sharegroup' => $this->getSharegroup(),
+            'storage' => array(
+                'local' => $this->getStorage()->isLocal()
+            ),
+            'needextract' => $this->neededExtract(),
+            'needUpdate' => $this->neededUpdate(),
+            'remote' => $this->isRemote(),
+            'encrypted' => $this->isEncrypted(),
+            'extractable' => $this->isExtractable(),
+            'indexed' => $this->isIndexed(),
+            'extracted' => $this->isExtracted(),
+            'processed' => $this->isProcessed(),
+            'deleted' => $this->isDeleted(),
+            'removed' => $this->isRemoved(),
+            'updated' => $this->isUpdated(),
+            'failedIndex' => $this->isFailedIndex(),
+            'failedExtract' => $this->isFailedExtract(),
+            'failedUpdate' => $this->isFailedUpdate(),
+            'temp' => $this->isTemp(),
+            'invalid' => $this->isInvalid(),
+            'synced' => $this->isSynced()
+        );
+        
+        return $complete;
+    }
+
+    public function toString()
+    {
+        return json_encode($this->toArray());
+    }
+
     public static function getItem(&$list, $item)
     {
         if ($list == null || $item == null)
