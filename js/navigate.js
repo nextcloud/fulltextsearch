@@ -100,15 +100,19 @@
 				self.config = infos.config;
 
 				var origResult = [];
-				if (self.config.index_files_nextant_only != '1')
+				if (self.config == null
+						|| self.config.index_files_nextant_only != '1')
 					origResult = self.currentFileResult();
 
 				self.searchResult = origResult.concat(result);
 
 				result = self.searchResult;
+				if (result == null)
+					return;
+
 				var data = [];
 				for (var i = 0; i < result.length; i++) {
-					if (result[i].entry == null)
+					if (result[i] == null || result[i].entry == null)
 						continue;
 
 					var alr = false;
@@ -132,11 +136,17 @@
 			//
 			//
 			this.updateSearchResult = function() {
-				self.locked = false;
 
 				var result = self.searchResult;
+				if (result == null)
+					return;
+
+				self.locked = false;
+
 				// We edit each row
 				_.each(result, function(item) {
+					if (item == null)
+						return;
 					if (item.entry == null)
 						return;
 
@@ -279,7 +289,6 @@
 
 				$(elemname).empty();
 				var displaydiv = $('<span></span>');
-
 				if (item.data.lines[1])
 					displaydiv.append($('<span></span>').attr('class',
 							'nextant_line nextant_line1').html(
@@ -288,6 +297,10 @@
 					displaydiv.append($('<span></span>').attr('class',
 							'nextant_line nextant_line2').html(
 							item.data.lines[2]));
+				if (item.data.lines[3])
+					displaydiv.append($('<span></span>').attr('class',
+							'nextant_line nextant_line3').html(
+							item.data.lines[3]));
 
 				$(elemname).append(displaydiv);
 				$(elemname).css('width', '800px');
@@ -352,6 +365,8 @@
 
 				var cBookmarks = 0;
 				for (var i = 0; i < files.length; i++) {
+					if (files[i] == null)
+						continue;
 					if (files[i].data.type == 'bookmarks')
 						cBookmarks++;
 				}
