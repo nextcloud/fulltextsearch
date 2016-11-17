@@ -99,14 +99,10 @@ class BookmarkService
             'permissions' => 27,
             'type' => 'bookmark'
         );
+        // 'mimetype' => 'text/html',
         
         $data->setEntry($entry);
         $data->valid(true);
-        
-        // $data['link_main'] = $data['path'];
-        // $data['title'] = $data['path'];
-        // $data['valid'] = true;
-        // $data['icon'] = \OCP\Util::imagePath('nextant', 'bookmarks.svg');
         
         return true;
     }

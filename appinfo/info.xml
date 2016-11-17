@@ -40,7 +40,7 @@
 
 
 	</description>
-	<version>0.6.6</version>
+	<version>0.6.900</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<types>
@@ -54,7 +54,6 @@
 	<website>https://github.com/nextcloud/nextant/wiki</website>
 	<bugs>https://github.com/nextcloud/nextant/issues</bugs>
 	<repository>https://github.com/nextcloud/nextant/</repository>
-	<!-- <discussion>https://help.nextcloud.com/t/nextant-navigate-through-your-cloud-using-solr/2954</discussion> -->
 	<screenshot>https://raw.githubusercontent.com/nextcloud/nextant/master/screenshots/displayResult.jpg</screenshot>
 	<screenshot>https://raw.githubusercontent.com/nextcloud/nextant/master/screenshots/admin.jpg</screenshot>
 	<dependencies>
