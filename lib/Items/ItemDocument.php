@@ -418,7 +418,7 @@ class ItemDocument
             'share' => $this->getShare(),
             'sharegroup' => $this->getSharegroup(),
             'storage' => array(
-                'local' => $this->getStorage()->isLocal()
+                'local' => (($this->getStorage() !== null) ? $this->getStorage()->isLocal() : '')
             ),
             'needextract' => $this->neededExtract(),
             'needUpdate' => $this->neededUpdate(),
