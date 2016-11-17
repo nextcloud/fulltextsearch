@@ -146,7 +146,12 @@ class SearchController extends Controller
             // $this->miscService->log('>> ' . var_export($results, true));
         }
         
-        return $results;
+        return array(
+            'config' => array(
+                'index_files_nextant_only' => $this->configService->getAppValue('index_files_nextant_only')
+            ),
+            'result' => $results
+        );
     }
 
     /**

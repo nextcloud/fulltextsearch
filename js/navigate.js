@@ -34,8 +34,11 @@
 	Nextant.prototype = {
 
 		fileList : null,
+		currQuery : '',
+		currFiles : null,
 		searchResult : [],
 		locked : false,
+		config : {},
 
 		/**
 		 * Initialize the file search
@@ -88,29 +91,46 @@
 			 * display search result
 			 * 
 			 */
-			this.searchRequestResult = function(result) {
+			this.searchRequestResult = function(infos) {
 
 				if (self.fileList == null)
 					return;
 
-				self.searchResult = result;
+				var result = infos.result;
+				self.config = infos.config;
 
+				var origResult = [];
+				if (self.config.index_files_nextant_only != '1')
+					origResult = self.currentFileResult();
+
+				self.searchResult = origResult.concat(result);
+
+				result = self.searchResult;
 				var data = [];
 				for (var i = 0; i < result.length; i++) {
 					if (result[i].entry == null)
 						continue;
 
-					result[i].entry.score = result[i].data.score;
-					data.push(result[i].entry);
+					var alr = false;
+					for (var j = 0; j < data.length; j++) {
+						if (data[j].id == result[i].entry.id) {
+							alr = true;
+							break;
+						}
+					}
+
+					if (!alr)
+						data.push(result[i].entry);
 				}
 
 				self.fileList.setSort('score', 'desc', false, false);
-				// self.fileList.setFiles(self.fileList.files.concat(data));
 				self.fileList.setFiles(data);
 
 				self.updateSearchResult();
 			};
 
+			//
+			//
 			this.updateSearchResult = function() {
 				self.locked = false;
 
@@ -139,11 +159,43 @@
 				self.locked = true;
 			};
 
+			//
+			// return array containing current file from current directory that
+			// fit the query.
+			// (like current search in files app)
+			this.currentFileResult = function() {
+				var currFiles = self.currFiles;
+				var data = [];
+
+				if (currFiles == null || currFiles.length == 0)
+					return data;
+
+				for (var i = 0; i < currFiles.length; i++) {
+
+					if (currFiles[i].name.toLowerCase().indexOf(
+							self.currQuery.toLowerCase()) === -1)
+						continue;
+
+					data.push({
+						data : {
+							id : currFiles[i].id,
+							score : 9999
+						},
+						entry : currFiles[i]
+					});
+				}
+
+				return data;
+			};
+
+			//
+			//
 			this.mutationFileList = function(mutations, observer) {
 				if (self.locked)
 					self.updateSearchResult();
 			};
 
+			//
 			// Go To Folder. Called on FileActions
 			this.onGoToFolder = function(path, context) {
 				var apath = path.split('/');
@@ -166,6 +218,7 @@
 				// window.alert('DIR: ' + dir + ' - FILENAME: ' + filename);
 			};
 
+			//
 			// get TR elem from filelist
 			this.getElem = function(file) {
 				var list = $('#fileList').children('tr');
@@ -177,6 +230,7 @@
 				return null;
 			};
 
+			//
 			// get info from url
 			this.get = function(name, url) {
 
@@ -219,6 +273,9 @@
 			this.__morphResultDisplay = function(tr, item) {
 				var elemname = $(tr).find('td.filename').find('a.name').find(
 						'span.nametext');
+
+				if (item.data.lines == null)
+					return;
 
 				$(elemname).empty();
 				var displaydiv = $('<span></span>');
@@ -361,17 +418,10 @@
 					if (self.fileList == null)
 						self.initFileList();
 
-					/**
-					 * from apps/files/js/search.js
-					 */
-					// self.fileList.setFilter(query);
-					// if (query.length > 2) {
-					// // search is not started until 500msec have passed
-					// window.setTimeout(function() {
-					// $('.nofilterresults').addClass('hidden');
-					// }, 500);
-					// }
-					/* end */
+					if (self.currFiles == null)
+						self.currFiles = self.fileList.files;
+
+					self.currQuery = query;
 
 					// sending the ajax request
 					var data = {
@@ -382,6 +432,10 @@
 					self.searchRequest(data);
 				}
 			});
+
+			// if ( == '1') {
+			// self.index_files_nextant_only = true;
+			// }
 
 			//
 			// Add few elem Summary
@@ -425,7 +479,6 @@
 		var i1 = 99;
 		var i2 = 99;
 		for (var i = 0; i < result.length; i++) {
-
 			if (result[i].data.id == f1.id)
 				i1 = i;
 			if (result[i].data.id == f2.id)
