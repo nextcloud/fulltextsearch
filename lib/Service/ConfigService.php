@@ -233,6 +233,16 @@ class ConfigService
         return $this->fileFilters;
     }
 
+    public function getCloudVersion($complete = false)
+    {
+        $ver = \OCP\Util::getVersion();
+        
+        if ($complete)
+            return implode('.', $ver);
+        
+        return $ver[0];
+    }
+
     /**
      * generate an array to pass config to Solarium
      *
