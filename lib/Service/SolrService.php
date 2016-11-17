@@ -485,7 +485,7 @@ class SolrService
                     $qstr = substr($qstr, 1);
                 }
                 
-                $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^30 ' . "\n";
+                $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^15 ' . "\n";
                 
                 if (substr($qstr, 0, 1) == '"')
                     $value = 150;
