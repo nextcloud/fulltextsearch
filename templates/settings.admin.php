@@ -109,7 +109,12 @@ style('nextant', 'admin');
 	    <?php p($l->t('Index Files Tree :')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_tree" id="solr_index_files_tree"
-									value="1" style="margin: 10px;"></td>
+									value="1" style="margin: 10px;"> <span
+									id="solr_index_files_nextant_only_span"><input type="checkbox"
+										name="solr_index_files_nextant_only"
+										id="solr_index_files_nextant_only" value="1"
+										style="margin: 10px;"> Disable default search from Files </span>
+								</td>
 							</tr>
 
 							<tr style="height: 30px;">
@@ -207,18 +212,6 @@ style('nextant', 'admin');
 							<td><input type="text" name="solr_index_delay"
 								id="solr_index_delay" value="2" style="width: 50px;" /> hours</td>
 						</tr>
-
-
-						<!-- 
-						<tr style="height: 30px;">
-							<td class="nextant_admin_left">
-	    <?php p($l->t('Fully Replace Core Search:')) ?></td>
-							<td id="solr_replace_core_search_td"><input type="checkbox"
-								name="solr_replace_core_search" id="solr_replace_core_search"
-								value="1" style="margin: 10px;"> (needs <b>Index Files Tree</b>
-								enabled)</td>
-						</tr>
-						-->
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">

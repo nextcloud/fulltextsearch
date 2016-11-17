@@ -98,6 +98,7 @@ class SettingsController extends Controller
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
             'index_files_tree' => $this->configService->getAppValue('index_files_tree'),
+            'index_files_nextant_only' => $this->configService->getAppValue('index_files_nextant_only'),
             'index_files_sharelink' => $this->configService->getAppValue('index_files_sharelink'),
             'index_files_external' => $this->configService->getAppValue('index_files_external'),
             'index_files_encrypted' => $this->configService->getAppValue('index_files_encrypted'),
@@ -107,7 +108,6 @@ class SettingsController extends Controller
             'index_files_filters_image' => $this->configService->getAppValue('index_files_filters_image'),
             'index_files_filters_audio' => $this->configService->getAppValue('index_files_filters_audio'),
             'index_files_filters_extensions' => self::FileFiltersExtensionsAsList($this->configService->getAppValue('index_files_filters_extensions')),
-            'replace_core_search' => $this->configService->getAppValue('replace_core_search'),
             'current_docs' => $this->solrTools->count('files'),
             'current_segments' => $this->solrTools->getInfoCore()->index->segmentCount,
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
@@ -127,10 +127,11 @@ class SettingsController extends Controller
         return $response;
     }
 
-    public function setOptionsFiles($index_files, $index_files_max_size, $index_files_tree, $index_files_sharelink, $index_files_external, $index_files_encrypted, $index_files_filters)
+    public function setOptionsFiles($index_files, $index_files_max_size, $index_files_tree, $index_files_nextant_only, $index_files_sharelink, $index_files_external, $index_files_encrypted, $index_files_filters)
     {
         $this->configService->setAppValue('index_files', $index_files);
         $this->configService->setAppValue('index_files_tree', $index_files_tree);
+        $this->configService->setAppValue('index_files_nextant_only', $index_files_nextant_only);
         $this->configService->setAppValue('index_files_sharelink', $index_files_sharelink);
         $this->configService->setAppValue('index_files_external', $index_files_external);
         $this->configService->setAppValue('index_files_encrypted', $index_files_encrypted);
@@ -160,7 +161,7 @@ class SettingsController extends Controller
         return $this->updateSubOptions(false, 'bookmarks');
     }
 
-    public function setOptionsStatus($index_live, $index_delay, $replace_core_search, $force_index)
+    public function setOptionsStatus($index_live, $index_delay, $force_index)
     {
         if ($index_live === '1' && $this->configService->getAppValue('index_live') !== '1')
             $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));

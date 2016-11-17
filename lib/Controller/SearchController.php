@@ -148,7 +148,7 @@ class SearchController extends Controller
         
         return array(
             'config' => array(
-                'index_files_nextant_only' => $this->configService->getAppValue('index_files_nextant_only')
+                'index_files_nextant_only' => (($this->configService->getAppValue('index_files_nextant_only') === '1' && $this->configService->getAppValue('index_files_tree') === '1') ? 1 : 0)
             ),
             'result' => $results
         );

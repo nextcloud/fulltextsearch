@@ -41,7 +41,6 @@ class ConfigService
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
         'solr_timeout' => 30,
-        'replace_core_search' => 0,
         
         'index_live' => 1,
         'index_live_queuekey' => 19375,
@@ -54,6 +53,7 @@ class ConfigService
         'index_files_needed' => 1,
         'index_files_update_needed' => 1,
         'index_files_tree' => 0,
+        'index_files_nextant_only' => 0,
         'undex_files_sharelink' => 0,
         'index_files_external' => 0,
         'index_files_encrypted' => 0,
