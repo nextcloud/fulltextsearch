@@ -64,8 +64,6 @@ class FileService
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->miscService = $miscService;
-        
-        // $this->view = Filesystem::getView();
     }
 
     public function setDebug($debug)
@@ -129,16 +127,19 @@ class FileService
         return substr($mimetype, 0, strpos($mimetype, '/'));
     }
 
-    public function initUser($userId)
+    public function initUser($userId, $complete = false)
     {
         $this->userId = $userId;
         Filesystem::init($this->userId, '');
+        $this->view = Filesystem::getView();
         
-        $this->initUserExternalMountPoints();
+        if ($complete)
+            $this->initUserExternalMountPoints();
     }
 
     public function endUser()
     {
+        $this->view = null;
         $this->userId = '';
         // $this->externalMountPoint = array();
     }
@@ -172,15 +173,11 @@ class FileService
     {
         $item->synced(true);
         
-        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') !== '1') {
-            $item->invalid(true);
+        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') !== '1')
             return false;
-        }
         
-        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') !== '1') {
-            $item->invalid(true);
+        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') !== '1')
             return false;
-        }
         
         $size = round($item->getSize() / 1024 / 1024, 1);
         if ($size > $this->configService->getAppValue('index_files_max_size')) {
@@ -192,10 +189,12 @@ class FileService
         if (! $this->solrService->extractableFile($item->getMimeType(), $item->getPath())) {
             $item->extractable(false);
             
-            if ($this->configService->getAppValue('index_files_tree') !== '1')
-                $item->invalid(true);
-        } else
+            if ($this->configService->getAppValue('index_files_tree') === '1')
+                $item->valid(true);
+        } else {
+            $item->valid(true);
             $item->extractable(true);
+        }
         
         $this->setShareRights($item);
         
@@ -290,7 +289,7 @@ class FileService
         $files = $folder->search('');
         
         foreach ($files as $file) {
-            if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER)
+            if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER && $this->configService->getAppValue('index_files_tree') !== '1')
                 continue;
             
             if ($file->isShared() && $file->getStorage()->isLocal() && ! in_array('forceshared', $options))
@@ -517,27 +516,26 @@ class FileService
      * @param boolean $trashbin            
      * @return array[]
      */
-    public function getSearchResult(&$data, $base = '', $trashbin = true)
+    public function getSearchResult(&$item, $base = '', $trashbin = true)
     {
-        Filesystem::init($data['userid'], '');
-        $view = Filesystem::getView();
+        if ($this->view === null || $this->userId === '')
+            return false;
         
         $path = '';
-        $deleted = false;
         $fileData = null;
         try {
-            $path = $view->getPath($data['id']);
-            $fileData = $view->getFileInfo($path);
+            $path = $this->view->getPath($item->getId());
+            $fileData = $this->view->getFileInfo($path);
         } catch (NotFoundException $e) {
             $fileData = null;
         }
         
         if ($fileData == null && $trashbin) {
             try {
-                $trashview = new View('/' . $data['userid'] . '/files_trashbin/files');
-                $path = $trashview->getPath($data['id']);
+                $trashview = new View('/' . $this->userId . '/files_trashbin/files');
+                $path = $trashview->getPath($item->getId());
                 $fileData = $trashview->getFileInfo($path);
-                $deleted = true;
+                $item->deleted(true);
             } catch (NotFoundException $e) {
                 return false;
             }
@@ -559,20 +557,14 @@ class FileService
             $dirpath = substr($dirpath, strpos($dirpath, $base) + strlen($base)) . '/';
         }
         
-        $data = array_merge($data, array(
-            'size' => $fileData->getSize(),
-            'title' => $path,
-            'icon' => $this->solrService->extractableFile($fileData->getMimeType(), $path),
-            'filename' => ((key_exists('extension', $pathParts)) ? ($pathParts['filename'] . '.' . $pathParts['extension']) : $pathParts['filename']),
-            'dirpath' => $dirpath,
-            'mimetype' => $fileData->getMimeType(),
-            'deleted' => $deleted,
-            'etag' => $fileData->getETag(),
-            'link_main' => ((! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename']),
-            'link_sub' => '',
-            'valid' => true,
-            'mtime' => $fileData->getMTime()
-        ));
+        // fileinfo entry
+        $entry = \OCA\Files\Helper::formatFileInfo($fileData);
+        $entry['name'] = ((substr($path, 0, 1) === '/') ? substr($path, 1) : $path);
+        $item->setEntry($entry);
+        
+        $item->setPath($path);
+        
+        $item->valid(true);
         
         return true;
     }

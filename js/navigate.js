@@ -22,334 +22,483 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
+(function() {
 
-$(document)
-		.ready(
-				function() {
+	/**
+	 * @constructs Nextant
+	 */
+	var Nextant = function() {
+		this.initialize();
+	};
 
-					(function(func) {
-						$.fn.addClass = function() {
-							func.apply(this, arguments);
-							this.trigger('classChanged');
-							return this;
+	Nextant.prototype = {
+
+		fileList : null,
+		currQuery : '',
+		currFiles : null,
+		searchResult : [],
+		locked : false,
+		config : {},
+
+		/**
+		 * Initialize the file search
+		 */
+		initialize : function() {
+
+			var self = this;
+
+			// detect if Files App is loaded
+			this.fileAppLoaded = function() {
+				return !!OCA.Files && !!OCA.Files.App;
+			};
+
+			this.initFileList = function() {
+				_.each(OC.Plugins.getPlugins('OCA.Search'), function(plugin) {
+					if (plugin instanceof OCA.Search.Files)
+						self.fileList = plugin.fileList;
+				});
+
+				if (!self.fileAppLoaded())
+					return;
+
+				/**
+				 * Haven't found a way to include (or remove) a fileAction only
+				 * in a specific place (only in search result)
+				 */
+				OCA.Files.fileActions.registerAction({
+					name : 'nextant_gotofolder',
+					displayName : 'Go To Folder',
+					mime : 'all',
+					permissions : OC.PERMISSION_READ,
+					type : OCA.Files.FileActions.TYPE_DROPDOWN,
+					icon : function() {
+						return OC.imagePath('core', 'filetypes/folder');
+					},
+					actionHandler : function(filename, context) {
+						self.onGoToFolder(filename, context);
+					}
+				});
+			}
+
+			// search request
+			this.searchRequest = function(data) {
+				$.post(OC.filePath('nextant', 'ajax', 'search.php'), data,
+						self.searchRequestResult);
+			};
+
+			/**
+			 * 
+			 * display search result
+			 * 
+			 */
+			this.searchRequestResult = function(infos) {
+
+				if (self.fileList == null)
+					return;
+
+				var result = infos.result;
+				self.config = infos.config;
+
+				var origResult = [];
+				if (self.config.index_files_nextant_only != '1')
+					origResult = self.currentFileResult();
+
+				self.searchResult = origResult.concat(result);
+
+				result = self.searchResult;
+				var data = [];
+				for (var i = 0; i < result.length; i++) {
+					if (result[i].entry == null)
+						continue;
+
+					var alr = false;
+					for (var j = 0; j < data.length; j++) {
+						if (data[j].id == result[i].entry.id) {
+							alr = true;
+							break;
 						}
-					})($.fn.addClass);
-
-					(function(func) {
-						$.fn.removeClass = function() {
-							func.apply(this, arguments);
-							this.trigger('classChanged');
-							return this;
-						}
-					})($.fn.removeClass);
-
-					$('#searchresults').on('classChanged', function() {
-						if ($('#searchresults').attr('class') == 'hidden')
-							$('#nextantList').hide();
-						else
-							$('#nextantList').show();
-					});
-
-					$('#searchbox').focusout(function() {
-						nextantCurrentFocus = false;
-						nextant.suggestShow();
-					});
-
-					$('#searchbox').focusin(function() {
-						nextantCurrentFocus = true;
-						nextant.suggestShow();
-					});
-
-					$(window).resize(function() {
-						nextant.suggestShow();
-					});
-
-					$('html').keydown(function(e) {
-						if (!nextantCurrentFocus)
-							return;
-						if (e.which == 13)
-							return nextant.search();
-						// if (e.which == 38)
-						// return nextant.suggestSelect('prev');
-						// if (e.which == 39)
-						// return nextant.suggestSelect('select');
-						// if (e.which == 40)
-						// return nextant.suggestSelect('next');
-					});
-
-					var nextantCurrentSearch = '';
-					var nextantCurrentFocus = false;
-					var nextantSearchDelayTimer = null;
-					var nextantSuggestDelayTimer = null;
-					var nextantSuggestNoSpam = false;
-					var nextantSuggestSelected = 0;
-					var nextantSuggestResults = null;
-					var nextant = {
-
-						init : function() {
-							$('#searchbox').on('input', function(e) {
-								nextant.searchTimer();
-								nextant.suggestTimer();
-							});
-						},
-
-						searchTimer : function() {
-							if (nextantSearchDelayTimer != null)
-								clearTimeout(nextantSearchDelayTimer);
-
-							nextantSearchDelayTimer = setTimeout(function() {
-								nextant.search();
-							}, 170);
-						},
-
-						suggestTimer : function() {
-							if (nextantSuggestDelayTimer != null)
-								clearTimeout(nextantSuggestDelayTimer);
-
-							nextantSuggestDelayTimer = setTimeout(function() {
-								nextant.suggest();
-							}, 10);
-						},
-
-						search : function() {
-							nextantSearchDelayTimer = null;
-
-							var query = $('#searchbox').val();
-							if (query == nextantCurrentSearch)
-								return;
-							nextantCurrentSearch = query;
-
-							var data = {
-								query : query,
-								current_dir : nextant.get('dir')
-							}
-
-							nextant.searchRequest(data);
-						},
-
-						suggest : function() {
-							nextantSuggestDelayTimer = null;
-							var query = $('#searchbox').val();
-							var data = {
-								query : query
-							}
-							nextant.suggestRequest(data);
-						},
-
-						suggestRequest : function(data) {
-							if (nextantSuggestNoSpam)
-								return;
-							$.post(
-									OC.filePath('nextant', 'ajax',
-											'suggest.php'), data,
-									nextant.suggestResult);
-						},
-
-						suggestResult : function(response) {
-
-							if (response == null || response.status > 0
-									|| response.result.length == 0) {
-
-								if (response.status > 0) {
-									nextantSuggestNoSpam = true;
-									setTimeout(function() {
-										nextantSuggestNoSpam = false;
-									}, 60000);
-								}
-								if ($('#nextantSugg_list').length)
-									$('#nextantSugg_list').hide(200);
-								return;
-							}
-
-							if (!$('#nextantSugg_list').length)
-								$('#body-user').append(
-										'<div id="nextantSugg_list"></div>');
-
-							nextant.suggestShow();
-
-							$('#nextantSugg_list').empty();
-							var result = response.result;
-							nextantSuggestResult = result;
-							for (var i = 0; i < result.length; i++) {
-								var first = '';
-								if (i == 0)
-									first = 'nextantSugg_firstitem';
-
-								$('#nextantSugg_list').append(
-										'<div id="nextant_sugg_' + i
-												+ '" class="nextantSugg_item '
-												+ first + '">'
-												+ result[i].suggestion
-												+ '</div>');
-							}
-
-							$('.nextantSugg_item').click(function() {
-								nextant.suggestReplace($(this).text());
-								nextant.search();
-							});
-
-						},
-
-						suggestShow : function() {
-
-							var offset = $('#searchbox').offset();
-							var height = $('#searchbox').height();
-							var top = offset.top + height + "px";
-							var left = offset.left + "px";
-
-							$('#nextantSugg_list').css({
-								'position' : 'absolute',
-								'left' : left,
-								'top' : top
-							});
-
-							if (!$('#nextantSugg_list').length)
-								return;
-							if (nextantCurrentFocus)
-								$('#nextantSugg_list').show(200);
-							else
-								$('#nextantSugg_list').hide(200);
-						},
-
-						suggestReplace : function(txt) {
-							$('#searchbox').val(txt + ' ');
-							$('#searchbox').focus();
-						},
-
-						// suggestSelect : function(pos) {
-						// if (!nextantCurrentFocus)
-						// return;
-						// if (nextantSuggestResult == null)
-						// return;
-						//							
-						// switch (pos) {
-						// case 'next':
-						// if (nextantSuggestSelected <
-						// nextantSuggestResult.length)
-						// nextantSuggestSelected++;
-						// break;
-						// case 'prev':
-						// if (nextantSuggestSelected > 1)
-						// nextantSuggestSelected--;
-						// break;
-						// case 'select':
-						// suggestReplace(nextantSuggestResult[nextantSuggestSelected]);
-						// break;
-						//
-						// case 'reset':
-						// nextantSuggestSelected = 0;
-						// break;
-						// }
-						// },
-
-						searchRequest : function(data) {
-							$.post(
-									OC
-											.filePath('nextant', 'ajax',
-													'search.php'), data,
-									nextant.searchResult);
-						},
-
-						searchResult : function(response) {
-							if (response == null)
-								return;
-
-							if (!$('#nextantList').length)
-								$('#fileList')
-										.append(
-												'<tr><td colspan="3" style="margin: 0px; padding: 0px;"><div id="nextantList"></div></td></tr>');
-
-							$('#nextantList').empty();
-
-							response
-									.forEach(function(entry) {
-										var row = nextant
-												.template_entry()
-												.replace(/%ID%/gi, entry.id)
-												.replace(/%TYPE%/gi, entry.type)
-												.replace(/%TITLE%/gi,
-														entry.title)
-												.replace(/%LINKMAIN%/gi,
-														entry.link_main)
-												.replace(/%FILENAME%/gi,
-														entry.filename)
-												.replace(/%DIRPATH%/gi,
-														entry.dirpath)
-												.replace(/%ETAG%/gi, entry.etag)
-												.replace(/%SIZE%/gi, entry.size)
-												.replace(/%SIZEREAD%/gi,
-														entry.size_readable)
-												.replace(/%MIMETYPE%/gi,
-														entry.mimetype)
-												.replace(/%ICON%/gi, entry.icon)
-												.replace(/%MTIME%/gi,
-														entry.mtime).replace(
-														/%HIGHLIGHT1%/gi,
-														entry.highlight1)
-												.replace(/%HIGHLIGHT2%/gi,
-														entry.highlight2);
-
-										row = row
-												.replace(
-														/%SHARED%/gi,
-														(entry.shared != '') ? ' style="background-image:url('
-																+ entry.shared
-																+ ');"'
-																: '');
-										row = row
-												.replace(
-														/%DELETED%/gi,
-														(entry.deleted != '') ? ' style="background-image:url('
-																+ entry.deleted
-																+ ');"'
-																: '');
-
-										$('#nextantList').append(row);
-									});
-						},
-
-						template_entry : function() {
-
-							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%FILENAME%" data-mime="%MIMETYPE%" data-mtime="%MTIME%000" data-etag="%ETAG%" ';
-							$tmpl += ' data-permissions="" data-has-preview="true" data-path="%DIRPATH%" data-share-permissions="">';
-							$tmpl += '<td class="filename ui-draggable">';
-							$tmpl += '<a class="action action-favorite " data-original-title="" title="">';
-							$tmpl += '</a>';
-							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%ICON%); background-size: 32px;">';
-							$tmpl += '<div class="nextant_details" %DELETED%%SHARED%></div>';
-							$tmpl += '</div>';
-							$tmpl += '<span class="hidden-visually">Select</span></label>';
-
-							$tmpl += '<a class="nextant_file" href="%LINKMAIN%">';
-							$tmpl += '<div>';
-							$tmpl += '<span class="nextant_line nextant_line1">%TITLE%</span>';
-							$tmpl += '<span class="nextant_line nextant_line2">%HIGHLIGHT1%</span>';
-							$tmpl += '<span class="nextant_line nextant_line3">%HIGHLIGHT2%</span>';
-							$tmpl += '</div></a>';
-							$tmpl += '</td>';
-							$tmpl += '<td class="filesize" style="color:rgb(-17,-17,-17)">%SIZEREAD%</td>';
-							$tmpl += '<td class="date"><span class="modified" title="" style="color:rgb(155,155,155)" data-original-title=""></span></td></tr>';
-
-							return $tmpl;
-						},
-
-						get : function(name, url) {
-							if (!url)
-								url = window.location.href;
-							name = name.replace(/[\[\]]/g, "\\$&");
-							var regex = new RegExp("[?&]" + name
-									+ "(=([^&#]*)|&|#|$)"), results = regex
-									.exec(url);
-							if (!results)
-								return null;
-							if (!results[2])
-								return '';
-							return decodeURIComponent(results[2].replace(/\+/g,
-									' '));
-						}
-
 					}
 
-					nextant.init();
+					if (!alr)
+						data.push(result[i].entry);
+				}
 
+				self.fileList.setSort('score', 'desc', false, false);
+				self.fileList.setFiles(data);
+
+				self.updateSearchResult();
+			};
+
+			//
+			//
+			this.updateSearchResult = function() {
+				self.locked = false;
+
+				var result = self.searchResult;
+				// We edit each row
+				_.each(result, function(item) {
+					if (item.entry == null)
+						return;
+
+					tr = self.getElem(item.entry.name);
+
+					if (!$(tr).length)
+						return;
+
+					self.__morphLink(tr, item);
+					self.__morphResultDisplay(tr, item);
+					self.__morphOverlayIcon(tr, item);
+					self.__morphBookmarksFileAction(tr, item);
 				});
+
+				self.__morphSummary(result);
+				self.__morphEmptyContent(result);
+
+				//
+				// done
+				self.locked = true;
+			};
+
+			//
+			// return array containing current file from current directory that
+			// fit the query.
+			// (like current search in files app)
+			this.currentFileResult = function() {
+				var currFiles = self.currFiles;
+				var data = [];
+
+				if (currFiles == null || currFiles.length == 0)
+					return data;
+
+				for (var i = 0; i < currFiles.length; i++) {
+
+					if (currFiles[i].name.toLowerCase().indexOf(
+							self.currQuery.toLowerCase()) === -1)
+						continue;
+
+					data.push({
+						data : {
+							id : currFiles[i].id,
+							score : 9999
+						},
+						entry : currFiles[i]
+					});
+				}
+
+				return data;
+			};
+
+			//
+			//
+			this.mutationFileList = function(mutations, observer) {
+				if (self.locked)
+					self.updateSearchResult();
+			};
+
+			//
+			// Go To Folder. Called on FileActions
+			this.onGoToFolder = function(path, context) {
+				var apath = path.split('/');
+
+				var dir = '';
+				var filename = '';
+				for (var i = 0; i < apath.length; i++) {
+					filename = apath[i];
+					dir += '/';
+					if (i < (apath.length - 1))
+						dir += filename;
+				}
+
+				window.location = OC.generateUrl(
+						'/apps/files/?dir={dir}&scrollto={scrollto}', {
+							dir : dir,
+							scrollto : filename
+						})
+
+				// window.alert('DIR: ' + dir + ' - FILENAME: ' + filename);
+			};
+
+			//
+			// get TR elem from filelist
+			this.getElem = function(file) {
+				var list = $('#fileList').children('tr');
+				for (var i = 0; i < list.length; i++) {
+					if ($(list[i]).attr('data-file') == file)
+						return $(list[i]);
+				}
+
+				return null;
+			};
+
+			//
+			// get info from url
+			this.get = function(name, url) {
+
+				if (!url)
+					url = window.location.href;
+				name = name.replace(/[\[\]]/g, "\\$&");
+				var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex
+						.exec(url);
+				if (!results)
+					return null;
+				if (!results[2])
+					return '';
+				return decodeURIComponent(results[2].replace(/\+/g, ' '));
+			};
+
+			//
+			// MORPH
+			//
+
+			//
+			// fix the subfolder link
+			//
+			this.__morphLink = function(tr, item) {
+				var elemhref = $(tr).find('td.filename').find('a.name');
+				if (!$(elemhref).length)
+					return;
+
+				if (item.data.type == 'files')
+					$(elemhref).attr('href',
+							$(elemhref).attr('href').replace(/%2F/g, '/'));
+
+				// fix bookmark link
+				if (item.data.type == 'bookmarks')
+					$(elemhref).attr('href', item.data.path);
+			};
+
+			//
+			// fix the display and add few lines
+			//
+			this.__morphResultDisplay = function(tr, item) {
+				var elemname = $(tr).find('td.filename').find('a.name').find(
+						'span.nametext');
+
+				if (item.data.lines == null)
+					return;
+
+				$(elemname).empty();
+				var displaydiv = $('<span></span>');
+
+				if (item.data.lines[1])
+					displaydiv.append($('<span></span>').attr('class',
+							'nextant_line nextant_line1').html(
+							item.data.lines[1]));
+				if (item.data.lines[2])
+					displaydiv.append($('<span></span>').attr('class',
+							'nextant_line nextant_line2').html(
+							item.data.lines[2]));
+
+				$(elemname).append(displaydiv);
+				$(elemname).css('width', '800px');
+
+			};
+
+			//
+			// Add overlay icon
+			//
+			this.__morphOverlayIcon = function(tr, item) {
+
+				var elemicon = $(tr).find('td.filename').find('div.thumbnail');
+
+				if (item.data.type == 'bookmarks')
+					elemicon.append($('<div></div>').attr(
+							{
+								'class' : 'nextant_details',
+								'style' : "background-image: url('"
+										+ OC.imagePath('nextant',
+												'bookmarks.svg') + "')"
+							}));
+				if (item.data.shared)
+					elemicon.append($('<div></div>').attr(
+							{
+								'class' : 'nextant_details',
+								'style' : "background-image: url('"
+										+ OC.imagePath('core',
+												'actions/shared.svg') + "')"
+							}));
+				if (item.data.deleted)
+					elemicon.append($('<div></div>').attr(
+							{
+								'class' : 'nextant_details',
+								'style' : "background-image: url('"
+										+ OC.imagePath('core',
+												'actions/delete.svg') + "')"
+							}));
+			};
+
+			//
+			// removing fileaction on bookmarks
+			//
+			this.__morphBookmarksFileAction = function(tr, item) {
+				if (item.data.type != 'bookmarks')
+					return;
+
+				$(tr).find('.fileactions').empty().on('click', function(e) {
+					e.stopPropagation();
+				});
+				$(tr).find('.filesize').empty().on('click', function(e) {
+					e.stopPropagation();
+				});
+				$(tr).find('.date').on('click', function(e) {
+					e.stopPropagation();
+				});
+			};
+
+			//		
+			// fix Summary
+			//
+			this.__morphSummary = function(files) {
+
+				var cBookmarks = 0;
+				for (var i = 0; i < files.length; i++) {
+					if (files[i].data.type == 'bookmarks')
+						cBookmarks++;
+				}
+
+				var elemsumm = $('tr.summary').find('span.info');
+				if (!elemsumm.length)
+					return;
+
+				// First, fix the current cummary
+				self.fileList.fileSummary.calculate(self.fileList.files);
+				self.fileList.fileSummary.summary.totalFiles -= cBookmarks;
+				self.fileList.fileSummary.update();
+
+				// Then, add a summary for bookmarks
+				elemsumm.find('span.bminfo').text(
+						cBookmarks + ' bookmark'
+								+ ((cBookmarks > 1) ? 's' : ''));
+
+				if (cBookmarks == 0) {
+					elemsumm.find('span.bminfo').addClass('hidden');
+					elemsumm.find('span.bmconnector').addClass('hidden');
+				} else {
+
+					elemsumm.find('span.bminfo').removeClass('hidden');
+					elemsumm.find('span.bmconnector').removeClass('hidden');
+
+					if (files.length == cBookmarks) {
+						$('tr.summary').removeClass('hidden');
+						elemsumm.find('span.dirinfo').addClass('hidden');
+						elemsumm.find('span.connector').addClass('hidden');
+						elemsumm.find('span.fileinfo').addClass('hidden');
+						elemsumm.find('span.bmconnector').addClass('hidden');
+
+					} else if (elemsumm.find('span.fileinfo.hidden').length
+							|| elemsumm.find('span.dirinfo.hidden').length) {
+					} else
+						elemsumm.find('span.connector').text(', ');
+				}
+			};
+
+			//
+			// fix empty result div
+			//
+			this.__morphEmptyContent = function(files) {
+				if (files.length > 0)
+					setTimeout(function() {
+						$('#searchresults').find('div.emptycontent').addClass(
+								'hidden')
+					}, 200);
+			};
+
+			// register
+			OC.Plugins.register('OCA.Search', this);
+		},
+
+		attach : function(search) {
+			var self = this;
+
+			// receiving search request in Files App
+			search.setFilter('files', function(query) {
+				if (self.fileAppLoaded()) {
+
+					// init Search/FileList if needed
+					if (self.fileList == null)
+						self.initFileList();
+
+					if (self.currFiles == null)
+						self.currFiles = self.fileList.files;
+
+					self.currQuery = query;
+
+					// sending the ajax request
+					var data = {
+						query : query,
+						current_dir : self.get('dir')
+					}
+
+					self.searchRequest(data);
+				}
+			});
+
+			// if ( == '1') {
+			// self.index_files_nextant_only = true;
+			// }
+
+			//
+			// Add few elem Summary
+			var elemsumm = $('tr.summary').find('span.info');
+			elemsumm.find('span.fileinfo').after(function() {
+				return $('<span></span>').attr('class', 'bminfo hidden');
+			});
+			elemsumm.find('span.fileinfo').after(
+					function() {
+						return $('<span></span>').attr('class',
+								'bmconnector hidden').text(
+								elemsumm.find('span.connector').text())
+					});
+
+			//
+			// Mutations
+			MutationObserver = window.MutationObserver
+					|| window.WebKitMutationObserver;
+
+			var observerFileList = new MutationObserver(function(mutations,
+					observer) {
+				self.mutationFileList(mutations, observer);
+			});
+
+			observerFileList.observe($('#fileList')[0], {
+				childList : true,
+				attributes : true
+			});
+
+		}
+	};
+	OCA.Search.Nextant = Nextant;
+	OCA.Search.nextant = new Nextant();
+
+	// Sort per score (also index if score is identical)
+	OCA.Files.FileList.Comparators.score = function(f1, f2) {
+		result = OCA.Search.nextant.searchResult;
+
+		var s1 = 0;
+		var s2 = 0;
+		var i1 = 99;
+		var i2 = 99;
+		for (var i = 0; i < result.length; i++) {
+			if (result[i].data.id == f1.id)
+				i1 = i;
+			if (result[i].data.id == f2.id)
+				i2 = i;
+			if (result[i].data.id == f1.id)
+				s1 = result[i].data.score;
+			if (result[i].data.id == f2.id)
+				s2 = result[i].data.score;
+		}
+
+		if (s1 < s2)
+			return -1;
+		else if (s1 > s2)
+			return 1;
+		else {
+			if (i1 > i2)
+				return -1;
+			else
+				return 1;
+		}
+	};
+
+})();

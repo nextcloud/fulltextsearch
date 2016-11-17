@@ -57,11 +57,25 @@ class ItemDocument
 
     private $storage;
 
+    private $content_type;
+
+    private $content_type_mime;
+
+    private $content_type_charset;
+
+    private $score;
+
+    private $lines = array();
+
+    private $highlighting;
+
     private $needExtract = false;
 
     private $needUpdate = false;
 
     private $remote = false;
+
+    private $shared = false;
 
     private $encrypted = false;
 
@@ -85,11 +99,13 @@ class ItemDocument
 
     private $failedUpdate = false;
 
+    private $entry = null;
+
     private $temp = false;
 
     private $link = false;
 
-    private $invalid = false;
+    private $valid = false;
 
     private $synced = false;
 
@@ -169,6 +185,16 @@ class ItemDocument
         return $this->size;
     }
 
+    public function setEntry($entry)
+    {
+        $this->entry = $entry;
+    }
+
+    public function getEntry()
+    {
+        return $this->entry;
+    }
+
     public function setAbsolutePath($absolutePath, $temp = false)
     {
         $this->absolutePath = $absolutePath;
@@ -212,6 +238,66 @@ class ItemDocument
     public function getShareGroup()
     {
         return $this->sharegroup;
+    }
+
+    public function setHighlighting($high)
+    {
+        $this->highlighting = $high;
+    }
+
+    public function getHighlighting()
+    {
+        return $this->highlighting;
+    }
+
+    public function setContentType($type)
+    {
+        $this->content_type = $type;
+        
+        if (strpos($type, ';') === false) {
+            $this->content_type_mime = $type;
+            return;
+        }
+        
+        list ($this->content_type_mime, $this->content_type_charset) = explode(';', $type);
+    }
+
+    public function getContentType()
+    {
+        return $this->content_type;
+    }
+
+    public function getContentMime()
+    {
+        return $this->content_type_mime;
+    }
+
+    public function getContentCharset()
+    {
+        return $this->content_type_charset;
+    }
+
+    public function setScore($score)
+    {
+        $this->score = $score;
+    }
+
+    public function getScore()
+    {
+        return $this->score;
+    }
+
+    public function setLine($nb, $html)
+    {
+        $this->lines[$nb] = $html;
+    }
+
+    public function getLine($nb)
+    {
+        if (key_exists($nb, $this->lines))
+            return $this->lines[$nb];
+        
+        return '';
     }
 
     public function setStorage($storage)
@@ -262,6 +348,16 @@ class ItemDocument
     public function isEncrypted()
     {
         return $this->encrypted;
+    }
+
+    public function shared($shared)
+    {
+        $this->shared = $shared;
+    }
+
+    public function isShared()
+    {
+        return $this->shared;
     }
 
     public function extractable($extractable)
@@ -388,14 +484,14 @@ class ItemDocument
     // {
     // return $this->link;
     // }
-    public function invalid($invalid)
+    public function valid($valid)
     {
-        $this->invalid = $invalid;
+        $this->valid = $valid;
     }
 
-    public function isInvalid()
+    public function isValid()
     {
-        return $this->invalid;
+        return $this->valid;
     }
 
     public static function fromCompleteId($str)
@@ -404,47 +500,19 @@ class ItemDocument
         return new ItemDocument($type, $id);
     }
 
-    public function toArray($complete = false)
+    public static function fromSolr($document)
     {
-        $complete = array(
-            'type' => $this->getType(),
-            'source' => $this->getSource(),
-            'owner' => $this->getOwner(),
-            'path' => $this->getPath(),
-            'mimetype' => $this->getMimetype(),
-            'size' => $this->getSize(),
-            'absolutepath' => $this->getAbsolutePath(),
-            'mtime' => $this->getMTime(),
-            'share' => $this->getShare(),
-            'sharegroup' => $this->getSharegroup(),
-            'storage' => array(
-                'local' => (($this->getStorage() !== null) ? $this->getStorage()->isLocal() : '')
-            ),
-            'needextract' => $this->neededExtract(),
-            'needUpdate' => $this->neededUpdate(),
-            'remote' => $this->isRemote(),
-            'encrypted' => $this->isEncrypted(),
-            'extractable' => $this->isExtractable(),
-            'indexed' => $this->isIndexed(),
-            'extracted' => $this->isExtracted(),
-            'processed' => $this->isProcessed(),
-            'deleted' => $this->isDeleted(),
-            'removed' => $this->isRemoved(),
-            'updated' => $this->isUpdated(),
-            'failedIndex' => $this->isFailedIndex(),
-            'failedExtract' => $this->isFailedExtract(),
-            'failedUpdate' => $this->isFailedUpdate(),
-            'temp' => $this->isTemp(),
-            'invalid' => $this->isInvalid(),
-            'synced' => $this->isSynced()
-        );
+        $item = self::fromCompleteId($document->id);
+        $item->setPath($document->nextant_path);
+        $item->setMTime($document->nextant_mtime);
+        $item->setSource($document->nextant_source);
+        $item->isDeleted($document->nextant_deleted);
+        $item->setOwner($document->nextant_owner);
+        $item->setScore($document->score);
+        if (is_array($document->nextant_attr_content_type) && sizeof($document->nextant_attr_content_type) > 0)
+            $item->setContentType($document->nextant_attr_content_type[0]);
         
-        return $complete;
-    }
-
-    public function toString()
-    {
-        return json_encode($this->toArray());
+        return $item;
     }
 
     public static function getItem(&$list, $item)
@@ -457,5 +525,62 @@ class ItemDocument
                 return $entry;
         
         return null;
+    }
+
+    public function toArray($complete = false)
+    {
+        $arr = array(
+            'entry' => $this->getEntry(),
+            'data' => array(
+                'id' => $this->getId(),
+                'type' => $this->getType(),
+                'path' => $this->getPath(),
+                'deleted' => $this->isDeleted(),
+                'shared' => $this->isShared(),
+                'score' => $this->getScore(),
+                'lines' => $this->lines
+            )
+        );
+        
+        if ($complete)
+            $arr['complete'] = $complete = array(
+                'type' => $this->getType(),
+                'source' => $this->getSource(),
+                'owner' => $this->getOwner(),
+                'path' => $this->getPath(),
+                'mimetype' => $this->getMimetype(),
+                'size' => $this->getSize(),
+                'absolutepath' => $this->getAbsolutePath(),
+                'mtime' => $this->getMTime(),
+                'share' => $this->getShare(),
+                'sharegroup' => $this->getSharegroup(),
+                'storage' => array(
+                    'local' => $this->getStorage()->isLocal()
+                ),
+                'needextract' => $this->neededExtract(),
+                'needUpdate' => $this->neededUpdate(),
+                'remote' => $this->isRemote(),
+                'encrypted' => $this->isEncrypted(),
+                'extractable' => $this->isExtractable(),
+                'indexed' => $this->isIndexed(),
+                'extracted' => $this->isExtracted(),
+                'processed' => $this->isProcessed(),
+                'deleted' => $this->isDeleted(),
+                'removed' => $this->isRemoved(),
+                'updated' => $this->isUpdated(),
+                'failedIndex' => $this->isFailedIndex(),
+                'failedExtract' => $this->isFailedExtract(),
+                'failedUpdate' => $this->isFailedUpdate(),
+                'temp' => $this->isTemp(),
+                'invalid' => $this->isInvalid(),
+                'synced' => $this->isSynced()
+            );
+        
+        return $arr;
+    }
+
+    public function toString()
+    {
+        return json_encode($this->toArray());
     }
 }
