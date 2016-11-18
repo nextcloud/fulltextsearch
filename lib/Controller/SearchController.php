@@ -101,7 +101,6 @@ class SearchController extends Controller
             if (! $solrResult)
                 return $results;
             
-            $files = array();
             foreach ($solrResult as $item) {
                 
                 switch ($item->getSource()) {
@@ -197,6 +196,7 @@ class SearchController extends Controller
             $key = substr($key, 0, strpos($key, '#'));
         
         $share = \OC\Share\Share::getShareByToken($key);
+        
         if (! $share)
             return $results;
         
@@ -208,64 +208,56 @@ class SearchController extends Controller
             if (! $solrResult)
                 return $results;
             
-            foreach ($solrResult as $data) {
+            foreach ($solrResult as $item) {
                 
-                $path = '';
-                $data = array_merge($data, array(
-                    'userid' => $share['uid_owner'],
-                    'title' => '',
-                    'link_main' => '',
-                    'link_sub' => '',
-                    'filename' => '',
-                    'dirpath' => '',
-                    'size' => '',
-                    'mtime' => '',
-                    'icon' => '',
-                    'mimetype' => '',
-                    'sharelink_token' => $key,
-                    'valid' => false
-                ));
-                
-                switch ($data['source']) {
+                switch ($item->getSource()) {
                     
                     case 'files':
-                        $this->fileService->getSearchResult($data, $share['file_target'], false);
+                        $this->fileService->initUser($item->getOwner(), false);
+                        $this->fileService->getSearchResult($item, $share['file_target'], false);
+                        $this->fileService->endUser();
                         break;
                     
                     // case 'bookmarks':
-                    // BookmarkService::getSearchResult($data);
+                    // $this->bookmarkService->getSearchResult($item);
                     // break;
                     
                     default:
                         continue;
                 }
                 
+                if (! $item->isValid())
+                    continue;
+                
                 $hl1 = '';
                 $hl2 = '';
-                if (key_exists('highlight', $data) && is_array($data['highlight'])) {
-                    if (sizeof($data['highlight']) >= 1)
-                        $hl1 = '... ' . $data['highlight'][0] . ' ...';
-                    if (sizeof($data['highlight']) > 1)
-                        $hl2 = '... ' . $data['highlight'][1] . ' ...';
+                if ($item->getHighlighting() !== null && is_array($item->getHighlighting())) {
+                    if (sizeof($item->getHighlighting()) >= 1)
+                        $hl1 = '... ' . $item->getHighlighting()[0] . ' ...';
+                    if (sizeof($item->getHighlighting()) > 1)
+                        $hl2 = '... ' . $item->getHighlighting()[1] . ' ...';
+                    if (sizeof($item->getHighlighting()) > 2)
+                        $hl1 .= '... ' . $item->getHighlighting()[2] . ' ...';
+                    if (sizeof($item->getHighlighting()) > 3)
+                        $hl2 .= '... ' . $item->getHighlighting()[3] . ' ...';
                 }
                 
-                if ($hl1 === '' || $hl1 === null)
-                    $hl1 = '';
-                if ($hl2 === '' || $hl2 === null)
-                    $hl2 = '';
+                $item->setLine(1, $item->getPath());
+                $item->setLine(2, $hl1);
+                $item->setLine(3, $hl2);
                 
-                $data['highlight1'] = $hl1;
-                $data['highlight2'] = $hl2;
-                
-                $data['size_readable'] = ($data['size'] > 0) ? \OC_Helper::humanFileSize($data['size']) : '';
-                $data['shared'] = ($data['shared']) ? \OCP\Util::imagePath('core', 'actions/shared.svg') : '';
-                $data['deleted'] = ($data['deleted']) ? \OCP\Util::imagePath('core', 'actions/delete.svg') : '';
-                
-                array_push($results, $data);
+                $results[] = $item->toArray();
             }
+            
+            // $this->miscService->log('>> ' . var_export($results, true));
         }
         
-        return $results;
+        return array(
+            'config' => array(
+                'index_files_nextant_only' => (($this->configService->getAppValue('index_files_nextant_only') === '1' && $this->configService->getAppValue('index_files_tree') === '1') ? 1 : 0)
+            ),
+            'result' => $results
+        );
     }
 
     /**
