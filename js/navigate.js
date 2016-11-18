@@ -40,6 +40,8 @@
 		locked : false,
 		config : {},
 
+		nextant_sharelink : true,
+
 		/**
 		 * Initialize the file search
 		 */
@@ -52,16 +54,25 @@
 				return !!OCA.Files && !!OCA.Files.App;
 			};
 
+			// detect if Files_sharing App is loaded
+			this.linkAppLoaded = function() {
+				return !!OCA.Files_Sharing && !!OCA.Files_Sharing.App;
+			};
+
 			this.initFileList = function() {
-				_.each(OC.Plugins.getPlugins('OCA.Search'), function(plugin) {
-					if (plugin instanceof OCA.Search.Files)
-						self.fileList = plugin.fileList;
-				});
 
-				if (!self.fileAppLoaded())
-					return;
+				if (self.nextant_sharelink)
+					self.fileList = OCA.Sharing.PublicApp.fileList;
 
-				/**
+				else {
+					_.each(OC.Plugins.getPlugins('OCA.Search'),
+							function(plugin) {
+								if (plugin instanceof OCA.Search.Files)
+									self.fileList = plugin.fileList;
+							});
+				}
+
+				/*
 				 * Haven't found a way to include (or remove) a fileAction only
 				 * in a specific place (only in search result)
 				 */
@@ -78,12 +89,62 @@
 						self.onGoToFolder(filename, context);
 					}
 				});
-			}
+			};
 
+			//
+			//
+			// init Share Link (only it needed)
+			this.initShareLink = function() {
+				if (!self.nextant_sharelink)
+					return;
+
+				$searchbox = '<form class="searchbox" action="#" method="post" role="search" novalidate="" style="padding-right: 300px;">';
+				$searchbox += ' <label for="searchbox" class="hidden-visually">Search</label>';
+				$searchbox += ' <input id="searchbox" name="query" value="" required="" autocomplete="off" tabindex="5" type="search">';
+				$searchbox += '</form>';
+
+				$('#logo-claim').after($searchbox);
+				setTimeout(function() {
+					$('#searchbox').fadeIn(500);
+				}, 1000);
+
+				$('#searchbox').on('input', function(e) {
+					self.searchShareLink($('#searchbox').val());
+					// nextant_share_link.suggestTimer();
+				});
+
+				$('DIV.crumb.svg.last').live('click', function() {
+					$('#searchbox').val('');
+					self.searchShareLink('');
+				});
+				$('DIV.crumb.svg.ui-droppable').live('click', function() {
+					$('#searchbox').val('');
+					self.searchShareLink('');
+				});
+
+				$('#searchbox').focusout(function() {
+					// nextantCurrentFocus = false;
+					// nextant_share_link.suggestShow();
+				});
+
+				$('#searchbox').focusin(function() {
+					// nextantCurrentFocus = true;
+					// nextant_share_link.suggestShow();
+				});
+
+			};
+
+			//
+			//
 			// search request
 			this.searchRequest = function(data) {
-				$.post(OC.filePath('nextant', 'ajax', 'search.php'), data,
-						self.searchRequestResult);
+
+				if (self.nextant_sharelink)
+					$.post(OC.filePath('nextant', 'ajax', 'search_public.php'),
+							data, self.searchRequestResult);
+				else
+					$.post(OC.filePath('nextant', 'ajax', 'search.php'), data,
+							self.searchRequestResult);
 			};
 
 			/**
@@ -141,6 +202,9 @@
 				if (result == null)
 					return;
 
+				if (self.currQuery == '')
+					return;
+
 				self.locked = false;
 
 				// We edit each row
@@ -167,6 +231,29 @@
 				//
 				// done
 				self.locked = true;
+			};
+
+			//
+			//
+			// init search on shared link
+			this.searchShareLink = function(query) {
+
+				if (self.fileList == null)
+					self.initFileList();
+
+				if (self.currFiles == null)
+					self.currFiles = self.fileList.files;
+
+				self.currQuery = query;
+
+				// sending the ajax request
+				var data = {
+					query : query,
+					current_dir : self.get('dir'),
+					key : self.getShareLinkKey()
+				}
+
+				self.searchRequest(data);
 			};
 
 			//
@@ -219,13 +306,22 @@
 						dir += filename;
 				}
 
-				window.location = OC.generateUrl(
-						'/apps/files/?dir={dir}&scrollto={scrollto}', {
-							dir : dir,
-							scrollto : filename
-						})
-
 				// window.alert('DIR: ' + dir + ' - FILENAME: ' + filename);
+
+				var link = '';
+				if (self.nextant_sharelink)
+					link = '/s/' + self.getShareLinkKey()
+							+ '?path={dir}&scrollto={scrollto}';
+
+				if (link == '')
+					link = '/apps/files/?dir={dir}&scrollto={scrollto}'
+
+				window.location = OC.generateUrl(link
+						+ '?dir={dir}&scrollto={scrollto}', {
+					dir : dir,
+					scrollto : filename
+				});
+
 			};
 
 			//
@@ -249,11 +345,19 @@
 				name = name.replace(/[\[\]]/g, "\\$&");
 				var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex
 						.exec(url);
-				if (!results)
-					return null;
-				if (!results[2])
+				if (!results || !results[2])
 					return '';
+
 				return decodeURIComponent(results[2].replace(/\+/g, ' '));
+			};
+
+			this.getShareLinkKey = function() {
+				if (!self.nextant_sharelink)
+					return '';
+
+				dir = window.location.href.split('/');
+				key = dir[dir.length - 1];
+				return key;
 			};
 
 			//
@@ -268,6 +372,17 @@
 				if (!$(elemhref).length)
 					return;
 
+				if (self.nextant_sharelink) {
+
+					var link = parent.location.protocol + '//' + location.host
+							+ OC.generateUrl('/s/') + self.getShareLinkKey();
+					link += '/download?path=' + item.entry.dirpath + '&files='
+							+ item.entry.filename;
+					$(elemhref).attr('href',
+							$(elemhref).attr('href').replace(/%2F/g, '/'));
+
+					return;
+				}
 				if (item.data.type == 'files')
 					$(elemhref).attr('href',
 							$(elemhref).attr('href').replace(/%2F/g, '/'));
@@ -427,27 +542,31 @@
 
 			// receiving search request in Files App
 			search.setFilter('files', function(query) {
-				if (self.fileAppLoaded()) {
+				// if (self.fileAppLoaded()) {
 
-					// init Search/FileList if needed
-					if (self.fileList == null)
-						self.initFileList();
+				// init Search/FileList if needed
+				if (self.fileList == null)
+					self.initFileList();
 
-					if (self.currFiles == null)
-						self.currFiles = self.fileList.files;
+				if (self.currFiles == null)
+					self.currFiles = self.fileList.files;
 
-					self.currQuery = query;
+				self.currQuery = query;
 
-					// sending the ajax request
-					var data = {
-						query : query,
-						current_dir : self.get('dir')
-					}
-
-					self.searchRequest(data);
+				// sending the ajax request
+				var data = {
+					query : query,
+					current_dir : self.get('dir')
 				}
+
+				self.searchRequest(data);
+				// }
 			});
 
+			if (self.fileAppLoaded())
+				self.nextant_sharelink = false;
+
+			self.initShareLink();
 			// if ( == '1') {
 			// self.index_files_nextant_only = true;
 			// }
@@ -464,6 +583,13 @@
 								'bmconnector hidden').text(
 								elemsumm.find('span.connector').text())
 					});
+
+			//
+			// Stop Mutation on click
+			$('#app-navigation').find('a').on('click', function(e) {
+				self.currQuery = '';
+				self.fileList.setSort('name', 'asc', false, false);
+			});
 
 			//
 			// Mutations
@@ -494,6 +620,8 @@
 		var i1 = 99;
 		var i2 = 99;
 		for (var i = 0; i < result.length; i++) {
+			if (result[i] == null)
+				continue;
 			if (result[i].data.id == f1.id)
 				i1 = i;
 			if (result[i].data.id == f2.id)
