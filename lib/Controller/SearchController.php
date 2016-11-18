@@ -170,10 +170,14 @@ class SearchController extends Controller
         
         $err = ($ierror == null) ? 0 : $ierror->getCode();
         
-        return array(
+        $result = array(
             'status' => $err,
             'result' => $suggest
         );
+        
+        // $this->miscService->log('>> ' . var_export($result, true));
+        
+        return $result;
     }
 
     /**
@@ -264,7 +268,7 @@ class SearchController extends Controller
      * @NoCSRFRequired
      * @PublicPage
      */
-    public function searchRequestPublic($query)
+    public function suggestRequestPublic($query)
     {
         if (! $this->solrService)
             return false;
@@ -284,6 +288,8 @@ class SearchController extends Controller
             'status' => $err,
             'result' => $suggest
         );
+        
+        // $this->miscService->log('>> ' . var_export($result, true));
         
         return $result;
     }
