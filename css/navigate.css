@@ -81,7 +81,7 @@ SPAN.nextant_hl {
 	font-weight: bold;
 }
 
-#nextantSugg_list {
+#nextant_suggestion {
 	z-index: 2000;
 	margin-top: 18px;
 	border: solid 1px #0000004D;
@@ -91,14 +91,14 @@ SPAN.nextant_hl {
 	box-shadow: 2px 2px 5px #0000004D;
 }
 
-DIV.nextantSugg_item {
+DIV.nextant_suggestion_item {
 	border-top: dashed 1px #0003;
 	padding: 4px;
 	padding-left: 12px;
 	padding-right: 12px;
 }
 
-DIV.nextantSugg_item, DIV.nextantSugg_item:hover {
+DIV.nextant_suggestion_item, nextant_suggestion_item:hover {
 	-webkit-transition: background-color 200ms linear;
 	-moz-transition: background-color 200ms linear;
 	-o-transition: background-color 200ms linear;
@@ -106,10 +106,10 @@ DIV.nextantSugg_item, DIV.nextantSugg_item:hover {
 	transition: background-color 200ms linear;
 }
 
-DIV.nextantSugg_item:hover {
+nextant_suggestion_item:hover {
 	background: #eee;;
 }
 
-DIV.nextantSugg_firstitem {
+DIV.nextant_suggestion_firstitem {
 	border-top: 0px;
 }
