@@ -41,7 +41,9 @@
 		config : {},
 
 		nextant_sharelink : true,
+		searchboxFocus : false,
 
+		suggestNoSpam : false,
 		/**
 		 * Initialize the file search
 		 */
@@ -109,17 +111,17 @@
 				}, 1000);
 
 				$('#searchbox').on('input', function(e) {
-					self.searchShareLink($('#searchbox').val());
-					// nextant_share_link.suggestTimer();
+					self.searchRequestPublic($('#searchbox').val());
+					self.suggestRequestPublic($('#searchbox').val());
 				});
 
 				$('DIV.crumb.svg.last').live('click', function() {
 					$('#searchbox').val('');
-					self.searchShareLink('');
+					self.searchRequestPublic('');
 				});
 				$('DIV.crumb.svg.ui-droppable').live('click', function() {
 					$('#searchbox').val('');
-					self.searchShareLink('');
+					self.searchRequestPublic('');
 				});
 
 				$('#searchbox').focusout(function() {
@@ -236,7 +238,7 @@
 			//
 			//
 			// init search on shared link
-			this.searchShareLink = function(query) {
+			this.searchRequestPublic = function(query) {
 
 				if (self.fileList == null)
 					self.initFileList();
@@ -283,6 +285,128 @@
 				}
 
 				return data;
+			};
+
+			//
+			//
+			// suggest request
+			this.suggestRequest = function(data) {
+
+				if (self.suggestNoSpam)
+					return;
+
+				if (self.nextant_sharelink)
+					$.post(
+							OC
+									.filePath('nextant', 'ajax',
+											'suggest_public.php'), data,
+							self.suggestRequestResult);
+				else
+					$.post(OC.filePath('nextant', 'ajax', 'suggest.php'), data,
+							self.suggestRequestResult);
+			};
+
+			//
+			//
+			this.suggestRequestResult = function(response) {
+
+				if (response == null || response.status > 0
+						|| response.result.length == 0) {
+
+					if (response.status > 0) {
+						self.suggestNoSpam = true;
+						setTimeout(function() {
+							self.suggestNoSpam = false;
+						}, 60000);
+					}
+
+					if ($('#nextant_suggestion').length)
+						$('#nextant_suggestion').hide(200);
+					return;
+				}
+
+				if (!$('#nextant_suggestion').length) {
+					if (self.nextant_sharelink)
+						$('#body-public').append(
+								$('<div></div>').attr('id',
+										'nextant_suggestion'));
+					else
+						$('#body-user').append(
+								$('<div></div>').attr('id',
+										'nextant_suggestion'));
+				}
+
+				self.suggestDisplay();
+
+				$('#nextant_suggestion').empty();
+				var result = response.result;
+				for (var i = 0; i < result.length; i++) {
+					var first = '';
+					if (i == 0)
+						first = 'nextant_suggestion_firstitem';
+
+					$('#nextant_suggestion').append(
+							$('<div></div>').attr('id', 'nextant_sugg_' + i)
+									.attr('class',
+											'nextant_suggestion_item ' + first)
+									.html(result[i].suggestion));
+				}
+
+				$('.nextant_suggestion_item').click(function() {
+					self.suggestReplace($(this).text());
+					self.searchRequest($('#searchbox'));
+				});
+			};
+
+			// 
+			// refresh display of suggestion
+			this.suggestDisplay = function() {
+
+				var offset = $('#searchbox').offset();
+				var height = $('#searchbox').height();
+				var top = offset.top + height + "px";
+				var left = offset.left + "px";
+
+				$('#nextant_suggestion').css({
+					'position' : 'absolute',
+					'left' : left,
+					'top' : top
+				});
+
+				if (!$('#nextant_suggestion').length)
+					return;
+				if (self.searchboxFocus)
+					$('#nextant_suggestion').show(200);
+				else
+					$('#nextant_suggestion').hide(200);
+			};
+
+			//
+			// replace search with suggestion
+			this.suggestReplace = function(suggestion) {
+				$('#searchbox').val(suggestion + ' ');
+				$('#searchbox').focus();
+			};
+
+			//
+			//
+			this.suggestRequestPublic = function(query) {
+
+				if (self.fileList == null)
+					self.initFileList();
+
+				if (self.currFiles == null)
+					self.currFiles = self.fileList.files;
+
+				self.currQuery = query;
+
+				// sending the ajax request
+				var data = {
+					query : query,
+					key : self.getShareLinkKey()
+				}
+
+				self.suggestRequest(data);
 			};
 
 			//
@@ -560,6 +684,7 @@
 				}
 
 				self.searchRequest(data);
+				self.suggestRequest(data);
 				// }
 			});
 
@@ -604,6 +729,21 @@
 			observerFileList.observe($('#fileList')[0], {
 				childList : true,
 				attributes : true
+			});
+
+			// animate suggest popup
+			$('#searchbox').focusout(function() {
+				self.searchboxFocus = false;
+				self.suggestDisplay();
+			});
+
+			$('#searchbox').focusin(function() {
+				self.searchboxFocus = true;
+				self.suggestDisplay();
+			});
+
+			$(window).resize(function() {
+				self.suggestDisplay();
 			});
 
 		}
