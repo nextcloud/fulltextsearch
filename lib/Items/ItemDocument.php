@@ -517,7 +517,7 @@ class ItemDocument
 
     public static function getItem(&$list, $item)
     {
-        if ($list == null || $item == null)
+        if ($list == null || $item == null || ! is_array($list))
             return null;
         
         foreach ($list as $entry)
