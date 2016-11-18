@@ -157,7 +157,7 @@ class SearchController extends Controller
      * @NoAdminRequired
      * @NoCSRFRequired
      */
-    public function getSuggestions($query)
+    public function suggestRequest($query)
     {
         if (! $this->solrService)
             return false;
@@ -180,7 +180,7 @@ class SearchController extends Controller
      * @NoCSRFRequired
      * @PublicPage
      */
-    public function searchRequestShareLink($query, $key)
+    public function searchRequestPublic($query, $key)
     {
         $results = array();
         
@@ -264,7 +264,7 @@ class SearchController extends Controller
      * @NoCSRFRequired
      * @PublicPage
      */
-    public function getSuggestionsShareLink($query)
+    public function searchRequestPublic($query)
     {
         if (! $this->solrService)
             return false;

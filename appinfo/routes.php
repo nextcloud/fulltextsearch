@@ -61,18 +61,18 @@ return [
             'verb' => 'POST'
         ],
         [
-            'name' => 'search#getSuggestions',
+            'name' => 'search#suggestRequest',
             'url' => 'ajax/suggest.php',
             'verb' => 'POST'
         ],
         [
-            'name' => 'search#searchRequestShareLink',
+            'name' => 'search#searchRequestPublic',
             'url' => 'ajax/search_public.php',
             'verb' => 'POST'
         ],
         [
-            'name' => 'search#getSuggestionsShareLink',
-            'url' => 'ajax/suggest_sharelink.php',
+            'name' => 'search#suggestRequestPublic',
+            'url' => 'ajax/suggest_public.php',
             'verb' => 'POST'
         ]
     ]
