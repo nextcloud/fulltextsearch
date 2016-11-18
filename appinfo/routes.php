@@ -67,7 +67,7 @@ return [
         ],
         [
             'name' => 'search#searchRequestShareLink',
-            'url' => 'ajax/search_sharelink.php',
+            'url' => 'ajax/search_public.php',
             'verb' => 'POST'
         ],
         [
