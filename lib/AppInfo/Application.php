@@ -212,7 +212,7 @@ class Application extends App
         
         if ($config->getAppValue('index_files_sharelink') === '1')
             \OC::$server->getEventDispatcher()->addListener('OCA\Files_Sharing::loadAdditionalScripts', function () {
-                \OCP\Util::addScript('nextant', 'navigate_sharelink');
+                \OCP\Util::addScript('nextant', 'navigate');
                 \OCP\Util::addStyle('nextant', 'navigate');
             });
     }
