@@ -499,13 +499,13 @@ class IndexService
             $progress = new ProgressBar($this->output, sizeof($data));
         
         if ($progress != null) {
-            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('/', 'job');
             $progress->setMessage('', 'duration');
             $progress->setMessage('', 'more');
             $progress->setMessage('', 'jvm');
             $progress->setMessage('[spoting orphans]', 'infos');
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->start();
         }
         
@@ -561,11 +561,13 @@ class IndexService
             }
             
             if ($progress != null) {
-                $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
                 $progress->setMessage('<info>' . $userId . '</info>/' . $type);
                 $progress->setMessage('-', 'job');
                 $progress->setMessage('', 'jvm');
+                $progress->setMessage('', 'duration');
+                $progress->setMessage('', 'more');
                 $progress->setMessage('[deleting orphans]', 'infos');
+                $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
                 $progress->start();
             }
             
