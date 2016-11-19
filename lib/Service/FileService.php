@@ -253,7 +253,7 @@ class FileService
         $item->setStorage($file->getStorage());
         
         if ($file->getStorage()->isLocal())
-            $item->setAbsolutePath(Filesystem::getView()->getLocalFile($item->getPath()));
+            $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
         else
             $item->remote(true);
         
