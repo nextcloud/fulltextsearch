@@ -311,6 +311,7 @@
 			this.suggestRequestResult = function(response) {
 
 				if (response == null || response.status > 0
+						|| response.result == null
 						|| response.result.length == 0) {
 
 					if (response.status > 0) {
