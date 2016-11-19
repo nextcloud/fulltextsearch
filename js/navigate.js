@@ -56,11 +56,6 @@
 				return !!OCA.Files && !!OCA.Files.App;
 			};
 
-			// detect if Files_sharing App is loaded
-			this.linkAppLoaded = function() {
-				return !!OCA.Files_Sharing && !!OCA.Files_Sharing.App;
-			};
-
 			this.initFileList = function() {
 
 				if (self.nextant_sharelink)
@@ -670,7 +665,6 @@
 
 			// receiving search request in Files App
 			search.setFilter('files', function(query) {
-				// if (self.fileAppLoaded()) {
 
 				// init Search/FileList if needed
 				if (self.fileList == null)
@@ -689,16 +683,12 @@
 
 				self.searchRequest(data);
 				self.suggestRequest(data);
-				// }
 			});
 
 			if (self.fileAppLoaded())
 				self.nextant_sharelink = false;
 
 			self.initShareLink();
-			// if ( == '1') {
-			// self.index_files_nextant_only = true;
-			// }
 
 			//
 			// Add few elem Summary
