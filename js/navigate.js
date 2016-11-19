@@ -587,6 +587,9 @@
 				if (item.data.type != 'bookmarks')
 					return;
 
+				$(tr).find('.filename').on('click', function(e) {
+					e.stopPropagation();
+				});
 				$(tr).find('.fileactions').empty().on('click', function(e) {
 					e.stopPropagation();
 				});
