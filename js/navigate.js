@@ -509,7 +509,8 @@
 
 				// fix bookmark link
 				if (item.data.type == 'bookmarks')
-					$(elemhref).attr('href', item.data.path);
+					$(elemhref).attr('href', item.data.path).attr('target',
+							'_blank');
 			};
 
 			//
