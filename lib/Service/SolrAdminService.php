@@ -212,6 +212,28 @@ class SolrAdminService
                 'multiValued' => false
             )
         ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'string',
+                'class' => 'solr.StrField',
+                'sortMissingLast' => false,
+                'docValues' => false
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'int',
+                'class' => 'solr.TrieIntField',
+                'positionIncrementGap' => '0',
+                'docValues' => false,
+                'precisionStep' => '0'
+            )
+        ));
+        
         array_push($fields, array(
             'type' => 'field-type',
             'data' => array(
