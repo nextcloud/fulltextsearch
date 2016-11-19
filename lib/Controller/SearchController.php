@@ -214,6 +214,7 @@ class SearchController extends Controller
             
             foreach ($solrResult as $item) {
                 
+                $item->public(true);
                 switch ($item->getSource()) {
                     
                     case 'files':

@@ -73,6 +73,8 @@ class ItemDocument
 
     private $needUpdate = false;
 
+    private $public = false;
+
     private $remote = false;
 
     private $shared = false;
@@ -102,8 +104,6 @@ class ItemDocument
     private $entry = null;
 
     private $temp = false;
-
-    private $link = false;
 
     private $valid = false;
 
@@ -474,16 +474,17 @@ class ItemDocument
     {
         return $this->temp;
     }
+
+    public function public($pub)
+    {
+        $this->public = $pub;
+    }
+
+    public function isPublic()
+    {
+        return $this->public;
+    }
     
-    // public function sharelink($link)
-    // {
-    // $this->link = $link;
-    // }
-    
-    // public function isSharelink()
-    // {
-    // return $this->link;
-    // }
     public function valid($valid)
     {
         $this->valid = $valid;
