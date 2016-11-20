@@ -258,11 +258,13 @@ class IndexService
             }
             
             $atick = $this->generateAverageTick();
-            if ($atick > - 1)
+            if ($progress != null && $atick > - 1)
                 $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . ($this->lastCommitQueryTime) . 'ms' : ''), 'more');
             
-            if ($entry->getType() == ItemDocument::TYPE_FILE)
-                $this->fileService->generateTempDocument($entry);
+            if ($entry->getType() == ItemDocument::TYPE_FILE) {
+                if (! $this->fileService->generateAbsolutePath($entry, $ierror))
+                    $this->manageFailure($ierror, $progress, 'Failed to find a descent path');
+            }
             
             $this->solrService->indexDocument($entry, $ierror);
             
@@ -277,9 +279,11 @@ class IndexService
                 if ($this->output != null && $this->debug == 2)
                     $this->output->writeln('- Commiting!');
                 
-                $progress->setMessage('@', 'job');
-                $progress->setMessage('[commiting]', 'infos');
-                $progress->display();
+                if ($progress != null) {
+                    $progress->setMessage('@', 'job');
+                    $progress->setMessage('[commiting]', 'infos');
+                    $progress->display();
+                }
                 
                 $commit = $this->solrTools->commit(false, $ierror);
                 if (! $commit)
@@ -412,12 +416,12 @@ class IndexService
             if ($entry->neededUpdate()) {
                 
                 $atick = $this->generateAverageTick();
-                if ($atick > - 1)
+                if ($progress != null && $atick > - 1)
                     $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . $this->lastCommitQueryTime . 'ms' : ''), 'more');
                 
                 $this->solrTools->updateDocument($entry, $current, true, $ierror);
                 
-                if ((time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
+                if ($progress != null && (time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
                     $progress->setMessage('@', 'job');
                     $progress->setMessage('[commiting]', 'infos');
                     $progress->display();
