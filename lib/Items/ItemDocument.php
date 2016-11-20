@@ -75,7 +75,7 @@ class ItemDocument
 
     private $public = false;
 
-    private $remote = false;
+    private $external = false;
 
     private $shared = false;
 
@@ -330,14 +330,14 @@ class ItemDocument
         return $this->needUpdate;
     }
 
-    public function remote($remote)
+    public function external($external)
     {
-        $this->remote = $remote;
+        $this->external = $external;
     }
 
-    public function isRemote()
+    public function isExternal()
     {
-        return $this->remote;
+        return $this->external;
     }
 
     public function encrypted($encrypted)
@@ -484,7 +484,7 @@ class ItemDocument
     {
         return $this->public;
     }
-    
+
     public function valid($valid)
     {
         $this->valid = $valid;
@@ -560,7 +560,7 @@ class ItemDocument
                 ),
                 'needextract' => $this->neededExtract(),
                 'needUpdate' => $this->neededUpdate(),
-                'remote' => $this->isRemote(),
+                'external' => $this->isExternal(),
                 'encrypted' => $this->isEncrypted(),
                 'extractable' => $this->isExtractable(),
                 'indexed' => $this->isIndexed(),

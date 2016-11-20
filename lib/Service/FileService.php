@@ -28,6 +28,7 @@ namespace OCA\Nextant\Service;
 
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\SolrToolsService;
+use \OCA\Nextant\Items\ItemError;
 use \OCA\Nextant\Items\ItemDocument;
 use OC\Files\Filesystem;
 use OC\Files\View;
@@ -173,7 +174,7 @@ class FileService
     {
         $item->synced(true);
         
-        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') !== '1')
+        if ($item->isExternal() && $this->configService->getAppValue('index_files_external') !== '1')
             return false;
         
         if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') !== '1')
@@ -211,15 +212,47 @@ class FileService
      *
      * @param ItemDocument $item            
      */
-    public function generateTempDocument(&$item)
+    public function generateAbsolutePath(&$item, &$ierror = '')
     {
+        if ($item->getStorage()->isLocal()) {
+            $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
+            return true;
+        }
+        
+        // not local, not external nor encrypted, we generate temp file
+        if (! $item->isExternal() && ! $item->isEncrypted()) {
+            $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            return true;
+        }
+        
         // We generate a local tmp file from the remote one
-        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') === '1')
-            $item->setAbsolutePath(Filesystem::getView()->toTmpFile($item->getPath()), true);
+        if ($item->isExternal() && $this->configService->getAppValue('index_files_external') === '1') {
+            $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            return true;
+        }
+        
+        // encrypted file
+        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') === '1') {
+            try {
+                $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
+            } catch (\OC\Encryption\Exceptions\DecryptionFailedException $dfe) {
+                $ierror = new ItemError(ItemError::EXCEPTION_DECRYPTION_FAILED, $dfe->getStatusMessage());
+                return false;
+            }
             
-            // We generate a local tmp file from the remote one
-        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') === '1')
-            $item->setAbsolutePath(Filesystem::getView()->toTmpFile($item->getPath()), true);
+            // \OC_Util::setupFS($this->userId);
+            // // $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            
+            // $tmpfile = \OC::$server->getTempManager()->getTemporaryFile();
+            
+            // $extension = pathinfo($item->getPath(), PATHINFO_EXTENSION);
+            // $tmpFile = \OC::$server->getTempManager()->getTemporaryFile($extension);
+            // file_put_contents($tmpFile, $content);
+            
+            // $item->setAbsolutePath($tmpfile);
+            
+            return true;
+        }
     }
 
     /**
@@ -252,10 +285,8 @@ class FileService
         $item->setSize($file->getSize());
         $item->setStorage($file->getStorage());
         
-        if ($file->getStorage()->isLocal())
-            $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
-        else
-            $item->remote(true);
+        if ($file->isMounted())
+            $item->external(true);
         
         if ($file->isEncrypted())
             $item->encrypted(true);
@@ -443,7 +474,7 @@ class FileService
 
     private static function getShareRightsFromExternalMountPoint($mountPoints, $path, &$data, &$entry)
     {
-        if (! $entry->isRemote())
+        if (! $entry->isExternal())
             return false;
         
         if (! key_exists('share_users', $data))
