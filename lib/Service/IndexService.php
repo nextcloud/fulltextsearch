@@ -242,6 +242,9 @@ class IndexService
             if (! $extract)
                 continue;
             
+            if (! $entry->isValid())
+                continue;
+            
             if (! $this->force && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
                 continue;
             
@@ -287,6 +290,7 @@ class IndexService
                 $this->lastCommitTick = time();
             }
             
+            // moving to FileService (cf. syncDocument)
             // fail at extract, let's try just index
             if ($entry->isFailedExtract()) {
                 if ($this->configService->getAppValue('index_files_tree') === '1')
