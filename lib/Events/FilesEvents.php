@@ -80,6 +80,9 @@ class FilesEvents
     {
         if ($this->configService->getAppValue('index_live') === '1') {
             $file = FileService::getFileInfoFromPath($path, Filesystem::getView());
+            if ($file === false)
+                return;
+            
             if ($file->getId() > 0)
                 $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_CREATE, array(
                     'userid' => $this->userId,
