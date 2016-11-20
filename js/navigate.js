@@ -493,7 +493,6 @@
 					return;
 
 				if (self.nextant_sharelink) {
-
 					var link = parent.location.protocol + '//' + location.host
 							+ OC.generateUrl('/s/') + self.getShareLinkKey();
 					link += '/download?path=' + item.entry.dirpath + '&files='
@@ -503,6 +502,7 @@
 
 					return;
 				}
+
 				if (item.data.type == 'files')
 					$(elemhref).attr('href',
 							$(elemhref).attr('href').replace(/%2F/g, '/'));

@@ -29,6 +29,8 @@ namespace OCA\Nextant\Items;
 class ItemError
 {
 
+    const EXCEPTION_DECRYPTION_FAILED = 1046;
+    
     private $errorcode;
 
     private $message;
