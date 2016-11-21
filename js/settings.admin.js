@@ -68,6 +68,8 @@ $(document)
 										.is(':checked')) ? 1 : 0,
 								index_files_sharelink : ($('#solr_index_files_sharelink')
 										.is(':checked')) ? 1 : 0,
+								index_files_federated : ($('#solr_index_files_federated')
+										.is(':checked')) ? 1 : 0,
 								index_files_external : ($('#solr_index_files_external')
 										.is(':checked')) ? 1 : 0,
 								index_files_encrypted : ($('#solr_index_files_encrypted')
@@ -88,6 +90,10 @@ $(document)
 
 							if (switched == 'index_files_sharelink')
 								data.index_files_sharelink = (data.index_files_sharelink == 1) ? 0
+										: 1;
+
+							if (switched == 'index_files_federated')
+								data.index_files_federated = (data.index_files_federated == 1) ? 0
 										: 1;
 
 							if (switched == 'index_files_external')
@@ -174,7 +180,7 @@ $(document)
 								index_delay : $('#solr_index_delay').val(),
 								force_index : force_index
 							}
-						
+
 							if (switched == 'index_live')
 								data.index_live = (data.index_live == 1) ? 0
 										: 1;
@@ -233,6 +239,8 @@ $(document)
 									(response.index_files_nextant_only == 1));
 							$('#solr_index_files_sharelink').prop('checked',
 									(response.index_files_sharelink == 1));
+							$('#solr_index_files_federated').prop('checked',
+									(response.index_files_federated == 1));
 							$('#solr_index_files_external').prop('checked',
 									(response.index_files_external == 1));
 							$('#solr_index_files_encrypted').prop('checked',
@@ -599,12 +607,20 @@ $(document)
 												.savesuboptions_files('index_files_sharelink');
 									});
 
+					$('#solr_index_files_federated')
+							.mousedown(
+									function() {
+										nextantSettings
+												.savesuboptions_files('index_files_federated');
+									});
+							
 					$('#solr_index_files_external')
 							.mousedown(
 									function() {
 										nextantSettings
 												.savesuboptions_files('index_files_external');
 									});
+					
 					$('#solr_index_files_encrypted')
 							.mousedown(
 									function() {

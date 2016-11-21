@@ -55,6 +55,7 @@ class ConfigService
         'index_files_tree' => 0,
         'index_files_nextant_only' => 0,
         'undex_files_sharelink' => 0,
+        'index_files_federated' => 0,
         'index_files_external' => 0,
         'index_files_encrypted' => 0,
         'index_files_max_size' => 40,

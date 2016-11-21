@@ -127,11 +127,22 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
+	    <?php p($l->t('Index Federated Shares :')) ?></td>
+								<td colspan="2"><input type="checkbox"
+									name="solr_index_files_federated"
+									id="solr_index_files_federated" value="1" style="margin: 10px;"></td>
+							</tr>
+
+
+							<tr style="height: 30px;">
+								<td class="nextant_admin_left">
 	    <?php p($l->t('Index External Storage :')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_external" id="solr_index_files_external"
 									value="1" style="margin: 10px;"></td>
 							</tr>
+
+
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">

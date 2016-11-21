@@ -174,6 +174,12 @@ class FileService
     {
         $item->synced(true);
         
+        // $this->miscService->log('-- local: ' . (($item->getStorage()
+        // ->isLocal()) ? 'y' : 'n') . ' -- external: ' . (($item->isExternal()) ? 'y' : 'n') . ' -- encrypted:' . (($item->isEncrypted()) ? 'y' : 'n') . ' -- test: ' . (($item->isTest()) ? 'y' : 'n') . ' -- ' . $item->getPath());
+        
+        if ($item->isFederated() && $this->configService->getAppValue('index_files_federated') !== '1')
+            return false;
+        
         if ($item->isExternal() && $this->configService->getAppValue('index_files_external') !== '1')
             return false;
         

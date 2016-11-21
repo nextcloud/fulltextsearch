@@ -35,6 +35,8 @@ class ItemDocument
 
     const TYPE_BOOKMARK = 'bookmarks';
 
+    private $test = false;
+
     private $type;
 
     private $source;
@@ -76,6 +78,8 @@ class ItemDocument
     private $public = false;
 
     private $external = false;
+
+    private $federated = false;
 
     private $shared = false;
 
@@ -133,6 +137,16 @@ class ItemDocument
     public function getId()
     {
         return (int) $this->id;
+    }
+
+    public function test($test)
+    {
+        $this->test = $test;
+    }
+
+    public function isTest()
+    {
+        return $this->test;
     }
 
     public function setSource($source)
@@ -308,6 +322,16 @@ class ItemDocument
     public function getStorage()
     {
         return $this->storage;
+    }
+
+    public function federated($fed)
+    {
+        $this->federated = $fed;
+    }
+
+    public function isFederated()
+    {
+        return $this->federated;
     }
 
     public function needExtract($need)
