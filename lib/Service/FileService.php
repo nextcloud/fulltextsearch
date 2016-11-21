@@ -132,6 +132,7 @@ class FileService
     {
         $this->userId = $userId;
         Filesystem::init($this->userId, '');
+        \OC_Util::setupFS($this->userId);        
         $this->view = Filesystem::getView();
         
         if ($complete)
@@ -236,7 +237,7 @@ class FileService
             $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
             return true;
         }
-                
+        
         // We generate a local tmp file from the federated
         if ($item->isFederated() && $this->configService->getAppValue('index_files_federated') === '1') {
             $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
@@ -248,7 +249,7 @@ class FileService
             try {
                 $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
             } catch (\OC\Encryption\Exceptions\DecryptionFailedException $dfe) {
-                $ierror = new ItemError(ItemError::EXCEPTION_DECRYPTION_FAILED, $dfe->getStatusMessage());
+                $ierror = new ItemError(ItemError::EXCEPTION_DECRYPTION_FAILED, $dfe->getHint());
                 return false;
             }
             
