@@ -236,6 +236,12 @@ class FileService
             $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
             return true;
         }
+                
+        // We generate a local tmp file from the federated
+        if ($item->isFederated() && $this->configService->getAppValue('index_files_federated') === '1') {
+            $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            return true;
+        }
         
         // encrypted file
         if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') === '1') {
@@ -268,7 +274,7 @@ class FileService
      */
     public function destroyTempDocument(&$item)
     {
-        if ($item->isTemp())
+        if ($item->getAbsolutePath() != null && $item->isTemp())
             unlink($item->getAbsolutePath());
     }
 
@@ -291,11 +297,17 @@ class FileService
         $item->setSize($file->getSize());
         $item->setStorage($file->getStorage());
         
-        if ($file->isMounted())
-            $item->external(true);
-        
         if ($file->isEncrypted())
             $item->encrypted(true);
+        
+        if ($file->isMounted())
+            $item->external(true);
+        else {
+            
+            // not clean - but only way I found to check if not mounted IS federated ?
+            if (method_exists($file->getMountPoint(), 'moveMount') && method_exists($file->getMountPoint(), 'removeMount'))
+                $item->federated(true);
+        }
         
         return $item;
     }
