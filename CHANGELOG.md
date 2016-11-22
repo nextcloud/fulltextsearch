@@ -1,3 +1,14 @@
+**v0.10.0**
+- nextant is working fine with Solr 6.3.0
+- results are displayed using fileList.
+- public sharelink are using same JS than private
+- bugfixes:
+  * encrypted file are now indexed, but only if master-key is enabled.
+  * local file that are considered not local by NC (ie. encrypted module enabled but not used).
+  * default file filters configuration could make files not to be extracted.
+  * other minor bugfixes. UI glitch.
+
+
 **v0.6.6**
 - Minor bugfixes.
 
