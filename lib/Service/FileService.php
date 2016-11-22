@@ -251,6 +251,10 @@ class FileService
             } catch (\OC\Encryption\Exceptions\DecryptionFailedException $dfe) {
                 $ierror = new ItemError(ItemError::EXCEPTION_DECRYPTION_FAILED, $dfe->getHint());
                 return false;
+            } catch (\OCA\Encryption\Exceptions\PrivateKeyMissingException $pkme)
+            {
+                $ierror = new ItemError(ItemError::EXCEPTION_DECRYPT_PRIVATEKEY_MISSING, $pkme->getHint());
+                return false;                
             }
             
             // \OC_Util::setupFS($this->userId);

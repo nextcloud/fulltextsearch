@@ -173,6 +173,7 @@ class IndexService
     public function extract($type, $userId, &$data, &$solrDocs, $extract = true, &$ierror = '')
     {
         $this->solrService->setOwner($userId);
+        $ierror = new ItemError();
         
         if ($solrDocs === null)
             $solrDocs = $this->getDocuments($type, $userId, 0, $ierror);
@@ -226,6 +227,7 @@ class IndexService
                 $this->bookmarkService->syncDocument($entry);
             if ($entry->getType() == ItemDocument::TYPE_TEST) {
                 $entry->synced(true);
+                $entry->valid(true);
                 $entry->extractable(true);
             }
             
@@ -262,8 +264,11 @@ class IndexService
                 $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . ($this->lastCommitQueryTime) . 'ms' : ''), 'more');
             
             if ($entry->getType() == ItemDocument::TYPE_FILE) {
-                if (! $this->fileService->generateAbsolutePath($entry, $ierror))
+                if (! $this->fileService->generateAbsolutePath($entry, $ierror)) {
                     $this->manageFailure($ierror, $progress, 'Failed to find a descent path');
+                    if ($this->configService->getAppValue('index_files_tree') !== '1')
+                        continue;
+                }
             }
             
             $this->solrService->indexDocument($entry, $ierror);
@@ -300,8 +305,10 @@ class IndexService
                 if ($this->configService->getAppValue('index_files_tree') === '1')
                     $entry->valid(true);
                 
-                if (! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
+                if (! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')')) {
+                    $ierror = new ItemError(ItemError::ERROR_MANAGING_FAILURE, 'server down ?');
                     return false;
+                }
                 
                 if ($this->configService->getAppValue('index_files_tree') === '1') {
                     $entry->extractable(false);
