@@ -132,7 +132,6 @@ class FileService
     {
         $this->userId = $userId;
         Filesystem::init($this->userId, '');
-        \OC_Util::setupFS($this->userId);        
         $this->view = Filesystem::getView();
         
         if ($complete)
@@ -244,29 +243,17 @@ class FileService
             return true;
         }
         
-        // encrypted file
+        // encrypted file = local tmp file
         if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') === '1') {
             try {
-                $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
+                $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
             } catch (\OC\Encryption\Exceptions\DecryptionFailedException $dfe) {
                 $ierror = new ItemError(ItemError::EXCEPTION_DECRYPTION_FAILED, $dfe->getHint());
                 return false;
-            } catch (\OCA\Encryption\Exceptions\PrivateKeyMissingException $pkme)
-            {
+            } catch (\OCA\Encryption\Exceptions\PrivateKeyMissingException $pkme) {
                 $ierror = new ItemError(ItemError::EXCEPTION_DECRYPT_PRIVATEKEY_MISSING, $pkme->getHint());
-                return false;                
+                return false;
             }
-            
-            // \OC_Util::setupFS($this->userId);
-            // // $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
-            
-            // $tmpfile = \OC::$server->getTempManager()->getTemporaryFile();
-            
-            // $extension = pathinfo($item->getPath(), PATHINFO_EXTENSION);
-            // $tmpFile = \OC::$server->getTempManager()->getTemporaryFile($extension);
-            // file_put_contents($tmpFile, $content);
-            
-            // $item->setAbsolutePath($tmpfile);
             
             return true;
         }
