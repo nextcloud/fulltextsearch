@@ -35,6 +35,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Check extends Base
 {
 
+    private $configService;
+
     private $solrService;
 
     private $solrTools;
@@ -43,9 +45,10 @@ class Check extends Base
 
     private $settingsController;
 
-    public function __construct($solrService, $solrTools, $solrAdmin, $settingsController)
+    public function __construct($configService, $solrService, $solrTools, $solrAdmin, $settingsController)
     {
         parent::__construct();
+        $this->configService = $configService;
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->solrAdmin = $solrAdmin;
@@ -71,6 +74,7 @@ class Check extends Base
         
         if ($input->getOption('info') || $input->getOption('infoall')) {
             $info = $this->settingsController->updateSubOptions(true, 'check');
+            $info['cloud_version'] = $this->configService->getCloudVersion(true);
             
             if (! $input->getOption('infoall')) {
                 $info['solr_url'] = '**HIDDEN**';

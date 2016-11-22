@@ -205,30 +205,16 @@ class Application extends App
         if ($config->getAppValue('configured') !== '1')
             return;
         
-        switch ($config->getAppValue('display_result')) {
-            
-            case ConfigService::SEARCH_DISPLAY_NEXTANT:
-                
-                \OC::$server->getEventDispatcher()->addListener('OCA\Files::loadAdditionalScripts', function () {
-                    \OCP\Util::addScript('nextant', 'navigate');
-                    \OCP\Util::addStyle('nextant', 'navigate');
-                });
-                
-                if ($config->getAppValue('index_files_sharelink') === '1')
-                    \OC::$server->getEventDispatcher()->addListener('OCA\Files_Sharing::loadAdditionalScripts', function () {
-                        \OCP\Util::addScript('nextant', 'navigate_sharelink');
-                        \OCP\Util::addStyle('nextant', 'navigate');
-                    });
-                break;
-            
-            case ConfigService::SEARCH_DISPLAY_FILES:
-                \OC::$server->getSearch()->registerProvider('\OCA\Nextant\Provider\SearchProvider', array(
-                    'apps' => array(
-                        'files'
-                    )
-                ));
-                break;
-        }
+        \OC::$server->getEventDispatcher()->addListener('OCA\Files::loadAdditionalScripts', function () {
+            \OCP\Util::addScript('nextant', 'navigate');
+            \OCP\Util::addStyle('nextant', 'navigate');
+        });
+        
+        if ($config->getAppValue('index_files_sharelink') === '1')
+            \OC::$server->getEventDispatcher()->addListener('OCA\Files_Sharing::loadAdditionalScripts', function () {
+                \OCP\Util::addScript('nextant', 'navigate');
+                \OCP\Util::addStyle('nextant', 'navigate');
+            });
     }
 
     public function registerSettingsAdmin()

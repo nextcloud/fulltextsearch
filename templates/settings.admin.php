@@ -34,7 +34,7 @@ style('nextant', 'admin');
 		<tr>
 			<td colspan="2"><em><?php p($l->t('Specify the URL of your Solr servlet, and the name of the core to use.')); ?>
 			<br />If you do not have a Solr servlet running, you can <a
-					href="https://github.com/daita/nextant/wiki" target="_blank">find
+					href="https://github.com/nextcloud/nextant/wiki" target="_blank">find
 						few guides on how to install one on the Wiki</a></em></td>
 		</tr>
 		<tr valign="top">
@@ -109,7 +109,12 @@ style('nextant', 'admin');
 	    <?php p($l->t('Index Files Tree :')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_tree" id="solr_index_files_tree"
-									value="1" style="margin: 10px;"></td>
+									value="1" style="margin: 10px;"> <span
+									id="solr_index_files_nextant_only_span"><input type="checkbox"
+										name="solr_index_files_nextant_only"
+										id="solr_index_files_nextant_only" value="1"
+										style="margin: 10px;"> Disable default search from Files </span>
+								</td>
 							</tr>
 
 							<tr style="height: 30px;">
@@ -122,11 +127,22 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
+	    <?php p($l->t('Index Federated Shares :')) ?></td>
+								<td colspan="2"><input type="checkbox"
+									name="solr_index_files_federated"
+									id="solr_index_files_federated" value="1" style="margin: 10px;"></td>
+							</tr>
+
+
+							<tr style="height: 30px;">
+								<td class="nextant_admin_left">
 	    <?php p($l->t('Index External Storage :')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_external" id="solr_index_files_external"
 									value="1" style="margin: 10px;"></td>
 							</tr>
+
+
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
@@ -207,26 +223,6 @@ style('nextant', 'admin');
 							<td><input type="text" name="solr_index_delay"
 								id="solr_index_delay" value="2" style="width: 50px;" /> hours</td>
 						</tr>
-
-						<tr style="height: 30px;">
-							<td class="nextant_admin_left">
-	    <?php p($l->t('Display result :')) ?></td>
-							<td><select id="solr_display_result" style="width: 260px;">
-									<option value="1">Nextant style</option>
-									<option value="2">Integrated to Files</option>
-							</select></td>
-						</tr>
-
-						<!-- 
-						<tr style="height: 30px;">
-							<td class="nextant_admin_left">
-	    <?php p($l->t('Fully Replace Core Search:')) ?></td>
-							<td id="solr_replace_core_search_td"><input type="checkbox"
-								name="solr_replace_core_search" id="solr_replace_core_search"
-								value="1" style="margin: 10px;"> (needs <b>Index Files Tree</b>
-								enabled)</td>
-						</tr>
-						-->
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">

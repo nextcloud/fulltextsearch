@@ -40,30 +40,30 @@ class ConfigService
         'configured' => '0',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
-        'solr_timeout' => 30,
-        'display_result' => 1,
-        'replace_core_search' => 0,
+        'solr_timeout' => '30',
         
-        'index_live' => 1,
-        'index_live_queuekey' => 19375,
-        'index_delay' => 2,
-        'index_locked' => 0,
-        'index_files_last' => 0,
-        'index_bookmarks_last' => 0,
+        'index_live' => '1',
+        'index_live_queuekey' => '19375',
+        'index_delay' => '2',
+        'index_locked' => '0',
+        'index_files_last' => '0',
+        'index_bookmarks_last' => '0',
         
-        'index_files' => 1,
-        'index_files_needed' => 1,
-        'index_files_update_needed' => 1,
-        'index_files_tree' => 0,
-        'undex_files_sharelink' => 0,
-        'index_files_external' => 0,
-        'index_files_encrypted' => 0,
-        'index_files_max_size' => 40,
-        'index_files_filters_text' => 1,
-        'index_files_filters_pdf' => 1,
-        'index_files_filters_office' => 1,
-        'index_files_filters_image' => 0,
-        'index_files_filters_audio' => 0,
+        'index_files' => '1',
+        'index_files_needed' => '1',
+        'index_files_update_needed' => '1',
+        'index_files_tree' => '0',
+        'index_files_nextant_only' => '0',
+        'undex_files_sharelink' => '0',
+        'index_files_federated' => '0',
+        'index_files_external' => '0',
+        'index_files_encrypted' => '0',
+        'index_files_max_size' => '40',
+        'index_files_filters_text' => '1',
+        'index_files_filters_pdf' => '1',
+        'index_files_filters_office' => '1',
+        'index_files_filters_image' => '0',
+        'index_files_filters_audio' => '0',
         'index_files_filters_extensions' => '',
         
         'index_bookmarks' => 0,
@@ -94,6 +94,7 @@ class ConfigService
 
     public function removeOldConfig()
     {
+        $this->deleteAppValue('display_result');
         $this->deleteAppValue('solr_lock');
         $this->deleteAppValue('needed_index');
         $this->deleteAppValue('last_index');
@@ -231,6 +232,16 @@ class ConfigService
             );
         
         return $this->fileFilters;
+    }
+
+    public function getCloudVersion($complete = false)
+    {
+        $ver = \OCP\Util::getVersion();
+        
+        if ($complete)
+            return implode('.', $ver);
+        
+        return $ver[0];
     }
 
     /**

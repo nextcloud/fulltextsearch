@@ -99,8 +99,7 @@ class Live extends Base
             return;
         }
         
-        if ($this->configService->getAppValue('index_live') !== '1')
-        {
+        if ($this->configService->getAppValue('index_live') !== '1') {
             $output->writeln('your nextant is not configured for Live Index');
             return;
         }
@@ -118,16 +117,28 @@ class Live extends Base
         $lasttick = 0;
         
         while (true) {
-            $this->interrupted();
-            $item = $this->queueService->readQueue(true);
-            if ($item !== false) {
-                if ($input->getOption('instant'))
-                    $this->queueService->executeItem($item);
-                else {
-                    
-                    $this->queueService->executeItem($item);
+            try {
+                $this->interrupted();
+                $item = $this->queueService->readQueue(true);
+                if ($item !== false) {
+                    if ($input->getOption('instant'))
+                        $this->queueService->executeItem($item);
+                    else {
+                        $this->queueService->executeItem($item);
+                    }
                 }
+            } catch (\Doctrine\DBAL\Exception\DriverException $dbde) {
+                $output->writeln('**** DRIVEREXCEPTION');
+                // $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $dbde->getStatusMessage());
+            } catch (\Doctrine\DBAL\Driver\PDOException $dbpdoe2) {
+                $output->writeln('**** Doctrine\DBAL\Driver\PDOException');
+                // $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $dbpdoe->getStatusMessage());
+            } catch (\PDOException $dbpdoe2) {
+                $output->writeln('**** PDOException');
+                // $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $dbpdoe2->getStatusMessage());
             }
+            //
+            //
             $output->writeln('');
         }
     }

@@ -22,334 +22,761 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
+(function() {
 
-$(document)
-		.ready(
-				function() {
+	/**
+	 * @constructs Nextant
+	 */
+	var Nextant = function() {
+		this.initialize();
+	};
 
-					(function(func) {
-						$.fn.addClass = function() {
-							func.apply(this, arguments);
-							this.trigger('classChanged');
-							return this;
-						}
-					})($.fn.addClass);
+	Nextant.prototype = {
 
-					(function(func) {
-						$.fn.removeClass = function() {
-							func.apply(this, arguments);
-							this.trigger('classChanged');
-							return this;
-						}
-					})($.fn.removeClass);
+		fileList : null,
+		currQuery : '',
+		currFiles : null,
+		searchResult : [],
+		locked : false,
+		config : {},
 
-					$('#searchresults').on('classChanged', function() {
-						if ($('#searchresults').attr('class') == 'hidden')
-							$('#nextantList').hide();
-						else
-							$('#nextantList').show();
-					});
+		nextant_sharelink : true,
+		searchboxFocus : false,
 
-					$('#searchbox').focusout(function() {
-						nextantCurrentFocus = false;
-						nextant.suggestShow();
-					});
+		suggestNoSpam : false,
+		/**
+		 * Initialize the file search
+		 */
+		initialize : function() {
 
-					$('#searchbox').focusin(function() {
-						nextantCurrentFocus = true;
-						nextant.suggestShow();
-					});
+			var self = this;
 
-					$(window).resize(function() {
-						nextant.suggestShow();
-					});
+			// detect if Files App is loaded
+			this.fileAppLoaded = function() {
+				return !!OCA.Files && !!OCA.Files.App;
+			};
 
-					$('html').keydown(function(e) {
-						if (!nextantCurrentFocus)
-							return;
-						if (e.which == 13)
-							return nextant.search();
-						// if (e.which == 38)
-						// return nextant.suggestSelect('prev');
-						// if (e.which == 39)
-						// return nextant.suggestSelect('select');
-						// if (e.which == 40)
-						// return nextant.suggestSelect('next');
-					});
+			this.initFileList = function() {
 
-					var nextantCurrentSearch = '';
-					var nextantCurrentFocus = false;
-					var nextantSearchDelayTimer = null;
-					var nextantSuggestDelayTimer = null;
-					var nextantSuggestNoSpam = false;
-					var nextantSuggestSelected = 0;
-					var nextantSuggestResults = null;
-					var nextant = {
+				if (self.nextant_sharelink)
+					self.fileList = OCA.Sharing.PublicApp.fileList;
 
-						init : function() {
-							$('#searchbox').on('input', function(e) {
-								nextant.searchTimer();
-								nextant.suggestTimer();
+				else {
+					_.each(OC.Plugins.getPlugins('OCA.Search'),
+							function(plugin) {
+								if (plugin instanceof OCA.Search.Files)
+									self.fileList = plugin.fileList;
 							});
-						},
+				}
 
-						searchTimer : function() {
-							if (nextantSearchDelayTimer != null)
-								clearTimeout(nextantSearchDelayTimer);
+				/*
+				 * Haven't found a way to include (or remove) a fileAction only
+				 * in a specific place (only in search result)
+				 */
+				OCA.Files.fileActions.registerAction({
+					name : 'nextant_gotofolder',
+					displayName : 'Go To Folder',
+					mime : 'all',
+					permissions : OC.PERMISSION_READ,
+					type : OCA.Files.FileActions.TYPE_DROPDOWN,
+					icon : function() {
+						return OC.imagePath('core', 'filetypes/folder');
+					},
+					actionHandler : function(filename, context) {
+						self.onGoToFolder(filename, context);
+					}
+				});
+			};
 
-							nextantSearchDelayTimer = setTimeout(function() {
-								nextant.search();
-							}, 170);
-						},
+			//
+			//
+			// init Share Link (only it needed)
+			this.initShareLink = function() {
+				if (!self.nextant_sharelink)
+					return;
 
-						suggestTimer : function() {
-							if (nextantSuggestDelayTimer != null)
-								clearTimeout(nextantSuggestDelayTimer);
+				$searchbox = '<form class="searchbox" action="#" method="post" role="search" novalidate="" style="padding-right: 300px;">';
+				$searchbox += ' <label for="searchbox" class="hidden-visually">Search</label>';
+				$searchbox += ' <input id="searchbox" name="query" value="" required="" autocomplete="off" tabindex="5" type="search">';
+				$searchbox += '</form>';
 
-							nextantSuggestDelayTimer = setTimeout(function() {
-								nextant.suggest();
-							}, 10);
-						},
+				$('#logo-claim').after($searchbox);
+				setTimeout(function() {
+					$('#searchbox').fadeIn(500);
+				}, 1000);
 
-						search : function() {
-							nextantSearchDelayTimer = null;
+				$('#searchbox').on('input', function(e) {
+					self.searchRequestPublic($('#searchbox').val());
+					self.suggestRequestPublic($('#searchbox').val());
+				});
 
-							var query = $('#searchbox').val();
-							if (query == nextantCurrentSearch)
-								return;
-							nextantCurrentSearch = query;
+				$('DIV.crumb.svg.last').live('click', function() {
+					$('#searchbox').val('');
+					self.searchRequestPublic('');
+				});
+				$('DIV.crumb.svg.ui-droppable').live('click', function() {
+					$('#searchbox').val('');
+					self.searchRequestPublic('');
+				});
 
-							var data = {
-								query : query,
-								current_dir : nextant.get('dir')
-							}
+				$('#searchbox').focusout(function() {
+					// nextantCurrentFocus = false;
+					// nextant_share_link.suggestShow();
+				});
 
-							nextant.searchRequest(data);
-						},
+				$('#searchbox').focusin(function() {
+					// nextantCurrentFocus = true;
+					// nextant_share_link.suggestShow();
+				});
 
-						suggest : function() {
-							nextantSuggestDelayTimer = null;
-							var query = $('#searchbox').val();
-							var data = {
-								query : query
-							}
-							nextant.suggestRequest(data);
-						},
+			};
 
-						suggestRequest : function(data) {
-							if (nextantSuggestNoSpam)
-								return;
-							$.post(
-									OC.filePath('nextant', 'ajax',
-											'suggest.php'), data,
-									nextant.suggestResult);
-						},
+			//
+			//
+			// search request
+			this.searchRequest = function(data) {
 
-						suggestResult : function(response) {
+				if (self.nextant_sharelink)
+					$.post(OC.filePath('nextant', 'ajax', 'search_public.php'),
+							data, self.searchRequestResult);
+				else
+					$.post(OC.filePath('nextant', 'ajax', 'search.php'), data,
+							self.searchRequestResult);
+			};
 
-							if (response == null || response.status > 0
-									|| response.result.length == 0) {
+			/**
+			 * 
+			 * display search result
+			 * 
+			 */
+			this.searchRequestResult = function(infos) {
 
-								if (response.status > 0) {
-									nextantSuggestNoSpam = true;
-									setTimeout(function() {
-										nextantSuggestNoSpam = false;
-									}, 60000);
-								}
-								if ($('#nextantSugg_list').length)
-									$('#nextantSugg_list').hide(200);
-								return;
-							}
+				if (self.fileList == null)
+					return;
 
-							if (!$('#nextantSugg_list').length)
-								$('#body-user').append(
-										'<div id="nextantSugg_list"></div>');
+				var result = infos.result;
+				self.config = infos.config;
 
-							nextant.suggestShow();
+				var origResult = [];
+				if (self.config == null
+						|| self.config.index_files_nextant_only != '1')
+					origResult = self.currentFileResult();
 
-							$('#nextantSugg_list').empty();
-							var result = response.result;
-							nextantSuggestResult = result;
-							for (var i = 0; i < result.length; i++) {
-								var first = '';
-								if (i == 0)
-									first = 'nextantSugg_firstitem';
+				self.searchResult = origResult.concat(result);
 
-								$('#nextantSugg_list').append(
-										'<div id="nextant_sugg_' + i
-												+ '" class="nextantSugg_item '
-												+ first + '">'
-												+ result[i].suggestion
-												+ '</div>');
-							}
+				result = self.searchResult;
+				if (result == null)
+					return;
 
-							$('.nextantSugg_item').click(function() {
-								nextant.suggestReplace($(this).text());
-								nextant.search();
-							});
+				var data = [];
+				for (var i = 0; i < result.length; i++) {
+					if (result[i] == null || result[i].entry == null)
+						continue;
 
-						},
-
-						suggestShow : function() {
-
-							var offset = $('#searchbox').offset();
-							var height = $('#searchbox').height();
-							var top = offset.top + height + "px";
-							var left = offset.left + "px";
-
-							$('#nextantSugg_list').css({
-								'position' : 'absolute',
-								'left' : left,
-								'top' : top
-							});
-
-							if (!$('#nextantSugg_list').length)
-								return;
-							if (nextantCurrentFocus)
-								$('#nextantSugg_list').show(200);
-							else
-								$('#nextantSugg_list').hide(200);
-						},
-
-						suggestReplace : function(txt) {
-							$('#searchbox').val(txt + ' ');
-							$('#searchbox').focus();
-						},
-
-						// suggestSelect : function(pos) {
-						// if (!nextantCurrentFocus)
-						// return;
-						// if (nextantSuggestResult == null)
-						// return;
-						//							
-						// switch (pos) {
-						// case 'next':
-						// if (nextantSuggestSelected <
-						// nextantSuggestResult.length)
-						// nextantSuggestSelected++;
-						// break;
-						// case 'prev':
-						// if (nextantSuggestSelected > 1)
-						// nextantSuggestSelected--;
-						// break;
-						// case 'select':
-						// suggestReplace(nextantSuggestResult[nextantSuggestSelected]);
-						// break;
-						//
-						// case 'reset':
-						// nextantSuggestSelected = 0;
-						// break;
-						// }
-						// },
-
-						searchRequest : function(data) {
-							$.post(
-									OC
-											.filePath('nextant', 'ajax',
-													'search.php'), data,
-									nextant.searchResult);
-						},
-
-						searchResult : function(response) {
-							if (response == null)
-								return;
-
-							if (!$('#nextantList').length)
-								$('#fileList')
-										.append(
-												'<tr><td colspan="3" style="margin: 0px; padding: 0px;"><div id="nextantList"></div></td></tr>');
-
-							$('#nextantList').empty();
-
-							response
-									.forEach(function(entry) {
-										var row = nextant
-												.template_entry()
-												.replace(/%ID%/gi, entry.id)
-												.replace(/%TYPE%/gi, entry.type)
-												.replace(/%TITLE%/gi,
-														entry.title)
-												.replace(/%LINKMAIN%/gi,
-														entry.link_main)
-												.replace(/%FILENAME%/gi,
-														entry.filename)
-												.replace(/%DIRPATH%/gi,
-														entry.dirpath)
-												.replace(/%ETAG%/gi, entry.etag)
-												.replace(/%SIZE%/gi, entry.size)
-												.replace(/%SIZEREAD%/gi,
-														entry.size_readable)
-												.replace(/%MIMETYPE%/gi,
-														entry.mimetype)
-												.replace(/%ICON%/gi, entry.icon)
-												.replace(/%MTIME%/gi,
-														entry.mtime).replace(
-														/%HIGHLIGHT1%/gi,
-														entry.highlight1)
-												.replace(/%HIGHLIGHT2%/gi,
-														entry.highlight2);
-
-										row = row
-												.replace(
-														/%SHARED%/gi,
-														(entry.shared != '') ? ' style="background-image:url('
-																+ entry.shared
-																+ ');"'
-																: '');
-										row = row
-												.replace(
-														/%DELETED%/gi,
-														(entry.deleted != '') ? ' style="background-image:url('
-																+ entry.deleted
-																+ ');"'
-																: '');
-
-										$('#nextantList').append(row);
-									});
-						},
-
-						template_entry : function() {
-
-							$tmpl = '<tr data-id="%ID%" data-type="%TYPE%" data-size="%SIZE%" data-file="%FILENAME%" data-mime="%MIMETYPE%" data-mtime="%MTIME%000" data-etag="%ETAG%" ';
-							$tmpl += ' data-permissions="" data-has-preview="true" data-path="%DIRPATH%" data-share-permissions="">';
-							$tmpl += '<td class="filename ui-draggable">';
-							$tmpl += '<a class="action action-favorite " data-original-title="" title="">';
-							$tmpl += '</a>';
-							$tmpl += '<label for="select-files-%ID%"><div class="thumbnail" style="background-image:url(%ICON%); background-size: 32px;">';
-							$tmpl += '<div class="nextant_details" %DELETED%%SHARED%></div>';
-							$tmpl += '</div>';
-							$tmpl += '<span class="hidden-visually">Select</span></label>';
-
-							$tmpl += '<a class="nextant_file" href="%LINKMAIN%">';
-							$tmpl += '<div>';
-							$tmpl += '<span class="nextant_line nextant_line1">%TITLE%</span>';
-							$tmpl += '<span class="nextant_line nextant_line2">%HIGHLIGHT1%</span>';
-							$tmpl += '<span class="nextant_line nextant_line3">%HIGHLIGHT2%</span>';
-							$tmpl += '</div></a>';
-							$tmpl += '</td>';
-							$tmpl += '<td class="filesize" style="color:rgb(-17,-17,-17)">%SIZEREAD%</td>';
-							$tmpl += '<td class="date"><span class="modified" title="" style="color:rgb(155,155,155)" data-original-title=""></span></td></tr>';
-
-							return $tmpl;
-						},
-
-						get : function(name, url) {
-							if (!url)
-								url = window.location.href;
-							name = name.replace(/[\[\]]/g, "\\$&");
-							var regex = new RegExp("[?&]" + name
-									+ "(=([^&#]*)|&|#|$)"), results = regex
-									.exec(url);
-							if (!results)
-								return null;
-							if (!results[2])
-								return '';
-							return decodeURIComponent(results[2].replace(/\+/g,
-									' '));
+					var alr = false;
+					for (var j = 0; j < data.length; j++) {
+						if (data[j].id == result[i].entry.id) {
+							alr = true;
+							break;
 						}
-
 					}
 
-					nextant.init();
+					if (!alr)
+						data.push(result[i].entry);
+				}
 
+				self.fileList.setSort('score', 'desc', false, false);
+				self.fileList.setFiles(data);
+
+				self.updateSearchResult();
+			};
+
+			//
+			//
+			this.updateSearchResult = function() {
+
+				var result = self.searchResult;
+				if (result == null)
+					return;
+
+				if (self.currQuery == '')
+					return;
+
+				self.locked = false;
+
+				// We edit each row
+				_.each(result, function(item) {
+					if (item == null)
+						return;
+					if (item.entry == null)
+						return;
+
+					tr = self.getElem(item.entry.name);
+
+					if (!$(tr).length)
+						return;
+
+					self.__morphLink(tr, item);
+					self.__morphResultDisplay(tr, item);
+					self.__morphOverlayIcon(tr, item);
+					self.__morphBookmarksFileAction(tr, item);
 				});
+
+				self.__morphSummary(result);
+				self.__morphEmptyContent(result);
+
+				//
+				// done
+				self.locked = true;
+			};
+
+			//
+			//
+			// init search on shared link
+			this.searchRequestPublic = function(query) {
+
+				if (self.fileList == null)
+					self.initFileList();
+
+				if (self.currFiles == null)
+					self.currFiles = self.fileList.files;
+
+				self.currQuery = query;
+
+				// sending the ajax request
+				var data = {
+					query : query,
+					current_dir : self.get('dir'),
+					key : self.getShareLinkKey()
+				}
+
+				self.searchRequest(data);
+			};
+
+			//
+			// return array containing current file from current directory that
+			// fit the query.
+			// (like current search in files app)
+			this.currentFileResult = function() {
+				var currFiles = self.currFiles;
+				var data = [];
+
+				if (currFiles == null || currFiles.length == 0)
+					return data;
+
+				for (var i = 0; i < currFiles.length; i++) {
+
+					if (currFiles[i].name.toLowerCase().indexOf(
+							self.currQuery.toLowerCase()) === -1)
+						continue;
+
+					data.push({
+						data : {
+							id : currFiles[i].id,
+							score : 9999
+						},
+						entry : currFiles[i]
+					});
+				}
+
+				return data;
+			};
+
+			//
+			//
+			// suggest request
+			this.suggestRequest = function(data) {
+
+				if (self.suggestNoSpam)
+					return;
+
+				if (self.nextant_sharelink)
+					$.post(
+							OC
+									.filePath('nextant', 'ajax',
+											'suggest_public.php'), data,
+							self.suggestRequestResult);
+				else
+					$.post(OC.filePath('nextant', 'ajax', 'suggest.php'), data,
+							self.suggestRequestResult);
+			};
+
+			//
+			//
+			this.suggestRequestResult = function(response) {
+
+				if (response == null || response.status > 0
+						|| response.result == null
+						|| response.result.length == 0) {
+
+					if (response.status > 0) {
+						self.suggestNoSpam = true;
+						setTimeout(function() {
+							self.suggestNoSpam = false;
+						}, 60000);
+					}
+
+					if ($('#nextant_suggestion').length)
+						$('#nextant_suggestion').hide(200);
+					return;
+				}
+
+				if (!$('#nextant_suggestion').length) {
+					if (self.nextant_sharelink)
+						$('#body-public').append(
+								$('<div></div>').attr('id',
+										'nextant_suggestion'));
+					else
+						$('#body-user').append(
+								$('<div></div>').attr('id',
+										'nextant_suggestion'));
+				}
+
+				self.suggestDisplay();
+
+				$('#nextant_suggestion').empty();
+				var result = response.result;
+				for (var i = 0; i < result.length; i++) {
+					var first = '';
+					if (i == 0)
+						first = 'nextant_suggestion_firstitem';
+
+					$('#nextant_suggestion').append(
+							$('<div></div>').attr('id', 'nextant_sugg_' + i)
+									.attr('class',
+											'nextant_suggestion_item ' + first)
+									.html(result[i].suggestion));
+				}
+
+				$('.nextant_suggestion_item').click(function() {
+					self.suggestReplace($(this).text());
+					self.searchRequest($('#searchbox'));
+				});
+			};
+
+			// 
+			// refresh display of suggestion
+			this.suggestDisplay = function() {
+
+				var offset = $('#searchbox').offset();
+				var height = $('#searchbox').height();
+				var top = offset.top + height + "px";
+				var left = offset.left + "px";
+
+				$('#nextant_suggestion').css({
+					'position' : 'absolute',
+					'left' : left,
+					'top' : top
+				});
+
+				if (!$('#nextant_suggestion').length)
+					return;
+				if (self.searchboxFocus)
+					$('#nextant_suggestion').show(200);
+				else
+					$('#nextant_suggestion').hide(200);
+			};
+
+			//
+			// replace search with suggestion
+			this.suggestReplace = function(suggestion) {
+				$('#searchbox').val(suggestion + ' ');
+				$('#searchbox').focus();
+			};
+
+			//
+			//
+			this.suggestRequestPublic = function(query) {
+
+				if (self.fileList == null)
+					self.initFileList();
+
+				if (self.currFiles == null)
+					self.currFiles = self.fileList.files;
+
+				self.currQuery = query;
+
+				// sending the ajax request
+				var data = {
+					query : query,
+					key : self.getShareLinkKey()
+				}
+
+				self.suggestRequest(data);
+			};
+
+			//
+			//
+			this.mutationFileList = function(mutations, observer) {
+				if (self.locked)
+					self.updateSearchResult();
+			};
+
+			//
+			// Go To Folder. Called on FileActions
+			this.onGoToFolder = function(path, context) {
+				var apath = path.split('/');
+
+				var dir = '';
+				var filename = '';
+				for (var i = 0; i < apath.length; i++) {
+					filename = apath[i];
+					dir += '/';
+					if (i < (apath.length - 1))
+						dir += filename;
+				}
+
+				// window.alert('DIR: ' + dir + ' - FILENAME: ' + filename);
+
+				var link = '';
+				if (self.nextant_sharelink)
+					link = '/s/' + self.getShareLinkKey()
+							+ '?path={dir}&scrollto={scrollto}';
+
+				if (link == '')
+					link = '/apps/files/?dir={dir}&scrollto={scrollto}'
+
+				window.location = OC.generateUrl(link
+						+ '?dir={dir}&scrollto={scrollto}', {
+					dir : dir,
+					scrollto : filename
+				});
+
+			};
+
+			//
+			// get TR elem from filelist
+			this.getElem = function(file) {
+				var list = $('#fileList').children('tr');
+				for (var i = 0; i < list.length; i++) {
+					if ($(list[i]).attr('data-file') == file)
+						return $(list[i]);
+				}
+
+				return null;
+			};
+
+			//
+			// get info from url
+			this.get = function(name, url) {
+
+				if (!url)
+					url = window.location.href;
+				name = name.replace(/[\[\]]/g, "\\$&");
+				var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex
+						.exec(url);
+				if (!results || !results[2])
+					return '';
+
+				return decodeURIComponent(results[2].replace(/\+/g, ' '));
+			};
+
+			this.getShareLinkKey = function() {
+				if (!self.nextant_sharelink)
+					return '';
+
+				dir = window.location.href.split('/');
+				key = dir[dir.length - 1];
+				return key;
+			};
+
+			//
+			// MORPH
+			//
+
+			//
+			// fix the subfolder link
+			//
+			this.__morphLink = function(tr, item) {
+				var elemhref = $(tr).find('td.filename').find('a.name');
+				if (!$(elemhref).length)
+					return;
+
+				if (self.nextant_sharelink) {
+					var link = parent.location.protocol + '//' + location.host
+							+ OC.generateUrl('/s/') + self.getShareLinkKey();
+					link += '/download?path=' + item.entry.dirpath + '&files='
+							+ item.entry.filename;
+					$(elemhref).attr('href',
+							$(elemhref).attr('href').replace(/%2F/g, '/'));
+
+					return;
+				}
+
+				if (item.data.type == 'files')
+					$(elemhref).attr('href',
+							$(elemhref).attr('href').replace(/%2F/g, '/'));
+
+				// fix bookmark link
+				if (item.data.type == 'bookmarks')
+					$(elemhref).attr('href', item.data.path).attr('target',
+							'_blank');
+			};
+
+			//
+			// fix the display and add few lines
+			//
+			this.__morphResultDisplay = function(tr, item) {
+				var elemname = $(tr).find('td.filename').find('a.name').find(
+						'span.nametext');
+
+				if (item.data.lines == null)
+					return;
+
+				$(elemname).empty();
+				var displaydiv = $('<span></span>');
+				if (item.data.lines[1])
+					displaydiv.append($('<span></span>').attr('class',
+							'nextant_line nextant_line1').html(
+							item.data.lines[1]));
+				if (item.data.lines[2])
+					displaydiv.append($('<span></span>').attr('class',
+							'nextant_line nextant_line2').html(
+							item.data.lines[2]));
+				if (item.data.lines[3])
+					displaydiv.append($('<span></span>').attr('class',
+							'nextant_line nextant_line3').html(
+							item.data.lines[3]));
+
+				$(elemname).append(displaydiv);
+				$(elemname).css('width', '800px');
+
+			};
+
+			//
+			// Add overlay icon
+			//
+			this.__morphOverlayIcon = function(tr, item) {
+
+				var elemicon = $(tr).find('td.filename').find('div.thumbnail');
+
+				if (item.data.type == 'bookmarks')
+					elemicon.append($('<div></div>').attr(
+							{
+								'class' : 'nextant_details',
+								'style' : "background-image: url('"
+										+ OC.imagePath('nextant',
+												'bookmarks.svg') + "')"
+							}));
+				if (item.data.shared)
+					elemicon.append($('<div></div>').attr(
+							{
+								'class' : 'nextant_details',
+								'style' : "background-image: url('"
+										+ OC.imagePath('core',
+												'actions/shared.svg') + "')"
+							}));
+				if (item.data.deleted)
+					elemicon.append($('<div></div>').attr(
+							{
+								'class' : 'nextant_details',
+								'style' : "background-image: url('"
+										+ OC.imagePath('core',
+												'actions/delete.svg') + "')"
+							}));
+			};
+
+			//
+			// removing fileaction on bookmarks
+			//
+			this.__morphBookmarksFileAction = function(tr, item) {
+				if (item.data.type != 'bookmarks')
+					return;
+
+				$(tr).find('.filename').on('click', function(e) {
+					e.stopPropagation();
+				});
+				$(tr).find('.fileactions').empty().on('click', function(e) {
+					e.stopPropagation();
+				});
+				$(tr).find('.filesize').empty().on('click', function(e) {
+					e.stopPropagation();
+				});
+				$(tr).find('.date').on('click', function(e) {
+					e.stopPropagation();
+				});
+			};
+
+			//		
+			// fix Summary
+			//
+			this.__morphSummary = function(files) {
+
+				var cBookmarks = 0;
+				for (var i = 0; i < files.length; i++) {
+					if (files[i] == null)
+						continue;
+					if (files[i].data.type == 'bookmarks')
+						cBookmarks++;
+				}
+
+				var elemsumm = $('tr.summary').find('span.info');
+				if (!elemsumm.length)
+					return;
+
+				// First, fix the current cummary
+				self.fileList.fileSummary.calculate(self.fileList.files);
+				self.fileList.fileSummary.summary.totalFiles -= cBookmarks;
+				self.fileList.fileSummary.update();
+
+				// Then, add a summary for bookmarks
+				elemsumm.find('span.bminfo').text(
+						cBookmarks + ' bookmark'
+								+ ((cBookmarks > 1) ? 's' : ''));
+
+				if (cBookmarks == 0) {
+					elemsumm.find('span.bminfo').addClass('hidden');
+					elemsumm.find('span.bmconnector').addClass('hidden');
+				} else {
+
+					elemsumm.find('span.bminfo').removeClass('hidden');
+					elemsumm.find('span.bmconnector').removeClass('hidden');
+
+					if (files.length == cBookmarks) {
+						$('tr.summary').removeClass('hidden');
+						elemsumm.find('span.dirinfo').addClass('hidden');
+						elemsumm.find('span.connector').addClass('hidden');
+						elemsumm.find('span.fileinfo').addClass('hidden');
+						elemsumm.find('span.bmconnector').addClass('hidden');
+
+					} else if (elemsumm.find('span.fileinfo.hidden').length
+							|| elemsumm.find('span.dirinfo.hidden').length) {
+					} else
+						elemsumm.find('span.connector').text(', ');
+				}
+			};
+
+			//
+			// fix empty result div
+			//
+			this.__morphEmptyContent = function(files) {
+				if (files.length > 0)
+					setTimeout(function() {
+						$('#searchresults').find('div.emptycontent').addClass(
+								'hidden')
+					}, 200);
+			};
+
+			// register
+			OC.Plugins.register('OCA.Search', this);
+		},
+
+		attach : function(search) {
+			var self = this;
+
+			// receiving search request in Files App
+			search.setFilter('files', function(query) {
+
+				// init Search/FileList if needed
+				if (self.fileList == null)
+					self.initFileList();
+
+				if (self.currFiles == null)
+					self.currFiles = self.fileList.files;
+
+				self.currQuery = query;
+
+				// sending the ajax request
+				var data = {
+					query : query,
+					current_dir : self.get('dir')
+				}
+
+				self.searchRequest(data);
+				self.suggestRequest(data);
+			});
+
+			if (self.fileAppLoaded())
+				self.nextant_sharelink = false;
+
+			self.initShareLink();
+
+			//
+			// Add few elem Summary
+			var elemsumm = $('tr.summary').find('span.info');
+			elemsumm.find('span.fileinfo').after(function() {
+				return $('<span></span>').attr('class', 'bminfo hidden');
+			});
+			elemsumm.find('span.fileinfo').after(
+					function() {
+						return $('<span></span>').attr('class',
+								'bmconnector hidden').text(
+								elemsumm.find('span.connector').text())
+					});
+
+			//
+			// Stop Mutation on click
+			$('#app-navigation').find('a').on('click', function(e) {
+				self.currQuery = '';
+				self.fileList.setSort('name', 'asc', false, false);
+			});
+
+			//
+			// Mutations
+			MutationObserver = window.MutationObserver
+					|| window.WebKitMutationObserver;
+
+			var observerFileList = new MutationObserver(function(mutations,
+					observer) {
+				self.mutationFileList(mutations, observer);
+			});
+
+			observerFileList.observe($('#fileList')[0], {
+				childList : true,
+				attributes : true
+			});
+
+			// animate suggest popup
+			$('#searchbox').focusout(function() {
+				self.searchboxFocus = false;
+				self.suggestDisplay();
+			});
+
+			$('#searchbox').focusin(function() {
+				self.searchboxFocus = true;
+				self.suggestDisplay();
+			});
+
+			$(window).resize(function() {
+				self.suggestDisplay();
+			});
+
+		}
+	};
+	OCA.Search.Nextant = Nextant;
+	OCA.Search.nextant = new Nextant();
+
+	// Sort per score (also index if score is identical)
+	OCA.Files.FileList.Comparators.score = function(f1, f2) {
+		result = OCA.Search.nextant.searchResult;
+
+		var s1 = 0;
+		var s2 = 0;
+		var i1 = 99;
+		var i2 = 99;
+		for (var i = 0; i < result.length; i++) {
+			if (result[i] == null)
+				continue;
+			if (result[i].data.id == f1.id)
+				i1 = i;
+			if (result[i].data.id == f2.id)
+				i2 = i;
+			if (result[i].data.id == f1.id)
+				s1 = result[i].data.score;
+			if (result[i].data.id == f2.id)
+				s2 = result[i].data.score;
+		}
+
+		if (s1 < s2)
+			return -1;
+		else if (s1 > s2)
+			return 1;
+		else {
+			if (i1 > i2)
+				return -1;
+			else
+				return 1;
+		}
+	};
+
+})();

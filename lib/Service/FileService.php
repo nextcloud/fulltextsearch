@@ -28,6 +28,7 @@ namespace OCA\Nextant\Service;
 
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\SolrToolsService;
+use \OCA\Nextant\Items\ItemError;
 use \OCA\Nextant\Items\ItemDocument;
 use OC\Files\Filesystem;
 use OC\Files\View;
@@ -64,8 +65,6 @@ class FileService
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->miscService = $miscService;
-        
-        // $this->view = Filesystem::getView();
     }
 
     public function setDebug($debug)
@@ -129,16 +128,19 @@ class FileService
         return substr($mimetype, 0, strpos($mimetype, '/'));
     }
 
-    public function initUser($userId)
+    public function initUser($userId, $complete = false)
     {
         $this->userId = $userId;
         Filesystem::init($this->userId, '');
+        $this->view = Filesystem::getView();
         
-        $this->initUserExternalMountPoints();
+        if ($complete)
+            $this->initUserExternalMountPoints();
     }
 
     public function endUser()
     {
+        $this->view = null;
         $this->userId = '';
         // $this->externalMountPoint = array();
     }
@@ -172,15 +174,17 @@ class FileService
     {
         $item->synced(true);
         
-        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') !== '1') {
-            $item->invalid(true);
-            return false;
-        }
+        // $this->miscService->log('-- local: ' . (($item->getStorage()
+        // ->isLocal()) ? 'y' : 'n') . ' -- external: ' . (($item->isExternal()) ? 'y' : 'n') . ' -- encrypted:' . (($item->isEncrypted()) ? 'y' : 'n') . ' -- test: ' . (($item->isTest()) ? 'y' : 'n') . ' -- ' . $item->getPath());
         
-        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') !== '1') {
-            $item->invalid(true);
+        if ($item->isFederated() && $this->configService->getAppValue('index_files_federated') !== '1')
             return false;
-        }
+        
+        if ($item->isExternal() && $this->configService->getAppValue('index_files_external') !== '1')
+            return false;
+        
+        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') !== '1')
+            return false;
         
         $size = round($item->getSize() / 1024 / 1024, 1);
         if ($size > $this->configService->getAppValue('index_files_max_size')) {
@@ -192,10 +196,12 @@ class FileService
         if (! $this->solrService->extractableFile($item->getMimeType(), $item->getPath())) {
             $item->extractable(false);
             
-            if ($this->configService->getAppValue('index_files_tree') !== '1')
-                $item->invalid(true);
-        } else
+            if ($this->configService->getAppValue('index_files_tree') === '1')
+                $item->valid(true);
+        } else {
+            $item->valid(true);
             $item->extractable(true);
+        }
         
         $this->setShareRights($item);
         
@@ -212,15 +218,45 @@ class FileService
      *
      * @param ItemDocument $item            
      */
-    public function generateTempDocument(&$item)
+    public function generateAbsolutePath(&$item, &$ierror = '')
     {
+        if ($item->getStorage()->isLocal()) {
+            $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
+            return true;
+        }
+        
+        // not local, not external nor encrypted, we generate temp file
+        if (! $item->isExternal() && ! $item->isEncrypted()) {
+            $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            return true;
+        }
+        
         // We generate a local tmp file from the remote one
-        if ($item->isRemote() && $this->configService->getAppValue('index_files_external') === '1')
-            $item->setAbsolutePath(Filesystem::getView()->toTmpFile($item->getPath()), true);
+        if ($item->isExternal() && $this->configService->getAppValue('index_files_external') === '1') {
+            $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            return true;
+        }
+        
+        // We generate a local tmp file from the federated
+        if ($item->isFederated() && $this->configService->getAppValue('index_files_federated') === '1') {
+            $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            return true;
+        }
+        
+        // encrypted file = local tmp file
+        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') === '1') {
+            try {
+                $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            } catch (\OC\Encryption\Exceptions\DecryptionFailedException $dfe) {
+                $ierror = new ItemError(ItemError::EXCEPTION_DECRYPTION_FAILED, $dfe->getHint());
+                return false;
+            } catch (\OCA\Encryption\Exceptions\PrivateKeyMissingException $pkme) {
+                $ierror = new ItemError(ItemError::EXCEPTION_DECRYPT_PRIVATEKEY_MISSING, $pkme->getHint());
+                return false;
+            }
             
-            // We generate a local tmp file from the remote one
-        if ($item->isEncrypted() && $this->configService->getAppValue('index_files_encrypted') === '1')
-            $item->setAbsolutePath(Filesystem::getView()->toTmpFile($item->getPath()), true);
+            return true;
+        }
     }
 
     /**
@@ -230,7 +266,7 @@ class FileService
      */
     public function destroyTempDocument(&$item)
     {
-        if ($item->isTemp())
+        if ($item->getAbsolutePath() != null && $item->isTemp())
             unlink($item->getAbsolutePath());
     }
 
@@ -253,13 +289,17 @@ class FileService
         $item->setSize($file->getSize());
         $item->setStorage($file->getStorage());
         
-        if ($file->getStorage()->isLocal())
-            $item->setAbsolutePath(Filesystem::getView()->getLocalFile($item->getPath()));
-        else
-            $item->remote(true);
-        
         if ($file->isEncrypted())
             $item->encrypted(true);
+        
+        if ($file->isMounted())
+            $item->external(true);
+        else {
+            
+            // not clean - but only way I found to check if not mounted IS federated ?
+            if (method_exists($file->getMountPoint(), 'moveMount') && method_exists($file->getMountPoint(), 'removeMount'))
+                $item->federated(true);
+        }
         
         return $item;
     }
@@ -290,7 +330,7 @@ class FileService
         $files = $folder->search('');
         
         foreach ($files as $file) {
-            if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER)
+            if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER && $this->configService->getAppValue('index_files_tree') !== '1')
                 continue;
             
             if ($file->isShared() && $file->getStorage()->isLocal() && ! in_array('forceshared', $options))
@@ -444,7 +484,7 @@ class FileService
 
     private static function getShareRightsFromExternalMountPoint($mountPoints, $path, &$data, &$entry)
     {
-        if (! $entry->isRemote())
+        if (! $entry->isExternal())
             return false;
         
         if (! key_exists('share_users', $data))
@@ -517,27 +557,26 @@ class FileService
      * @param boolean $trashbin            
      * @return array[]
      */
-    public function getSearchResult(&$data, $base = '', $trashbin = true)
+    public function getSearchResult(&$item, $base = '', $trashbin = true)
     {
-        Filesystem::init($data['userid'], '');
-        $view = Filesystem::getView();
+        if ($this->view === null || $this->userId === '')
+            return false;
         
         $path = '';
-        $deleted = false;
         $fileData = null;
         try {
-            $path = $view->getPath($data['id']);
-            $fileData = $view->getFileInfo($path);
+            $path = $this->view->getPath($item->getId());
+            $fileData = $this->view->getFileInfo($path);
         } catch (NotFoundException $e) {
             $fileData = null;
         }
         
         if ($fileData == null && $trashbin) {
             try {
-                $trashview = new View('/' . $data['userid'] . '/files_trashbin/files');
-                $path = $trashview->getPath($data['id']);
+                $trashview = new View('/' . $this->userId . '/files_trashbin/files');
+                $path = $trashview->getPath($item->getId());
                 $fileData = $trashview->getFileInfo($path);
-                $deleted = true;
+                $item->deleted(true);
             } catch (NotFoundException $e) {
                 return false;
             }
@@ -559,20 +598,17 @@ class FileService
             $dirpath = substr($dirpath, strpos($dirpath, $base) + strlen($base)) . '/';
         }
         
-        $data = array_merge($data, array(
-            'size' => $fileData->getSize(),
-            'title' => $path,
-            'icon' => $this->solrService->extractableFile($fileData->getMimeType(), $path),
-            'filename' => ((key_exists('extension', $pathParts)) ? ($pathParts['filename'] . '.' . $pathParts['extension']) : $pathParts['filename']),
-            'dirpath' => $dirpath,
-            'mimetype' => $fileData->getMimeType(),
-            'deleted' => $deleted,
-            'etag' => $fileData->getETag(),
-            'link_main' => ((! $deleted) ? str_replace('//', '/', parse_url(\OCP\Util::linkToRemote('webdav') . $path, PHP_URL_PATH)) : '?view=trashbin&dir=' . $basepath . '&scrollto=' . $pathParts['filename']),
-            'link_sub' => '',
-            'valid' => true,
-            'mtime' => $fileData->getMTime()
-        ));
+        // fileinfo entry
+        $entry = \OCA\Files\Helper::formatFileInfo($fileData);
+        $entry['name'] = ((substr($path, 0, 1) === '/') ? substr($path, 1) : $path);
+        if ($item->isPublic())
+            $entry['permissions'] = \OCP\Constants::PERMISSION_READ;
+        
+        $item->setEntry($entry);
+        
+        $item->setPath($path);
+        
+        $item->valid(true);
         
         return true;
     }

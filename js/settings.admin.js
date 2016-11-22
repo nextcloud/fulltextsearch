@@ -64,7 +64,11 @@ $(document)
 										'#solr_index_files_max_size').val(),
 								index_files_tree : ($('#solr_index_files_tree')
 										.is(':checked')) ? 1 : 0,
+								index_files_nextant_only : ($('#solr_index_files_nextant_only')
+										.is(':checked')) ? 1 : 0,
 								index_files_sharelink : ($('#solr_index_files_sharelink')
+										.is(':checked')) ? 1 : 0,
+								index_files_federated : ($('#solr_index_files_federated')
 										.is(':checked')) ? 1 : 0,
 								index_files_external : ($('#solr_index_files_external')
 										.is(':checked')) ? 1 : 0,
@@ -80,8 +84,16 @@ $(document)
 								data.index_files_tree = (data.index_files_tree == 1) ? 0
 										: 1;
 
+							if (switched == 'index_files_nextant_only')
+								data.index_files_nextant_only = (data.index_files_nextant_only == 1) ? 0
+										: 1;
+
 							if (switched == 'index_files_sharelink')
 								data.index_files_sharelink = (data.index_files_sharelink == 1) ? 0
+										: 1;
+
+							if (switched == 'index_files_federated')
+								data.index_files_federated = (data.index_files_federated == 1) ? 0
 										: 1;
 
 							if (switched == 'index_files_external')
@@ -166,16 +178,8 @@ $(document)
 								index_live : ($('#solr_index_live')
 										.is(':checked')) ? 1 : 0,
 								index_delay : $('#solr_index_delay').val(),
-								display_result : $('#solr_display_result')
-										.val(),
-								replace_core_search : ($('#solr_replace_core_search')
-										.is(':checked')) ? 1 : 0,
 								force_index : force_index
 							}
-
-							if (switched == 'replace_core_search')
-								data.replace_core_search = (data.replace_core_search == 1) ? 0
-										: 1;
 
 							if (switched == 'index_live')
 								data.index_live = (data.index_live == 1) ? 0
@@ -198,6 +202,10 @@ $(document)
 							var delay = 600;
 							if (response.instant == 'true')
 								delay = 0;
+
+							if ($('#nextant_version').text() != ''
+									&& response.configured == '0')
+								return;
 
 							if (response.source != '')
 								nextantSettings.saving(response.source, false);
@@ -231,8 +239,12 @@ $(document)
 									(response.index_files == 1));
 							$('#solr_index_files_tree').prop('checked',
 									(response.index_files_tree == 1));
+							$('#solr_index_files_nextant_only').prop('checked',
+									(response.index_files_nextant_only == 1));
 							$('#solr_index_files_sharelink').prop('checked',
 									(response.index_files_sharelink == 1));
+							$('#solr_index_files_federated').prop('checked',
+									(response.index_files_federated == 1));
 							$('#solr_index_files_external').prop('checked',
 									(response.index_files_external == 1));
 							$('#solr_index_files_encrypted').prop('checked',
@@ -287,23 +299,16 @@ $(document)
 									response.index_live_queuekey);
 							$('#solr_index_delay').val(response.index_delay);
 
-							$(
-									'#solr_display_result option[value="'
-											+ response.display_result + '"]')
-									.prop('selected', true);
-
-							$('#solr_replace_core_search').prop('checked',
-									(response.replace_core_search == 1));
 							if (response.index_files_tree == 1) {
-								$('#solr_replace_core_search :input').attr(
+								$('#solr_index_files_nextant_only').attr(
 										"disabled", false);
-								$('#solr_replace_core_search_td').fadeTo(delay,
-										1);
+								$('#solr_index_files_nextant_only_span')
+										.fadeTo(delay, 1);
 							} else {
-								$('#solr_replace_core_search :input').attr(
+								$('#solr_index_files_nextant_only').attr(
 										"disabled", true);
-								$('#solr_replace_core_search_td').fadeTo(delay,
-										0.5);
+								$('#solr_index_files_nextant_only_span')
+										.fadeTo(delay, 0.4);
 							}
 
 							if (response.index_files_last > 0)
@@ -592,11 +597,25 @@ $(document)
 												.savesuboptions_files('index_files_tree');
 									});
 
+					$('#solr_index_files_nextant_only')
+							.mousedown(
+									function() {
+										nextantSettings
+												.savesuboptions_files('index_files_nextant_only');
+									});
+
 					$('#solr_index_files_sharelink')
 							.mousedown(
 									function() {
 										nextantSettings
 												.savesuboptions_files('index_files_sharelink');
+									});
+
+					$('#solr_index_files_federated')
+							.mousedown(
+									function() {
+										nextantSettings
+												.savesuboptions_files('index_files_federated');
 									});
 
 					$('#solr_index_files_external')
@@ -605,6 +624,7 @@ $(document)
 										nextantSettings
 												.savesuboptions_files('index_files_external');
 									});
+
 					$('#solr_index_files_encrypted')
 							.mousedown(
 									function() {
@@ -669,15 +689,7 @@ $(document)
 					$('#solr_index_delay').on('input', function(e) {
 						nextantSettings.savesuboptions_status();
 					});
-					$('#solr_display_result').on('change', function() {
-						nextantSettings.savesuboptions_status();
-					});
-					$('#solr_replace_core_search')
-							.mousedown(
-									function() {
-										nextantSettings
-												.savesuboptions_files('replace_core_search');
-									});
+
 					$('#solr_index_bookmarks_cont')
 							.mousedown(
 									function() {

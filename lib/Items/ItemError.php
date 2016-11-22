@@ -29,6 +29,14 @@ namespace OCA\Nextant\Items;
 class ItemError
 {
 
+    const EXCEPTION_DECRYPTION_FAILED = 1046;
+
+    const EXCEPTION_DECRYPT_PRIVATEKEY_MISSING = 1050;
+
+    const EXCEPTION_INDEXDOCUMENT_WITHOUT_ABSOLUTEPATH = 2234;
+
+    const ERROR_MANAGING_FAILURE = 1129;
+
     private $errorcode;
 
     private $message;

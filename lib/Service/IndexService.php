@@ -173,6 +173,7 @@ class IndexService
     public function extract($type, $userId, &$data, &$solrDocs, $extract = true, &$ierror = '')
     {
         $this->solrService->setOwner($userId);
+        $ierror = new ItemError();
         
         if ($solrDocs === null)
             $solrDocs = $this->getDocuments($type, $userId, 0, $ierror);
@@ -226,6 +227,7 @@ class IndexService
                 $this->bookmarkService->syncDocument($entry);
             if ($entry->getType() == ItemDocument::TYPE_TEST) {
                 $entry->synced(true);
+                $entry->valid(true);
                 $entry->extractable(true);
             }
             
@@ -242,6 +244,9 @@ class IndexService
             if (! $extract)
                 continue;
             
+            if (! $entry->isValid())
+                continue;
+            
             if (! $this->force && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
                 continue;
             
@@ -255,11 +260,16 @@ class IndexService
             }
             
             $atick = $this->generateAverageTick();
-            if ($atick > - 1)
+            if ($progress != null && $atick > - 1)
                 $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . ($this->lastCommitQueryTime) . 'ms' : ''), 'more');
             
-            if ($entry->getType() == ItemDocument::TYPE_FILE)
-                $this->fileService->generateTempDocument($entry);
+            if ($entry->getType() == ItemDocument::TYPE_FILE) {
+                if (! $this->fileService->generateAbsolutePath($entry, $ierror)) {
+                    $this->manageFailure($ierror, $progress, 'Failed to find a descent path');
+                    if ($this->configService->getAppValue('index_files_tree') !== '1')
+                        continue;
+                }
+            }
             
             $this->solrService->indexDocument($entry, $ierror);
             
@@ -274,9 +284,11 @@ class IndexService
                 if ($this->output != null && $this->debug == 2)
                     $this->output->writeln('- Commiting!');
                 
-                $progress->setMessage('@', 'job');
-                $progress->setMessage('[commiting]', 'infos');
-                $progress->display();
+                if ($progress != null) {
+                    $progress->setMessage('@', 'job');
+                    $progress->setMessage('[commiting]', 'infos');
+                    $progress->display();
+                }
                 
                 $commit = $this->solrTools->commit(false, $ierror);
                 if (! $commit)
@@ -287,14 +299,16 @@ class IndexService
                 $this->lastCommitTick = time();
             }
             
+            // moving to FileService (cf. syncDocument)
             // fail at extract, let's try just index
             if ($entry->isFailedExtract()) {
+                if ($this->configService->getAppValue('index_files_tree') === '1')
+                    $entry->valid(true);
                 
-                if ($this->configService->getAppValue('index_files_tree') !== '1')
-                    $entry->invalid(true);
-                
-                if (! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')'))
+                if (! $this->manageFailure($ierror, $progress, 'Failed to extract document #' . $entry->getId() . ' (' . $entry->getPath() . ')')) {
+                    $ierror = new ItemError(ItemError::ERROR_MANAGING_FAILURE, 'server down ?');
                     return false;
+                }
                 
                 if ($this->configService->getAppValue('index_files_tree') === '1') {
                     $entry->extractable(false);
@@ -306,8 +320,8 @@ class IndexService
                 }
             }
             
-            if ($entry->isFailedIndex())
-                $entry->invalid(true);
+            if (! $entry->isFailedIndex())
+                $entry->valid(true);
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
                 $this->fileService->destroyTempDocument($entry);
@@ -409,12 +423,12 @@ class IndexService
             if ($entry->neededUpdate()) {
                 
                 $atick = $this->generateAverageTick();
-                if ($atick > - 1)
+                if ($progress != null && $atick > - 1)
                     $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . $this->lastCommitQueryTime . 'ms' : ''), 'more');
                 
                 $this->solrTools->updateDocument($entry, $current, true, $ierror);
                 
-                if ((time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
+                if ($progress != null && (time() - self::REFRESH_COMMIT) > $this->lastCommitTick) {
                     $progress->setMessage('@', 'job');
                     $progress->setMessage('[commiting]', 'infos');
                     $progress->display();
@@ -500,19 +514,19 @@ class IndexService
             $progress = new ProgressBar($this->output, sizeof($data));
         
         if ($progress != null) {
-            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('/', 'job');
             $progress->setMessage('', 'duration');
             $progress->setMessage('', 'more');
             $progress->setMessage('', 'jvm');
             $progress->setMessage('[spoting orphans]', 'infos');
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
             $progress->start();
         }
         
         $docIds = array();
         foreach ($data as $entry) {
-            if (! $entry->isInvalid())
+            if ($entry->isValid())
                 array_push($docIds, (int) $entry->getId());
         }
         
@@ -562,11 +576,13 @@ class IndexService
             }
             
             if ($progress != null) {
-                $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
                 $progress->setMessage('<info>' . $userId . '</info>/' . $type);
                 $progress->setMessage('-', 'job');
                 $progress->setMessage('', 'jvm');
+                $progress->setMessage('', 'duration');
+                $progress->setMessage('', 'more');
                 $progress->setMessage('[deleting orphans]', 'infos');
+                $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
                 $progress->start();
             }
             

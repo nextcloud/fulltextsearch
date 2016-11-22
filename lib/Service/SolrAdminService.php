@@ -212,6 +212,28 @@ class SolrAdminService
                 'multiValued' => false
             )
         ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'string',
+                'class' => 'solr.StrField',
+                'sortMissingLast' => false,
+                'docValues' => false
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'int',
+                'class' => 'solr.TrieIntField',
+                'positionIncrementGap' => '0',
+                'docValues' => false,
+                'precisionStep' => '0'
+            )
+        ));
+        
         array_push($fields, array(
             'type' => 'field-type',
             'data' => array(
@@ -265,7 +287,7 @@ class SolrAdminService
         while (true) {
             foreach ($fields as $field) {
                 $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\' : ', false);
-                if (self::checkFieldProperty($this->miscService, $client, $field, $curr, $ierror))
+                if (self::checkFieldProperty($client, $field, $curr, $ierror))
                     $this->solrService->message('<info>ok</info>');
                 else {
                     if ($ierror->getCode() == 0)
@@ -275,14 +297,26 @@ class SolrAdminService
                     
                     if ($fix) {
                         $changed = true;
-                        $this->solrService->message('   -> Fixing ' . $field['type'] . ' \'' . $field['data']['name'] . '\'');
+                        $this->solrService->message('   -> <comment>Fixing ' . $field['type'] . ' \'' . $field['data']['name'] . '\'</comment> ', false);
                         
                         if ($curr) {
                             if (! self::modifyField($client, $field, $ierror))
-                                return false;
+                                $this->solrService->message('<error>fail</error>');
+                            else 
+                                if (! self::checkFieldProperty($client, $field, $curr, $ierror)) {
+                                    $this->solrService->message('<error>fail</error> ' . $ierror->getCore() . ' - ' . $ierror->getMessage());
+                                    $failed = true;
+                                } else
+                                    $this->solrService->message('<info>ok</info>');
                         } else {
                             if (! self::createField($client, $field, $ierror))
-                                return false;
+                                $this->solrService->message('<error>fail</error>');
+                            else 
+                                if (! self::checkFieldProperty($client, $field, $curr, $ierror)) {
+                                    $this->solrService->message('<error>fail</error> ' . $ierror->getCore() . ' - ' . $ierror->getMessage());
+                                    $failed = true;
+                                } else
+                                    $this->solrService->message('<info>ok</info>');
                         }
                     } else
                         $failed = true;
@@ -297,8 +331,7 @@ class SolrAdminService
         
         if ($changed)
             $this->configService->setAppValue('index_files_needed', '1');
-            
-            // $this->configService->setAppValue('configured', '1');
+        
         return true;
     }
 
@@ -343,16 +376,16 @@ class SolrAdminService
      * @param array $property            
      * @return boolean
      */
-    private static function checkFieldProperty($misc, \Solarium\Client $client, $field, &$property, &$ierror)
+    private static function checkFieldProperty(\Solarium\Client $client, $field, &$property, &$ierror)
     {
         $property = self::getFieldProperty($client, $field['type'], $field['data']['name'], $ierror);
         if (! $property)
             return false;
         
-        return self::checkFieldPropertyRecursive($misc, $field['data'], $property);
+        return self::checkFieldPropertyRecursive($field['data'], $property);
     }
 
-    private static function checkFieldPropertyRecursive($misc, $value, $property)
+    private static function checkFieldPropertyRecursive($value, $property)
     {
         if (is_array($value)) {
             
@@ -367,7 +400,7 @@ class SolrAdminService
                 if (! key_exists($k, $property))
                     return false;
                 
-                if (! self::checkFieldPropertyRecursive($misc, $value[$k], $property[$k]))
+                if (! self::checkFieldPropertyRecursive($value[$k], $property[$k]))
                     return false;
             }
         } else 

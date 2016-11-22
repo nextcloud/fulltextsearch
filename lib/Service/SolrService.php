@@ -28,6 +28,7 @@ namespace OCA\Nextant\Service;
 use \OCA\Nextant\Items\ItemError;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\ConfigService;
+use \OCA\Nextant\Items\ItemDocument;
 
 class SolrService
 {
@@ -191,7 +192,7 @@ class SolrService
             case 'text':
                 if ($filters['text'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
         }
         
         switch ($mimetype) {
@@ -199,42 +200,42 @@ class SolrService
             case 'application/epub+zip':
                 if ($filters['pdf'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             
             case 'application/pdf':
                 if ($filters['pdf'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/application-pdf.svg');
+                return true;
             
             case 'application/rtf':
                 if ($filters['pdf'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             
             case 'application/msword':
                 if ($filters['office'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             
             case 'image/jpeg':
                 if ($filters['image'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+                return true;
             
             case 'image/tiff':
                 if ($filters['image'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/image.svg');
+                return true;
             
             case 'audio/mpeg':
                 if ($filters['audio'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
+                return true;
             
             case 'audio/flac':
                 if ($filters['audio'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
+                return true;
             
             case 'application/octet-stream':
                 if ($path === '')
@@ -251,7 +252,7 @@ class SolrService
                 }
                 
                 if (key_exists('extension', $pinfo))
-                    return self::extractableFileExtension($pinfo['extension']);
+                    return true;
                 
                 return false;
         }
@@ -271,7 +272,7 @@ class SolrService
             if (substr($mimetype, 0, strlen($mt)) == $mt) {
                 if ($filters['office'] !== '1')
                     return false;
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             }
         }
         
@@ -287,10 +288,10 @@ class SolrService
     {
         switch ($extension) {
             case 'srt':
-                return \OCP\Util::imagePath('core', 'filetypes/text.svg');
+                return true;
             
             case 'mid':
-                return \OCP\Util::imagePath('core', 'filetypes/audio.svg');
+                return true;
         }
         
         return false;
@@ -309,8 +310,15 @@ class SolrService
         if (! $this->configured())
             return false;
         
-        if ($document->getAbsolutePath() == null)
-            return false;
+        if ($document->getAbsolutePath() == null) {
+            if ($entry->isExtractable())
+                $entry->failedExtract(true);
+            $document->extractable(false);
+            if ($this->configService->getAppValue('index_files_tree') !== '1') {
+                $ierror = new ItemError(ItemError::EXCEPTION_INDEXDOCUMENT_WITHOUT_ABSOLUTEPATH);
+                return false;
+            }
+        }
         
         if ($document->getType() == null || $document->getType() == '') {
             $ierror = new ItemError(self::ERROR_TYPE_NOT_SET);
@@ -484,7 +492,7 @@ class SolrService
                     $qstr = substr($qstr, 1);
                 }
                 
-                $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^30 ' . "\n";
+                $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^15 ' . "\n";
                 
                 if (substr($qstr, 0, 1) == '"')
                     $value = 150;
@@ -505,29 +513,26 @@ class SolrService
                 'nextant_deleted',
                 'nextant_path',
                 'nextant_source',
-                'nextant_owner'
+                'nextant_owner',
+                'nextant_mtime',
+                'nextant_attr_content_type',
+                'score'
             ));
             
             // if (key_exists('current_directory', $options))
             // $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
             
             $hl = $query->getHighlighting();
-            $hl->setFields(array(
-                'text'
-            ));
-            // 'nextant_path'
-            
-            if ($this->configService->getAppValue('display_result') == ConfigService::SEARCH_DISPLAY_NEXTANT) {
-                $hl->setSimplePrefix('<span class="nextant_hl">');
-                $hl->setSimplePostfix('</span>');
-            } else {
-                $hl->setSimplePrefix('');
-                $hl->setSimplePostfix('');
-            }
+            $hl->setSimplePrefix('<span class="nextant_hl">');
+            $hl->setSimplePostfix('</span>');
             $hl->setSnippets(5);
             // $hl->setAlternateField('nextant_path');
             $hl->setFragSize(70);
             $hl->setMaxAnalyzedChars(50000000);
+            $hl->setFields(array(
+                'text'
+            ));
+            // 'nextant_path'
             
             $resultset = $client->select($query);
             $highlighting = $resultset->getHighlighting();
@@ -535,22 +540,14 @@ class SolrService
             $return = array();
             foreach ($resultset as $document) {
                 
-                // highlight
-                $hlDoc = $highlighting->getResult($document->id);
-                list ($type, $docid) = explode('_', $document->id, 2);
+                $item = ItemDocument::fromSolr($document);
+                $item->shared(($document->nextant_owner != $this->owner));
                 
-                array_push($return, array(
-                    'id' => $docid,
-                    'type' => $type,
-                    'path' => $document->nextant_path,
-                    'source' => $document->nextant_source,
-                    'shared' => ($document->nextant_owner != $this->owner),
-                    'deleted' => $document->nextant_deleted,
-                    'owner' => $document->nextant_owner,
-                    'highlight_text' => $hlDoc->getField('text'),
-                    'highlight_path' => $hlDoc->getField('nextant_path'),
-                    'score' => $document->score
-                ));
+                // highlighting
+                $hlDoc = $highlighting->getResult($document->id);
+                $item->setHighlighting($hlDoc->getField('text'));
+                
+                $return[] = $item;
             }
             
             return $return;

@@ -121,7 +121,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         foreach ($users as $user) {
             
-            $this->fileService->initUser($user->getUID());
+            $this->fileService->initUser($user->getUID(), true);
             $files = $this->fileService->getFilesPerUserId('/files', array());
             $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
@@ -144,7 +144,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $users = $this->userManager->search('');
         foreach ($users as $user) {
             
-            $this->fileService->initUser($user->getUID());
+            $this->fileService->initUser($user->getUID(), true);
             $files = $this->fileService->getFilesPerUserId('/files', array());
             $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
