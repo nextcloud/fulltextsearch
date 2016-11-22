@@ -121,7 +121,7 @@ class Index extends Base
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (beta)</comment>');
+        $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (rc1)</comment>');
         // $output->writeln('<comment>discussion forum:</comment> https://help.nextcloud.com/c/apps/nextant');
         // $output->writeln('');
         

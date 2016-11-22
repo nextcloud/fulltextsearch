@@ -93,7 +93,7 @@ class SettingsController extends Controller
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core'),
             'solr_timeout' => $this->configService->getAppValue('solr_timeout'),
-            'nextant_version' => $this->configService->getAppValue('installed_version') . ' (beta)',
+            'nextant_version' => $this->configService->getAppValue('installed_version') . ' (rc1)',
             'index_files' => $this->configService->getAppValue('index_files'),
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
