@@ -85,7 +85,7 @@ class SettingsController extends Controller
     }
 
     public function updateSubOptions($instant, $source = '')
-    {
+    {        
         $response = array(
             'instant' => $instant,
             'configured' => $this->configService->getAppValue('configured'),
@@ -110,7 +110,7 @@ class SettingsController extends Controller
             'index_files_filters_audio' => $this->configService->getAppValue('index_files_filters_audio'),
             'index_files_filters_extensions' => self::FileFiltersExtensionsAsList($this->configService->getAppValue('index_files_filters_extensions')),
             'current_docs' => $this->solrTools->count('files'),
-            'current_segments' => $this->solrTools->getInfoCore()->index->segmentCount,
+            'current_segments' => (($this->solrTools->getInfoCore()) ? $this->solrTools->getInfoCore()->index->segmentCount : ''),
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
             'index_bookmarks' => $this->configService->getAppValue('index_bookmarks'),
             'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
