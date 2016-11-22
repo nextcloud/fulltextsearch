@@ -203,6 +203,10 @@ $(document)
 							if (response.instant == 'true')
 								delay = 0;
 
+							if ($('#nextant_version').text() != ''
+									&& response.configured == '0')
+								return;
+
 							if (response.source != '')
 								nextantSettings.saving(response.source, false);
 
@@ -613,14 +617,14 @@ $(document)
 										nextantSettings
 												.savesuboptions_files('index_files_federated');
 									});
-							
+
 					$('#solr_index_files_external')
 							.mousedown(
 									function() {
 										nextantSettings
 												.savesuboptions_files('index_files_external');
 									});
-					
+
 					$('#solr_index_files_encrypted')
 							.mousedown(
 									function() {
