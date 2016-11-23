@@ -81,7 +81,7 @@ class ItemDocument
 
     private $federated = false;
 
-    private $shared = false;
+    private $sharedpublic = false;
 
     private $encrypted = false;
 
