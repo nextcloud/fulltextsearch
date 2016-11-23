@@ -182,8 +182,10 @@ class IndexService
                 $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $ierror);
         
         $progress = null;
-        if ($this->output !== null)
+        if ($this->output !== null) {
             $progress = new ProgressBar($this->output, sizeof($data));
+            $progress->clear();
+        }
         
         if ($progress != null) {
             $progress->setMessage('<info>' . $userId . '</info>');
@@ -368,8 +370,10 @@ class IndexService
                 $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $ierror);
         
         $progress = null;
-        if ($this->output !== null)
+        if ($this->output !== null) {
             $progress = new ProgressBar($this->output, sizeof($data));
+            $progress->clear();
+        }
         
         if ($progress !== null) {
             $progress->setMessage('<info>' . $userId . '</info>');
@@ -510,10 +514,12 @@ class IndexService
             return false;
         
         $progress = null;
-        if ($this->output != null)
+        if ($this->output != null) {
             $progress = new ProgressBar($this->output, sizeof($data));
+            $progress->clear();
+        }
         
-        if ($progress != null) {
+        if ($progress !== null) {
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('/', 'job');
             $progress->setMessage('', 'duration');
@@ -573,6 +579,7 @@ class IndexService
             $progress = null;
             if ($this->output != null) {
                 $progress = new ProgressBar($this->output, sizeof($deleting));
+                $progress->clear();
             }
             
             if ($progress != null) {
@@ -652,6 +659,7 @@ class IndexService
                     $progress = new ProgressBar($this->output, 1);
                 else
                     $progress = new ProgressBar($this->output, $this->solrTools->count($type, $userId));
+                $progress->clear();
             }
             
             if ($progress != null) {
