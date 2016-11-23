@@ -499,14 +499,14 @@ class ItemDocument
         return $this->temp;
     }
 
-    public function public($pub)
+    public function sharedPublic($pub)
     {
-        $this->public = $pub;
+        $this->sharedpublic = $pub;
     }
 
-    public function isPublic()
+    public function isSharedPublic()
     {
-        return $this->public;
+        return $this->sharedpublic;
     }
 
     public function valid($valid)

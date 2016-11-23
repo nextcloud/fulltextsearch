@@ -601,7 +601,7 @@ class FileService
         // fileinfo entry
         $entry = \OCA\Files\Helper::formatFileInfo($fileData);
         $entry['name'] = ((substr($path, 0, 1) === '/') ? substr($path, 1) : $path);
-        if ($item->isPublic())
+        if ($item->isSharedPublic())
             $entry['permissions'] = \OCP\Constants::PERMISSION_READ;
         
         $item->setEntry($entry);
