@@ -31,7 +31,11 @@ class ItemError
 
     const EXCEPTION_DECRYPTION_FAILED = 1046;
 
+    const LINK_EXCEPTION_DECRYPTION_FAILED = 'https://help.nextcloud.com/t/nextant-regarding-encrypted-files/5422';
+
     const EXCEPTION_DECRYPT_PRIVATEKEY_MISSING = 1050;
+
+    const LINK_EXCEPTION_DECRYPT_PRIVATEKEY_MISSING = 'https://help.nextcloud.com/t/nextant-regarding-encrypted-files/5422';
 
     const EXCEPTION_INDEXDOCUMENT_WITHOUT_ABSOLUTEPATH = 2234;
 
@@ -40,6 +44,8 @@ class ItemError
     private $errorcode;
 
     private $message;
+
+    private $link = '';
 
     public function __construct($code = 0, $msg = '')
     {
@@ -55,5 +61,15 @@ class ItemError
     public function getMessage()
     {
         return $this->message;
+    }
+
+    public function link($link)
+    {
+        $this->link = $link;
+    }
+
+    public function getLink()
+    {
+        return $this->link;
     }
 }

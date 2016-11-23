@@ -249,9 +249,11 @@ class FileService
                 $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
             } catch (\OC\Encryption\Exceptions\DecryptionFailedException $dfe) {
                 $ierror = new ItemError(ItemError::EXCEPTION_DECRYPTION_FAILED, $dfe->getHint());
+                $ierror->link(ItemError::LINK_EXCEPTION_DECRYPTION_FAILED);
                 return false;
             } catch (\OCA\Encryption\Exceptions\PrivateKeyMissingException $pkme) {
                 $ierror = new ItemError(ItemError::EXCEPTION_DECRYPT_PRIVATEKEY_MISSING, $pkme->getHint());
+                $ierror->link(ItemError::LINK_EXCEPTION_DECRYPT_PRIVATEKEY_MISSING);
                 return false;
             }
             

@@ -783,6 +783,10 @@ class IndexService
                 $this->output->writeln('*** Error #' . $ierror->getCode() . ' (' . $ierror->getMessage() . ')');
             $this->output->writeln('*** ' . $message);
             
+            if ($ierror->getLink() !== '')
+                $this->output->writeln('> More informations: <comment>' . $ierror->getLink() . '</comment>');
+            $this->output->writeln('');
+            
             if ($ierror->getCode() == SolrService::EXCEPTION_HTTPEXCEPTION)
                 $this->output->writeln('Note: we will wait here for few seconds and check if Solr is still running');
             $this->output->writeln('');
