@@ -73,19 +73,21 @@
 				 * Haven't found a way to include (or remove) a fileAction only
 				 * in a specific place (only in search result)
 				 */
-				OCA.Files.fileActions.registerAction({
-					name : 'nextant_gotofolder',
-					displayName : 'Go To Folder',
-					mime : 'all',
-					permissions : OC.PERMISSION_READ,
-					type : OCA.Files.FileActions.TYPE_DROPDOWN,
-					icon : function() {
-						return OC.imagePath('core', 'filetypes/folder');
-					},
-					actionHandler : function(filename, context) {
-						self.onGoToFolder(filename, context);
-					}
-				});
+				if (OCA.Files.App.fileList != null) // #82
+					OCA.Files.fileActions.registerAction({
+						name : 'nextant_gotofolder',
+						displayName : 'Go To Folder',
+						mime : 'all',
+						permissions : OC.PERMISSION_READ,
+						type : OCA.Files.FileActions.TYPE_DROPDOWN,
+						icon : function() {
+							return OC.imagePath('core', 'filetypes/folder');
+						},
+						actionHandler : function(filename, context) {
+							self.onGoToFolder(filename, context);
+						}
+					});
+
 			};
 
 			//
