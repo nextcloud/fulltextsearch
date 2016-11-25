@@ -55,6 +55,9 @@ class QueueService
 
     public function liveIndex($item)
     {
+        if ($this->configService->getAppValue('index_live') !== '1')
+            return;
+        
         $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
         $msg = ItemQueue::toJson($item);
         
@@ -64,11 +67,17 @@ class QueueService
 
     public function emptyQueue()
     {
+        if ($this->configService->getAppValue('index_live') !== '1')
+            return;
+        
         msg_remove_queue(msg_get_queue($this->configService->getAppValue('index_live_queuekey')));
     }
 
     public function readQueue($standby = false)
     {
+        if ($this->configService->getAppValue('index_live') !== '1')
+            return;
+        
         $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
         
         $msg_type = NULL;
