@@ -36,6 +36,7 @@
 		fileList : null,
 		currQuery : '',
 		currFiles : null,
+		currQuery : '',
 		searchResult : [],
 		locked : false,
 		config : {},
@@ -669,12 +670,6 @@
 			// receiving search request in Files App
 			search.setFilter('files', function(query) {
 
-				// init Search/FileList if needed
-				if (self.fileList == null)
-					self.initFileList();
-
-				if (self.currFiles == null)
-					self.currFiles = self.fileList.files;
 
 				self.currQuery = query;
 
@@ -692,6 +687,13 @@
 				self.nextant_sharelink = false;
 
 			self.initShareLink();
+
+			// init Search/FileList if needed
+			if (self.fileList == null)
+				self.initFileList();
+
+			if (self.currFiles == null)
+				self.currFiles = self.fileList.files;
 
 			//
 			// Add few elem Summary
