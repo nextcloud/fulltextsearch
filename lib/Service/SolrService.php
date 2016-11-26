@@ -516,7 +516,7 @@ class SolrService
                 $q = '(' . $q . ")\n OR (" . $path . ')';
                 
                 // Uncomment to display the request sent to solr
-            $this->miscService->log($q);
+//             $this->miscService->log($q);
             
             $query->setRows(25);
             $query->setQuery($q);
