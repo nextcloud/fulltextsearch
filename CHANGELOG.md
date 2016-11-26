@@ -1,4 +1,8 @@
 
+**v0.10.1**
+- bugfixes
+
+
 **v0.10.0**
 - nextant is working fine with Solr 6.3.0
 - results are displayed using fileList.

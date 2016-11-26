@@ -25,11 +25,6 @@
  *
  */
 
-/**
- * ***
- * This Controller is now useless
- * **
- */
 namespace OCA\Nextant\Controller;
 
 use \OCA\Nextant\Service\FileService;

@@ -91,7 +91,7 @@ class Live extends Base
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (rc1)</comment>');
+        $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (rc)</comment>');
         $output->writeln('');
         
         if (! $this->solrService->configured(true)) {
