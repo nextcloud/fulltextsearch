@@ -79,207 +79,10 @@ class SolrAdminService
             return false;
         }
         
+        $fields = self::solrSchema();
         $client = $this->solrService->getClient();
         
-        $fields = array();
-        array_push($fields, array(
-            'type' => 'dynamic-field',
-            'data' => array(
-                'name' => 'nextant_attr_*',
-                'type' => 'text_general',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => true
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_path',
-                'type' => 'text_general',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => false
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'text',
-                'type' => 'text_general',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => false
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_owner',
-                'type' => 'string',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => false
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_mtime',
-                'type' => 'int',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => false
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_share',
-                'type' => 'string',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => true
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_sharegroup',
-                'type' => 'string',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => true
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_deleted',
-                'type' => 'boolean',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => false
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_source',
-                'type' => 'string',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => false
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_tags',
-                'type' => 'string',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => true
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_extracted',
-                'type' => 'boolean',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => false
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_ocr',
-                'type' => 'int',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => false
-            )
-        ));
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'nextant_unmounted',
-                'type' => 'int',
-                'indexed' => true,
-                'stored' => true,
-                'multiValued' => false
-            )
-        ));
-        
-        array_push($fields, array(
-            'type' => 'field-type',
-            'data' => array(
-                'name' => 'string',
-                'class' => 'solr.StrField',
-                'sortMissingLast' => false,
-                'docValues' => false
-            )
-        ));
-        
-        array_push($fields, array(
-            'type' => 'field-type',
-            'data' => array(
-                'name' => 'int',
-                'class' => 'solr.TrieIntField',
-                'positionIncrementGap' => '0',
-                'docValues' => false,
-                'precisionStep' => '0'
-            )
-        ));
-        
-        array_push($fields, array(
-            'type' => 'field-type',
-            'data' => array(
-                'name' => 'text_general',
-                'class' => 'solr.TextField',
-                'omitNorms' => false,
-                'indexAnalyzer' => array(
-                    'tokenizer' => array(
-                        'class' => 'solr.StandardTokenizerFactory'
-                    ),
-                    'filters' => array(
-                        array(
-                            'class' => 'solr.StandardFilterFactory'
-                        ),
-                        array(
-                            'class' => 'solr.ASCIIFoldingFilterFactory'
-                        ),
-                        array(
-                            'class' => 'solr.LowerCaseFilterFactory'
-                        ),
-                        array(
-                            'class' => 'solr.EdgeNGramFilterFactory',
-                            'maxGramSize' => '15',
-                            'minGramSize' => '1'
-                        )
-                    )
-                ),
-                'queryAnalyzer' => array(
-                    'tokenizer' => array(
-                        'class' => 'solr.StandardTokenizerFactory'
-                    ),
-                    'filters' => array(
-                        array(
-                            'class' => 'solr.ASCIIFoldingFilterFactory'
-                        ),
-                        array(
-                            'class' => 'solr.StandardFilterFactory'
-                        ),
-                        array(
-                            'class' => 'solr.LowerCaseFilterFactory'
-                        )
-                    )
-                )
-            )
-        ));
-        
+        $this->solrService->message('');
         $this->solrService->message('Checking Solr schema fields');
         
         $failed = false;
@@ -304,7 +107,7 @@ class SolrAdminService
                                 $this->solrService->message('<error>fail</error>');
                             else 
                                 if (! self::checkFieldProperty($client, $field, $curr, $ierror)) {
-                                    $this->solrService->message('<error>fail</error> ' . $ierror->getCore() . ' - ' . $ierror->getMessage());
+                                    $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
                                     $failed = true;
                                 } else
                                     $this->solrService->message('<info>ok</info>');
@@ -313,7 +116,7 @@ class SolrAdminService
                                 $this->solrService->message('<error>fail</error>');
                             else 
                                 if (! self::checkFieldProperty($client, $field, $curr, $ierror)) {
-                                    $this->solrService->message('<error>fail</error> ' . $ierror->getCore() . ' - ' . $ierror->getMessage());
+                                    $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
                                     $failed = true;
                                 } else
                                     $this->solrService->message('<info>ok</info>');
@@ -326,6 +129,70 @@ class SolrAdminService
             break;
         }
         
+        $this->solrService->message('');
+        $this->solrService->message('Cleaning extra fields');
+        $currSchema = self::getCurrentSchema($client, $ierror);
+        
+        $currFieldsType = $currSchema['schema']['fieldTypes'];
+        $currFields = $currSchema['schema']['fields'];
+        $currDynamicFields = $currSchema['schema']['dynamicFields'];
+        
+        foreach ($currFieldsType as $fieldType) {
+            if (! self::checkFieldNecessity($client, $fields, 'field-type', $fieldType, $ierror)) {
+                $this->solrService->message('* Removing \'' . $fieldType['name'] . '\' : ', false);
+                if (! $fix) {
+                    $this->solrService->message('<comment>please fix this</comment>');
+                    continue;
+                }
+                
+                if (self::deleteField($client, 'field-type', $fieldType['name'], $ierror))
+                    $this->solrService->message('<info>ok</info>');
+                else {
+                    if ($ierror->getCode() == 0)
+                        $this->solrService->message('<error>fail</error>');
+                    else
+                        return false;
+                }
+            }
+        }
+        
+        foreach ($currFields as $field) {
+            if (! self::checkFieldNecessity($client, $fields, 'field', $field, $ierror)) {
+                $this->solrService->message('* Removing \'' . $field['name'] . '\' : ', false);
+                if (! $fix) {
+                    $this->solrService->message('<comment>please fix this</comment>');
+                    continue;
+                }
+                
+                if (self::deleteField($client, 'field', $field['name'], $ierror))
+                    $this->solrService->message('<info>ok</info>');
+                else {
+                    if ($ierror->getCode() == 0)
+                        $this->solrService->message('<error>fail</error>');
+                    else
+                        return false;
+                }
+            }
+        }
+        
+        foreach ($currDynamicFields as $fielddyn) {
+            if (! self::checkFieldNecessity($client, $fields, 'dynamic-field', $fielddyn, $ierror)) {
+                $this->solrService->message('* Removing \'' . $fielddyn['name'] . '\' : ', false);
+                if (! $fix) {
+                    $this->solrService->message('<comment>please fix this</comment>');
+                    continue;
+                }
+                
+                if (self::deleteField($client, 'dynamic-field', $fielddyn['name'], $ierror))
+                    $this->solrService->message('<info>ok</info>');
+                else {
+                    if ($ierror->getCode() == 0)
+                        $this->solrService->message('<error>fail</error>');
+                    else
+                        return false;
+                }
+            }
+        }
         if ($failed)
             return false;
         
@@ -363,6 +230,16 @@ class SolrAdminService
             $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
         } catch (\Solarium\Exception $e) {
             $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
+        }
+        
+        return false;
+    }
+
+    private static function checkFieldNecessity(\Solarium\Client $client, $fields, $type, $check, $ierror)
+    {
+        foreach ($fields as $field) {
+            if ($field['type'] == $type && $field['data']['name'] == $check['name'])
+                return true;
         }
         
         return false;
@@ -408,6 +285,31 @@ class SolrAdminService
                 return false;
         
         return true;
+    }
+
+    private static function getCurrentSchema(\Solarium\Client $client, &$ierror = '')
+    {
+        try {
+            $query = $client->createSelect();
+            $request = $client->createRequest($query);
+            
+            $request->setHandler('schema');
+            
+            $response = $client->executeRequest($request);
+            if ($response->getStatusCode() != 200)
+                return false;
+            
+            $result = json_decode($response->getBody(), true);
+            
+            return $result;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
+        } catch (\Solarium\Exception $e) {
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
+        }
+        return false;
     }
 
     /**
@@ -496,13 +398,14 @@ class SolrAdminService
      * @param \Solarium\Client $client            
      * @param array $field            
      */
-    private static function deleteField(\Solarium\Client $client, $field, &$ierror)
+    private static function deleteField(\Solarium\Client $client, $type, $fieldname, &$ierror)
     {
         $data = array(
-            'delete-' . $field['type'] => array(
-                'name' => $field['data']['name']
+            'delete-' . $type => array(
+                'name' => $fieldname
             )
         );
+        
         return self::solariumPostSchemaRequest($client, $data, $ierror);
     }
 
@@ -579,6 +482,585 @@ class SolrAdminService
         }
         
         return false;
+    }
+
+    public static function solrSchema()
+    {
+        $fields = array();
+        
+        //
+        // field-types
+        //
+        
+        // boolean
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'boolean',
+                'class' => 'solr.BoolField',
+                'sortMissingLast' => true
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'booleans',
+                'class' => 'solr.BoolField',
+                'sortMissingLast' => true,
+                'multiValued' => true
+            )
+        ));
+        
+        // double
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'double',
+                'class' => 'solr.TrieDoubleField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '0'
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'doubles',
+                'class' => 'solr.TrieDoubleField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '0',
+                'multiValued' => true
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tdouble',
+                'class' => 'solr.TrieDoubleField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '8'
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tdoubles',
+                'class' => 'solr.TrieDoubleField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '8',
+                'multiValued' => true
+            )
+        ));
+        
+        // float
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'float',
+                'class' => 'solr.TrieFloatField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '0'
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'floats',
+                'class' => 'solr.TrieFloatField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '0',
+                'multiValued' => true
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tfloat',
+                'class' => 'solr.TrieFloatField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '8'
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tfloats',
+                'class' => 'solr.TrieFloatField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '8',
+                'multiValued' => true
+            )
+        ));
+        
+        // int
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'int',
+                'class' => 'solr.TrieIntField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '0'
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'ints',
+                'class' => 'solr.TrieIntField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '0',
+                'multiValued' => true
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tint',
+                'class' => 'solr.TrieIntField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '8'
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tints',
+                'class' => 'solr.TrieIntField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '8',
+                'multiValued' => true
+            )
+        ));
+        
+        // long
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'long',
+                'class' => 'solr.TrieLongField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '0'
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'longs',
+                'class' => 'solr.TrieLongField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '0',
+                'multiValued' => true
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tlong',
+                'class' => 'solr.TrieLongField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '8'
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tlongs',
+                'class' => 'solr.TrieLongField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '8',
+                'multiValued' => true
+            )
+        ));
+        // string
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'string',
+                'class' => 'solr.StrField',
+                'sortMissingLast' => true,
+                'docValues' => true
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'strings',
+                'class' => 'solr.StrField',
+                'sortMissingLast' => true,
+                'docValues' => true,
+                'multiValued' => true
+            )
+        ));
+        
+        // date
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tdate',
+                'class' => 'solr.TrieDateField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '6'
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'tdates',
+                'class' => 'solr.TrieDateField',
+                'positionIncrementGap' => '0',
+                'docValues' => true,
+                'precisionStep' => '6',
+                'multiValued' => true
+            )
+        ));
+        
+        // ignored
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'ignored',
+                'class' => 'solr.StrField',
+                'indexed' => false,
+                'stored' => false,
+                'docValues' => false,
+                'multiValued' => true
+            )
+        ));
+        
+        // text
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'text_nextant',
+                'class' => 'solr.TextField',
+                'omitNorms' => false,
+                'indexAnalyzer' => array(
+                    'tokenizer' => array(
+                        'class' => 'solr.StandardTokenizerFactory'
+                    ),
+                    'filters' => array(
+                        array(
+                            'class' => 'solr.StandardFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.ASCIIFoldingFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.LowerCaseFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.EdgeNGramFilterFactory',
+                            'maxGramSize' => '15',
+                            'minGramSize' => '3'
+                        )
+                    )
+                ),
+                'queryAnalyzer' => array(
+                    'tokenizer' => array(
+                        'class' => 'solr.StandardTokenizerFactory'
+                    ),
+                    'filters' => array(
+                        array(
+                            'class' => 'solr.ASCIIFoldingFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.StandardFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.LowerCaseFilterFactory'
+                        )
+                    )
+                )
+            )
+        ));
+        
+        //
+        // fields
+        //
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => '_version_',
+                'type' => 'long',
+                'indexed' => true,
+                'stored' => false
+            )
+        ));
+        
+        // id
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'id',
+                'type' => 'string',
+                'multiValued' => false,
+                'indexed' => true,
+                'required' => true,
+                'stored' => true
+            )
+        ));
+        
+        // text
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'text',
+                'type' => 'text_nextant',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        // text
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'text_light',
+                'type' => 'text_nextant',
+                'indexed' => true,
+                'stored' => false,
+                'multiValued' => false
+            )
+        ));
+        
+        // nextant_path
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_path',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        // nextant_owner
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_owner',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        // nextant_mtime
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_mtime',
+                'type' => 'int',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        // nextant_share
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_share',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => true
+            )
+        ));
+        
+        // nextant_sharegroup
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_sharegroup',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => true
+            )
+        ));
+        
+        // nextant_deleted
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_deleted',
+                'type' => 'boolean',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        // nextant_source
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_source',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        // nextant_tags
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_tags',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => true
+            )
+        ));
+        
+        // nextant_extracted
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_extracted',
+                'type' => 'boolean',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        // nextant_ocr
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_ocr',
+                'type' => 'int',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        // nextant_unmounted
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'nextant_unmounted',
+                'type' => 'int',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        //
+        // dunamic-fields
+        //
+        
+        // ignored_
+        array_push($fields, array(
+            'type' => 'dynamic-field',
+            'data' => array(
+                'name' => 'ignored_*',
+                'type' => 'ignored',
+                'multiValued' => true
+            )
+        ));
+        
+        // nextant_attr_
+        array_push($fields, array(
+            'type' => 'dynamic-field',
+            'data' => array(
+                'name' => 'nextant_attr_*',
+                'type' => 'string',
+                'indexed' => true,
+                'stored' => true,
+                'multiValued' => true
+            )
+        ));
+        
+        // array_push($fields, array(
+        // 'type' => 'field-type',
+        // 'data' => array(
+        // 'name' => 'text_general',
+        // 'class' => 'solr.TextField',
+        // 'omitNorms' => false,
+        // 'indexAnalyzer' => array(
+        // 'tokenizer' => array(
+        // 'class' => 'solr.StandardTokenizerFactory'
+        // ),
+        // 'filters' => array(
+        // array(
+        // 'class' => 'solr.StandardFilterFactory'
+        // ),
+        // array(
+        // 'class' => 'solr.LowerCaseFilterFactory'
+        // ),
+        // array(
+        // 'class' => 'solr.ASCIIFoldingFilterFactory'
+        // ),
+        // array(
+        // 'class' => 'solr.NGramFilterFactory',
+        // 'maxGramSize' => '15',
+        // 'minGramSize' => '3'
+        // )
+        // )
+        // ),
+        // 'queryAnalyzer' => array(
+        // 'tokenizer' => array(
+        // 'class' => 'solr.StandardTokenizerFactory'
+        // ),
+        // 'filters' => array(
+        // array(
+        // 'class' => 'solr.StandardFilterFactory'
+        // ),
+        // array(
+        // 'class' => 'solr.LowerCaseFilterFactory'
+        // ),
+        // array(
+        // 'class' => 'solr.ASCIIFoldingFilterFactory'
+        // )
+        // )
+        
+        // )
+        // )
+        // ));
+        
+        return $fields;
     }
 }
     
