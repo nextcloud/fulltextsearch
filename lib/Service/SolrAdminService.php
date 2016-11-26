@@ -774,13 +774,14 @@ class SolrAdminService
                             'class' => 'solr.StandardFilterFactory'
                         ),
                         array(
-                            'class' => 'solr.ASCIIFoldingFilterFactory'
-                        ),
-                        array(
                             'class' => 'solr.LowerCaseFilterFactory'
                         ),
                         array(
-                            'class' => 'solr.EdgeNGramFilterFactory',
+                            'class' => 'solr.ASCIIFoldingFilterFactory'
+                        ),
+                        array(
+                            // 'class' => 'solr.EdgeNGramFilterFactory',
+                            'class' => 'solr.NGramFilterFactory',
                             'maxGramSize' => '15',
                             'minGramSize' => '3'
                         )
@@ -792,19 +793,18 @@ class SolrAdminService
                     ),
                     'filters' => array(
                         array(
-                            'class' => 'solr.ASCIIFoldingFilterFactory'
-                        ),
-                        array(
                             'class' => 'solr.StandardFilterFactory'
                         ),
                         array(
                             'class' => 'solr.LowerCaseFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.ASCIIFoldingFilterFactory'
                         )
                     )
                 )
             )
         ));
-        
         //
         // fields
         //
@@ -860,7 +860,7 @@ class SolrAdminService
             'type' => 'field',
             'data' => array(
                 'name' => 'nextant_path',
-                'type' => 'string',
+                'type' => 'text_nextant',
                 'indexed' => true,
                 'stored' => true,
                 'multiValued' => false
@@ -1012,53 +1012,6 @@ class SolrAdminService
                 'multiValued' => true
             )
         ));
-        
-        // array_push($fields, array(
-        // 'type' => 'field-type',
-        // 'data' => array(
-        // 'name' => 'text_general',
-        // 'class' => 'solr.TextField',
-        // 'omitNorms' => false,
-        // 'indexAnalyzer' => array(
-        // 'tokenizer' => array(
-        // 'class' => 'solr.StandardTokenizerFactory'
-        // ),
-        // 'filters' => array(
-        // array(
-        // 'class' => 'solr.StandardFilterFactory'
-        // ),
-        // array(
-        // 'class' => 'solr.LowerCaseFilterFactory'
-        // ),
-        // array(
-        // 'class' => 'solr.ASCIIFoldingFilterFactory'
-        // ),
-        // array(
-        // 'class' => 'solr.NGramFilterFactory',
-        // 'maxGramSize' => '15',
-        // 'minGramSize' => '3'
-        // )
-        // )
-        // ),
-        // 'queryAnalyzer' => array(
-        // 'tokenizer' => array(
-        // 'class' => 'solr.StandardTokenizerFactory'
-        // ),
-        // 'filters' => array(
-        // array(
-        // 'class' => 'solr.StandardFilterFactory'
-        // ),
-        // array(
-        // 'class' => 'solr.LowerCaseFilterFactory'
-        // ),
-        // array(
-        // 'class' => 'solr.ASCIIFoldingFilterFactory'
-        // )
-        // )
-        
-        // )
-        // )
-        // ));
         
         return $fields;
     }
