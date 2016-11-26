@@ -525,10 +525,10 @@ class SolrService
             $hl = $query->getHighlighting();
             $hl->setSimplePrefix('<span class="nextant_hl">');
             $hl->setSimplePostfix('</span>');
-            $hl->setSnippets(5);
+            $hl->setSnippets(4);
             // $hl->setAlternateField('nextant_path');
             $hl->setFragSize(70);
-            $hl->setMaxAnalyzedChars(50000000);
+            $hl->setMaxAnalyzedChars(100000);
             $hl->setFields(array(
                 'text'
             ));
