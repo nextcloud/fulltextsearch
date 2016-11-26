@@ -63,6 +63,11 @@ class Clear extends Base
             return;
         }
         
+        if (! ($this->solrAdmin->ping())) {
+            $output->writeln('*** Solr seems down.');
+            return false;
+        }
+        
         $helper = $this->getHelper('question');
         $question = new ConfirmationQuestion('<question>This will remove all indexes on your Solr. Continue with this action? (y/N) </question> ', false);
         
