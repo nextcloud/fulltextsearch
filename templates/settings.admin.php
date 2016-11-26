@@ -211,10 +211,10 @@ style('nextant', 'admin');
 							<td colspan="2"><select name="solr_resource_level"
 								id="solr_resource_level">
 									<!-- <option value="5">Higher Level</option> -->
-									<option value="4">High Level</option>
+									<option value="4">High performance</option>
 									<!-- <option value="3">Mid level</option> -->
-									<option value="2">Low level</option>
-									<option value="1">Lower level</option>
+									<option value="2">Low performance</option>
+									<option value="1">Lower performance</option>
 							</select></td>
 						</tr>
 
