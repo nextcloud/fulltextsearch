@@ -44,6 +44,7 @@
 		nextant_sharelink : true,
 		searchboxFocus : false,
 
+		timerQuery : null,
 		suggestNoSpam : false,
 		/**
 		 * Initialize the file search
@@ -670,17 +671,25 @@
 			// receiving search request in Files App
 			search.setFilter('files', function(query) {
 
+				if (self.currQuery == query)
+					return;
 
 				self.currQuery = query;
 
-				// sending the ajax request
 				var data = {
 					query : query,
 					current_dir : self.get('dir')
 				}
 
-				self.searchRequest(data);
-				self.suggestRequest(data);
+				if (self.timerQuery != null)
+					window.clearTimeout(self.timerQuery);
+
+				self.timerQuery = setTimeout(function() {
+					self.timerQuery = null;
+					self.searchRequest(data);
+					self.suggestRequest(data);
+				}, 100);
+
 			});
 
 			if (self.fileAppLoaded())
