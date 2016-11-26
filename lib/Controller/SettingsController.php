@@ -85,7 +85,7 @@ class SettingsController extends Controller
     }
 
     public function updateSubOptions($instant, $source = '')
-    {        
+    {
         $response = array(
             'instant' => $instant,
             'configured' => $this->configService->getAppValue('configured'),
@@ -114,6 +114,7 @@ class SettingsController extends Controller
             'bookmarks_app_enabled' => (\OCP\App::isEnabled('bookmarks')),
             'index_bookmarks' => $this->configService->getAppValue('index_bookmarks'),
             'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
+            'resource_level' => $this->configService->getAppValue('resource_level'),
             'index_live' => $this->configService->getAppValue('index_live'),
             'index_live_queuekey' => $this->configService->getAppValue('index_live_queuekey'),
             'index_delay' => $this->configService->getAppValue('index_delay'),
@@ -163,8 +164,10 @@ class SettingsController extends Controller
         return $this->updateSubOptions(false, 'bookmarks');
     }
 
-    public function setOptionsStatus($index_live, $index_delay, $force_index)
+    public function setOptionsStatus($resource_level, $index_live, $index_delay, $force_index)
     {
+        $this->configService->setAppValue('resource_level', $resource_level);
+        
         if ($index_live === '1' && $this->configService->getAppValue('index_live') !== '1')
             $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
         

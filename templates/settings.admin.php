@@ -133,7 +133,6 @@ style('nextant', 'admin');
 									id="solr_index_files_federated" value="1" style="margin: 10px;"></td>
 							</tr>
 
-
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
 	    <?php p($l->t('Index External Storage :')) ?></td>
@@ -141,8 +140,6 @@ style('nextant', 'admin');
 									name="solr_index_files_external" id="solr_index_files_external"
 									value="1" style="margin: 10px;"></td>
 							</tr>
-
-
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
@@ -205,6 +202,20 @@ style('nextant', 'admin');
 							<td><div id="nextant_saving_status">Saving</div>
 								<div id="nextant_saving_check">Checking</div></td>
 							<td class="nextant_admin_head">Nextant Status</td>
+						</tr>
+
+						<tr style="height: 30px;">
+							<td class="nextant_admin_left">					
+	    <?php p($l->t('Resource Level :')); ?>
+						</td>
+							<td colspan="2"><select name="solr_resource_level"
+								id="solr_resource_level">
+									<!-- <option value="5">Higher Level</option> -->
+									<option value="4">High Level</option>
+									<!-- <option value="3">Mid level</option> -->
+									<option value="2">Low level</option>
+									<option value="1">Lower level</option>
+							</select></td>
 						</tr>
 
 						<tr style="height: 30px;">

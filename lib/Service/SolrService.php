@@ -522,20 +522,35 @@ class SolrService
             // if (key_exists('current_directory', $options))
             // $query->setQuery('nextant_path:' . $helper->escapePhrase($options['current_directory']));
             
-            $hl = $query->getHighlighting();
-            $hl->setSimplePrefix('<span class="nextant_hl">');
-            $hl->setSimplePostfix('</span>');
-            $hl->setSnippets(4);
-            // $hl->setAlternateField('nextant_path');
-            $hl->setFragSize(70);
-            $hl->setMaxAnalyzedChars(100000);
-            $hl->setFields(array(
-                'text'
-            ));
-            // 'nextant_path'
+            $hl = null;
+            if ($this->configService->resourceLevel() > ConfigService::RESOURCE_LEVEL_LOWER) {
+                $hl = $query->getHighlighting();
+                $hl->setSimplePrefix('<span class="nextant_hl">');
+                $hl->setSimplePostfix('</span>');
+                // $hl->setAlternateField('nextant_path');
+                $hl->setFragSize(70);
+                
+                switch ($this->configService->resourceLevel()) {
+                    case ConfigService::RESOURCE_LEVEL_LOW:
+                        $hl->setSnippets(2);
+                        $hl->setFragSize(100);
+                        $hl->setMaxAnalyzedChars(50000);
+                        break;
+                    
+                    case ConfigService::RESOURCE_LEVEL_HIGH:
+                        $hl->setSnippets(4);
+                        $hl->setMaxAnalyzedChars(100000);
+                        break;
+                }
+                
+                $hl->setFields(array(
+                    'text'
+                ));
+            }
             
             $resultset = $client->select($query);
-            $highlighting = $resultset->getHighlighting();
+            if ($hl !== null)
+                $highlighting = $resultset->getHighlighting();
             
             $return = array();
             foreach ($resultset as $document) {
@@ -544,8 +559,10 @@ class SolrService
                 $item->shared(($document->nextant_owner != $this->owner));
                 
                 // highlighting
-                $hlDoc = $highlighting->getResult($document->id);
-                $item->setHighlighting($hlDoc->getField('text'));
+                if ($hl !== null) {
+                    $hlDoc = $highlighting->getResult($document->id);
+                    $item->setHighlighting($hlDoc->getField('text'));
+                }
                 
                 $return[] = $item;
             }

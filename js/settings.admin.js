@@ -175,6 +175,7 @@ $(document)
 								force_index = 1;
 
 							var data = {
+								resource_level : $('#solr_resource_level').val(),
 								index_live : ($('#solr_index_live')
 										.is(':checked')) ? 1 : 0,
 								index_delay : $('#solr_index_delay').val(),
@@ -293,6 +294,8 @@ $(document)
 							else
 								$('#solr_sub_bookmarks').hide(delay);
 
+							$('#solr_resource_level').val(
+									response.resource_level);
 							$('#solr_index_live').prop('checked',
 									(response.index_live == 1));
 							$('#solr_index_live_queuekey').val(
@@ -680,6 +683,10 @@ $(document)
 					});
 					$('#nextant_force_first_index').on('click', function() {
 						nextantSettings.savesuboptions_status('force_index');
+					});
+
+					$('#solr_resource_level').on('change', function() {
+						nextantSettings.savesuboptions_status();
 					});
 
 					$('#solr_index_live').mousedown(function() {

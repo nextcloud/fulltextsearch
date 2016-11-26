@@ -36,12 +36,23 @@ class ConfigService
 
     const SEARCH_DISPLAY_FILES = 2;
 
+    const RESOURCE_LEVEL_LOWER = '1';
+
+    const RESOURCE_LEVEL_LOW = '2';
+
+    const RESOURCE_LEVEL_MID = '3';
+
+    const RESOURCE_LEVEL_HIGH = '4';
+
+    const RESOURCE_LEVEL_HIGHER = '5';
+
     private $defaults = [
         'configured' => '0',
         'solr_url' => 'http://127.0.0.1:8983/solr/',
         'solr_core' => 'nextant',
         'solr_timeout' => '30',
         
+        'resource_level' => '4',
         'index_live' => '1',
         'index_live_queuekey' => '19375',
         'index_delay' => '2',
@@ -180,6 +191,11 @@ class ConfigService
             return true;
         
         return false;
+    }
+
+    public function resourceLevel()
+    {
+        return $this->getAppValue('resource_level');
     }
 
     /**
