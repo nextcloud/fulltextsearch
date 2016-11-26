@@ -123,7 +123,7 @@ class SolrService
         $this->output = $output;
     }
 
-    public function configured($first = false)
+    public function configured($first = false, &$ierror = '')
     {
         if (! $this->configured) {
             $isIt = $this->configService->getAppValue('configured');
@@ -132,6 +132,10 @@ class SolrService
             if ($first && $isIt > 0)
                 $this->configured = true;
         }
+        
+        if (! $this->configured)
+            $ierror = new ItemError(ItemError::ERROR_SOLR_NOT_FULLY_CONFIGURED);
+        
         return $this->configured;
     }
     
@@ -151,8 +155,11 @@ class SolrService
         return true;
     }
 
-    public function getClient()
+    public function getClient(&$ierror = '')
     {
+        if ($this->solariumClient === false)
+            $ierror = new ItemError(ItemError::ERROR_GET_SOLARIUM_CLIENT);
+        
         return $this->solariumClient;
     }
 
@@ -450,10 +457,12 @@ class SolrService
 
     public function search($string, $options = array(), &$ierror = '')
     {
-        if (! $this->configured())
+        $ierror = new ItemError();
+        
+        if (! $this->configured(false, $ierror))
             return false;
         
-        if ($this->getClient() == false)
+        if ($this->getClient($ierror) === false)
             return false;
         
         $string = str_replace('  ', ' ', trim($string));

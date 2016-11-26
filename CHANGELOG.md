@@ -1,7 +1,11 @@
 
+**v0.10.2**
+- bugfixes
+
+
 **v0.10.1**
 - To make nextant working fine on single-board computers, admin can now choose between 3 levels of performance: High, Low, Lower.
-- compaptible NC11
+- compatible NC11
 - bugfixes
 
 

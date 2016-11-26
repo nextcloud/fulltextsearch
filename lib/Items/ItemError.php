@@ -41,6 +41,10 @@ class ItemError
 
     const ERROR_MANAGING_FAILURE = 1129;
 
+    const ERROR_SOLR_NOT_FULLY_CONFIGURED = 9938;
+
+    const ERROR_GET_SOLARIUM_CLIENT = 9939;
+
     private $errorcode;
 
     private $message;
