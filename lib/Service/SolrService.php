@@ -344,7 +344,10 @@ class SolrService
             if ($document->isExtractable()) {
                 $query = $client->createExtract();
                 $query->setUprefix('nextant_attr_');
-                $query->addFieldMapping('content', 'text');
+                if ($this->configService->resourceLevel() === ConfigService::RESOURCE_LEVEL_LOWER)
+                    $query->addFieldMapping('content', 'text_light');
+                else
+                    $query->addFieldMapping('content', 'text');
                 
                 $query->addFieldMapping('div', 'ignored_');
                 $query->addFieldMapping('html', 'ignored_');
@@ -497,14 +500,15 @@ class SolrService
                 if (substr($qstr, 0, 1) == '"')
                     $value = 150;
                 
-                $q .= $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ' ';
+                $q .= '(' . $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ') OR (' . $oper . 'text_light:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ')';
             }
             
             if ($path !== '')
                 $q = '(' . $q . ")\n OR (" . $path . ')';
                 
                 // Uncomment to display the request sent to solr
-                // $this->miscService->log($q);
+            $this->miscService->log($q);
+            
             $query->setRows(25);
             $query->setQuery($q);
             $query->createFilterQuery('owner')->setQuery($ownerQuery);
@@ -532,12 +536,14 @@ class SolrService
                 
                 switch ($this->configService->resourceLevel()) {
                     case ConfigService::RESOURCE_LEVEL_LOW:
+                    case ConfigService::RESOURCE_LEVEL_MID:
                         $hl->setSnippets(2);
                         $hl->setFragSize(100);
                         $hl->setMaxAnalyzedChars(50000);
                         break;
                     
                     case ConfigService::RESOURCE_LEVEL_HIGH:
+                    case ConfigService::RESOURCE_LEVEL_HIGHER:
                         $hl->setSnippets(4);
                         $hl->setMaxAnalyzedChars(100000);
                         break;
