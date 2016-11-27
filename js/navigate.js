@@ -60,6 +60,12 @@
 
 			this.initFileList = function() {
 
+				if (self.fileList != null) {
+					if (self.currFiles == null)
+						self.currFiles = self.fileList.files;
+					return;
+				}
+
 				if (self.nextant_sharelink)
 					self.fileList = OCA.Sharing.PublicApp.fileList;
 
@@ -140,6 +146,8 @@
 			// search request
 			this.searchRequest = function(data) {
 
+				// self.initFileList();
+
 				if (self.nextant_sharelink)
 					$.post(OC.filePath('nextant', 'ajax', 'search_public.php'),
 							data, self.searchRequestResult);
@@ -154,9 +162,6 @@
 			 * 
 			 */
 			this.searchRequestResult = function(infos) {
-
-				if (self.fileList == null)
-					return;
 
 				var result = infos.result;
 				self.config = infos.config;
@@ -239,12 +244,7 @@
 			// init search on shared link
 			this.searchRequestPublic = function(query) {
 
-				if (self.fileList == null)
-					self.initFileList();
-
-				if (self.currFiles == null)
-					self.currFiles = self.fileList.files;
-
+				self.initFileList();
 				self.currQuery = query;
 
 				// sending the ajax request
@@ -290,6 +290,8 @@
 			//
 			// suggest request
 			this.suggestRequest = function(data) {
+
+				// self.initFileList();
 
 				if (self.suggestNoSpam)
 					return;
@@ -392,12 +394,7 @@
 			//
 			this.suggestRequestPublic = function(query) {
 
-				if (self.fileList == null)
-					self.initFileList();
-
-				if (self.currFiles == null)
-					self.currFiles = self.fileList.files;
-
+				self.initFileList();
 				self.currQuery = query;
 
 				// sending the ajax request
@@ -671,6 +668,9 @@
 			// receiving search request in Files App
 			search.setFilter('files', function(query) {
 
+				// init Search/FileList if needed
+				self.initFileList();
+
 				if (self.currQuery == query)
 					return;
 
@@ -698,11 +698,7 @@
 			self.initShareLink();
 
 			// init Search/FileList if needed
-			if (self.fileList == null)
-				self.initFileList();
-
-			if (self.currFiles == null)
-				self.currFiles = self.fileList.files;
+			self.initFileList();
 
 			//
 			// Add few elem Summary
