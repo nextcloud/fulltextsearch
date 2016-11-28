@@ -152,6 +152,9 @@ class Index extends Base
             }
             $this->configService->needIndexFiles(true);
             $this->configService->needIndexBookmarks(true);
+            $this->configService->setAppValue('index_files_last', '0');
+            $this->configService->setAppValue('index_bookmarks_last', '0');
+            
             $output->writeln('A background indexing process is scheduled');
             return;
         }
