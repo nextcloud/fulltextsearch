@@ -101,6 +101,8 @@ class ItemDocument
 
     private $updated = false;
 
+    private $noindex = false;
+
     private $failedIndex = false;
 
     private $failedExtract = false;
@@ -454,6 +456,16 @@ class ItemDocument
     public function isUpdated()
     {
         return $this->updated;
+    }
+
+    public function noIndex($noindex)
+    {
+        $this->noindex = $noindex;
+    }
+
+    public function isNoIndex()
+    {
+        return $this->noindex;
     }
 
     public function failedIndex($index)

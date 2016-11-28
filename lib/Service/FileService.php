@@ -39,6 +39,8 @@ class FileService
 {
 
     const UPDATE_MAXIMUM_FILES = 1000;
+
+    const NOINDEX_FILE = '.noindex';
     
     // private $root;
     private $configService;
@@ -203,7 +205,7 @@ class FileService
             $item->extractable(true);
         }
         
-        $this->setShareRights($item);
+        $this->dataRetrievalFromPath($item);
         
         if ($item->isDeleted()) {
             $item->setShare();
@@ -447,12 +449,12 @@ class FileService
     }
 
     /**
-     * update ItemDocument share rights
+     * update ItemDocument based on its filepath (sharing rights, noindex status, ..)
      *
      * @param ItemDocument $entry            
      * @return boolean
      */
-    private function setShareRights(&$entry)
+    private function dataRetrievalFromPath(&$entry)
     {
         $data = array();
         
@@ -467,15 +469,19 @@ class FileService
             if (strlen($subpath) > 0 && $subpath != '/') {
                 
                 self::getShareRightsFromExternalMountPoint($this->externalMountPoint, $subpath, $data, $entry);
+                // self::getIndexStatusFromExternalMountPoint($this->externalMountPoint, $subpath, $data, $entry);
                 
                 $subdirInfos = self::getFileInfoFromPath($subpath);
-                
                 if (! $subdirInfos)
                     continue;
+                
                 self::getShareRightsFromFileId($subdirInfos->getId(), $data);
+                self::getIndexStatusFromFileInfo($this->view, $subdirInfos, $data);
             }
         }
         
+        if (key_exists('noindex', $data))
+            $entry->noIndex($data['noindex']);
         if (key_exists('share_users', $data))
             $entry->setShare($data['share_users']);
         if (key_exists('share_groups', $data))
@@ -549,6 +555,36 @@ class FileService
         }
         
         return true;
+    }
+
+    /**
+     * update ItemDocument index status based on path
+     *
+     * @param number $fileId            
+     * @param ItemDocument $data            
+     * @return boolean
+     */
+    private static function getIndexStatusFromFileInfo($view, $fileInfo, &$data)
+    {
+        if (! key_exists('noindex', $data))
+            $data['noindex'] = false;
+        
+        if ($data['noindex'] === true)
+            return true;
+        
+        if ($fileInfo->getType() != \OCP\Files\FileInfo::TYPE_FOLDER)
+            return false;
+        
+        $files = $view->getDirectoryContent($fileInfo->getPath());
+        
+        foreach ($files as $file) {
+            if ($file->getName() === self::NOINDEX_FILE) {
+                $data['noindex'] = true;
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     /**

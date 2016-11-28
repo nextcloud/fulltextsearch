@@ -240,6 +240,9 @@ class IndexService
                 $this->output->writeln('_solr: ' . var_export(ItemDocument::getItem($solrDocs, $entry), true));
             }
             
+            if ($entry->isNoIndex())
+                continue;
+            
             if (! $entry->isExtractable() && $this->configService->getAppValue('index_files_tree') !== '1')
                 continue;
             
@@ -532,7 +535,7 @@ class IndexService
         
         $docIds = array();
         foreach ($data as $entry) {
-            if ($entry->isValid())
+            if ($entry->isValid() && ! $entry->isNoIndex())
                 array_push($docIds, (int) $entry->getId());
         }
         
