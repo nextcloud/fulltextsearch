@@ -318,8 +318,8 @@ class SolrService
             return false;
         
         if ($document->getAbsolutePath() == null) {
-            if ($entry->isExtractable())
-                $entry->failedExtract(true);
+            if ($document->isExtractable())
+                $document->failedExtract(true);
             $document->extractable(false);
             if ($this->configService->getAppValue('index_files_tree') !== '1') {
                 $ierror = new ItemError(ItemError::EXCEPTION_INDEXDOCUMENT_WITHOUT_ABSOLUTEPATH);
