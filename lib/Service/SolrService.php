@@ -259,8 +259,8 @@ class SolrService
                     return $this->extractableFile($tmpmime);
                 }
                 
-                // if (key_exists('extension', $pinfo))
-                // return true;
+                if (key_exists('extension', $pinfo))
+                    return self::extractableFileExtension($pinfo['extension']);
                 
                 return false;
         }
