@@ -136,18 +136,24 @@ class SolrAdminService
         $currFieldsType = $currSchema['schema']['fieldTypes'];
         $currFields = $currSchema['schema']['fields'];
         $currDynamicFields = $currSchema['schema']['dynamicFields'];
+        $currCopyFields = $currSchema['schema']['copyFields'];
         
-        foreach ($currFieldsType as $fieldType) {
-            if (! self::checkFieldNecessity($client, $fields, 'field-type', $fieldType, $ierror)) {
-                $this->solrService->message('* Removing \'' . $fieldType['name'] . '\' : ', false);
+        foreach ($currCopyFields as $copyfield) {
+            if (! self::checkFieldNecessity($client, $fields, 'copy-field', $copyfield, $ierror)) {
+                $this->solrService->message('* Removing copy-field \'' . $copyfield['source'] . '/' . $copyfield['dest'] . '\' : ', false);
                 if (! $fix) {
                     $this->solrService->message('<comment>please fix this</comment>');
                     continue;
                 }
                 
-                if (self::deleteField($client, 'field-type', $fieldType['name'], $ierror))
-                    $this->solrService->message('<info>ok</info>');
-                else {
+                if (self::deleteField($client, 'copy-field', $copyfield, $ierror)) {
+                    
+                    self::checkFieldProperty($client, $copyfield, $curr, $ierror);
+                    if ($curr)
+                        $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
+                    else
+                        $this->solrService->message('<info>ok</info>');
+                } else {
                     if ($ierror->getCode() == 0)
                         $this->solrService->message('<error>fail</error>');
                     else
@@ -158,15 +164,42 @@ class SolrAdminService
         
         foreach ($currFields as $field) {
             if (! self::checkFieldNecessity($client, $fields, 'field', $field, $ierror)) {
-                $this->solrService->message('* Removing \'' . $field['name'] . '\' : ', false);
+                $this->solrService->message('* Removing field \'' . $field['name'] . '\' : ', false);
                 if (! $fix) {
                     $this->solrService->message('<comment>please fix this</comment>');
                     continue;
                 }
                 
-                if (self::deleteField($client, 'field', $field['name'], $ierror))
-                    $this->solrService->message('<info>ok</info>');
-                else {
+                if (self::deleteField($client, 'field', $field, $ierror)) {
+                    self::checkFieldProperty($client, $field, $curr, $ierror);
+                    if ($curr)
+                        $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
+                    else
+                        $this->solrService->message('<info>ok</info>');
+                } else {
+                    if ($ierror->getCode() == 0)
+                        $this->solrService->message('<error>fail</error>');
+                    else
+                        return false;
+                }
+            }
+        }
+        
+        foreach ($currFieldsType as $fieldType) {
+            if (! self::checkFieldNecessity($client, $fields, 'field-type', $fieldType, $ierror)) {
+                $this->solrService->message('* Removing field-type \'' . $fieldType['name'] . '\' : ', false);
+                if (! $fix) {
+                    $this->solrService->message('<comment>please fix this</comment>');
+                    continue;
+                }
+                
+                if (self::deleteField($client, 'field-type', $fieldType, $ierror)) {
+                    self::checkFieldProperty($client, $fieldType, $curr, $ierror);
+                    if ($curr)
+                        $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
+                    else
+                        $this->solrService->message('<info>ok</info>');
+                } else {
                     if ($ierror->getCode() == 0)
                         $this->solrService->message('<error>fail</error>');
                     else
@@ -177,15 +210,19 @@ class SolrAdminService
         
         foreach ($currDynamicFields as $fielddyn) {
             if (! self::checkFieldNecessity($client, $fields, 'dynamic-field', $fielddyn, $ierror)) {
-                $this->solrService->message('* Removing \'' . $fielddyn['name'] . '\' : ', false);
+                $this->solrService->message('* Removing dynamic-field \'' . $fielddyn['name'] . '\' : ', false);
                 if (! $fix) {
                     $this->solrService->message('<comment>please fix this</comment>');
                     continue;
                 }
                 
-                if (self::deleteField($client, 'dynamic-field', $fielddyn['name'], $ierror))
-                    $this->solrService->message('<info>ok</info>');
-                else {
+                if (self::deleteField($client, 'dynamic-field', $fielddyn, $ierror)) {
+                    self::checkFieldProperty($client, $fielddyn, $curr, $ierror);
+                    if ($curr)
+                        $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
+                    else
+                        $this->solrService->message('<info>ok</info>');
+                } else {
                     if ($ierror->getCode() == 0)
                         $this->solrService->message('<error>fail</error>');
                     else
@@ -238,8 +275,13 @@ class SolrAdminService
     private static function checkFieldNecessity(\Solarium\Client $client, $fields, $type, $check, $ierror)
     {
         foreach ($fields as $field) {
-            if ($field['type'] == $type && $field['data']['name'] == $check['name'])
-                return true;
+            if ($type === 'dynamic-field') {
+                if ($field['type'] === $type && substr($field['data']['name'], 0, strlen($check['name']) - 1) === substr($check['name'], 0, - 1))
+                    return true;
+            } else {
+                if ($field['type'] === $type && $field['data']['name'] === $check['name'])
+                    return true;
+            }
         }
         
         return false;
@@ -329,6 +371,8 @@ class SolrAdminService
             $url = 'schema/dynamicfields/';
         if ($fieldType == 'field-type')
             $url = 'schema/fieldtypes/';
+        if ($fieldType == 'copy-field')
+            $url = 'schema/copyfields/';
         if ($url == '')
             return false;
         
@@ -398,13 +442,22 @@ class SolrAdminService
      * @param \Solarium\Client $client            
      * @param array $field            
      */
-    private static function deleteField(\Solarium\Client $client, $type, $fieldname, &$ierror)
+    private static function deleteField(\Solarium\Client $client, $type, $field, &$ierror)
     {
-        $data = array(
-            'delete-' . $type => array(
-                'name' => $fieldname
-            )
-        );
+        if ($type === 'copy-field')
+            $data = array(
+                'delete-' . $type => array(
+                    'source' => $field['source'],
+                    'dest' => $field['dest']
+                )
+            );
+        
+        else
+            $data = array(
+                'delete-' . $type => array(
+                    'name' => $field['name']
+                )
+            );
         
         return self::solariumPostSchemaRequest($client, $data, $ierror);
     }
@@ -762,7 +815,7 @@ class SolrAdminService
         array_push($fields, array(
             'type' => 'field-type',
             'data' => array(
-                'name' => 'text_nextant',
+                'name' => 'text_general',
                 'class' => 'solr.TextField',
                 'omitNorms' => false,
                 'indexAnalyzer' => array(
@@ -780,8 +833,8 @@ class SolrAdminService
                             'class' => 'solr.ASCIIFoldingFilterFactory'
                         ),
                         array(
-                            // 'class' => 'solr.EdgeNGramFilterFactory',
-                            'class' => 'solr.NGramFilterFactory',
+                            'class' => 'solr.EdgeNGramFilterFactory',
+                            // 'class' => 'solr.NGramFilterFactory',
                             'maxGramSize' => '15',
                             'minGramSize' => '3'
                         )
@@ -836,7 +889,7 @@ class SolrAdminService
             'type' => 'field',
             'data' => array(
                 'name' => 'text',
-                'type' => 'text_nextant',
+                'type' => 'text_general',
                 'indexed' => true,
                 'stored' => true,
                 'multiValued' => false
@@ -848,7 +901,7 @@ class SolrAdminService
             'type' => 'field',
             'data' => array(
                 'name' => 'text_light',
-                'type' => 'text_nextant',
+                'type' => 'text_general',
                 'indexed' => true,
                 'stored' => false,
                 'multiValued' => false
@@ -860,7 +913,7 @@ class SolrAdminService
             'type' => 'field',
             'data' => array(
                 'name' => 'nextant_path',
-                'type' => 'text_nextant',
+                'type' => 'text_general',
                 'indexed' => true,
                 'stored' => true,
                 'multiValued' => false
@@ -873,6 +926,7 @@ class SolrAdminService
             'data' => array(
                 'name' => 'nextant_owner',
                 'type' => 'string',
+                'docValues' => false,
                 'indexed' => true,
                 'stored' => true,
                 'multiValued' => false
@@ -885,6 +939,7 @@ class SolrAdminService
             'data' => array(
                 'name' => 'nextant_mtime',
                 'type' => 'int',
+                'docValues' => false,
                 'indexed' => true,
                 'stored' => true,
                 'multiValued' => false
@@ -933,6 +988,7 @@ class SolrAdminService
             'data' => array(
                 'name' => 'nextant_source',
                 'type' => 'string',
+                'docValues' => false,
                 'indexed' => true,
                 'stored' => true,
                 'multiValued' => false

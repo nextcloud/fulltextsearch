@@ -249,7 +249,8 @@ class SolrService
                     return false;
                 
                 $pinfo = pathinfo($path);
-                if (key_exists('extension', $pinfo) && substr($pinfo['extension'], 0, 1) == 'd' && ((int) (substr($pinfo['extension'], 1)) > 0)) {
+                
+                if (key_exists('extension', $pinfo) && substr($pinfo['extension'], 0, 1) === 'd' && ((int) (substr($pinfo['extension'], 1)) > 0)) {
                     $tmppath = substr($path, 0, strrpos($path, '.'));
                     $tmpmime = \OC::$server->getMimeTypeDetector()->detectPath($tmppath);
                     
@@ -258,8 +259,8 @@ class SolrService
                     return $this->extractableFile($tmpmime);
                 }
                 
-                if (key_exists('extension', $pinfo))
-                    return true;
+                // if (key_exists('extension', $pinfo))
+                // return true;
                 
                 return false;
         }

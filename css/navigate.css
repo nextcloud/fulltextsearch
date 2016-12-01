@@ -3,7 +3,7 @@
 .searchbox input[type="search"]:valid, .searchbox input[type="search"]:focus
 	{
 	width: 300px;
-	background: #fff1;
+	background: #ffffff18;
 }
 
 #nextantList {
