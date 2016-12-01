@@ -76,10 +76,4 @@ return [
             'verb' => 'POST'
         ]
     ]
-]
-;
-
-/*
- * This route is now useless. It was used with navigate.js + SearchController
- * We are now using SearchProvider.
- */
+];
