@@ -276,7 +276,7 @@ style('nextant', 'admin');
 				</div>
 			</td>
 			<td
-				style="padding-left: 30px; padding-top: 40px; vertical-align: top">
+				style="padding-left: 30px; padding-top: 40px; vertical-align: top; position: relative;">
 				<div id="nextant-display" class="nextant-box">
 					<div id="ping" class="nextant-display-line">
 						<img id="icon_check" class="nextant_display_icon"
