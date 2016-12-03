@@ -54,7 +54,6 @@ class ConfigService
         
         'resource_level' => '4',
         'index_live' => '1',
-        'index_live_sql' => '1',
         'index_live_queuekey' => '19375',
         'index_delay' => '2',
         'index_locked' => '0',

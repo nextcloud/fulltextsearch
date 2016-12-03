@@ -40,7 +40,7 @@ class LiveQueueMapper extends Mapper
     {
         parent::__construct($db, self::TABLENAME, 'OCA\Nextant\Db\LiveQueue');
     }
-       
+
     public function find($id)
     {
         $sql = 'SELECT * FROM *PREFIX*' . self::TABLENAME . ' WHERE id = ?';
@@ -68,7 +68,7 @@ class LiveQueueMapper extends Mapper
     public function clear()
     {
         $sql = 'TRUNCATE *PREFIX*' . self::TABLENAME;
-        return $this->execute();
+        return $this->execute($sql);
     }
 }
 

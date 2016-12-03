@@ -175,16 +175,12 @@ $(document)
 								force_index = 1;
 
 							var data = {
-								resource_level : $('#solr_resource_level').val(),
-								index_live : ($('#solr_index_live')
-										.is(':checked')) ? 1 : 0,
+								resource_level : $('#solr_resource_level')
+										.val(),
+								index_live : $('#solr_index_live').val(),
 								index_delay : $('#solr_index_delay').val(),
 								force_index : force_index
 							}
-
-							if (switched == 'index_live')
-								data.index_live = (data.index_live == 1) ? 0
-										: 1;
 
 							$.post(OC.filePath('nextant', 'ajax/settings',
 									'option_status.php'), data,
@@ -224,8 +220,12 @@ $(document)
 								$('#nextant_suboptions').fadeTo(delay, 1);
 								$('#solr_index_live_queuekey').prop('disabled',
 										true);
-								$('#solr_index_live_queuekey').fadeTo(delay,
-										0.85);
+								if (response.index_live == 1)
+									$('#solr_index_live_queuekey').fadeTo(
+											delay, 0.85);
+								else
+									$('#solr_index_live_queuekey').fadeTo(
+											delay, 0);
 							} else {
 								$('#nextant_suboptions :input').attr(
 										"disabled", true);
@@ -296,8 +296,7 @@ $(document)
 
 							$('#solr_resource_level').val(
 									response.resource_level);
-							$('#solr_index_live').prop('checked',
-									(response.index_live == 1));
+							$('#solr_index_live').val(response.index_live);
 							$('#solr_index_live_queuekey').val(
 									response.index_live_queuekey);
 							$('#solr_index_delay').val(response.index_delay);
@@ -689,8 +688,8 @@ $(document)
 						nextantSettings.savesuboptions_status();
 					});
 
-					$('#solr_index_live').mousedown(function() {
-						nextantSettings.savesuboptions_status('index_live');
+					$('#solr_index_live').on('change', function() {
+						nextantSettings.savesuboptions_status();
 					});
 
 					$('#solr_index_delay').on('input', function(e) {

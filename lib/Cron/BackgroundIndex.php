@@ -89,7 +89,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 
     private function liveIndex()
     {
-        if ($this->configService->getAppValue('index_live') !== '1')
+        if ($this->configService->getAppValue('index_live') === '0')
             return;
         
         while (($item = $this->queueService->readQueue()) !== false) {

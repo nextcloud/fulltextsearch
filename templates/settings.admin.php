@@ -209,7 +209,7 @@ style('nextant', 'admin');
 	    <?php p($l->t('Resource Level :')); ?>
 						</td>
 							<td colspan="2"><select name="solr_resource_level"
-								id="solr_resource_level">
+								id="solr_resource_level" style="width: 200px">
 									<!-- <option value="5">Higher Level</option> -->
 									<option value="4">High performance</option>
 									<!-- <option value="3">Mid level</option> -->
@@ -222,9 +222,11 @@ style('nextant', 'admin');
 							<td class="nextant_admin_left">					
 	    <?php p($l->t('Live Index :')); ?>
 						</td>
-							<td colspan="2"><input type="checkbox" name="solr_index_live"
-								id="solr_index_live" value="1" style="margin: 10px;"> <input
-								type="text" id="solr_index_live_queuekey"
+							<td colspan="2"><select id="solr_index_live" style="width: 200px">
+									<option value="0">Disabled</option>
+									<option value="1">Using Semaphore</option>
+									<option value="2">Using Database</option>
+							</select> <input type="text" id="solr_index_live_queuekey"
 								style="width: 100px; font-size: 12px;" /></td>
 						</tr>
 
