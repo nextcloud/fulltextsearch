@@ -99,10 +99,11 @@ class Live extends Base
             return;
         }
         
-        if ($this->configService->getAppValue('index_live') !== '1') {
+        if ($this->configService->getAppValue('index_live') === '0') {
             $output->writeln('your nextant is not configured for Live Index');
             return;
         }
+        
         // $this->miscService->setDebug($input->getOption('debug'));
         // $this->fileService->setDebug($input->getOption('debug'));
         // $this->indexService->setDebug($input->getOption('debug'));
@@ -110,6 +111,7 @@ class Live extends Base
         $this->solrService->setOutput($output);
         $this->indexService->setOutput($output);
         $this->indexService->setParent($this);
+        $this->queueService->setParent($this);
         
         $output->writeln('');
         
@@ -117,27 +119,47 @@ class Live extends Base
         $lasttick = 0;
         
         while (true) {
+            $catched = false;
+            
             try {
                 $this->interrupted();
                 $item = $this->queueService->readQueue(true);
                 if ($item !== false) {
                     if ($input->getOption('instant'))
                         $this->queueService->executeItem($item);
-                    else {
+                    else
                         $this->queueService->executeItem($item);
-                    }
                 }
             } catch (\Doctrine\DBAL\Exception\DriverException $dbde) {
-                $output->writeln('**** DRIVEREXCEPTION');
+                $catched = true;
                 // $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $dbde->getStatusMessage());
             } catch (\Doctrine\DBAL\Driver\PDOException $dbpdoe2) {
-                $output->writeln('**** Doctrine\DBAL\Driver\PDOException');
+                $catched = true;
                 // $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $dbpdoe->getStatusMessage());
             } catch (\PDOException $dbpdoe2) {
-                $output->writeln('**** PDOException');
+                $catched = true;
                 // $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $dbpdoe2->getStatusMessage());
             }
-            //
+            
+            if ($catched) {
+                
+                $dead = false;
+                $dbConn = \OC::$server->getDatabaseConnection();
+                
+                try {
+                    $dbConn->close();
+                } catch (\Exception $ex) {}
+                
+                try {
+                    $dbConn->connect();
+                } catch (\Exception $ex) {
+                    $dead = true;
+                }
+                
+                if ($dead)
+                    break;
+            }
+            
             //
             $output->writeln('');
         }
