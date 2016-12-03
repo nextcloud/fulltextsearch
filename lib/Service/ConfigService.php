@@ -54,6 +54,7 @@ class ConfigService
         
         'resource_level' => '4',
         'index_live' => '1',
+        'index_live_sql' => '1',
         'index_live_queuekey' => '19375',
         'index_delay' => '2',
         'index_locked' => '0',
@@ -193,6 +194,11 @@ class ConfigService
         return false;
     }
 
+    /**
+     * returns the current resource level.
+     *
+     * @return number
+     */
     public function resourceLevel()
     {
         return $this->getAppValue('resource_level');

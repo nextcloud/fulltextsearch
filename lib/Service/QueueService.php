@@ -29,6 +29,7 @@ namespace OCA\Nextant\Service;
 use \OCA\Nextant\Events\FilesEvents;
 use \OCA\Nextant\Items\ItemQueue;
 use \OCA\Nextant\Items\ItemDocument;
+use \OCA\Nextant\Db\LiveQueue;
 
 class QueueService
 {
@@ -45,12 +46,20 @@ class QueueService
 
     private $queue = null;
 
-    public function __construct($configService, $indexService, $fileService, $miscService)
+    private $parent = null;
+
+    public function __construct($liveQueueMapper, $configService, $indexService, $fileService, $miscService)
     {
+        $this->liveQueueMapper = $liveQueueMapper;
         $this->configService = $configService;
         $this->indexService = $indexService;
         $this->fileService = $fileService;
         $this->miscService = $miscService;
+    }
+
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
     }
 
     public function liveIndex($item)
@@ -58,11 +67,15 @@ class QueueService
         if ($this->configService->getAppValue('index_live') !== '1')
             return;
         
-        $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
-        $msg = ItemQueue::toJson($item);
+        if ($this->configService->getAppValue('index_live_sql') === '1')
+            $this->liveQueueMapper->insert(new LiveQueue($item));
         
-        if (! msg_send($queue, 1, $msg))
-            $this->miscService->log('can\'t msg_send()');
+        else {
+            $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
+            
+            if (! msg_send($queue, 1, ItemQueue::toJson($item)))
+                $this->miscService->log('can\'t msg_send()');
+        }
     }
 
     public function emptyQueue()
@@ -70,7 +83,10 @@ class QueueService
         if ($this->configService->getAppValue('index_live') !== '1')
             return;
         
-        msg_remove_queue(msg_get_queue($this->configService->getAppValue('index_live_queuekey')));
+        if ($this->configService->getAppValue('index_live_sql') === '1')
+            $this->liveQueueMapper->clear();
+        else
+            msg_remove_queue(msg_get_queue($this->configService->getAppValue('index_live_queuekey')));
     }
 
     public function readQueue($standby = false)
@@ -78,25 +94,51 @@ class QueueService
         if ($this->configService->getAppValue('index_live') !== '1')
             return;
         
-        $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
-        
-        $msg_type = NULL;
         $msg = NULL;
-        $max_msg_size = 512;
-        
-        $infos = msg_stat_queue($queue);
-        if (! $standby && $infos['msg_qnum'] == 0)
-            return false;
-        
-        if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg, true, 0, $error)) {
-            return false;
+        if ($this->configService->getAppValue('index_live_sql') === '1') {
+            
+            while (true) {
+                
+                if ($this->parent != null)
+                    $this->parent->interrupted();
+                
+                $queue = $this->liveQueueMapper->next();
+                if ($queue)
+                    break;
+                if (! $standby && ! $queue)
+                    break;
+                sleep(15);
+            }
+            
+            if ($queue)
+                $msg = $queue->getItem();
+            
+        } else {
+            $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
+            
+            $msg_type = NULL;
+            $max_msg_size = 512;
+            
+            $infos = msg_stat_queue($queue);
+            if (! $standby && $infos['msg_qnum'] == 0)
+                return false;
+            
+            if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg, true, 0, $error)) {
+                return false;
+            }
         }
+        
+        if ($msg == NULL)
+            return;
         
         return ItemQueue::fromJson($msg);
     }
 
     public function executeItem($item)
     {
+        if ($item == null)
+            return false;
+        
         $options = array();
         
         if (! $item->getUserId())

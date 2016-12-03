@@ -24,37 +24,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-// namespace OCA\Nextant\Db;
+namespace OCA\Nextant\Db;
 
-// use OCP\IDBConnection;
-// use OCP\AppFramework\Db\Mapper;
+use \OCA\Nextant\Items\ItemQueue;
+use OCP\AppFramework\Db\Entity;
 
-// class IndexMapper extends Mapper
-// {
+class LiveQueue extends Entity
+{
 
-//     const TABLENAME = 'nextant_index';
+    public $id;
 
-//     public function __construct(IDBConnection $db)
-//     {
-//         parent::__construct($db, self::TABLENAME);
-//     }
+    public $item;
 
-//     public function find($id)
-//     {
-//         $sql = 'SELECT * FROM *PREFIX*' . self::TABLENAME . ' WHERE id = ?';
-//         return $this->findEntity($sql, [
-//             $id
-//         ]);
-//     }
-
-//     public function findByKey($clef)
-//     {
-//         $sql = 'SELECT * FROM *PREFIX*' . self::TABLENAME . ' WHERE clef = ?';
-//         return $this->findEntity($sql, [
-//             $clef
-//         ]);
-//     }
-
-
-// }
+    public function __construct($item = null)
+    {
+        $this->setItem(ItemQueue::toJson($item));
+    }
+}
 

@@ -28,7 +28,7 @@ namespace OCA\Nextant\AppInfo;
 
 use \OCA\Nextant\Controller\SettingsController;
 use \OCA\Nextant\Controller\SearchController;
-use \OCA\Nextant\Db\IndexMapper;
+use \OCA\Nextant\Db\LiveQueueMapper;
 use \OCA\Nextant\Events\FilesEvents;
 use \OCA\Nextant\Events\BookmarksEvents;
 use \OCA\Nextant\Hooks\FilesHooks;
@@ -78,7 +78,7 @@ class Application extends App
         });
         
         $container->registerService('QueueService', function ($c) {
-            return new QueueService($c->query('ConfigService'), $c->query('IndexService'), $c->query('FileService'), $c->query('MiscService'));
+            return new QueueService($c->query('LiveQueueMapper'), $c->query('ConfigService'), $c->query('IndexService'), $c->query('FileService'), $c->query('MiscService'));
         });
         
         $container->registerService('FileService', function ($c) {
@@ -101,8 +101,8 @@ class Application extends App
             return new SolrToolsService($c->query('SolrService'), $c->query('ConfigService'), $c->query('MiscService'));
         });
         
-        $container->registerService('IndexMapper', function ($c) {
-            return new IndexMapper($c->query('ServerContainer')
+        $container->registerService('LiveQueueMapper', function ($c) {
+            return new LiveQueueMapper($c->query('ServerContainer')
                 ->getDb());
         });
         
@@ -113,8 +113,6 @@ class Application extends App
         $container->registerService('BookmarksEvents', function ($c) {
             return new BookmarksEvents($c->query('ConfigService'), $c->query('UserId'), $c->query('SolrService'), $c->query('MiscService'));
         });
-        
-        // $container->query('IndexMapper')->insert(new IndexEntity(array(userid => 2, 'path' => '/toto', 'clef' => 'CLEFCLEF')));
         
         $container->registerService('SearchController', function ($c) {
             return new SearchController($c->query('AppName'), $c->query('Request'), $c->query('UserId'), $c->query('GroupManager'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('FileService'), $c->query('BookmarkService'), $c->query('MiscService'));
@@ -165,6 +163,12 @@ class Application extends App
         $container->registerService('RootFolder', function ($c) {
             return $c->getServer()
                 ->getRootFolder();
+        });
+        
+        // Translates
+        $container->registerService('L10N', function (IContainer $c) {
+            return $c->query('ServerContainer')
+                ->getL10N($c->query('AppName'));
         });
         
         $container->registerService('SolariumClient', function ($c) {

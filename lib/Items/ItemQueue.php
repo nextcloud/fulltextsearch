@@ -118,6 +118,8 @@ class ItemQueue
 
     public static function toJson($item)
     {
+        if ($item === null)
+            return null;
         return json_encode(array(
             'type' => $item->getType(),
             'userid' => $item->getUserId(),
