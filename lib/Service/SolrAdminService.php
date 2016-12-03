@@ -439,13 +439,8 @@ class SolrAdminService
         if (! key_exists('copyFields', $curr['schema']))
             return false;
         
-        $currCopyFields = $curr['schema']['copyFields'];
-        
-        $app = new \OCA\Nextant\AppInfo\Application();
-        $app->getContainer()
-            ->query('MiscService')
-            ->log('___' . var_export($field, true) . '---' . var_export($currCopyFields, true));
-        
+        $currCopyFields = $curr['schema']['copyFields'];        
+       
         foreach ($currCopyFields as $copyfield) {
             if ($copyfield['dest'] === $field['data']['dest'])
                 return json_decode(json_encode($copyfield), true);
