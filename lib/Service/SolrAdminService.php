@@ -136,7 +136,7 @@ class SolrAdminService
             
             break;
         }
-        return;
+        
         $this->solrService->message('');
         $this->solrService->message('Cleaning extra fields');
         $currSchema = self::getCurrentSchema($client, $ierror);
