@@ -510,7 +510,9 @@ class SolrService
                 if (substr($qstr, 0, 1) == '"')
                     $value = 150;
                 
-                $q .= '(' . $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ') OR (' . $oper . 'text_light:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ')';
+                $q .= '(' . $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ')';
+                $q .= ' OR (' . $oper . 'text_light:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ')';
+                $q .= ' OR (' . $oper . 'text_edge:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . ($value * 3) . ')';
             }
             
             if ($path !== '')

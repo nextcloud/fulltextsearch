@@ -1,6 +1,8 @@
-**v0.10.3**
+**v0.10.4**
 - Upload/creating a .noindex file in a folder will prevent nextant to index its content (and subdirectories)
 - --background will force the scan on next tick of the cron 
+- Live Index can use database instead of Semaphore
+- bugfixes
 
 
 **v0.10.2**

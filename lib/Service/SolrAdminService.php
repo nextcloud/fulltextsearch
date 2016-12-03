@@ -89,7 +89,12 @@ class SolrAdminService
         $changed = false;
         while (true) {
             foreach ($fields as $field) {
-                $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\' : ', false);
+                
+                if ($field['type'] === 'copy-field')
+                    $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['source'] . '/' . $field['data']['dest'] . '\' : ', false);
+                else
+                    $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\' : ', false);
+                
                 if (self::checkFieldProperty($client, $field, $curr, $ierror))
                     $this->solrService->message('<info>ok</info>');
                 else {
@@ -100,7 +105,10 @@ class SolrAdminService
                     
                     if ($fix) {
                         $changed = true;
-                        $this->solrService->message('   -> <comment>Fixing ' . $field['type'] . ' \'' . $field['data']['name'] . '\'</comment> ', false);
+                        if ($field['type'] === 'copy-field')
+                            $this->solrService->message('   -> <comment>Fixing ' . $field['type'] . ' \'' . $field['data']['source'] . '/' . $field['data']['dest'] . '\'</comment> ', false);
+                        else
+                            $this->solrService->message('   -> <comment>Fixing ' . $field['type'] . ' \'' . $field['data']['name'] . '\'</comment> ', false);
                         
                         if ($curr) {
                             if (! self::modifyField($client, $field, $ierror))
@@ -128,7 +136,7 @@ class SolrAdminService
             
             break;
         }
-        
+        return;
         $this->solrService->message('');
         $this->solrService->message('Cleaning extra fields');
         $currSchema = self::getCurrentSchema($client, $ierror);
@@ -297,7 +305,8 @@ class SolrAdminService
      */
     private static function checkFieldProperty(\Solarium\Client $client, $field, &$property, &$ierror)
     {
-        $property = self::getFieldProperty($client, $field['type'], $field['data']['name'], $ierror);
+        $property = self::getFieldProperty($client, $field, $ierror);
+        
         if (! $property)
             return false;
         
@@ -362,17 +371,19 @@ class SolrAdminService
      * @param string $fieldName            
      * @return boolean|mixed
      */
-    private static function getFieldProperty(\Solarium\Client $client, $fieldType, $fieldName, &$ierror = '')
+    private static function getFieldProperty(\Solarium\Client $client, $field, &$ierror = '')
     {
         $url = '';
-        if ($fieldType == 'field')
+        if ($field['type'] == 'field')
             $url = 'schema/fields/';
-        if ($fieldType == 'dynamic-field')
+        if ($field['type'] == 'dynamic-field')
             $url = 'schema/dynamicfields/';
-        if ($fieldType == 'field-type')
+        if ($field['type'] == 'field-type')
             $url = 'schema/fieldtypes/';
-        if ($fieldType == 'copy-field')
-            $url = 'schema/copyfields/';
+        if ($field['type'] == 'copy-field')
+            return self::getCopyFieldProperty($client, $field, $ierror);
+            
+            // $url = 'schema/copyfields/';
         if ($url == '')
             return false;
         
@@ -380,7 +391,7 @@ class SolrAdminService
             $query = $client->createSelect();
             $request = $client->createRequest($query);
             
-            $request->setHandler($url . $fieldName);
+            $request->setHandler($url . $field['data']['name']);
             
             $response = $client->executeRequest($request);
             if ($response->getStatusCode() != 200)
@@ -405,6 +416,41 @@ class SolrAdminService
         } catch (\Solarium\Exception $e) {
             $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
         }
+        return false;
+    }
+
+    /**
+     * Get properties on a field based on its type and name
+     *
+     * @param \Solarium\Client $client            
+     * @param string $fieldType            
+     * @param string $fieldName            
+     * @return boolean|mixed
+     */
+    private static function getCopyFieldProperty(\Solarium\Client $client, $field, &$ierror = '')
+    {
+        $url = '';
+        if ($field['type'] != 'copy-field')
+            return false;
+            
+            // $url = 'schema/copyfields/';
+        
+        $curr = self::getCurrentSchema($client, $ierror);
+        if (! key_exists('copyFields', $curr['schema']))
+            return false;
+        
+        $currCopyFields = $curr['schema']['copyFields'];
+        
+        $app = new \OCA\Nextant\AppInfo\Application();
+        $app->getContainer()
+            ->query('MiscService')
+            ->log('___' . var_export($field, true) . '---' . var_export($currCopyFields, true));
+        
+        foreach ($currCopyFields as $copyfield) {
+            if ($copyfield['dest'] === $field['data']['dest'])
+                return json_decode(json_encode($copyfield), true);
+        }
+        
         return false;
     }
 
@@ -833,9 +879,54 @@ class SolrAdminService
                             'class' => 'solr.ASCIIFoldingFilterFactory'
                         ),
                         array(
+                            'class' => 'solr.NGramFilterFactory',
+                            'maxGramSize' => '20',
+                            'minGramSize' => '3'
+                        )
+                    )
+                ),
+                'queryAnalyzer' => array(
+                    'tokenizer' => array(
+                        'class' => 'solr.StandardTokenizerFactory'
+                    ),
+                    'filters' => array(
+                        array(
+                            'class' => 'solr.StandardFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.LowerCaseFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.ASCIIFoldingFilterFactory'
+                        )
+                    )
+                )
+            )
+        ));
+        
+        array_push($fields, array(
+            'type' => 'field-type',
+            'data' => array(
+                'name' => 'text_general_edge',
+                'class' => 'solr.TextField',
+                'omitNorms' => false,
+                'indexAnalyzer' => array(
+                    'tokenizer' => array(
+                        'class' => 'solr.StandardTokenizerFactory'
+                    ),
+                    'filters' => array(
+                        array(
+                            'class' => 'solr.StandardFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.LowerCaseFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.ASCIIFoldingFilterFactory'
+                        ),
+                        array(
                             'class' => 'solr.EdgeNGramFilterFactory',
-                            // 'class' => 'solr.NGramFilterFactory',
-                            'maxGramSize' => '15',
+                            'maxGramSize' => '20',
                             'minGramSize' => '3'
                         )
                     )
@@ -892,6 +983,18 @@ class SolrAdminService
                 'type' => 'text_general',
                 'indexed' => true,
                 'stored' => true,
+                'multiValued' => false
+            )
+        ));
+        
+        // text
+        array_push($fields, array(
+            'type' => 'field',
+            'data' => array(
+                'name' => 'text_edge',
+                'type' => 'text_general_edge',
+                'indexed' => true,
+                'stored' => false,
                 'multiValued' => false
             )
         ));
@@ -1066,6 +1169,19 @@ class SolrAdminService
                 'indexed' => true,
                 'stored' => true,
                 'multiValued' => true
+            )
+        ));
+        
+        //
+        // copy-field
+        //
+        
+        // copy-field
+        array_push($fields, array(
+            'type' => 'copy-field',
+            'data' => array(
+                'source' => 'text',
+                'dest' => 'text_edge'
             )
         ));
         
