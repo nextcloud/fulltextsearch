@@ -60,6 +60,7 @@ class Check extends Base
         parent::configure();
         $this->setName('nextant:check')
             ->setDescription('check, fix and optimise your current Solr configuration')
+            ->addOption('disable', null, InputOption::VALUE_NONE, 'disable Nextant')
             ->addOption('info', null, InputOption::VALUE_NONE, 'display some info')
             ->addOption('infoall', null, InputOption::VALUE_NONE, 'display some info (also sensitive)')
             ->addOption('fix', 'f', InputOption::VALUE_NONE, 'fix');
@@ -69,6 +70,11 @@ class Check extends Base
     {
         if (! $this->solrService->configured(true)) {
             $output->writeln('Nextant is not yet configured');
+            return;
+        }
+        
+        if ($input->getOption('disable')) {
+            $this->configService->setAppValue('configured', '2');
             return;
         }
         
