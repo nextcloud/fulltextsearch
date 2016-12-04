@@ -54,7 +54,9 @@ class SettingsController extends Controller
 
     private $solr_timeout;
 
-    public function __construct($appName, IRequest $request, ConfigService $configService, $indexService, $solrService, $solrTools, $solrAdmin, $miscService)
+    private $l10n;
+
+    public function __construct($appName, IRequest $request, ConfigService $configService, $indexService, $solrService, $solrTools, $solrAdmin, $l10n, $miscService)
     {
         parent::__construct($appName, $request);
         $this->configService = $configService;
@@ -62,6 +64,7 @@ class SettingsController extends Controller
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->solrAdmin = $solrAdmin;
+        $this->l10n = $l10n;
         $this->miscService = $miscService;
     }
 
@@ -93,7 +96,7 @@ class SettingsController extends Controller
             'solr_url' => $this->configService->getAppValue('solr_url'),
             'solr_core' => $this->configService->getAppValue('solr_core'),
             'solr_timeout' => $this->configService->getAppValue('solr_timeout'),
-            'nextant_version' => $this->configService->getAppValue('installed_version') . ' (rc)',
+            'nextant_version' => $this->configService->getAppValue('installed_version'),
             'index_files' => $this->configService->getAppValue('index_files'),
             'index_files_needed' => $this->configService->getAppValue('index_files_needed'),
             'index_files_max_size' => $this->configService->getAppValue('index_files_max_size'),
@@ -251,7 +254,7 @@ class SettingsController extends Controller
     private function test_ping(&$message)
     {
         if ($this->solrAdmin->ping($ierror)) {
-            $message = 'Apache Solr is up, running and responding to our ping query';
+            $message = $this->l10n->t('Apache Solr is up, running and responding to our ping query');
             return true;
         }
         

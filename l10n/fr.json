@@ -1,0 +1,6 @@
+{
+	"translations": {
+		"Apache Solr is up, running and responding to our ping query": "Apache Solr fonctionne et repond a notre requete Ping"	
+	},
+	"pluralForm": "nplurals=2; plural=(n != 1);"
+}
