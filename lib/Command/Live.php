@@ -124,7 +124,7 @@ class Live extends Base
             try {
                 $this->interrupted();
                 $item = $this->queueService->readQueue(true);
-                if ($item !== false) {
+                if ($item !== null) {
                     if ($input->getOption('instant'))
                         $this->queueService->executeItem($item);
                     else

@@ -120,6 +120,7 @@ class ItemQueue
     {
         if ($item === null)
             return null;
+        
         return json_encode(array(
             'type' => $item->getType(),
             'userid' => $item->getUserId(),
@@ -132,6 +133,10 @@ class ItemQueue
     public static function fromJson($json)
     {
         $data = json_decode($json);
+        
+        if ($data == null)
+            return null;
+        
         $item = new ItemQueue($data->type, $data);
         return $item;
     }
