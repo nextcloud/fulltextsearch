@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 namespace OCA\Nextant\Controller;
 
 use \OCA\Nextant\Service\FileService;
@@ -121,13 +120,13 @@ class SearchController extends Controller
                 $hl2 = '';
                 if ($item->getHighlighting() !== null && is_array($item->getHighlighting())) {
                     if (sizeof($item->getHighlighting()) >= 1)
-                        $hl1 = '... ' . $item->getHighlighting()[0] . ' ...';
+                        $hl1 = '... ' . str_replace('<em>', '<span class="nextant_hl">', str_replace('</em>', '</span>', $item->getHighlighting()[0])) . ' ...';
                     if (sizeof($item->getHighlighting()) > 1)
-                        $hl2 = '... ' . $item->getHighlighting()[1] . ' ...';
+                        $hl2 = '... ' . str_replace('<em>', '<span class="nextant_hl">', str_replace('</em>', '</span>', $item->getHighlighting()[1])) . ' ...';
                     if (sizeof($item->getHighlighting()) > 2)
-                        $hl1 .= '... ' . $item->getHighlighting()[2] . ' ...';
+                        $hl1 .= '... ' . str_replace('<em>', '<span class="nextant_hl">', str_replace('</em>', '</span>', $item->getHighlighting()[2])) . ' ...';
                     if (sizeof($item->getHighlighting()) > 3)
-                        $hl2 .= '... ' . $item->getHighlighting()[3] . ' ...';
+                        $hl2 .= '... ' . str_replace('<em>', '<span class="nextant_hl">', str_replace('</em>', '</span>', $item->getHighlighting()[3])) . ' ...';
                 }
                 
                 $item->setLine(1, $item->getPath());

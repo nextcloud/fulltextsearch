@@ -352,10 +352,10 @@ class SolrService
             if ($document->isExtractable()) {
                 $query = $client->createExtract();
                 $query->setUprefix('nextant_attr_');
-                if ($this->configService->resourceLevel() === ConfigService::RESOURCE_LEVEL_LOWER)
-                    $query->addFieldMapping('content', 'text_light');
-                else
-                    $query->addFieldMapping('content', 'text');
+                // if ($this->configService->resourceLevel() === ConfigService::RESOURCE_LEVEL_LOWER)
+                // $query->addFieldMapping('content', 'text_light');
+                // else
+                $query->addFieldMapping('content', 'text');
                 
                 $query->addFieldMapping('div', 'ignored_');
                 $query->addFieldMapping('html', 'ignored_');
@@ -492,9 +492,9 @@ class SolrService
             array_push($options, 'complete_words');
             // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
             
-            $q = '';
             $path = '';
             $special = '+-';
+            $q = '(text_dense:"' . $helper->escapeTerm(str_replace('"', '', $string)) . '"^150)';
             foreach ($astring as $qstr) {
                 
                 $oper = '';
@@ -510,9 +510,9 @@ class SolrService
                 if (substr($qstr, 0, 1) == '"')
                     $value = 150;
                 
-                $q .= '(' . $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ')';
+                $q .= ' OR (' . $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ')';
                 $q .= ' OR (' . $oper . 'text_light:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ')';
-                $q .= ' OR (' . $oper . 'text_edge:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . ($value * 3) . ')';
+                $q .= ' OR (' . $oper . 'text_edge:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . ($value * 10) . ')';
             }
             
             if ($path !== '')
@@ -541,10 +541,19 @@ class SolrService
             $hl = null;
             if ($this->configService->resourceLevel() > ConfigService::RESOURCE_LEVEL_LOWER) {
                 $hl = $query->getHighlighting();
-                $hl->setSimplePrefix('<span class="nextant_hl">');
-                $hl->setSimplePostfix('</span>');
-                // $hl->setAlternateField('nextant_path');
+                // $hl->setAlternateField('text_dense');
                 $hl->setFragSize(70);
+                
+                $hl->setUsePhraseHighlighter(true);
+                $hl->setUseFastVectorHighlighter(true);
+                
+                $hl->setBoundaryScannerType('SENTENCE');
+                // $hl->setBoundaryScannerMaxScan();
+                // $hl->setBoundaryScannerChars();
+                // $hl->setBoundaryScannerLanguage();
+                // $hl->setBoundaryScannerCountry();
+                // $hl->setSimplePrefix('<span class="nextant_hl">');
+                // $hl->setSimplePostfix('</span>');
                 
                 switch ($this->configService->resourceLevel()) {
                     case ConfigService::RESOURCE_LEVEL_LOW:
@@ -562,7 +571,7 @@ class SolrService
                 }
                 
                 $hl->setFields(array(
-                    'text'
+                    'text_dense'
                 ));
             }
             
@@ -579,7 +588,7 @@ class SolrService
                 // highlighting
                 if ($hl !== null) {
                     $hlDoc = $highlighting->getResult($document->id);
-                    $item->setHighlighting($hlDoc->getField('text'));
+                    $item->setHighlighting($hlDoc->getField('text_dense'));
                 }
                 
                 $return[] = $item;
