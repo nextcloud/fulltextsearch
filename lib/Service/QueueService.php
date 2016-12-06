@@ -199,7 +199,7 @@ class QueueService
                     $this->fileService->endUser();
                 } else {
                     $doc[] = new ItemDocument(ItemDocument::TYPE_FILE, $item->getFileId());
-                    $this->indexService->removeDocuments($doc);
+                    $this->indexService->removeDocuments($doc, $ierror);
                 }
                 break;
         }

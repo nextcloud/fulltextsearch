@@ -479,7 +479,7 @@ class IndexService
      * @param ItemDocument[] $data            
      * @return boolean
      */
-    public function removeDocuments(&$data, &$ierror)
+    public function removeDocuments(&$data, &$ierror = '')
     {
         if (sizeof($data) == 0)
             return false;

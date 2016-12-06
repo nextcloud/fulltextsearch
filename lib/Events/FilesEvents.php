@@ -164,6 +164,10 @@ class FilesEvents
     {
         if ($this->configService->getAppValue('index_live') !== '0') {
             $file = FileService::getFileInfoFromPath($path, new \OC\Files\View('/' . $this->userId));
+            
+            if (! $file)
+                return;
+            
             if ($file->getId() > 0)
                 $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_DELETE, array(
                     'userid' => $this->userId,
