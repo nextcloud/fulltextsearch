@@ -207,11 +207,11 @@ style('nextant', 'admin');
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">					
-	    <?php p($l->t('Ressource Level :')); ?>
+	    <?php p($l->t('Resource Level :')); ?>
 						</td>
 							<td colspan="2"><select name="solr_resource_level"
 								id="solr_resource_level" style="width: 200px">
-									<!-- <option value="5"><?php p($l->t('Higher performance')); ?></option> -->
+									<option value="5"><?php p($l->t('Higher performance')); ?></option>
 									<option value="4"><?php p($l->t('High performance')); ?></option>
 									<!-- <option value="3"><?php p($l->t('Medium performance')); ?></option> -->
 									<option value="2"><?php p($l->t('Low performance')); ?></option>
@@ -258,7 +258,7 @@ style('nextant', 'admin');
 								<div id="nextant_first_index"
 									style="width: 270px; font-size: 12px; white-space: normal;">
 									<i>
-									<?php p($l->t('we recommand doing the very first indexing of your files using the <b>./occ nextant:index</b> command.')); ?>
+									<?php p($l->t('we recommand doing the very first indexing of your files using the ./occ nextant:index command.')); ?>
 									<?php p($l->t('However, you can force it to be started as a background process.')); ?>
 									</i> <br />
 									<button type="button" id="nextant_force_first_index"
