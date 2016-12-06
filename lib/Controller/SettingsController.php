@@ -207,7 +207,7 @@ class SettingsController extends Controller
         $message = '';
         $result = false;
         if (! $this->solrService->setClient($tmpConfig))
-            $message = 'The format of your address is not correct';
+            $message = $this->l10n->t('The format of the address is not correct');
         else {
             
             switch ($command) {
@@ -254,22 +254,26 @@ class SettingsController extends Controller
     private function test_ping(&$message)
     {
         if ($this->solrAdmin->ping($ierror)) {
-            $message = $this->l10n->t('Apache Solr is up, running and responding to our ping query');
+            $message = $this->l10n->t('Apache Solr is up, running and responding to ping query');
             return true;
         }
         
-        $message = 'Apache Solr is not responding to our ping query (Error #' . $ierror->getCode() . ')';
+        $message = $this->l10n->t('Apache Solr is not responding to ping query (Error #%1$s)', array(
+            $ierror->getCode()
+        ));
         return false;
     }
 
     private function test_schema(&$message)
     {
         if ($this->solrAdmin->checkSchema(true, $ierror)) {
-            $message = 'Schema is fine';
+            $message = $this->l10n->t('Schema is fine');
             return true;
         }
         
-        $message = 'Were not able to verify/fix your schema integrity (Error #' . $ierror->getCode() . ')';
+        $message = $this->l10n->t('Were not able to verify/fix schema integrity (Error #%1$s)', array(
+            $ierror->getCode()
+        ));
         return false;
     }
 
@@ -284,11 +288,13 @@ class SettingsController extends Controller
         $this->indexService->extract(ItemDocument::TYPE_TEST, '_nextant_test', $data, $solrDocs, true, $ierror);
         
         if ($doc->isProcessed()) {
-            $message = 'Text successfully extracted';
+            $message = $this->l10n->t('Text successfully extracted');
             return true;
         }
         
-        $message = 'Extract failed. Please check the configuration of your Solr server (Error #' . $ierror->getCode() . ')';
+        $message = $this->l10n->t('Extract failed. Please check the configuration of your Solr server (Error #%1$s)', array(
+            $ierror->getCode()
+        ));
         return false;
     }
 
@@ -298,7 +304,9 @@ class SettingsController extends Controller
         $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $ierror);
         
         if ($asource == false || sizeof($asource) != 1) {
-            $message('Error Updating field - Can\'t find original document - ' . $ierror->getCode());
+            $message = $this->l10n->t('Error Updating field - Can\'t find original document - (Error #%1$s)', array(
+                $ierror->getCode()
+            ));
             return false;
         }
         
@@ -318,16 +326,20 @@ class SettingsController extends Controller
         $this->indexService->updateDocuments(ItemDocument::TYPE_TEST, '_nextant_test', $data, $asource, $ierror);
         
         if (! $this->solrTools->commit(false, $ierror)) {
-            $message = 'Error during commit (Error #' . $ierror->getCode() . ')';
+            $message = $this->l10n->t('Error during commit (Error #%1$s)', array(
+                $ierror->getCode()
+            ));
             return false;
         }
         
         if (! $source->isUpdated()) {
-            $message = 'Error Updating field (Error #' . $ierror->getCode() . ')';
+            $message = $this->l10n->t('Error during updating field (Error #%1$s)', array(
+                $ierror->getCode()
+            ));
             return false;
         }
         
-        $message = 'Document successfully updated';
+        $message = $this->l10n->t('Document successfully updated');
         return true;
     }
 
@@ -340,20 +352,23 @@ class SettingsController extends Controller
                 
                 foreach ($result as $doc) {
                     if ($doc->getType() === ItemDocument::TYPE_TEST && $doc->getId() === 1) {
-                        $message = 'Found exactly what we were looking for';
+                        $message = $this->l10n->t('Found exactly what we were looking for');
                         return true;
                     }
                 }
                 
                 // CHECK ID DOCUMENT
-                $message = 'We found something, but not what we were expecting.';
+                $message = $this->l10n->t('We found something, but not what we were expecting.');
                 return false;
             }
-            $message = 'Canno\'t find any document';
+            
+            $message = $this->l10n->t('Cannot find any document');
             return false;
         }
         
-        $message = 'Search failed. Please check the configuration of your Solr server (Error #' . $ierror->getCode() . ')';
+        $message = $this->l10n->t('Search failed. Please check the configuration of your Solr server (Error #%1$s)', array(
+            $ierror->getCode()
+        ));
         return false;
     }
 
@@ -365,11 +380,13 @@ class SettingsController extends Controller
         );
         $this->indexService->removeDocuments($data, $ierror);
         if ($doc->isRemoved()) {
-            $message = 'Test document deleted';
+            $message = $this->l10n->t('Test document deleted');
             return true;
         }
         
-        $message = 'We could not delete our test document. Please check the configuration of your Solr server (Error #' . $ierror->getCode() . ')';
+        $message = $this->l10n->t('We could not delete our test document. Please check the configuration of your Solr server (Error #%1$s)', array(
+            $ierror->getCode()
+        ));
         return false;
     }
 
@@ -386,11 +403,11 @@ class SettingsController extends Controller
             if ($this->configService->getAppValue('configured') !== '1')
                 $this->configService->setAppValue('configured', '2');
             
-            $message = "Your configuration has been saved";
+            $message = $this->l10n->t('Your configuration has been saved');
             return true;
         }
         
-        $message = 'Configuration failed to be saved. Please reload this page.';
+        $message = $this->l10n->t('Configuration failed to be saved. Please reload this page.');
         return false;
     }
 

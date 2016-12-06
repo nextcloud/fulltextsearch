@@ -32,10 +32,13 @@ style('nextant', 'admin');
 
 	<table>
 		<tr>
-			<td colspan="2"><em><?php p($l->t('Specify the URL of your Solr servlet, and the name of the core to use.')); ?>
-			<br />If you do not have a Solr servlet running, you can <a
-					href="https://github.com/nextcloud/nextant/wiki" target="_blank">find
-						few guides on how to install one on the Wiki</a></em></td>
+			<td colspan="2"><em><?php p($l->t('Specify the address of your Solr, and the name of the core to use.')); ?>
+			<br /> <a href="https://github.com/nextcloud/nextant/wiki"
+					target="_blank">
+					<?php p($l->t('If you do not have a Solr servlet running, you can find few guides on how to install one on the Wiki.')); ?></a>
+					<br /> <a
+					href="https://github.com/nextcloud/nextant/wiki/Admin-Interface">
+						<?php p($l->t('You can also find there more information about this interface.')); ?></a></em></td>
 		</tr>
 		<tr valign="top">
 			<td>
@@ -44,8 +47,8 @@ style('nextant', 'admin');
 						<td>&nbsp;</td>
 					</tr>
 					<tr class="nextant_admin_head">
-						<td><div id="nextant_saving_settings">Saving</div></td>
-						<td class="nextant_admin_head">Settings</td>
+						<td><div id="nextant_saving_settings"><?php p($l->t('Saving')); ?></div></td>
+						<td class="nextant_admin_head"><?php p($l->t('Settings')); ?></td>
 					</tr>
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
@@ -84,10 +87,10 @@ style('nextant', 'admin');
 							<td>&nbsp;</td>
 						</tr>
 						<tr class="nextant_admin_head" id="solr_index_files_cont">
-							<td><div id="nextant_saving_files">Saving</div></td>
+							<td><div id="nextant_saving_files"> <?php p($l->t('Saving')); ?></div></td>
 							<td colspan="2" class="nextant_admin_head"><input type="checkbox"
 								name="solr_index_files" id="solr_index_files" value="1"
-								style="margin: 5px; margin-right: 15px;">Indexing Files</td>
+								style="margin: 5px; margin-right: 15px;"><?php p($l->t('Indexing Files')); ?></td>
 						</tr>
 					</table>
 					<div id="solr_sub_files">
@@ -99,8 +102,7 @@ style('nextant', 'admin');
 								<td><input type="text" id="solr_index_files_max_size"
 									style="width: 100px;"></td>
 								<td style="width: 60px; padding-right: 10px;">[<span
-									style="font-size: 12px;" id="solr_switch_filters">Edit your
-										filters</span>]
+									style="font-size: 12px;" id="solr_switch_filters"><?php p($l->t('Edit your filters')); ?></span>]
 								</td>
 							</tr>
 
@@ -113,7 +115,7 @@ style('nextant', 'admin');
 									id="solr_index_files_nextant_only_span"><input type="checkbox"
 										name="solr_index_files_nextant_only"
 										id="solr_index_files_nextant_only" value="1"
-										style="margin: 10px;"> Disable default search from Files </span>
+										style="margin: 10px;"><?php p($l->t('Disable default search from Files')); ?></span>
 								</td>
 							</tr>
 
@@ -135,7 +137,7 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
-	    <?php p($l->t('Index External Storage :')) ?></td>
+	    <?php p($l->t('Index External Storages :')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_external" id="solr_index_files_external"
 									value="1" style="margin: 10px;"></td>
@@ -163,10 +165,10 @@ style('nextant', 'admin');
 							<td>&nbsp;</td>
 						</tr>
 						<tr class="nextant_admin_head" id="solr_index_bookmarks_cont">
-							<td><div id="nextant_saving_bookmarks">Saving</div></td>
+							<td><div id="nextant_saving_bookmarks"><?php p($l->t('Saving')); ?></div></td>
 							<td class="nextant_admin_head"><input type="checkbox"
 								name="solr_index_bookmarks" id="solr_index_bookmarks" value="1"
-								style="margin: 5px; margin-right: 15px;">Indexing Bookmarks</td>
+								style="margin: 5px; margin-right: 15px;"><?php p($l->t('Indexing Bookmarks')); ?></td>
 						</tr>
 					</table>
 
@@ -175,11 +177,10 @@ style('nextant', 'admin');
 							<tr style="height: 30px;">
 								<td colspan="2">
 									<div id="nextant_bookmarks_appdisabled">
-										The App <i>Bookmarks</i> is not installed/enabled.
+										<?php p($l->t('The App Bookmarks is not installed/enabled.')); ?>
 									</div>
 									<div id="nextant_bookmarks_appenabled">
-										The App <i>Bookmarks</i> is enabled, your bookmarks will be
-										indexed.
+										<?php p($l->t('The App Bookmarks is enabled, your bookmarks will be index.')); ?>
 									</div>
 								</td>
 							</tr>
@@ -199,22 +200,22 @@ style('nextant', 'admin');
 							<td>&nbsp;</td>
 						</tr>
 						<tr class="nextant_admin_head">
-							<td><div id="nextant_saving_status">Saving</div>
-								<div id="nextant_saving_check">Checking</div></td>
-							<td class="nextant_admin_head">Nextant Status</td>
+							<td><div id="nextant_saving_status"><?php p($l->t('Saving')); ?></div>
+								<div id="nextant_saving_check"><?php p($l->t('Checking')); ?></div></td>
+							<td class="nextant_admin_head"><?php p($l->t('Nextant Status')); ?></td>
 						</tr>
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">					
-	    <?php p($l->t('Resource Level :')); ?>
+	    <?php p($l->t('Ressource Level :')); ?>
 						</td>
 							<td colspan="2"><select name="solr_resource_level"
 								id="solr_resource_level" style="width: 200px">
-									<!-- <option value="5">Higher Level</option> -->
-									<option value="4">High performance</option>
-									<!-- <option value="3">Mid level</option> -->
-									<option value="2">Low performance</option>
-									<option value="1">Lower performance</option>
+									<!-- <option value="5"><?php p($l->t('Higher performance')); ?></option> -->
+									<option value="4"><?php p($l->t('High performance')); ?></option>
+									<!-- <option value="3"><?php p($l->t('Medium performance')); ?></option> -->
+									<option value="2"><?php p($l->t('Low performance')); ?></option>
+									<option value="1"><?php p($l->t('Lower performance')); ?></option>
 							</select></td>
 						</tr>
 
@@ -223,9 +224,9 @@ style('nextant', 'admin');
 	    <?php p($l->t('Live Index :')); ?>
 						</td>
 							<td colspan="2"><select id="solr_index_live" style="width: 200px">
-									<option value="0">Disabled</option>
-									<option value="1">Using Semaphore</option>
-									<option value="2">Using Database</option>
+									<option value="0"><?php p($l->t('Disabled')); ?></option>
+									<option value="1"><?php p($l->t('Using Semaphore')); ?></option>
+									<option value="2"><?php p($l->t('Using Database')); ?></option>
 							</select> <input type="text" id="solr_index_live_queuekey"
 								style="width: 100px; font-size: 12px;" /></td>
 						</tr>
@@ -234,7 +235,7 @@ style('nextant', 'admin');
 							<td class="nextant_admin_left">
 	    <?php p($l->t('Background Index delay :')) ?></td>
 							<td><input type="text" name="solr_index_delay"
-								id="solr_index_delay" value="2" style="width: 50px;" /> hours</td>
+								id="solr_index_delay" value="2" style="width: 50px;" /><?php p($l->t('hours')); ?></td>
 						</tr>
 
 						<tr style="height: 30px;">
@@ -256,20 +257,20 @@ style('nextant', 'admin');
 							<td>
 								<div id="nextant_first_index"
 									style="width: 270px; font-size: 12px; white-space: normal;">
-									<i></i> we recommand doing the very first indexing of your
-									files using the <b>./occ nextant:index</b> command.<br />
-									However, you can force it to be started as a background
-									process: </i> <br />
+									<i>
+									<?php p($l->t('we recommand doing the very first indexing of your files using the <b>./occ nextant:index</b> command.')); ?>
+									<?php p($l->t('However, you can force it to be started as a background process.')); ?>
+									</i> <br />
 									<button type="button" id="nextant_force_first_index"
 										style="width: 270px"><?php p($l->t('Force first index as a cronjob')) ?></button>
 								</div>
 								<button type="button" id="nextant_force_index"
 									style="width: 270px"><?php p($l->t('Force index')) ?></button>
 								<div id="nextant_index_scheduled">
-									<i>Indexing is scheduled within the next few hours (cron)</i>
+									<i><?php p($l->t('Indexing is scheduled within the next few hours (cron)')); ?></i>
 								</div>
 								<div id="nextant_index_inprogress">
-									<i>Indexing in progress</i>
+									<i><?php p($l->t('Indexing in progress')); ?></i>
 								</div>
 							</td>
 						</tr>
@@ -341,47 +342,39 @@ style('nextant', 'admin');
 				<div id="nextant-filters" class="nextant-box">
 
 					<div id="nextant_saving_files_filters"
-						style="position: absolute; top: 10px; right: 25px;">Saving</div>
+						style="position: absolute; top: 10px; right: 25px;"><?php p($l->t('Saving')); ?></div>
 
-					<div class="solr_filters_item_large solr_filters_title">Type of
-						files to extract</div>
+					<div class="solr_filters_item_large solr_filters_title"><?php p($l->t('Type of files to extract')); ?></div>
 
 					<div class="solr_filters_item_large">
 						<input type="checkbox" name="solr_filters_text"
-							id="solr_filters_text" value="1" style="margin: 10px;"> Text File
-						(Text, Html, Subtitles, Source Code, ...)
+							id="solr_filters_text" value="1" style="margin: 10px;"> <?php p($l->t('Text File (Text, Html, Subtitles, Source Code, ...)')); ?>
 					</div>
 					<div class="solr_filters_item">
 						<input type="checkbox" name="solr_filters_pdf"
-							id="solr_filters_pdf" value="1" style="margin: 10px;"> E-pub /
-						PDF / rtf
+							id="solr_filters_pdf" value="1" style="margin: 10px;"> <?php p($l->t('E-pub / PDF / rtf')); ?>
 					</div>
 					<div class="solr_filters_item">
 						<input type="checkbox" name="solr_filters_office"
-							id="solr_filters_office" value="1" style="margin: 10px;"> Office
-						Documents
+							id="solr_filters_office" value="1" style="margin: 10px;"> <?php p($l->t('Office Documents')); ?>
 					</div>
 					<div class="solr_filters_item">
 						<input type="checkbox" name="solr_filters_image"
-							id="solr_filters_image" value="1" style="margin: 10px;"> Image
-						(Jpeg, Tiff)
+							id="solr_filters_image" value="1" style="margin: 10px;"> <?php p($l->t('Image (Jpeg, Tiff)')); ?>
 					</div>
 					<div class="solr_filters_item">
 						<input type="checkbox" name="solr_filters_audio"
-							id="solr_filters_audio" value="1" style="margin: 10px;"> Audio
-						File (mp3, flac)
+							id="solr_filters_audio" value="1" style="margin: 10px;"> <?php p($l->t('Audio File (mp3, flac)')); ?>
 					</div>
 
 					<div class="solr_filters_item_large solr_filters_title"
-						style="margin-top: 15px;">Extension you wish to ignore (.java
-						.xml)</div>
+						style="margin-top: 15px;"><?php p($l->t('Extensions you wish to ignore (.java .xml)')); ?></div>
 					<div class="solr_filters_item_large">
 						<textarea name="" style="width: 435px; height: 75px;"
 							id="solr_filters_extensions"></textarea>
 					</div>
 
 				</div>
-
 
 			</td>
 		</tr>

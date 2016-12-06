@@ -326,8 +326,10 @@ $(document)
 								$('#solr_index_bookmarks_last').text('never');
 
 							if (response.configured == 0) {
-								$('#solr_current_docs').text(
-										'Nextant is not configured yet');
+								$('#solr_current_docs')
+										.text(
+												t('nextant',
+														'Nextant is not configured yet'));
 								$('#solr_current_segments').text('');
 								$('#nextant_force_index').hide(delay);
 								$('#nextant_index_scheduled').hide(delay);
@@ -457,33 +459,33 @@ $(document)
 								if ($('#nextant-display').children('#ping')
 										.children('#text').text() != '')
 									nextantSettings.statusclearall(false);
-								nextantSettings.status('#ping',
-										'Ping querying your Solr Server', 0);
+								nextantSettings.status('#ping', t('nextant',
+										'Ping querying your Solr Server'), 0);
 								break;
 
 							case 'schema':
-								nextantSettings.status('#schema',
-										'Verifying Schema integrity', 0);
+								nextantSettings.status('#schema', t('nextant',
+										'Verifying Schema integrity'), 0);
 								break;
 
 							case 'extract':
-								nextantSettings.status('#extract',
-										'Test simple text extract query', 0);
+								nextantSettings.status('#extract', t('nextant',
+										'Test simple text extract query'), 0);
 								break;
 
 							case 'update':
-								nextantSettings.status('#update',
-										'Test update document query', 0);
+								nextantSettings.status('#update', t('nextant',
+										'Test update document query'), 0);
 								break;
 
 							case 'search':
-								nextantSettings.status('#search',
-										'Test search query', 0);
+								nextantSettings.status('#search', t('nextant',
+										'Test search query'), 0);
 								break;
 
 							case 'delete':
-								nextantSettings.status('#delete',
-										'Removing the test document', 0);
+								nextantSettings.status('#delete', t('nextant',
+										'Removing the test document'), 0);
 								break;
 
 							case 'save':
@@ -491,7 +493,8 @@ $(document)
 								nextantSettings
 										.status(
 												'#save',
-												'All test went fine. Saving your configuration',
+												t('nextant',
+														'All test went fine. Saving your configuration'),
 												0);
 								break;
 							}
