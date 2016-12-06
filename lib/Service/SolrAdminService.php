@@ -95,7 +95,7 @@ class SolrAdminService
                 else
                     $this->solrService->message(' * Checking ' . $field['type'] . ' \'' . $field['data']['name'] . '\' : ', false);
                 
-                if (self::checkFieldProperty($client, $field, $curr, $ierror))
+                if (self::checkFieldProperty($client, $this->configService->resourceLevel(), $field, $curr, $ierror))
                     $this->solrService->message('<info>ok</info>');
                 else {
                     if ($ierror->getCode() == 0)
@@ -111,19 +111,19 @@ class SolrAdminService
                             $this->solrService->message('   -> <comment>Fixing ' . $field['type'] . ' \'' . $field['data']['name'] . '\'</comment> ', false);
                         
                         if ($curr) {
-                            if (! self::modifyField($client, $field, $ierror))
+                            if (! self::modifyField($client, $this->configService->resourceLevel(), $field, $ierror))
                                 $this->solrService->message('<error>fail</error>');
                             else 
-                                if (! self::checkFieldProperty($client, $field, $curr, $ierror)) {
+                                if (! self::checkFieldProperty($client, $this->configService->resourceLevel(), $field, $curr, $ierror)) {
                                     $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
                                     $failed = true;
                                 } else
                                     $this->solrService->message('<info>ok</info>');
                         } else {
-                            if (! self::createField($client, $field, $ierror))
+                            if (! self::createField($client, $this->configService->resourceLevel(), $field, $ierror))
                                 $this->solrService->message('<error>fail</error>');
                             else 
-                                if (! self::checkFieldProperty($client, $field, $curr, $ierror)) {
+                                if (! self::checkFieldProperty($client, $this->configService->resourceLevel(), $field, $curr, $ierror)) {
                                     $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
                                     $failed = true;
                                 } else
@@ -156,7 +156,7 @@ class SolrAdminService
                 
                 if (self::deleteField($client, 'copy-field', $copyfield, $ierror)) {
                     
-                    self::checkFieldProperty($client, $copyfield, $curr, $ierror);
+                    self::checkFieldProperty($client, $this->configService->resourceLevel(), $copyfield, $curr, $ierror);
                     if ($curr)
                         $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
                     else
@@ -179,7 +179,7 @@ class SolrAdminService
                 }
                 
                 if (self::deleteField($client, 'field', $field, $ierror)) {
-                    self::checkFieldProperty($client, $field, $curr, $ierror);
+                    self::checkFieldProperty($client, $this->configService->resourceLevel(), $field, $curr, $ierror);
                     if ($curr)
                         $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
                     else
@@ -202,7 +202,7 @@ class SolrAdminService
                 }
                 
                 if (self::deleteField($client, 'field-type', $fieldType, $ierror)) {
-                    self::checkFieldProperty($client, $fieldType, $curr, $ierror);
+                    self::checkFieldProperty($client, $this->configService->resourceLevel(), $fieldType, $curr, $ierror);
                     if ($curr)
                         $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
                     else
@@ -225,7 +225,7 @@ class SolrAdminService
                 }
                 
                 if (self::deleteField($client, 'dynamic-field', $fielddyn, $ierror)) {
-                    self::checkFieldProperty($client, $fielddyn, $curr, $ierror);
+                    self::checkFieldProperty($client, $this->configService->resourceLevel(), $fielddyn, $curr, $ierror);
                     if ($curr)
                         $this->solrService->message('<error>fail</error> ' . $ierror->getCode() . ' - ' . $ierror->getMessage());
                     else
@@ -307,14 +307,27 @@ class SolrAdminService
      * @param array $property            
      * @return boolean
      */
-    private static function checkFieldProperty(\Solarium\Client $client, $field, &$property, &$ierror)
+    private static function checkFieldProperty(\Solarium\Client $client, $resources, $field, &$property, &$ierror)
     {
         $property = self::getFieldProperty($client, $field, $ierror);
         
         if (! $property)
             return false;
         
-        return self::checkFieldPropertyRecursive($field['data'], $property);
+        $data = $field['data'];
+        switch ($resources) {
+            case ConfigService::RESOURCE_LEVEL_LOWER:
+                if (key_exists('lower', $field))
+                    $data = array_merge($field['data'], $field['lower']);
+                break;
+            
+            case ConfigService::RESOURCE_LEVEL_HIGHER:
+                if (key_exists('higher', $field))
+                    $data = array_merge($field['data'], $field['higher']);
+                break;
+        }
+        
+        return self::checkFieldPropertyRecursive($data, $property);
     }
 
     private static function checkFieldPropertyRecursive($value, $property)
@@ -462,12 +475,26 @@ class SolrAdminService
      * @param \Solarium\Client $client            
      * @param array $field            
      */
-    private static function createField(\Solarium\Client $client, $field, &$ierror)
+    private static function createField(\Solarium\Client $client, $resources, $field, &$ierror)
     {
-        $data = array(
-            'add-' . $field['type'] => $field['data']
+        $data = $field['data'];
+        switch ($resources) {
+            case ConfigService::RESOURCE_LEVEL_LOWER:
+                if (key_exists('lower', $field))
+                    $data = array_merge($field['data'], $field['lower']);
+                    break;
+        
+            case ConfigService::RESOURCE_LEVEL_HIGHER:
+                if (key_exists('higher', $field))
+                    $data = array_merge($field['data'], $field['higher']);
+                    break;
+        }
+        
+        $send = array(
+            'add-' . $field['type'] => $data
         );
-        return self::solariumPostSchemaRequest($client, $data, $ierror);
+        
+        return self::solariumPostSchemaRequest($client, $send, $ierror);
     }
 
     /**
@@ -476,12 +503,25 @@ class SolrAdminService
      * @param \Solarium\Client $client            
      * @param array $field            
      */
-    private static function modifyField(\Solarium\Client $client, $field, &$ierror)
+    private static function modifyField(\Solarium\Client $client, $resources, $field, &$ierror)
     {
-        $data = array(
-            'replace-' . $field['type'] => $field['data']
+        $data = $field['data'];
+        switch ($resources) {
+            case ConfigService::RESOURCE_LEVEL_LOWER:
+                if (key_exists('lower', $field))
+                    $data = array_merge($field['data'], $field['lower']);
+                    break;
+        
+            case ConfigService::RESOURCE_LEVEL_HIGHER:
+                if (key_exists('higher', $field))
+                    $data = array_merge($field['data'], $field['higher']);
+                    break;
+        }
+        $send = array(
+            'replace-' . $field['type'] => $data
         );
-        return self::solariumPostSchemaRequest($client, $data, $ierror);
+        
+        return self::solariumPostSchemaRequest($client, $send, $ierror);
     }
 
     /**
@@ -882,7 +922,7 @@ class SolrAdminService
                         ),
                         array(
                             'class' => 'solr.NGramFilterFactory',
-                            'maxGramSize' => '20',
+                            'maxGramSize' => '15',
                             'minGramSize' => '3'
                         )
                     )
@@ -928,8 +968,8 @@ class SolrAdminService
                         ),
                         array(
                             'class' => 'solr.EdgeNGramFilterFactory',
-                            'maxGramSize' => '25',
-                            'minGramSize' => '3'
+                            'maxGramSize' => '18',
+                            'minGramSize' => '1'
                         )
                     )
                 ),
@@ -955,7 +995,7 @@ class SolrAdminService
         array_push($fields, array(
             'type' => 'field-type',
             'data' => array(
-                'name' => 'text_general_dense',
+                'name' => 'text_general_word',
                 'class' => 'solr.TextField',
                 'omitNorms' => false,
                 'indexAnalyzer' => array(
@@ -971,14 +1011,15 @@ class SolrAdminService
                         ),
                         array(
                             'class' => 'solr.ASCIIFoldingFilterFactory'
-                        ),
-                        array(
-                            'class' => 'solr.EdgeNGramFilterFactory',
-                            'maxGramSize' => '20',
-                            'minGramSize' => '1'
                         )
                     )
                 ),
+                // array(
+                // 'class' => 'solr.EdgeNGramFilterFactory',
+                // 'maxGramSize' => '15',
+                // 'minGramSize' => '3'
+                // )
+                
                 'queryAnalyzer' => array(
                     'tokenizer' => array(
                         'class' => 'solr.StandardTokenizerFactory'
@@ -989,14 +1030,14 @@ class SolrAdminService
                         ),
                         array(
                             'class' => 'solr.LowerCaseFilterFactory'
-                        ),
-                        array(
-                            'class' => 'solr.ASCIIFoldingFilterFactory'
                         )
                     )
                 )
             )
         ));
+        // array(
+        // 'class' => 'solr.ASCIIFoldingFilterFactory'
+        // )
         
         //
         // fields
@@ -1031,49 +1072,66 @@ class SolrAdminService
                 'name' => 'text',
                 'type' => 'text_general',
                 'indexed' => true,
-                'stored' => true,
+                'stored' => false,
                 'multiValued' => false
             )
         ));
         
-        // text
+        // text_edge
         array_push($fields, array(
             'type' => 'field',
             'data' => array(
                 'name' => 'text_edge',
                 'type' => 'text_general_edge',
                 'indexed' => true,
-                'stored' => false,
-                'multiValued' => false
-            )
-        ));
-        
-        // text
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'text_dense',
-                'type' => 'text_general_dense',
-                'termVectors' => true,
-                'termPositions' => true,
-                'termOffsets' => true,
-                'indexed' => true,
                 'stored' => true,
                 'multiValued' => false
+            ),
+            'higher' => array(
+                'termVectors' => true,
+                'termPositions' => true,
+                'termOffsets' => true
+            ),
+            'lower' => array(
+                'stored' => false
+            )
+        ));
+        
+        // text_dense
+        array_push($fields, array(
+            'type' => 'field',
+            // 'data' => array(
+            // 'name' => 'text_dense',
+            // 'type' => 'text_general_dense',
+            // 'indexed' => true,
+            // 'stored' => false,
+            // 'multiValued' => false
+            // )
+            // ));
+            'data' => array(
+                'name' => 'text_word',
+                'type' => 'text_general_word',
+                'multiValued' => false,
+                'indexed' => true,
+                'required' => false,
+                'stored' => false
             )
         ));
         
         // text
-        array_push($fields, array(
-            'type' => 'field',
-            'data' => array(
-                'name' => 'text_light',
-                'type' => 'text_general',
-                'indexed' => true,
-                'stored' => false,
-                'multiValued' => false
-            )
-        ));
+        // array_push($fields, array(
+        // 'type' => 'field',
+        // 'data' => array(
+        // 'name' => 'text_light',
+        // 'type' => 'text_general',
+        // 'indexed' => true,
+        // 'stored' => true,
+        // 'multiValued' => false
+        // ),
+        // 'lower' => array(
+        // 'stored' => false
+        // )
+        // ));
         
         // nextant_path
         array_push($fields, array(
@@ -1254,7 +1312,7 @@ class SolrAdminService
             'type' => 'copy-field',
             'data' => array(
                 'source' => 'text',
-                'dest' => 'text_dense'
+                'dest' => 'text_word'
             )
         ));
         

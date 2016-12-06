@@ -494,7 +494,7 @@ class SolrService
             
             $path = '';
             $special = '+-';
-            $q = '(text_dense:"' . $helper->escapeTerm(str_replace('"', '', $string)) . '"^150)';
+            $q = '(text_edge:"' . $helper->escapeTerm(str_replace('"', '', $string)) . '"^150)';
             foreach ($astring as $qstr) {
                 
                 $oper = '';
@@ -510,9 +510,13 @@ class SolrService
                 if (substr($qstr, 0, 1) == '"')
                     $value = 150;
                 
-                $q .= ' OR (' . $oper . 'text:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ')';
-                $q .= ' OR (' . $oper . 'text_light:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . $value . ')';
-                $q .= ' OR (' . $oper . 'text_edge:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . ($value * 10) . ')';
+                $unqstr = str_replace('"', '', $qstr);
+                if (strlen($unqstr) > 4) {
+                    $q .= ' OR (' . $oper . 'text:"' . $helper->escapeTerm($unqstr) . '"^' . $value . ')';
+                    $q .= ' OR (' . $oper . 'text_edge:"' . $helper->escapeTerm($unqstr) . '"^' . ($value * 10) . ')';
+                } else {
+                    $q .= ' OR (' . $oper . 'text_word:"' . $helper->escapeTerm($unqstr) . '"^' . $value . ')';
+                }
             }
             
             if ($path !== '')
@@ -544,14 +548,17 @@ class SolrService
                 // $hl->setAlternateField('text_dense');
                 $hl->setFragSize(70);
                 
-                $hl->setUsePhraseHighlighter(true);
-                $hl->setUseFastVectorHighlighter(true);
+                if ($this->configService->resourceLevel() === ConfigService::RESOURCE_LEVEL_HIGHER) {
+                    $hl->setUsePhraseHighlighter(true);
+                    $hl->setUseFastVectorHighlighter(true);
+                    $hl->setBoundaryScannerType('SENTENCE');
+                    
+                    // $hl->setBoundaryScannerMaxScan();
+                    // $hl->setBoundaryScannerChars();
+                    // $hl->setBoundaryScannerLanguage();
+                    // $hl->setBoundaryScannerCountry();
+                }
                 
-                $hl->setBoundaryScannerType('SENTENCE');
-                // $hl->setBoundaryScannerMaxScan();
-                // $hl->setBoundaryScannerChars();
-                // $hl->setBoundaryScannerLanguage();
-                // $hl->setBoundaryScannerCountry();
                 // $hl->setSimplePrefix('<span class="nextant_hl">');
                 // $hl->setSimplePostfix('</span>');
                 
@@ -571,7 +578,7 @@ class SolrService
                 }
                 
                 $hl->setFields(array(
-                    'text_dense'
+                    'text_edge'
                 ));
             }
             
@@ -588,7 +595,7 @@ class SolrService
                 // highlighting
                 if ($hl !== null) {
                     $hlDoc = $highlighting->getResult($document->id);
-                    $item->setHighlighting($hlDoc->getField('text_dense'));
+                    $item->setHighlighting($hlDoc->getField('text_edge'));
                 }
                 
                 $return[] = $item;
