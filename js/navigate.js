@@ -489,6 +489,7 @@
 			// fix the subfolder link
 			//
 			this.__morphLink = function(tr, item) {
+				$(tr).attr('data-path', '/');
 				var elemhref = $(tr).find('td.filename').find('a.name');
 				if (!$(elemhref).length)
 					return;

@@ -629,11 +629,11 @@ class FileService
         if (substr($path, - 1) == '/')
             $path = substr($path, 0, - 1);
         
-        $dirpath = $pathParts['dirname'];
+  //      $dirpath = $pathParts['dirname'];
         
         if ($base !== '') {
             $path = substr($path, strpos($path, $base) + strlen($base));
-            $dirpath = substr($dirpath, strpos($dirpath, $base) + strlen($base)) . '/';
+   //         $dirpath = substr($dirpath, strpos($dirpath, $base) + strlen($base)) . '/';
         }
         
         // fileinfo entry
