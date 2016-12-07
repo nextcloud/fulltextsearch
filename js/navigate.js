@@ -84,7 +84,7 @@
 				if (self.nextant_sharelink || OCA.Files.App.fileList != null) // #82
 					OCA.Files.fileActions.registerAction({
 						name : 'nextant_gotofolder',
-						displayName : 'Go To Folder',
+						displayName : t('Go to folder'),
 						mime : 'all',
 						permissions : OC.PERMISSION_READ,
 						type : OCA.Files.FileActions.TYPE_DROPDOWN,
