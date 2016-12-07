@@ -39,7 +39,7 @@
 		currQuery : '',
 		searchResult : [],
 		locked : false,
-		config : {},
+		config : null,
 
 		nextant_sharelink : true,
 		searchboxFocus : false,
@@ -96,8 +96,21 @@
 						}
 					});
 
+				if (self.config == null)
+					$.post(
+							OC
+									.filePath('nextant', 'ajax',
+											'search_options.php'), {},
+							self.searchOptions);
+
 			};
 
+			this.searchOptions = function(result) {
+				if (self.config != null)
+					return;
+
+				self.config = result;
+			}
 			//
 			//
 			// init Share Link (only it needed)
@@ -164,7 +177,6 @@
 			this.searchRequestResult = function(infos) {
 
 				var result = infos.result;
-				self.config = infos.config;
 
 				var origResult = [];
 				if (self.config == null
@@ -685,11 +697,23 @@
 				if (self.timerQuery != null)
 					window.clearTimeout(self.timerQuery);
 
+				var delay = 250;
+				if (self.config != null)
+					switch (self.config.resource_level) {
+					case '1':
+						delay = 400;
+						break;
+
+					case '5':
+						delay = 150;
+						break;
+					}
+
 				self.timerQuery = setTimeout(function() {
 					self.timerQuery = null;
 					self.searchRequest(data);
 					self.suggestRequest(data);
-				}, 100);
+				}, delay);
 
 			});
 
