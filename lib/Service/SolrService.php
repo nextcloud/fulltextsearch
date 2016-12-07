@@ -32,6 +32,14 @@ use \OCA\Nextant\Items\ItemDocument;
 
 class SolrService
 {
+
+    const SCORE_TEXT_SIMPLE = 1;
+
+    const SCORE_TEXT_EDGE = 5;
+
+    const SCORE_TEXT_LITTLEWORD = 1;
+
+    const SCORE_SENTENCE_COEF = 1000;
     
     // no solr
     const ERROR_SOLRSERVICE_DOWN = 2;
@@ -498,7 +506,7 @@ class SolrService
             $q = '(text_edge:"' . $helper->escapeTerm(str_replace('"', '', $string)) . '"^150)';
             foreach ($astring as $qstr) {
                 
-                $value = 15;
+                $coef = 1;
                 
                 $oper = '';
                 if (strpos($special, substr($qstr, 0, 1)) !== false) {
@@ -517,13 +525,16 @@ class SolrService
                 $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^15 ' . "\n";
                 
                 if (substr($qstr, 0, 1) == '"')
-                    $value = 150;
+                    $coef = self::SCORE_SENTENCE_COEF;
+                    
+                    // if (strpos($qstr, ' '))
+                    // $coef = self::SCORE_SENTENCE_COEF;
                 
-                if (strlen($unqstr) > 4) {
-                    $q .= ' OR (' . $oper . 'text:"' . $helper->escapeTerm($unqstr) . '"^' . $value . ')';
-                    $q .= ' OR (' . $oper . 'text_edge:"' . $helper->escapeTerm($unqstr) . '"^' . ($value * 10) . ')';
+                if (strlen($unqstr) >= 4) {
+                    $q .= ' OR (' . $oper . 'text:"' . $helper->escapeTerm($unqstr) . '"^' . (self::SCORE_TEXT_SIMPLE * $coef) . ')';
+                    $q .= ' OR (' . $oper . 'text_edge:"' . $helper->escapeTerm($unqstr) . '"^' . (self::SCORE_TEXT_EDGE * $coef) . ')';
                 } else {
-                    $q .= ' OR (' . $oper . 'text_word:"' . $helper->escapeTerm($unqstr) . '"^' . $value . ')';
+                    $q .= ' OR (' . $oper . 'text_word:"' . $helper->escapeTerm($unqstr) . '"^' . (self::SCORE_TEXT_LITTLEWORD) . ')';
                 }
             }
             
@@ -535,7 +546,7 @@ class SolrService
             }
             
             // Uncomment to display the request sent to solr
-            // $this->miscService->log($q);
+            $this->miscService->log($q);
             
             $query->setRows(25);
             $query->setQuery($q);
