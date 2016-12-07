@@ -71,6 +71,17 @@ class SearchController extends Controller
     /**
      * @NoAdminRequired
      */
+    public function searchOptions()
+    {
+        return array(
+            'resource_level' => $this->configService->getAppValue('resource_level'),
+            'index_files_nextant_only' => (($this->configService->getAppValue('index_files_nextant_only') === '1' && $this->configService->getAppValue('index_files_tree') === '1') ? 1 : 0)
+        );
+    }
+
+    /**
+     * @NoAdminRequired
+     */
     public function searchRequest($query, $current_dir)
     {
         $results = array();
@@ -140,9 +151,6 @@ class SearchController extends Controller
         }
         
         return array(
-            'config' => array(
-                'index_files_nextant_only' => (($this->configService->getAppValue('index_files_nextant_only') === '1' && $this->configService->getAppValue('index_files_tree') === '1') ? 1 : 0)
-            ),
             'result' => $results
         );
     }
@@ -252,9 +260,6 @@ class SearchController extends Controller
         }
         
         return array(
-            'config' => array(
-                'index_files_nextant_only' => (($this->configService->getAppValue('index_files_nextant_only') === '1' && $this->configService->getAppValue('index_files_tree') === '1') ? 1 : 0)
-            ),
             'result' => $results
         );
     }

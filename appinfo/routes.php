@@ -66,6 +66,12 @@ return [
             'verb' => 'POST'
         ],
         [
+            'name' => 'search#searchOptions',
+            'url' => 'ajax/search_options.php',
+            'verb' => 'POST'
+        ],
+        
+        [
             'name' => 'search#searchRequestPublic',
             'url' => 'ajax/search_public.php',
             'verb' => 'POST'
