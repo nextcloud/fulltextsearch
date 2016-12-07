@@ -494,15 +494,24 @@ class SolrService
             
             $path = '';
             $special = '+-';
+            $docminus = array();
             $q = '(text_edge:"' . $helper->escapeTerm(str_replace('"', '', $string)) . '"^150)';
             foreach ($astring as $qstr) {
                 
-                $oper = '';
                 $value = 15;
                 
+                $oper = '';
                 if (strpos($special, substr($qstr, 0, 1)) !== false) {
                     $oper = substr($qstr, 0, 1);
                     $qstr = substr($qstr, 1);
+                }
+                
+                $unqstr = str_replace('"', '', $qstr);
+                
+                if ($oper === '-') {
+                    $docminus[] = $oper . 'text:"' . $helper->escapeTerm($unqstr) . '"';
+                    $docminus[] = $oper . 'text_edge:"' . $helper->escapeTerm($unqstr) . '"';
+                    continue;
                 }
                 
                 $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^15 ' . "\n";
@@ -510,7 +519,6 @@ class SolrService
                 if (substr($qstr, 0, 1) == '"')
                     $value = 150;
                 
-                $unqstr = str_replace('"', '', $qstr);
                 if (strlen($unqstr) > 4) {
                     $q .= ' OR (' . $oper . 'text:"' . $helper->escapeTerm($unqstr) . '"^' . $value . ')';
                     $q .= ' OR (' . $oper . 'text_edge:"' . $helper->escapeTerm($unqstr) . '"^' . ($value * 10) . ')';
@@ -521,9 +529,13 @@ class SolrService
             
             if ($path !== '')
                 $q = '(' . $q . ")\n OR (" . $path . ')';
-                
-                // Uncomment to display the request sent to solr
-                // $this->miscService->log($q);
+            
+            foreach ($docminus as $mdoc) {
+                $q .= "\n" . $mdoc;
+            }
+            
+            // Uncomment to display the request sent to solr
+            // $this->miscService->log($q);
             
             $query->setRows(25);
             $query->setQuery($q);
