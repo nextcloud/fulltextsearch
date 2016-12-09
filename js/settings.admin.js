@@ -329,13 +329,13 @@ $(document)
 								$('#solr_index_files_last').text(
 										response.index_files_last_format);
 							else
-								$('#solr_index_files_last').text('never');
+								$('#solr_index_files_last').text(t('nextant', 'never'));
 
 							if (response.index_bookmarks_last > 0)
 								$('#solr_index_bookmarks_last').text(
 										response.index_bookmarks_last_format);
 							else
-								$('#solr_index_bookmarks_last').text('never');
+								$('#solr_index_bookmarks_last').text(t('nextant', 'never'));
 
 							if (response.configured == 0) {
 								$('#solr_current_docs')
