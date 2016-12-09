@@ -42,7 +42,7 @@ style('nextant', 'admin');
 		</tr>
 		<tr valign="top">
 			<td>
-				<table style="width: 550px;">
+				<table style="width: 650px;">
 					<tr>
 						<td>&nbsp;</td>
 					</tr>
@@ -82,7 +82,7 @@ style('nextant', 'admin');
 					</tr>
 				</table>
 				<div id="nextant_suboptions">
-					<table style="width: 550px;">
+					<table style="width: 650px;">
 						<tr>
 							<td>&nbsp;</td>
 						</tr>
@@ -94,7 +94,7 @@ style('nextant', 'admin');
 						</tr>
 					</table>
 					<div id="solr_sub_files">
-						<table style="width: 550px;">
+						<table style="width: 650px;">
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
@@ -160,7 +160,7 @@ style('nextant', 'admin');
 						</table>
 					</div>
 
-					<table style="width: 550px;">
+					<table style="width: 650px;">
 						<tr>
 							<td>&nbsp;</td>
 						</tr>
@@ -173,7 +173,7 @@ style('nextant', 'admin');
 					</table>
 
 					<div id="solr_sub_bookmarks">
-						<table style="width: 550px;">
+						<table style="width: 650px;">
 							<tr style="height: 30px;">
 								<td colspan="2">
 									<div id="nextant_bookmarks_appdisabled">
@@ -188,13 +188,12 @@ style('nextant', 'admin');
 								<td class="nextant_admin_left">
 	    <?php p($l->t('Last index :')) ?></td>
 								<td><div id="solr_index_bookmarks_last"></div></td>
-
 							</tr>
 
 						</table>
 					</div>
 
-					<table style="width: 550px;">
+					<table style="width: 650px;">
 
 						<tr>
 							<td>&nbsp;</td>

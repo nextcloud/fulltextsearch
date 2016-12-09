@@ -71,7 +71,7 @@ DIV.nextant_display_text {
 }
 
 TD.nextant_admin_left {
-	width: 200px;
+	width: 300px;
 	text-align: right;
 	font-weight: bold;
 	padding-right: 15px;
@@ -79,6 +79,7 @@ TD.nextant_admin_left {
 
 TR.nextant_admin_head, TR.nextant_admin_head:hover {
 	margin-top: 12px;
+	width: 600px;
 	background: #ddd;
 }
 
