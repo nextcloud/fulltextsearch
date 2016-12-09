@@ -213,6 +213,10 @@ $(document)
 							$('#solr_core').val(response.solr_core);
 							$('#solr_timeout').val(response.solr_timeout);
 
+							if (response.index_live == 1
+									&& response.ext_sysvmsg_loaded == false)
+								response.index_live = 2;
+
 							if (response.configured > 0) {
 								$('#nextant_suboptions :input').prop(
 										'disabled', false);
@@ -226,6 +230,13 @@ $(document)
 								else
 									$('#solr_index_live_queuekey').fadeTo(
 											delay, 0);
+								if (response.ext_sysvmsg_loaded == false)
+									$('#solr_index_live option[value="1"]')
+											.prop('disabled', true);
+								else
+									$('#solr_index_live option[value="1"]')
+											.prop('disabled', false);
+
 							} else {
 								$('#nextant_suboptions :input').attr(
 										"disabled", true);
@@ -296,6 +307,7 @@ $(document)
 
 							$('#solr_resource_level').val(
 									response.resource_level);
+
 							$('#solr_index_live').val(response.index_live);
 							$('#solr_index_live_queuekey').val(
 									response.index_live_queuekey);

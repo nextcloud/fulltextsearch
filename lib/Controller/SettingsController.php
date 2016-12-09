@@ -126,6 +126,7 @@ class SettingsController extends Controller
             'index_files_last_format' => date('r', $this->configService->getAppValue('index_files_last')),
             'index_bookmarks_last' => $this->configService->getAppValue('index_bookmarks_last'),
             'index_bookmarks_last_format' => date('r', $this->configService->getAppValue('index_bookmarks_last')),
+            'ext_sysvmsg_loaded' => extension_loaded('sysvmsg'),
             'source' => $source
         );
         
@@ -171,10 +172,12 @@ class SettingsController extends Controller
     {
         $this->configService->setAppValue('resource_level', $resource_level);
         
-        if ($index_live === '1' && $this->configService->getAppValue('index_live') !== '1')
-            $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
-        
-        $this->configService->setAppValue('index_live', $index_live);
+        if ($index_live === '1' && extension_loaded('sysvmsg')) {
+            if ($this->configService->getAppValue('index_live') !== '1')
+                $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
+            
+            $this->configService->setAppValue('index_live', $index_live);
+        }
         
         if ($index_delay > 0)
             $this->configService->setAppValue('index_delay', $index_delay);
@@ -400,8 +403,12 @@ class SettingsController extends Controller
             $this->configService->setAppValue('solr_url', $this->solr_url);
             $this->configService->setAppValue('solr_core', $this->solr_core);
             $this->configService->setAppValue('solr_timeout', $this->solr_timeout);
-            if ($this->configService->getAppValue('configured') !== '1')
+            
+            if ($this->configService->getAppValue('configured') !== '1') {
                 $this->configService->setAppValue('configured', '2');
+                if (! extension_loaded('sysvmsg'))
+                    $this->configService->setAppValue('index_live', '2');
+            }
             
             $message = $this->l10n->t('Your configuration has been saved');
             return true;
