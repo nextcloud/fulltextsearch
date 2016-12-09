@@ -482,12 +482,12 @@ class SolrAdminService
             case ConfigService::RESOURCE_LEVEL_LOWER:
                 if (key_exists('lower', $field))
                     $data = array_merge($field['data'], $field['lower']);
-                    break;
-        
+                break;
+            
             case ConfigService::RESOURCE_LEVEL_HIGHER:
                 if (key_exists('higher', $field))
                     $data = array_merge($field['data'], $field['higher']);
-                    break;
+                break;
         }
         
         $send = array(
@@ -510,12 +510,12 @@ class SolrAdminService
             case ConfigService::RESOURCE_LEVEL_LOWER:
                 if (key_exists('lower', $field))
                     $data = array_merge($field['data'], $field['lower']);
-                    break;
-        
+                break;
+            
             case ConfigService::RESOURCE_LEVEL_HIGHER:
                 if (key_exists('higher', $field))
                     $data = array_merge($field['data'], $field['higher']);
-                    break;
+                break;
         }
         $send = array(
             'replace-' . $field['type'] => $data
@@ -922,7 +922,7 @@ class SolrAdminService
                         ),
                         array(
                             'class' => 'solr.NGramFilterFactory',
-                            'maxGramSize' => '15',
+                            'maxGramSize' => '20',
                             'minGramSize' => '3'
                         )
                     )
@@ -968,7 +968,7 @@ class SolrAdminService
                         ),
                         array(
                             'class' => 'solr.EdgeNGramFilterFactory',
-                            'maxGramSize' => '18',
+                            'maxGramSize' => '20',
                             'minGramSize' => '1'
                         )
                     )
@@ -1014,12 +1014,6 @@ class SolrAdminService
                         )
                     )
                 ),
-                // array(
-                // 'class' => 'solr.EdgeNGramFilterFactory',
-                // 'maxGramSize' => '15',
-                // 'minGramSize' => '3'
-                // )
-                
                 'queryAnalyzer' => array(
                     'tokenizer' => array(
                         'class' => 'solr.StandardTokenizerFactory'
@@ -1030,14 +1024,14 @@ class SolrAdminService
                         ),
                         array(
                             'class' => 'solr.LowerCaseFilterFactory'
+                        ),
+                        array(
+                            'class' => 'solr.ASCIIFoldingFilterFactory'
                         )
                     )
                 )
             )
         ));
-        // array(
-        // 'class' => 'solr.ASCIIFoldingFilterFactory'
-        // )
         
         //
         // fields
@@ -1097,41 +1091,18 @@ class SolrAdminService
             )
         ));
         
-        // text_dense
+        // text_word
         array_push($fields, array(
             'type' => 'field',
-            // 'data' => array(
-            // 'name' => 'text_dense',
-            // 'type' => 'text_general_dense',
-            // 'indexed' => true,
-            // 'stored' => false,
-            // 'multiValued' => false
-            // )
-            // ));
             'data' => array(
                 'name' => 'text_word',
                 'type' => 'text_general_word',
                 'multiValued' => false,
                 'indexed' => true,
-                'required' => false,
-                'stored' => false
+                'stored' => false,
+                'multiValued' => false
             )
         ));
-        
-        // text
-        // array_push($fields, array(
-        // 'type' => 'field',
-        // 'data' => array(
-        // 'name' => 'text_light',
-        // 'type' => 'text_general',
-        // 'indexed' => true,
-        // 'stored' => true,
-        // 'multiValued' => false
-        // ),
-        // 'lower' => array(
-        // 'stored' => false
-        // )
-        // ));
         
         // nextant_path
         array_push($fields, array(
@@ -1307,7 +1278,7 @@ class SolrAdminService
             )
         ));
         
-        // text_general_dense
+        // text_word
         array_push($fields, array(
             'type' => 'copy-field',
             'data' => array(
