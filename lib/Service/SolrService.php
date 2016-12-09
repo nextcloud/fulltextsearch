@@ -594,9 +594,13 @@ class SolrService
                         break;
                     
                     case ConfigService::RESOURCE_LEVEL_HIGH:
-                    case ConfigService::RESOURCE_LEVEL_HIGHER:
                         $hl->setSnippets(4);
                         $hl->setMaxAnalyzedChars(100000);
+                        break;
+                    
+                    case ConfigService::RESOURCE_LEVEL_HIGHER:
+                        $hl->setSnippets(4);
+                        $hl->setMaxAnalyzedChars(200000);
                         break;
                 }
                 
