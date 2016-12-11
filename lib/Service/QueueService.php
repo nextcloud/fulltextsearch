@@ -194,8 +194,6 @@ class QueueService
                     $files = array_merge($files, $files_trashbin);
                     $solrDocs = null;
                     
-                    $this->miscService->log('___FILE_DELETE ' . $item->getUserId() . ' __ ' . var_export($files, true) . ' __ ');
-                    
                     $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
                     
                     $this->fileService->endUser();
