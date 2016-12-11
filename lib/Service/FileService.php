@@ -629,16 +629,22 @@ class FileService
         if (substr($path, - 1) == '/')
             $path = substr($path, 0, - 1);
         
-  //      $dirpath = $pathParts['dirname'];
+        $dirpath = $pathParts['dirname'];
         
         if ($base !== '') {
             $path = substr($path, strpos($path, $base) + strlen($base));
-   //         $dirpath = substr($dirpath, strpos($dirpath, $base) + strlen($base)) . '/';
+            $dirpath = substr($dirpath, strpos($dirpath, $base) + strlen($base));
         }
         
-        // fileinfo entry
+        if ($dirpath === '')
+            $dirpath = '/';
+            
+            // fileinfo entry
         $entry = \OCA\Files\Helper::formatFileInfo($fileData);
+        $entry['dirpath'] = $dirpath;
+        $entry['filename'] = $pathParts['basename'];
         $entry['name'] = ((substr($path, 0, 1) === '/') ? substr($path, 1) : $path);
+        
         if ($item->isSharedPublic())
             $entry['permissions'] = \OCP\Constants::PERMISSION_READ;
         
