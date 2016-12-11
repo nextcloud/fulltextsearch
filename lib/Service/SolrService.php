@@ -475,6 +475,9 @@ class SolrService
             return false;
         
         $string = str_replace('  ', ' ', trim($string));
+        if (substr_count($string, '"') & 1)
+            $string = substr_replace($string, '', strrpos($string, '"'), 1);
+        
         $astring = preg_split("/(\ )(?=(?:[^\"]|\"[^\"]*\")*$)/m", $string);
         
         if ($string == '')
@@ -546,7 +549,7 @@ class SolrService
             }
             
             // Uncomment to display the request sent to solr
-            $this->miscService->log($q);
+//             $this->miscService->log($q);
             
             $query->setRows(25);
             $query->setQuery($q);
@@ -681,6 +684,8 @@ class SolrService
                     }
                 }
             }
+            
+//             $this->miscService->log(var_export($suggestions, true));
             
             return $suggestions;
         } catch (\Solarium\Exception\HttpException $ehe) {
