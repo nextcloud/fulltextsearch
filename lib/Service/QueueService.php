@@ -183,7 +183,6 @@ class QueueService
                 break;
             
             case FilesEvents::FILE_DELETE:
-                
                 if ($item->getFolder()) {
                     
                     $this->fileService->initUser($item->getUserId(), true);
@@ -194,10 +193,14 @@ class QueueService
                     
                     $files = array_merge($files, $files_trashbin);
                     $solrDocs = null;
+                    
+                    $this->miscService->log('___FILE_DELETE ' . $item->getUserId() . ' __ ' . var_export($files, true) . ' __ ');
+                    
                     $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
                     
                     $this->fileService->endUser();
                 } else {
+                    // animation on file delete ?
                     $doc[] = new ItemDocument(ItemDocument::TYPE_FILE, $item->getFileId());
                     $this->indexService->removeDocuments($doc, $ierror);
                 }

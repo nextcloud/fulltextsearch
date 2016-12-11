@@ -146,6 +146,7 @@
 					$('#searchbox').val('');
 					self.sendSearchRequest();
 				});
+				
 				$('DIV.crumb.svg.ui-droppable').live('click', function() {
 					$('#searchbox').val('');
 					self.sendSearchRequest();

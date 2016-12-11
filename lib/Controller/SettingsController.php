@@ -172,10 +172,15 @@ class SettingsController extends Controller
     {
         $this->configService->setAppValue('resource_level', $resource_level);
         
-        if ($index_live === '1' && extension_loaded('sysvmsg')) {
-            if ($this->configService->getAppValue('index_live') !== '1')
-                $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
-            
+        if ($index_live === '1') {
+            if (extension_loaded('sysvmsg')) {
+                
+                if ($this->configService->getAppValue('index_live') !== '1')
+                    $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
+                
+                $this->configService->setAppValue('index_live', $index_live);
+            }
+        } else {
             $this->configService->setAppValue('index_live', $index_live);
         }
         

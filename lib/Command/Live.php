@@ -79,7 +79,7 @@ class Live extends Base
     {
         parent::configure();
         $this->setName('nextant:live')
-            ->setDescription('[ALPHA] Real Live Extract -- do not use')
+            ->setDescription('Instant Index')
             ->addOption('instant', 'i', InputOption::VALUE_NONE, 'Instant indexes');
     }
 
@@ -91,7 +91,7 @@ class Live extends Base
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . ' (rc)</comment>');
+        $output->writeln('<comment>nextant v' . $this->configService->getAppValue('installed_version') . '</comment>');
         $output->writeln('');
         
         if (! $this->solrService->configured(true)) {
@@ -130,6 +130,10 @@ class Live extends Base
                     else
                         $this->queueService->executeItem($item);
                 }
+                
+                if (! $this->configService->isLockedIndex())
+                    $this->solrTools->commit(false, $ierror);
+                
             } catch (\Doctrine\DBAL\Exception\DriverException $dbde) {
                 $catched = true;
                 // $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $dbde->getStatusMessage());
