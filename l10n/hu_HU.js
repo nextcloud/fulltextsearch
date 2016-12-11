@@ -1,6 +1,7 @@
 OC.L10N.register(
     "nextant",
     {
+    "Go to folder" : "Ugrás a mappába",
     "Nextant is not configured yet" : "A Nextant még nincs beállítva",
     "Ping querying your Solr Server" : "Solr szerver pingelése",
     "Verifying Schema integrity" : "Séma integritás ellenőrzése",

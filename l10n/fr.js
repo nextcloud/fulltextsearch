@@ -1,6 +1,7 @@
 OC.L10N.register(
     "nextant",
     {
+    "Go to folder" : "Ouvrir le dossier",
     "Nextant is not configured yet" : "Nextant n'est pas encore configuré",
     "Ping querying your Solr Server" : "Envoi d'une requête ping au serveur Solr",
     "Verifying Schema integrity" : "Vérification de l’intégrité du schéma",
@@ -64,7 +65,7 @@ OC.L10N.register(
     "Disabled" : "Désactivé",
     "Using Semaphore" : "via Semaphore",
     "Using Database" : "via Base de données ",
-    "Background Index delay :" : "Intervalle de synchronisation en arrière plan",
+    "Background Index delay :" : "Intervalle de synchronisation en arrière plan :",
     "hours" : "heures",
     "Number of documents :" : "Nombre de documents :",
     "Number of segments :" : "Nombre de segments :",
