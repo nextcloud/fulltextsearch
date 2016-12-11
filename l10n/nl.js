@@ -1,6 +1,7 @@
 OC.L10N.register(
     "nextant",
     {
+    "Go to folder" : "Ga naar map",
     "Nextant is not configured yet" : "Nextant is nog niet geconfigureerd",
     "Ping querying your Solr Server" : "Ping bevraagt je Solr Server",
     "Verifying Schema integrity" : "Verifiëren schema integriteit",
@@ -45,6 +46,8 @@ OC.L10N.register(
     "Index Files Tree :" : "Index bestandenboom :",
     "Disable default search from Files" : "De standaard zoekfunctie voor bestanden uitzetten",
     "Index Public Links :" : "Index publieke links :",
+    "Index Federated Shares :" : "Indexeren gefedereerde Shares :",
+    "Index External Storages :" : "Indexeren externe opslag :",
     "Index Encrypted Files :" : "Index versleutelde bestanden :",
     "Last index :" : "Laatste index :",
     "Indexing Bookmarks" : "bladwijzers indexeren",
@@ -67,13 +70,17 @@ OC.L10N.register(
     "Number of documents :" : "Aantal documenten :",
     "Number of segments :" : "Aantal segmenten :",
     "we recommand doing the very first indexing of your files using the ./occ nextant:index command." : "We adviseren om bij de eerste indexering van de bestanden de ./occ nextant:index commando te gebruiken.",
+    "However, you can force it to be started as a background process." : "Maar, je kunt ook forceren dat het als een achtergrondproces wordt gestart.",
     "Force first index as a cronjob" : "Eerste indexering als een cronjob forceren",
     "Force index" : "Indexering forceren",
+    "Indexing is scheduled within the next few hours (cron)" : "Indexeren is gepland voor binnen de komende uren (cron)",
     "Indexing in progress" : "Indexering is gaande",
     "Type of files to extract" : "Bestand voor uittrekken intypen",
+    "Text File (Text, Html, Subtitles, Source Code, ...)" : "Tekstbestand (Tekst, Html, ondertitels, broncode, ...)",
     "E-pub / PDF / rtf" : "E-pub / PDF / rtf",
     "Office Documents" : "Office documenten",
     "Image (Jpeg, Tiff)" : "Afbeelding (Jpeg, Tiff)",
-    "Audio File (mp3, flac)" : "Audiobestand (mp3, flac)"
+    "Audio File (mp3, flac)" : "Audiobestand (mp3, flac)",
+    "Extensions you wish to ignore (.java .xml)" : "Extensies die je wilt negeren (.java .xml)"
 },
 "nplurals=2; plural=(n != 1);");
