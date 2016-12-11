@@ -84,10 +84,13 @@ class SearchController extends Controller
      */
     public function searchRequest($query, $current_dir)
     {
-        $results = array();
+        $return = array(
+            'query' => $query,
+            'result' => array()
+        );
         
         if (! $this->solrService)
-            return $results;
+            return $return;
         
         if ($query !== null) {
             
@@ -104,8 +107,9 @@ class SearchController extends Controller
             ));
             
             if (! $solrResult)
-                return $results;
+                return $return;
             
+            $results = array();
             foreach ($solrResult as $item) {
                 
                 switch ($item->getSource()) {
@@ -147,12 +151,10 @@ class SearchController extends Controller
                 $results[] = $item->toArray();
             }
             
-            // $this->miscService->log('>> ' . var_export($results, true));
+            $return['result'] = $results;
         }
         
-        return array(
-            'result' => $results
-        );
+        return $return;
     }
 
     /**
@@ -161,25 +163,29 @@ class SearchController extends Controller
      */
     public function suggestRequest($query)
     {
+        $return = array(
+            'query' => $query,
+            'status' => '',
+            'result' => array()
+        );
+        
         if (! $this->solrService)
-            return false;
+            return $return;
         
         if ($query == null || $query === '')
-            return false;
+            return $return;
         
         $ierror = null;
         $suggest = $this->solrService->suggest($query, $ierror);
         
         $err = ($ierror == null) ? 0 : $ierror->getCode();
         
-        $result = array(
-            'status' => $err,
-            'result' => $suggest
-        );
+        $return['result'] = $suggest;
+        $return['status'] = $err;
         
-        // $this->miscService->log('>> ' . var_export($result, true));
+        // $this->miscService->log('>> ' . var_export($return, true));
         
-        return $result;
+        return $return;
     }
 
     /**
@@ -188,13 +194,16 @@ class SearchController extends Controller
      */
     public function searchRequestPublic($query, $key)
     {
-        $results = array();
+        $return = array(
+            'query' => $query,
+            'result' => array()
+        );
         
         if ($this->configService->getAppValue('index_files_sharelink') !== '1')
-            return $results;
+            return $return;
         
         if (! $this->solrService)
-            return $results;
+            return $return;
         
         if (strpos($key, '?') > 0)
             $key = substr($key, 0, strpos($key, '?'));
@@ -204,7 +213,7 @@ class SearchController extends Controller
         $share = \OC\Share\Share::getShareByToken($key);
         
         if (! $share)
-            return $results;
+            return $return;
         
         if ($query !== null) {
             
@@ -212,8 +221,9 @@ class SearchController extends Controller
             $solrResult = $this->solrService->search($query, array());
             
             if (! $solrResult)
-                return $results;
+                return $return;
             
+            $results = array();
             foreach ($solrResult as $item) {
                 
                 $item->sharedPublic(true);
@@ -256,12 +266,12 @@ class SearchController extends Controller
                 $results[] = $item->toArray();
             }
             
-            // $this->miscService->log('>> ' . var_export($results, true));
+            $return['result'] = $results;
         }
         
-        return array(
-            'result' => $results
-        );
+        // $this->miscService->log('' . var_export($return, true));
+        
+        return $return;
     }
 
     /**
@@ -270,27 +280,29 @@ class SearchController extends Controller
      */
     public function suggestRequestPublic($query)
     {
+        $return = array(
+            'query' => $query,
+            'status' => '',
+            'result' => array()
+        );
+        
         if (! $this->solrService)
-            return false;
+            return $return;
         
         if ($this->configService->getAppValue('index_files_sharelink') !== '1')
-            return array();
+            return $return;
         
         if ($query == null || $query === '')
-            return array();
+            return $return;
         
         $ierror = null;
         $suggest = $this->solrService->suggest($query, $ierror);
         
         $err = ($ierror == null) ? 0 : $ierror->getCode();
         
-        $result = array(
-            'status' => $err,
-            'result' => $suggest
-        );
+        $return['result'] = $suggest;
+        $return['status'] = $err;
         
-        // $this->miscService->log('>> ' . var_export($result, true));
-        
-        return $result;
+        return $return;
     }
 }

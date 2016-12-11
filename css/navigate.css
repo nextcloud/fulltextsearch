@@ -3,7 +3,12 @@
 .searchbox input[type="search"]:valid, .searchbox input[type="search"]:focus
 	{
 	width: 300px;
-	background: #ffffff18;
+	background: #fff3;
+	border-radius: 15px;
+}
+
+.searchbox_querying {
+	border-color: #ffff !important;
 }
 
 #nextantList {

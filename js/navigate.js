@@ -34,10 +34,10 @@
 	Nextant.prototype = {
 
 		fileList : null,
-		currQuery : '',
+		requesting : false,
 		currFiles : null,
-		currQuery : '',
-		searchResult : [],
+		oldQuery : '',
+		searchResult : null,
 		locked : false,
 		config : null,
 
@@ -46,6 +46,7 @@
 
 		timerQuery : null,
 		suggestNoSpam : false,
+
 		/**
 		 * Initialize the file search
 		 */
@@ -53,16 +54,23 @@
 
 			var self = this;
 
-			// detect if Files App is loaded
+			//
+			// fileAppLoaded - detect if Files App is loaded
 			this.fileAppLoaded = function() {
 				return !!OCA.Files && !!OCA.Files.App;
 			};
 
+			//
+			// initFileList - init fileList
 			this.initFileList = function() {
 
+				var query = $('#searchbox').val();
 				if (self.fileList != null) {
-					if (self.currFiles == null)
+
+					if (self.oldQuery == '')
 						self.currFiles = self.fileList.files;
+
+					self.oldQuery = $('#searchbox').val();
 					return;
 				}
 
@@ -101,24 +109,25 @@
 							OC
 									.filePath('nextant', 'ajax',
 											'search_options.php'), {},
-							self.searchOptions);
+							self.getOptionsResult);
 
 			};
 
-			this.searchOptions = function(result) {
+			//
+			// getOptionsResult - get config from server
+			this.getOptionsResult = function(result) {
 				if (self.config != null)
 					return;
 
 				self.config = result;
 			}
-			//
-			//
-			// init Share Link (only it needed)
+
+			// initShareLink - init Share Link (only if needed)
 			this.initShareLink = function() {
 				if (!self.nextant_sharelink)
 					return;
 
-				$searchbox = '<form class="searchbox" action="#" method="post" role="search" novalidate="" style="padding-right: 300px;">';
+				$searchbox = '<form class="searchbox" action="#" method="post" role="search" novalidate="" style="padding-right: 300px;" o>';
 				$searchbox += ' <label for="searchbox" class="hidden-visually">Search</label>';
 				$searchbox += ' <input id="searchbox" name="query" value="" required="" autocomplete="off" tabindex="5" type="search">';
 				$searchbox += '</form>';
@@ -129,17 +138,21 @@
 				}, 1000);
 
 				$('#searchbox').on('input', function(e) {
-					self.searchRequestPublic($('#searchbox').val());
-					self.suggestRequestPublic($('#searchbox').val());
+					self.sendSuggestRequest();
+					self.delayedSearchRequest();
 				});
 
 				$('DIV.crumb.svg.last').live('click', function() {
 					$('#searchbox').val('');
-					self.searchRequestPublic('');
+					self.sendSearchRequest();
 				});
 				$('DIV.crumb.svg.ui-droppable').live('click', function() {
 					$('#searchbox').val('');
-					self.searchRequestPublic('');
+					self.sendSearchRequest();
+				});
+
+				$("form.searchbox").submit(function() {
+					return false;
 				});
 
 				$('#searchbox').focusout(function() {
@@ -155,11 +168,58 @@
 			};
 
 			//
-			//
-			// search request
-			this.searchRequest = function(data) {
+			// sendSearchRequest -
+			this.sendSearchRequest = function() {
 
-				// self.initFileList();
+				var query = $('#searchbox').val();
+
+				if (query == '') {
+					if (self.searchResult != null) {
+						self.searchResult = null;
+						self.fileList.setSort('name', 'asc', false, false);
+						self.fileList.setFiles(self.currFiles);
+					}
+					return;
+				}
+
+				if (self.requesting)
+					return;
+
+				self.requesting = true;
+				$('#searchbox').addClass('searchbox_querying');
+
+				var data = {
+					query : query,
+					current_dir : self.get('dir'),
+					key : self.getShareLinkKey()
+				}
+
+				self.postSearchRequest(data);
+			};
+
+			//
+			// sendSuggestRequest -
+			this.sendSuggestRequest = function() {
+				var query = $('#searchbox').val();
+
+				if (query == '')
+					return;
+
+				if (self.requestingSuggest)
+					return;
+
+				self.requestingSuggest = true;
+
+				var data = {
+					query : query
+				}
+
+				self.postSuggestRequest(data);
+			};
+
+			//
+			// searchRequest - search request
+			this.postSearchRequest = function(data) {
 
 				if (self.nextant_sharelink)
 					$.post(OC.filePath('nextant', 'ajax', 'search_public.php'),
@@ -169,11 +229,26 @@
 							self.searchRequestResult);
 			};
 
-			/**
-			 * 
-			 * display search result
-			 * 
-			 */
+			//
+			// suggest request
+			this.postSuggestRequest = function(data) {
+
+				if (self.suggestNoSpam)
+					return;
+
+				if (self.nextant_sharelink)
+					$.post(
+							OC
+									.filePath('nextant', 'ajax',
+											'suggest_public.php'), data,
+							self.suggestRequestResult);
+				else
+					$.post(OC.filePath('nextant', 'ajax', 'suggest.php'), data,
+							self.suggestRequestResult);
+			};
+
+			//
+			// searchRequestResult - parse result from last request
 			this.searchRequestResult = function(infos) {
 
 				var result = infos.result;
@@ -184,8 +259,8 @@
 					origResult = self.currentFileResult();
 
 				self.searchResult = origResult.concat(result);
-
 				result = self.searchResult;
+
 				if (result == null)
 					return;
 
@@ -209,19 +284,25 @@
 				self.fileList.setSort('score', 'desc', false, false);
 				self.fileList.setFiles(data);
 
+				self.requesting = false;
+				$('#searchbox').removeClass('searchbox_querying');
+
 				self.updateSearchResult();
+
+				if (infos.query && $('#searchbox').val() != infos.query)
+					self.sendSearchRequest();
 			};
 
 			//
-			//
+			// updateSearchResult - update and morph the filelist with result
 			this.updateSearchResult = function() {
 
 				var result = self.searchResult;
 				if (result == null)
 					return;
 
-				if (self.currQuery == '')
-					return;
+				// if (self.currQuery == '')
+				// return;
 
 				self.locked = false;
 
@@ -246,82 +327,16 @@
 				self.__morphSummary(result);
 				self.__morphEmptyContent(result);
 
-				//
 				// done
 				self.locked = true;
 			};
 
 			//
-			//
-			// init search on shared link
-			this.searchRequestPublic = function(query) {
-
-				self.initFileList();
-				self.currQuery = query;
-
-				// sending the ajax request
-				var data = {
-					query : query,
-					current_dir : self.get('dir'),
-					key : self.getShareLinkKey()
-				}
-
-				self.searchRequest(data);
-			};
-
-			//
-			// return array containing current file from current directory that
-			// fit the query.
-			// (like current search in files app)
-			this.currentFileResult = function() {
-				var currFiles = self.currFiles;
-				var data = [];
-
-				if (currFiles == null || currFiles.length == 0)
-					return data;
-
-				for (var i = 0; i < currFiles.length; i++) {
-
-					if (currFiles[i].name.toLowerCase().indexOf(
-							self.currQuery.toLowerCase()) === -1)
-						continue;
-
-					data.push({
-						data : {
-							id : currFiles[i].id,
-							score : 9999
-						},
-						entry : currFiles[i]
-					});
-				}
-
-				return data;
-			};
-
-			//
-			//
-			// suggest request
-			this.suggestRequest = function(data) {
-
-				// self.initFileList();
-
-				if (self.suggestNoSpam)
-					return;
-
-				if (self.nextant_sharelink)
-					$.post(
-							OC
-									.filePath('nextant', 'ajax',
-											'suggest_public.php'), data,
-							self.suggestRequestResult);
-				else
-					$.post(OC.filePath('nextant', 'ajax', 'suggest.php'), data,
-							self.suggestRequestResult);
-			};
-
-			//
-			//
 			this.suggestRequestResult = function(response) {
+
+				self.requestingSuggest = false;
+				if (response.query && $('#searchbox').val() != response.query)
+					self.sendSuggestRequest();
 
 				if (response == null || response.status > 0
 						|| response.result == null
@@ -368,8 +383,64 @@
 
 				$('.nextant_suggestion_item').click(function() {
 					self.suggestReplace($(this).text());
-					self.searchRequest($('#searchbox'));
+					// self.searchRequest($('#searchbox'));
 				});
+			};
+
+			//
+			// init search on shared link
+			this.delayedSearchRequest = function() {
+
+				self.initFileList();
+				// self.currQuery = query;
+
+				if (self.timerQuery != null)
+					window.clearTimeout(self.timerQuery);
+
+				var delay = 250;
+				if (self.config != null)
+					switch (self.config.resource_level) {
+					case '1':
+						delay = 400;
+						break;
+
+					case '5':
+						delay = 150;
+						break;
+					}
+
+				self.timerQuery = setTimeout(function() {
+					self.sendSearchRequest();
+				}, delay);
+			};
+
+			//
+			// return array containing current file from current directory that
+			// fit the query.
+			// (like current search in files app)
+			this.currentFileResult = function() {
+				var currFiles = self.currFiles;
+				var data = [];
+
+				if (currFiles == null || currFiles.length == 0)
+					return data;
+
+				for (var i = 0; i < currFiles.length; i++) {
+
+					if (currFiles[i].name.toLowerCase().indexOf(
+							$('#searchbox').val().toLowerCase()) === -1)
+						continue;
+
+					data.push({
+						data : {
+							id : currFiles[i].id,
+							score : 9999
+						},
+						entry : currFiles[i]
+					});
+				}
+
+				return data;
 			};
 
 			// 
@@ -403,23 +474,7 @@
 			};
 
 			//
-			//
-			this.suggestRequestPublic = function(query) {
-
-				self.initFileList();
-				self.currQuery = query;
-
-				// sending the ajax request
-				var data = {
-					query : query,
-					key : self.getShareLinkKey()
-				}
-
-				self.suggestRequest(data);
-			};
-
-			//
-			//
+			// detect mutation FileList
 			this.mutationFileList = function(mutations, observer) {
 				if (self.locked)
 					self.updateSearchResult();
@@ -449,8 +504,7 @@
 				if (link == '')
 					link = '/apps/files/?dir={dir}&scrollto={scrollto}'
 
-				window.location = OC.generateUrl(link
-						+ '?dir={dir}&scrollto={scrollto}', {
+				window.location = OC.generateUrl(link, {
 					dir : dir,
 					scrollto : filename
 				});
@@ -511,9 +565,9 @@
 							+ OC.generateUrl('/s/') + self.getShareLinkKey();
 					link += '/download?path=' + item.entry.dirpath + '&files='
 							+ item.entry.filename;
-					$(elemhref).attr('href',
-							$(elemhref).attr('href').replace(/%2F/g, '/'));
-
+					$(elemhref).attr('href', link.replace(/%2F/g, '/'));
+					// $(elemhref).attr('href',
+					// $(elemhref).attr('href').replace(/%2F/g, '/'));
 					return;
 				}
 
@@ -680,41 +734,8 @@
 
 			// receiving search request in Files App
 			search.setFilter('files', function(query) {
-
-				// init Search/FileList if needed
-				self.initFileList();
-
-				if (self.currQuery == query)
-					return;
-
-				self.currQuery = query;
-
-				var data = {
-					query : query,
-					current_dir : self.get('dir')
-				}
-
-				if (self.timerQuery != null)
-					window.clearTimeout(self.timerQuery);
-
-				var delay = 250;
-				if (self.config != null)
-					switch (self.config.resource_level) {
-					case '1':
-						delay = 400;
-						break;
-
-					case '5':
-						delay = 150;
-						break;
-					}
-
-				self.timerQuery = setTimeout(function() {
-					self.timerQuery = null;
-					self.searchRequest(data);
-					self.suggestRequest(data);
-				}, delay);
-
+				self.sendSuggestRequest();
+				self.delayedSearchRequest();
 			});
 
 			if (self.fileAppLoaded())
@@ -741,7 +762,7 @@
 			//
 			// Stop Mutation on click
 			$('#app-navigation').find('a').on('click', function(e) {
-				self.currQuery = '';
+				// self.currQuery = '';
 				self.fileList.setSort('name', 'asc', false, false);
 			});
 
@@ -783,6 +804,8 @@
 	// Sort per score (also index if score is identical)
 	OCA.Files.FileList.Comparators.score = function(f1, f2) {
 		result = OCA.Search.nextant.searchResult;
+		if (result == null)
+			return;
 
 		var s1 = 0;
 		var s2 = 0;
