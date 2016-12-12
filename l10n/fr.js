@@ -2,6 +2,7 @@ OC.L10N.register(
     "nextant",
     {
     "Go to folder" : "Ouvrir le dossier",
+    "never" : "jamais",
     "Nextant is not configured yet" : "Nextant n'est pas encore configuré",
     "Ping querying your Solr Server" : "Envoi d'une requête ping au serveur Solr",
     "Verifying Schema integrity" : "Vérification de l’intégrité du schéma",
