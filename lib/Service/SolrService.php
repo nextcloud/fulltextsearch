@@ -41,6 +41,8 @@ class SolrService
 
     const SCORE_SENTENCE_COEF = 1000;
     
+    const SCORE_PATH = 1000;
+    
     // no solr
     const ERROR_SOLRSERVICE_DOWN = 2;
     
@@ -525,7 +527,7 @@ class SolrService
                     continue;
                 }
                 
-                $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^15 ' . "\n";
+                $path .= $oper . 'nextant_path:"' . $helper->escapeTerm(str_replace('"', '', $qstr)) . '"^' . self::SCORE_PATH . ' ' . "\n";
                 
                 if (substr($qstr, 0, 1) == '"')
                     $coef = self::SCORE_SENTENCE_COEF;
