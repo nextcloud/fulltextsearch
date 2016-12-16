@@ -152,6 +152,9 @@ class FileService
         if ($this->configService->getAppValue('index_files_external') !== '1')
             return false;
         
+        if (! \OCP\App::isEnabled('files_external'))
+            return false;
+        
         $data = array();
         $mounts = \OC_Mount_Config::getAbsoluteMountPoints($this->userId);
         foreach ($mounts as $mountPoint => $mount) {
