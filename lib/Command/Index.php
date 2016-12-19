@@ -243,6 +243,9 @@ class Index extends Base
         $output->writeln('');
         $output->writeln('* Extracting files:');
         $output->writeln('');
+        $output->writeln('');
+        if ($input->getOption('debug'))
+            $output->writeln('');
         
         $users = $this->getUsers($input->getOption('user'));
         
