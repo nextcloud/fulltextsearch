@@ -135,7 +135,7 @@ class ItemQueue
         $data = json_decode($json);
         
         if ($data == null)
-            return null;
+            return false;
         
         $item = new ItemQueue($data->type, $data);
         return $item;

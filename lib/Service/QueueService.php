@@ -110,7 +110,8 @@ class QueueService
                 $max_msg_size = 512;
                 
                 $infos = msg_stat_queue($queue);
-                if (! $standby && $infos['msg_qnum'] == 0)
+                
+                if (! $standby && $infos['msg_qnum'] === 0)
                     return false;
                 
                 if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg, true, 0, $error))
@@ -128,7 +129,8 @@ class QueueService
                     if ($queue)
                         break;
                     if (! $standby && ! $queue)
-                        break;
+                        return false;
+                    
                     sleep(15);
                 }
                 
