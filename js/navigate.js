@@ -146,7 +146,7 @@
 					$('#searchbox').val('');
 					self.sendSearchRequest();
 				});
-				
+
 				$('DIV.crumb.svg.ui-droppable').live('click', function() {
 					$('#searchbox').val('');
 					self.sendSearchRequest();
@@ -572,14 +572,18 @@
 					return;
 				}
 
-				if (item.data.type == 'files')
-					$(elemhref).attr('href',
-							$(elemhref).attr('href').replace(/%2F/g, '/'));
+				// if (item.data.type == 'files')
+				// $(elemhref).attr('href',
+				// $(elemhref).attr('href').replace(/%2F/g, '/'));
 
 				// fix bookmark link
 				if (item.data.type == 'bookmarks')
 					$(elemhref).attr('href', item.data.path).attr('target',
 							'_blank');
+				else
+					$(elemhref).attr('href',
+							$(elemhref).attr('href').replace(/%2F/g, '/'));
+
 			};
 
 			//
