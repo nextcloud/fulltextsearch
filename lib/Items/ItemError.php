@@ -31,6 +31,8 @@ class ItemError
 
     const EXCEPTION_DECRYPTION_FAILED = 1046;
 
+    const EXCEPTION_ENCRYPT_NO_MODULE = 1040;
+
     const LINK_EXCEPTION_DECRYPTION_FAILED = 'https://help.nextcloud.com/t/nextant-regarding-encrypted-files/5422';
 
     const EXCEPTION_DECRYPT_PRIVATEKEY_MISSING = 1050;

@@ -238,7 +238,16 @@ class FileService
         
         // We generate a local tmp file from the remote one
         if ($item->isExternal() && $this->configService->getAppValue('index_files_external') === '1') {
-            $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            try {
+                $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+            } catch (\OC\Encryption\Exceptions\DecryptionFailedException $dfe) {
+                $ierror = new ItemError(ItemError::EXCEPTION_DECRYPTION_FAILED, $dfe->getHint());
+                return false;
+            } catch (\OC\Encryption\Exceptions\ModuleDoesNotExistsException $mod) {
+                $ierror = new ItemError(ItemError::EXCEPTION_ENCRYPT_NO_MODULE, $mod->getHint());
+                return false;
+            }
+            
             return true;
         }
         
