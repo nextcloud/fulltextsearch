@@ -2,6 +2,7 @@ OC.L10N.register(
     "nextant",
     {
     "Go to folder" : "Ga naar map",
+    "never" : "nooit",
     "Nextant is not configured yet" : "Nextant is nog niet geconfigureerd",
     "Ping querying your Solr Server" : "Ping bevraagt je Solr Server",
     "Verifying Schema integrity" : "Verifiëren schema integriteit",
