@@ -98,6 +98,9 @@ class Pick extends Base
                 if (is_array($value))
                     $value = implode(', ', $value);
                 
+                if (is_bool($value))
+                    $value = ($value) ? 'true' : 'false';
+                
                 $output->writeln($field . ' -> ' . $value);
             }
             
