@@ -40,7 +40,7 @@ class SolrService
     const SCORE_TEXT_LITTLEWORD = 1;
 
     const SCORE_SENTENCE_COEF = 1000;
-    
+
     const SCORE_PATH = 1000;
     
     // no solr
@@ -419,6 +419,8 @@ class SolrService
                 $request = $client->createRequest($query);
                 $request->addParam('captureAttr', true);
                 $request->addParam('ignoreTikaException', true);
+                $request->addParam('extractInlineImages', true);
+                $request->addParam('ocrStrategy', 'ocr_and_text');
                 
                 $response = $client->executeRequest($request);
                 $ret = $client->createResult($query, $response);
@@ -482,7 +484,7 @@ class SolrService
         
         $astring = preg_split("/(\ )(?=(?:[^\"]|\"[^\"]*\")*$)/m", $string);
         
-        if ($string == '')
+        if ($string === '')
             return false;
         
         if ($options == null)
@@ -493,16 +495,24 @@ class SolrService
             $query = $client->createSelect();
             
             $helper = $query->getHelper();
-            $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $helper, $ierror);
-            if ($ownerQuery === false)
-                return false;
             
-            if ($ownerQuery == '') {
-                $ierror = new ItemError(self::ERROR_TOOWIDE_SEARCH);
-                return false;
+            if (in_array('no_owner_check', $options))
+                $ownerQuery = '';
+            
+            else {
+                
+                $ownerQuery = $this->generateOwnerQuery(self::SEARCH_ALL, $helper, $ierror);
+                
+                if ($ownerQuery === false)
+                    return false;
+                
+                if ($ownerQuery === '') {
+                    $ierror = new ItemError(self::ERROR_TOOWIDE_SEARCH);
+                    return false;
+                }
             }
             
-            array_push($options, 'complete_words');
+            // array_push($options, 'complete_words');
             // $query->setQuery('text:' . ((! in_array('complete_words', $options)) ? '*' : '') . $helper->escapePhrase($string));
             
             $path = '';
@@ -546,16 +556,22 @@ class SolrService
             if ($path !== '')
                 $q = '(' . $q . ")\n OR (" . $path . ')';
             
+            if (key_exists('limit_document_id', $options))
+                $q = '(' . $q . ")\n AND (id:" . $options['limit_document_id'] . ')';
+            
             foreach ($docminus as $mdoc) {
                 $q .= "\n" . $mdoc;
             }
             
             // Uncomment to display the request sent to solr
-//             $this->miscService->log($q);
+            // $this->miscService->log($q);
             
             $query->setRows(25);
             $query->setQuery($q);
-            $query->createFilterQuery('owner')->setQuery($ownerQuery);
+            
+            if ($ownerQuery !== '')
+                $query->createFilterQuery('owner')->setQuery($ownerQuery);
+            
             $query->setFields(array(
                 'id',
                 'nextant_deleted',
@@ -687,7 +703,7 @@ class SolrService
                 }
             }
             
-//             $this->miscService->log(var_export($suggestions, true));
+            // $this->miscService->log(var_export($suggestions, true));
             
             return $suggestions;
         } catch (\Solarium\Exception\HttpException $ehe) {

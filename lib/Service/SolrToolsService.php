@@ -460,6 +460,34 @@ class SolrToolsService
         return false;
     }
 
+    public function pick($type, $id)
+    {
+        if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
+            $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
+            return false;
+        }
+        
+        $client = $this->solrService->getClient();
+        
+        try {
+            $query = $client->createSelect();
+            $helper = $query->getHelper();
+            
+            $query->setQuery('id:' . $type . '_' . $id);
+            $resultset = $client->execute($query);
+            
+            return $resultset;
+        } catch (\Solarium\Exception\HttpException $ehe) {
+            $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $ehe->getStatusMessage());
+        } catch (\Solarium\Exception\RuntimeException $re) {
+            $ierror = new ItemError(SolrService::EXCEPTION_RUNTIME, $re->getMessage());
+        } catch (\Solarium\Exception $e) {
+            $ierror = new ItemError(SolrService::EXCEPTION, $e->getMessage());
+        }
+        
+        return false;
+    }
+
     /**
      * Count document on Solr Core
      *
