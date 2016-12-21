@@ -39,6 +39,8 @@ class BookmarkService
     // private $solrTools;
     private $miscService;
 
+    private $libBookmarks = null;
+
     public function __construct($configService, $miscService)
     {
         $this->configService = $configService;
@@ -74,9 +76,18 @@ class BookmarkService
     {
         if (! $this->configured())
             return false;
+            
+            // if ($this->configService->getCloudVersion() >= 11) {
+        if ($this->libBookmarks == null) {
+            $bookmarkApp = new \OCA\Bookmarks\AppInfo\Application();
+            $this->libBookmarks = $bookmarkApp->getContainer()->query(\OCA\Bookmarks\Controller\Lib\Bookmarks::class);
+        }
         
-        $db = \OC::$server->getDb();
-        $bookmarks = Bookmarks::findBookmarks($userId, $db, 0, 'id', array(), false, - 1);
+        $bookmarks = $this->libBookmarks->findBookmarks($userId, 0, 'id', array(), false, - 1);
+        // } else {
+        // $db = \OC::$server->getDb();
+        // $bookmarks = Bookmarks::findBookmarks($userId, $db, 0, 'id', array(), false, - 1);
+        // }
         
         $data = array();
         foreach ($bookmarks as $bookmark) {
