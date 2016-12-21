@@ -46,13 +46,11 @@ class SearchController extends Controller
 
     private $solrService;
 
-    private $fileService;
-
-    private $bookmarkService;
+    private $sourceService;
 
     private $miscService;
 
-    public function __construct($appName, IRequest $request, $userId, $groupManager, $configService, $solrService, $fileService, $bookmarkService, $miscService)
+    public function __construct($appName, IRequest $request, $userId, $groupManager, $configService, $solrService, $sourceService, $miscService)
     {
         parent::__construct($appName, $request);
         
@@ -62,8 +60,7 @@ class SearchController extends Controller
         
         $this->solrService = $solrService;
         
-        $this->fileService = $fileService;
-        $this->bookmarkService = $bookmarkService;
+        $this->sourceService = $sourceService;
         
         $this->miscService = $miscService;
     }
@@ -115,13 +112,13 @@ class SearchController extends Controller
                 switch ($item->getSource()) {
                     
                     case 'files':
-                        $this->fileService->initUser($this->userId, false);
-                        $this->fileService->getSearchResult($item);
-                        $this->fileService->endUser();
+                        $this->sourceService->file()->initUser($this->userId, false);
+                        $this->sourceService->file()->getSearchResult($item);
+                        $this->sourceService->file()->endUser();
                         break;
                     
                     case 'bookmarks':
-                        $this->bookmarkService->getSearchResult($item);
+                        $this->sourceService->bookmark()->getSearchResult($item);
                         break;
                     
                     default:
@@ -230,13 +227,13 @@ class SearchController extends Controller
                 switch ($item->getSource()) {
                     
                     case 'files':
-                        $this->fileService->initUser($item->getOwner(), false);
-                        $this->fileService->getSearchResult($item, $share['file_target'], false);
-                        $this->fileService->endUser();
+                        $this->sourceService->file()->initUser($item->getOwner(), false);
+                        $this->sourceService->file()->getSearchResult($item, $share['file_target'], false);
+                        $this->sourceService->file()->endUser();
                         break;
                     
                     // case 'bookmarks':
-                    // $this->bookmarkService->getSearchResult($item);
+                    // $this->sourceService->bookmark()->getSearchResult($item);
                     // break;
                     
                     default:

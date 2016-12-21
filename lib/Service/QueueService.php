@@ -40,7 +40,7 @@ class QueueService
 
     private $indexService;
 
-    private $fileService;
+    private $sourceService;
 
     private $miscService;
 
@@ -48,12 +48,12 @@ class QueueService
 
     private $parent = null;
 
-    public function __construct($liveQueueMapper, $configService, $indexService, $fileService, $miscService)
+    public function __construct($liveQueueMapper, $configService, $indexService, $sourceService, $miscService)
     {
         $this->liveQueueMapper = $liveQueueMapper;
         $this->configService = $configService;
         $this->indexService = $indexService;
-        $this->fileService = $fileService;
+        $this->sourceService = $sourceService;
         $this->miscService = $miscService;
     }
 
@@ -157,13 +157,13 @@ class QueueService
                 array_push($options, 'forceshared');
             
             case FilesEvents::FILE_CREATE:
-                $this->fileService->initUser($item->getUserId(), true);
-                $files = $this->fileService->getFilesPerFileId($item->getFileId(), $options);
+                $this->sourceService->file()->initUser($item->getUserId(), true);
+                $files = $this->sourceService->file()->getFilesPerFileId($item->getFileId(), $options);
                 if ($files != false && sizeof($files) > 0) {
                     $ispack = (sizeof($files) != 1);
                     $this->indexService->extract(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $ispack);
                 }
-                $this->fileService->endUser();
+                $this->sourceService->file()->endUser();
                 break;
             
             case FilesEvents::FILE_TRASH:
@@ -175,21 +175,21 @@ class QueueService
             case FilesEvents::FILE_UNSHARE:
                 array_push($options, 'forceshared');
                 
-                $this->fileService->initUser($item->getUserId(), true);
-                $files = $this->fileService->getFilesPerFileId($item->getFileId(), $options);
+                $this->sourceService->file()->initUser($item->getUserId(), true);
+                $files = $this->sourceService->file()->getFilesPerFileId($item->getFileId(), $options);
                 if (is_array($files) && sizeof($files) > 0) {
                     $ispack = (sizeof($files) != 1);
                     $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $ispack);
                 }
-                $this->fileService->endUser();
+                $this->sourceService->file()->endUser();
                 break;
             
             case FilesEvents::FILE_DELETE:
                 if ($item->getFolder()) {
                     
-                    $this->fileService->initUser($item->getUserId(), true);
-                    $files = $this->fileService->getFilesPerUserId('/files', array());
-                    $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
+                    $this->sourceService->file()->initUser($item->getUserId(), true);
+                    $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
+                    $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
                         'deleted'
                     ));
                     
@@ -198,7 +198,7 @@ class QueueService
                     
                     $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);
                     
-                    $this->fileService->endUser();
+                    $this->sourceService->file()->endUser();
                 } else {
                     // animation on file delete ?
                     $doc[] = new ItemDocument(ItemDocument::TYPE_FILE, $item->getFileId());

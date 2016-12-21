@@ -58,15 +58,13 @@ class Index extends Base
 
     private $configService;
 
-    private $fileService;
-
-    private $bookmarkService;
+    private $sourceService;
 
     private $miscService;
 
     private $currentIndexStatus = array();
 
-    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $queueService, $solrService, $solrTools, $solrAdmin, $configService, $fileService, $bookmarkService, $miscService)
+    public function __construct(IUserManager $userManager, $rootFolder, $indexService, $queueService, $solrService, $solrTools, $solrAdmin, $configService, $sourceService, $miscService)
     {
         parent::__construct();
         $this->userManager = $userManager;
@@ -77,8 +75,7 @@ class Index extends Base
         $this->solrTools = $solrTools;
         $this->solrAdmin = $solrAdmin;
         $this->configService = $configService;
-        $this->fileService = $fileService;
-        $this->bookmarkService = $bookmarkService;
+        $this->sourceService = $sourceService;
         $this->miscService = $miscService;
     }
 
@@ -137,7 +134,7 @@ class Index extends Base
             $debug = 2;
         
         $this->miscService->setDebug($debug);
-        $this->fileService->setDebug($debug);
+        $this->sourceService->file()->setDebug($debug);
         $this->indexService->setDebug($debug);
         $this->indexService->setForcing($input->getOption('force'));
         
@@ -234,7 +231,7 @@ class Index extends Base
      */
     private function indexesFiles($input, $output)
     {
-        if (! $this->fileService->configured()) {
+        if (! $this->sourceService->file()->configured()) {
             if ($input->getOption('files') || $input->getOption('files_extract'))
                 $output->writeln('Error while indexing Files: Nextant is not configured to extract your files.');
             return;
@@ -261,9 +258,9 @@ class Index extends Base
             if (! $this->userManager->userExists($user))
                 continue;
             
-            $this->fileService->initUser($user, true);
-            $files = $this->fileService->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
+            $this->sourceService->file()->initUser($user, true);
+            $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
+            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
             ));
             
@@ -272,7 +269,7 @@ class Index extends Base
             $this->indexService->extract(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
             $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
             
-            $this->fileService->endUser();
+            $this->sourceService->file()->endUser();
             
             foreach ($files as $doc) {
                 if ($doc->isIndexed())
@@ -309,7 +306,7 @@ class Index extends Base
      */
     private function updateFiles($input, $output)
     {
-        if (! $this->fileService->configured()) {
+        if (! $this->sourceService->file()->configured()) {
             if ($input->getOption('files') || $input->getOption('files_update'))
                 $output->writeln('Error while indexing Files: Nextant is not configured to update your files.');
             return;
@@ -318,6 +315,9 @@ class Index extends Base
         $output->writeln('');
         $output->writeln('* Updating files:');
         $output->writeln('');
+        $output->writeln('');
+        if ($input->getOption('debug'))
+            $output->writeln('');
         
         $users = $this->getUsers($input->getOption('user'));
         
@@ -330,16 +330,16 @@ class Index extends Base
             if (! $this->userManager->userExists($user))
                 continue;
             
-            $this->fileService->initUser($user, true);
-            $files = $this->fileService->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
+            $this->sourceService->file()->initUser($user, true);
+            $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
+            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
             ));
             
             $files = array_merge($files, $files_trashbin);
             $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user, $files);
             
-            $this->fileService->endUser();
+            $this->sourceService->file()->endUser();
             
             $output->writeln('');
             foreach ($files as $doc) {
@@ -362,7 +362,7 @@ class Index extends Base
      */
     private function indexesBookmarks($input, OutputInterface $output)
     {
-        if (! $this->bookmarkService->configured()) {
+        if (! $this->sourceService->bookmark()->configured()) {
             if ($input->getOption('bookmarks'))
                 $output->writeln('Error while indexing Bookmarks: Nextant is not configured to extract your bookmarks.');
             return;
@@ -371,6 +371,9 @@ class Index extends Base
         $output->writeln('');
         $output->writeln('* Indexing bookmarks:');
         $output->writeln('');
+        $output->writeln('');
+        if ($input->getOption('debug'))
+            $output->writeln('');
         
         $users = $this->getUsers($input->getOption('user'));
         
@@ -385,7 +388,7 @@ class Index extends Base
             if (! $this->userManager->userExists($user))
                 continue;
             
-            $bm = $this->bookmarkService->getBookmarksPerUserId($user);
+            $bm = $this->sourceService->bookmark()->getBookmarksPerUserId($user);
             
             $solrDocs = null;
             $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user, $bm, $solrDocs);

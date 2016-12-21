@@ -39,6 +39,8 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 
     private $miscService;
 
+    private $sourceService;
+
     public function __construct()
     {
         $this->setInterval(5); // 2 minutes
@@ -55,9 +57,8 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $this->solrService = $c->query('SolrService');
         $this->solrTools = $c->query('SolrToolsService');
         $this->solrAdmin = $c->query('SolrAdminService');
-        $this->fileService = $c->query('FileService');
+        $this->sourceService = $c->query('SourceService');
         $this->indexService = $c->query('IndexService');
-        $this->bookmarkService = $c->query('BookmarkService');
         $this->queueService = $c->query('QueueService');
         $this->rootFolder = $c->query('RootFolder');
         
@@ -84,7 +85,7 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
     public function setDebug($debug)
     {
         $this->miscService->setDebug($debug);
-        $this->fileService->setDebug($debug);
+        $this->sourceService->file()->setDebug($debug);
     }
 
     private function liveIndex()
@@ -117,16 +118,16 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
 
     private function cronIndexFiles()
     {
-        if (! $this->fileService->configured())
+        if (! $this->sourceService->file()->configured())
             return;
         
         $users = $this->userManager->search('');
         
         foreach ($users as $user) {
             
-            $this->fileService->initUser($user->getUID(), true);
-            $files = $this->fileService->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
+            $this->sourceService->file()->initUser($user->getUID(), true);
+            $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
+            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
             ));
             
@@ -135,39 +136,39 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
             $this->indexService->extract(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
             $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
             
-            $this->fileService->endUser();
+            $this->sourceService->file()->endUser();
         }
     }
 
     private function cronUpdateFiles()
     {
-        if (! $this->fileService->configured())
+        if (! $this->sourceService->file()->configured())
             return;
         
         $users = $this->userManager->search('');
         foreach ($users as $user) {
             
-            $this->fileService->initUser($user->getUID(), true);
-            $files = $this->fileService->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->fileService->getFilesPerUserId('/files_trashbin', array(
+            $this->sourceService->file()->initUser($user->getUID(), true);
+            $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
+            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
                 'deleted'
             ));
             
             $files = array_merge($files, $files_trashbin);
             $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user->getUID(), $files);
             
-            $this->fileService->endUser();
+            $this->sourceService->file()->endUser();
         }
     }
 
     private function cronIndexBookmarks()
     {
-        if (! $this->bookmarkService->configured())
+        if (! $this->sourceService->bookmark()->configured())
             return;
         
         $users = $this->userManager->search('');
         foreach ($users as $user) {
-            $bm = $this->bookmarkService->getBookmarksPerUserId($user->getUID());
+            $bm = $this->sourceService->bookmark()->getBookmarksPerUserId($user->getUID());
             
             $solrDocs = null;
             $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm, $solrDocs);

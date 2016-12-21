@@ -63,12 +63,8 @@ class FilesEvents
     {
         $this->userId = $userId;
         $this->configService = $configService;
-        // $this->fileService = $fileService;
-        // $this->solrService = $solrService;
         $this->queueService = $queueService;
         $this->miscService = $miscService;
-        
-        // $this->solrService->setOwner($this->userId);
     }
 
     /**

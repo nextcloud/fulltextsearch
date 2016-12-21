@@ -54,9 +54,8 @@ class IndexService
 
     private $configService;
 
-    private $fileService;
+    private $sourceService;
 
-    private $bookmarkService;
 
     private $miscService;
 
@@ -86,11 +85,10 @@ class IndexService
 
     private $initTime = 0;
 
-    public function __construct($configService, $fileService, $bookmarkService, $solrService, $solrTools, $solrAdmin, $miscService)
+    public function __construct($configService, $sourceService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
         $this->configService = $configService;
-        $this->fileService = $fileService;
-        $this->bookmarkService = $bookmarkService;
+        $this->sourceService = $sourceService;
         
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
@@ -224,9 +222,9 @@ class IndexService
             }
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
-                $this->fileService->syncDocument($entry);
+                $this->sourceService->file()->syncDocument($entry);
             if ($entry->getType() == ItemDocument::TYPE_BOOKMARK)
-                $this->bookmarkService->syncDocument($entry);
+                $this->sourceService->bookmark()->syncDocument($entry);
             if ($entry->getType() == ItemDocument::TYPE_TEST) {
                 $entry->synced(true);
                 $entry->valid(true);
@@ -269,7 +267,7 @@ class IndexService
                 $progress->setMessage($atick . ' documents extracted in the last minute. ' . (($this->lastCommitQueryTime > 0) ? 'Last commit took ' . ($this->lastCommitQueryTime) . 'ms' : ''), 'more');
             
             if ($entry->getType() == ItemDocument::TYPE_FILE) {
-                if (! $this->fileService->generateAbsolutePath($entry, $ierror)) {
+                if (! $this->sourceService->file()->generateAbsolutePath($entry, $ierror)) {
                     $this->manageFailure($ierror, $progress, 'Failed to find a descent path');
                     if ($this->configService->getAppValue('index_files_tree') !== '1')
                         continue;
@@ -329,7 +327,7 @@ class IndexService
                 $entry->valid(true);
             
             if ($entry->getType() == ItemDocument::TYPE_FILE)
-                $this->fileService->destroyTempDocument($entry);
+                $this->sourceService->file()->destroyTempDocument($entry);
         }
         
         $this->resetAverageTick();

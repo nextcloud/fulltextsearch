@@ -37,10 +37,12 @@ use \OCA\Nextant\Provider\SearchProvider;
 use \OCA\Nextant\Service\ConfigService;
 use \OCA\Nextant\Service\QueueService;
 use \OCA\Nextant\Service\MiscService;
+use \OCA\Nextant\Service\SourceService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\IndexService;
 use \OCA\Nextant\Service\BookmarkService;
+use \OCA\Nextant\Service\NewsService;
 use \OCA\Nextant\Service\SolrAdminService;
 use \OCA\Nextant\Service\SolrToolsService;
 use \OCA\Nextant\Migration\NextantUpgrade;
@@ -74,11 +76,15 @@ class Application extends App
         });
         
         $container->registerService('IndexService', function ($c) {
-            return new IndexService($c->query('ConfigService'), $c->query('FileService'), $c->query('BookmarkService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
+            return new IndexService($c->query('ConfigService'), $c->query('SourceService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
         });
         
         $container->registerService('QueueService', function ($c) {
-            return new QueueService($c->query('LiveQueueMapper'), $c->query('ConfigService'), $c->query('IndexService'), $c->query('FileService'), $c->query('MiscService'));
+            return new QueueService($c->query('LiveQueueMapper'), $c->query('ConfigService'), $c->query('IndexService'), $c->query('SourceService'), $c->query('MiscService'));
+        });
+        
+        $container->registerService('SourceService', function ($c) {
+            return new SourceService($c->query('FileService'), $c->query('BookmarkService'), $c->query('NewsService'), $c->query('MiscService'));
         });
         
         $container->registerService('FileService', function ($c) {
@@ -87,6 +93,10 @@ class Application extends App
         
         $container->registerService('BookmarkService', function ($c) {
             return new BookmarkService($c->query('ConfigService'), $c->query('MiscService'));
+        });
+        
+        $container->registerService('NewsService', function ($c) {
+            return new NewsService($c->query('ConfigService'), $c->query('MiscService'));
         });
         
         $container->registerService('SolrService', function ($c) {
@@ -115,7 +125,7 @@ class Application extends App
         });
         
         $container->registerService('SearchController', function ($c) {
-            return new SearchController($c->query('AppName'), $c->query('Request'), $c->query('UserId'), $c->query('GroupManager'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('FileService'), $c->query('BookmarkService'), $c->query('MiscService'));
+            return new SearchController($c->query('AppName'), $c->query('Request'), $c->query('UserId'), $c->query('GroupManager'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('SourceService'), $c->query('MiscService'));
         });
         
         $container->registerService('SettingsController', function ($c) {

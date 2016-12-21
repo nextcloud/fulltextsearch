@@ -54,15 +54,13 @@ class Live extends Base
 
     private $configService;
 
-    private $fileService;
-
-    private $bookmarkService;
+    private $sourceService;
 
     private $miscService;
 
     private $currentIndexStatus = array();
 
-    public function __construct($queueService, $indexService, $solrService, $solrTools, $configService, $fileService, $bookmarkService, $miscService)
+    public function __construct($queueService, $indexService, $solrService, $solrTools, $configService, $sourceService, $miscService)
     {
         parent::__construct();
         $this->queueService = $queueService;
@@ -70,8 +68,7 @@ class Live extends Base
         $this->solrService = $solrService;
         $this->solrTools = $solrTools;
         $this->configService = $configService;
-        $this->fileService = $fileService;
-        $this->bookmarkService = $bookmarkService;
+        $this->sourceService = $sourceService;
         $this->miscService = $miscService;
     }
 
@@ -105,7 +102,7 @@ class Live extends Base
         }
         
         // $this->miscService->setDebug($input->getOption('debug'));
-        // $this->fileService->setDebug($input->getOption('debug'));
+        // $this->sourceService->file()->setDebug($input->getOption('debug'));
         // $this->indexService->setDebug($input->getOption('debug'));
         
         $this->solrService->setOutput($output);
@@ -133,7 +130,6 @@ class Live extends Base
                 
                 if (! $this->configService->isLockedIndex())
                     $this->solrTools->commit(false, $ierror);
-                
             } catch (\Doctrine\DBAL\Exception\DriverException $dbde) {
                 $catched = true;
                 // $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $dbde->getStatusMessage());
