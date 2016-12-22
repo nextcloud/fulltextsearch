@@ -572,17 +572,17 @@
 					return;
 				}
 
-				// if (item.data.type == 'files')
-				// $(elemhref).attr('href',
-				// $(elemhref).attr('href').replace(/%2F/g, '/'));
+				if (item.data.type == 'files') {
+					$(elemhref).attr('href',
+							$(elemhref).attr('href').replace(/%2F/g, '/'));
+					$(tr).attr('data-file',
+							$(tr).attr('data-file').replace(/%2F/g, '/'));
+				}
 
 				// fix bookmark link
 				if (item.data.type == 'bookmarks')
 					$(elemhref).attr('href', item.data.path).attr('target',
 							'_blank');
-				else
-					$(elemhref).attr('href',
-							$(elemhref).attr('href').replace(/%2F/g, '/'));
 
 			};
 
