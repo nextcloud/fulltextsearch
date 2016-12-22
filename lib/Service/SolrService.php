@@ -518,6 +518,7 @@ class SolrService
             $path = '';
             $special = '+-';
             $docminus = array();
+            $islist = array();
             $q = '(text_edge:"' . $helper->escapeTerm(str_replace('"', '', $string)) . '"^150)';
             foreach ($astring as $qstr) {
                 
@@ -530,6 +531,11 @@ class SolrService
                 }
                 
                 $unqstr = str_replace('"', '', $qstr);
+                
+                if (substr($unqstr, 0, 3) === 'is:') {
+                    $islist[] = substr($unqstr, 3);
+                    continue;
+                }
                 
                 if ($oper === '-') {
                     $docminus[] = $oper . 'text:"' . $helper->escapeTerm($unqstr) . '"';
@@ -558,6 +564,19 @@ class SolrService
             
             if (key_exists('limit_document_id', $options))
                 $q = '(' . $q . ")\n AND (id:" . $options['limit_document_id'] . ')';
+            
+            foreach ($islist as $is) {
+                
+                $addq = '';
+                switch ($is) {
+                    case 'deleted':
+                        $addq = 'nextant_deleted:true';
+                        break;
+                }
+                
+                if ($addq !== '')
+                    $q = "($q)\n AND ($addq)";
+            }
             
             foreach ($docminus as $mdoc) {
                 $q .= "\n" . $mdoc;
