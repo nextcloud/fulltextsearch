@@ -365,7 +365,7 @@ class SolrService
                 // if ($this->configService->resourceLevel() === ConfigService::RESOURCE_LEVEL_LOWER)
                 // $query->addFieldMapping('content', 'text_light');
                 // else
-                $query->addFieldMapping('content', 'text');
+                $query->addFieldMapping('content', 'text_edge');
                 
                 $query->addFieldMapping('div', 'ignored_');
                 $query->addFieldMapping('html', 'ignored_');
@@ -419,8 +419,8 @@ class SolrService
                 $request = $client->createRequest($query);
                 $request->addParam('captureAttr', true);
                 $request->addParam('ignoreTikaException', true);
-                $request->addParam('extractInlineImages', true);
-                $request->addParam('ocrStrategy', 'ocr_and_text');
+           //     $request->addParam('extractInlineImages', true);
+           //     $request->addParam('ocrStrategy', 'ocr_and_text');
                 
                 $response = $client->executeRequest($request);
                 $ret = $client->createResult($query, $response);

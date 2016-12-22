@@ -1273,8 +1273,8 @@ class SolrAdminService
         array_push($fields, array(
             'type' => 'copy-field',
             'data' => array(
-                'source' => 'text',
-                'dest' => 'text_edge'
+                'source' => 'text_edge',
+                'dest' => 'text'
             )
         ));
         
@@ -1282,7 +1282,7 @@ class SolrAdminService
         array_push($fields, array(
             'type' => 'copy-field',
             'data' => array(
-                'source' => 'text',
+                'source' => 'text_edge',
                 'dest' => 'text_word'
             )
         ));
