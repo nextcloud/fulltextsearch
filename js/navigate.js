@@ -556,7 +556,7 @@
 			// fix the subfolder link
 			//
 			this.__morphLink = function(tr, item) {
-				$(tr).attr('data-path', '/');
+				$(tr).attr('data-path', item.entry.dirpath);
 				var elemhref = $(tr).find('td.filename').find('a.name');
 				if (!$(elemhref).length)
 					return;
@@ -575,8 +575,8 @@
 				if (item.data.type == 'files') {
 					$(elemhref).attr('href',
 							$(elemhref).attr('href').replace(/%2F/g, '/'));
-					$(tr).attr('data-file',
-							$(tr).attr('data-file').replace(/%2F/g, '/'));
+					$(tr).attr('data-file', item.entry.filename);
+					// $(tr).attr('data-file').replace(/%2F/g, '/'));
 				}
 
 				// fix bookmark link
