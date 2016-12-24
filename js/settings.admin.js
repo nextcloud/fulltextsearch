@@ -178,9 +178,14 @@ $(document)
 								resource_level : $('#solr_resource_level')
 										.val(),
 								index_live : $('#solr_index_live').val(),
+								use_cron : ($('#solr_use_cron').is(':checked')) ? 1
+										: 0,
 								index_delay : $('#solr_index_delay').val(),
 								force_index : force_index
 							}
+
+							if (switched == 'use_cron')
+								data.use_cron = (data.use_cron == 1) ? 0 : 1;
 
 							$.post(OC.filePath('nextant', 'ajax/settings',
 									'option_status.php'), data,
@@ -321,6 +326,10 @@ $(document)
 							$('#solr_index_live').val(response.index_live);
 							$('#solr_index_live_queuekey').val(
 									response.index_live_queuekey);
+							
+							$('#solr_use_cron').prop('checked',
+									(response.use_cron == 1));
+							
 							$('#solr_index_delay').val(response.index_delay);
 
 							if (response.index_files_tree == 1) {
@@ -719,6 +728,13 @@ $(document)
 						nextantSettings.savesuboptions_status();
 					});
 
+					$('#solr_use_cron')
+					.mousedown(
+							function() {
+								nextantSettings
+										.savesuboptions_status('use_cron');
+							});
+					
 					$('#solr_index_delay').on('input', function(e) {
 						nextantSettings.savesuboptions_status();
 					});

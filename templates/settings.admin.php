@@ -237,6 +237,15 @@ style('nextant', 'admin');
 								id="solr_index_delay" value="2" style="width: 50px;" /><?php p($l->t('hours')); ?></td>
 						</tr>
 
+
+						<tr style="height: 30px;">
+							<td class="nextant_admin_left">					
+	    <?php p($l->t('Use System Cron :')); ?>
+						</td>
+							<td colspan="2"><input type="checkbox" name="solr_use_cron"
+								id="solr_use_cron" value="1" style="margin: 10px;" /></td>
+						</tr>
+
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">
 	    <?php p($l->t('Number of documents :')) ?></td>

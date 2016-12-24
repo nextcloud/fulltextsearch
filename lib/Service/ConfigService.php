@@ -56,6 +56,7 @@ class ConfigService
         'index_live' => '1',
         'index_live_queuekey' => '19375',
         'index_delay' => '2',
+        'use_cron' => '1',
         'index_locked' => '0',
         'index_files_last' => '0',
         'index_bookmarks_last' => '0',
