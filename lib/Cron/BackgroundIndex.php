@@ -52,6 +52,10 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         $c = $app->getContainer();
         
         $this->configService = $c->query('ConfigService');
+        
+        if ($this->configService->getAppValue('use_cron') !== '1')
+            return;
+                
         $this->miscService = $c->query('MiscService');
         $this->userManager = $c->query('UserManager');
         $this->solrService = $c->query('SolrService');
