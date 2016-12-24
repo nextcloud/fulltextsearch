@@ -41,6 +41,7 @@ use \OCA\Nextant\Service\SourceService;
 use \OCA\Nextant\Service\FileService;
 use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\IndexService;
+use \OCA\Nextant\Service\BackgroundService;
 use \OCA\Nextant\Service\BookmarkService;
 use \OCA\Nextant\Service\NewsService;
 use \OCA\Nextant\Service\SolrAdminService;
@@ -77,6 +78,10 @@ class Application extends App
         
         $container->registerService('IndexService', function ($c) {
             return new IndexService($c->query('ConfigService'), $c->query('SourceService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
+        });
+        
+        $container->registerService('BackgroundService', function ($c) {
+            return new BackgroundService($c->query('UserManager'), $c->query('RootFolder'), $c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('SourceService'), $c->query('IndexService'), $c->query('QueueService'), $c->query('MiscService'));
         });
         
         $container->registerService('QueueService', function ($c) {

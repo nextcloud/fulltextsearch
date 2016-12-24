@@ -26,8 +26,6 @@
  */
 namespace OCA\Nextant\Cron;
 
-use \OCA\Nextant\Service\FileService;
-use \OCA\Nextant\Items\ItemDocument;
 use \OCA\Nextant\AppInfo\Application;
 
 class BackgroundIndex extends \OC\BackgroundJob\TimedJob
@@ -55,128 +53,8 @@ class BackgroundIndex extends \OC\BackgroundJob\TimedJob
         
         if ($this->configService->getAppValue('use_cron') !== '1')
             return;
-                
-        $this->miscService = $c->query('MiscService');
-        $this->userManager = $c->query('UserManager');
-        $this->solrService = $c->query('SolrService');
-        $this->solrTools = $c->query('SolrToolsService');
-        $this->solrAdmin = $c->query('SolrAdminService');
-        $this->sourceService = $c->query('SourceService');
-        $this->indexService = $c->query('IndexService');
-        $this->queueService = $c->query('QueueService');
-        $this->rootFolder = $c->query('RootFolder');
         
-        if (! $this->solrService->configured(false))
-            return;
-        
-        if (! $this->solrAdmin->ping())
-            return;
-        
-        if ($this->configService->isLockedIndex())
-            return;
-        
-        $this->indexService->lockActive(true);
-        $this->configService->lockIndex(true);
-        
-        $this->liveIndex();
-        $this->cronIndex();
-        
-        $this->configService->lockIndex(false);
-        
-        return;
-    }
-
-    public function setDebug($debug)
-    {
-        $this->miscService->setDebug($debug);
-        $this->sourceService->file()->setDebug($debug);
-    }
-
-    private function liveIndex()
-    {
-        if ($this->configService->getAppValue('index_live') === '0')
-            return;
-        
-        while (($item = $this->queueService->readQueue()) !== false) {
-            $this->queueService->executeItem($item);
-        }
-    }
-
-    private function cronIndex()
-    {
-        if (($this->configService->timeIndexDelay('files') && $this->configService->neededIndexFiles()) || $this->configService->timeIndexDelay('files', 24)) {
-            // $this->miscService->log('___cronFiles');
-            $this->configService->needIndexFiles(false);
-            $this->cronIndexFiles();
-            $this->cronUpdateFiles();
-            $this->configService->timeIndex('files');
-        }
-        
-        if (($this->configService->timeIndexDelay('bookmarks') && $this->configService->neededIndexBookmarks()) || $this->configService->timeIndexDelay('bookmarks', 24)) {
-            // $this->miscService->log('___cronBookmarks');
-            $this->configService->needIndexBookmarks(false);
-            $this->cronIndexBookmarks();
-            $this->configService->timeIndex('bookmarks');
-        }
-    }
-
-    private function cronIndexFiles()
-    {
-        if (! $this->sourceService->file()->configured())
-            return;
-        
-        $users = $this->userManager->search('');
-        
-        foreach ($users as $user) {
-            
-            $this->sourceService->file()->initUser($user->getUID(), true);
-            $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
-                'deleted'
-            ));
-            
-            $files = array_merge($files, $files_trashbin);
-            $solrDocs = null;
-            $this->indexService->extract(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
-            $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
-            
-            $this->sourceService->file()->endUser();
-        }
-    }
-
-    private function cronUpdateFiles()
-    {
-        if (! $this->sourceService->file()->configured())
-            return;
-        
-        $users = $this->userManager->search('');
-        foreach ($users as $user) {
-            
-            $this->sourceService->file()->initUser($user->getUID(), true);
-            $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
-                'deleted'
-            ));
-            
-            $files = array_merge($files, $files_trashbin);
-            $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user->getUID(), $files);
-            
-            $this->sourceService->file()->endUser();
-        }
-    }
-
-    private function cronIndexBookmarks()
-    {
-        if (! $this->sourceService->bookmark()->configured())
-            return;
-        
-        $users = $this->userManager->search('');
-        foreach ($users as $user) {
-            $bm = $this->sourceService->bookmark()->getBookmarksPerUserId($user->getUID());
-            
-            $solrDocs = null;
-            $this->indexService->extract(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm, $solrDocs);
-            $this->indexService->removeOrphans(ItemDocument::TYPE_BOOKMARK, $user->getUID(), $bm, $solrDocs);
-        }
+        $backgroundService = $c->query('BackgroundService');
+        $backgroundService->run();
     }
 }

@@ -33,5 +33,6 @@ $application->add(new OCA\Nextant\Command\Index(OC::$server->getUserManager(), $
 $application->add(new OCA\Nextant\Command\Optimize($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService')));
 $application->add(new OCA\Nextant\Command\Pick($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService')));
 $application->add(new OCA\Nextant\Command\Live($c->query('QueueService'), $c->query('IndexService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('ConfigService'), $c->query('SourceService'), $c->query('MiscService')));
+$application->add(new OCA\Nextant\Command\Background($c->query('BackgroundService')));
 
 
