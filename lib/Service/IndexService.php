@@ -394,6 +394,8 @@ class IndexService
             if ($this->parent != null)
                 $this->parent->interrupted();
             
+                $this->output->writeln('file_' . $entry->getId());
+                
             if ($this->output != null && $this->debug == 100)
                 $this->output->writeln('t_01_' . microtime());
             
