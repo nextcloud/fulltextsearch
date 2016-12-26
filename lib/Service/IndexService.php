@@ -56,7 +56,6 @@ class IndexService
 
     private $sourceService;
 
-
     private $miscService;
 
     private $parent;
@@ -376,6 +375,9 @@ class IndexService
             $progress->clear();
         }
         
+        if ($this->output != null && $this->debug == 100)
+            $this->output->writeln('> init Comparing');
+        
         if ($progress !== null) {
             $progress->setMessage('<info>' . $userId . '</info>');
             $progress->setMessage('', 'jvm');
@@ -392,7 +394,13 @@ class IndexService
             if ($this->parent != null)
                 $this->parent->interrupted();
             
+            if ($this->output != null && $this->debug == 100)
+                $this->output->writeln('t_01_' . time());
+            
             $this->lockIndex(true);
+            
+            if ($this->output != null && $this->debug == 100)
+                $this->output->writeln('t_02_' . time());
             
             if ($progress !== null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
@@ -409,10 +417,19 @@ class IndexService
                 $progress->advance();
             }
             
+            if ($this->output != null && $this->debug == 100)
+                $this->output->writeln('t_03_' . time());
+            
             $current = ItemDocument::getItem($solrDocs, $entry);
             $continue = false;
             
+            if ($this->output != null && $this->debug == 100)
+                $this->output->writeln('t_04_' . time());
+            
             $this->solrTools->updateDocument($entry, $current, false, $ierror);
+            
+            if ($this->output != null && $this->debug == 100)
+                $this->output->writeln('t_05_' . time());
             
             if ($progress != null) {
                 if ($entry->neededUpdate()) {
