@@ -567,16 +567,14 @@
 					link += '/download?path=' + item.entry.dirpath + '&files='
 							+ item.entry.filename;
 					$(elemhref).attr('href', link.replace(/%2F/g, '/'));
-					// $(elemhref).attr('href',
-					// $(elemhref).attr('href').replace(/%2F/g, '/'));
 					return;
 				}
 
+				// fix files link
 				if (item.data.type == 'files') {
 					$(elemhref).attr('href',
 							$(elemhref).attr('href').replace(/%2F/g, '/'));
 					$(tr).attr('data-file', item.entry.filename);
-					// $(tr).attr('data-file').replace(/%2F/g, '/'));
 				}
 
 				// fix bookmark link
