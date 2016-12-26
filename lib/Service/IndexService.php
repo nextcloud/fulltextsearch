@@ -395,12 +395,12 @@ class IndexService
                 $this->parent->interrupted();
             
             if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_01_' . time());
+                $this->output->writeln('t_01_' . microtime());
             
             $this->lockIndex(true);
             
             if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_02_' . time());
+                $this->output->writeln('t_02_' . microtime());
             
             if ($progress !== null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
@@ -418,18 +418,18 @@ class IndexService
             }
             
             if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_03_' . time());
+                $this->output->writeln('t_03_' . microtime());
             
             $current = ItemDocument::getItem($solrDocs, $entry);
             $continue = false;
             
             if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_04_' . time());
+                $this->output->writeln('t_04_' . microtime());
             
             $this->solrTools->updateDocument($entry, $current, false, $ierror);
             
             if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_05_' . time());
+                $this->output->writeln('t_05_' . microtime());
             
             if ($progress != null) {
                 if ($entry->neededUpdate()) {
