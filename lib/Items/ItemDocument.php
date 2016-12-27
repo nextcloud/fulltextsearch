@@ -569,17 +569,6 @@ class ItemDocument
         
         if (isset($list[$item->getType() . '_' . $item->getId()]))
             return $list[$item->getType() . '_' . $item->getId()];
-            
-            // $neededObject = array_filter(
-            // $arrayOfObjects,
-            // function ($e) {
-            // return $e->id == $searchedValue;
-            // }
-            // );
-            
-        // foreach ($list as $entry)
-            // if ($entry->getId() === $item->getId() && $entry->getType() === $item->getType())
-            // return $entry;
         
         return null;
     }
