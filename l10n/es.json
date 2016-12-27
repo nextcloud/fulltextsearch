@@ -66,6 +66,7 @@
     "Using Database" : "Usar base de datos",
     "Background Index delay :" : "Retardo de análisis en segundo plano:",
     "hours" : "horas",
+    "Use System Cron :" : "Usar cron del sistema:",
     "Number of documents :" : "Numero de documentos:",
     "Number of segments :" : "Numero de segmentos:",
     "we recommand doing the very first indexing of your files using the ./occ nextant:index command." : "recomendamos hacer el primer análisis de sus archivos usando la orden ./occ nextant:index .",
