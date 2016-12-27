@@ -313,6 +313,7 @@ class IndexService
                 }
                 
                 if ($this->configService->getAppValue('index_files_tree') === '1') {
+                    
                     $entry->extractable(false);
                     
                     if (! $this->force && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
@@ -360,7 +361,7 @@ class IndexService
     {
         $this->solrService->setOwner($userId);
         
-        if (sizeof($data) > 0 && ! $data[0]->isSynced())
+        if (reset($data) && ($sync = current($data)) && ! $sync->isSynced())
             $this->extract($type, $userId, $data, $solrDocs, false);
         
         if ($solrDocs === null)
@@ -374,9 +375,6 @@ class IndexService
             $progress = new ProgressBar($this->output, sizeof($data));
             $progress->clear();
         }
-        
-        if ($this->output != null && $this->debug == 100)
-            $this->output->writeln('> init Comparing');
         
         if ($progress !== null) {
             $progress->setMessage('<info>' . $userId . '</info>');
@@ -394,15 +392,7 @@ class IndexService
             if ($this->parent != null)
                 $this->parent->interrupted();
             
-                $this->output->writeln('file_' . $entry->getId());
-                
-            if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_01_' . microtime());
-            
             $this->lockIndex(true);
-            
-            if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_02_' . microtime());
             
             if ($progress !== null) {
                 $progress->setMessage('<info>' . $userId . '</info>/' . $entry->getType());
@@ -416,22 +406,17 @@ class IndexService
                     $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
                     $this->lastProgressTick = time();
                 }
+                
                 $progress->advance();
             }
             
-            if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_03_' . microtime());
-            
             $current = ItemDocument::getItem($solrDocs, $entry);
+            if ($current === null)
+                continue;
+            
             $continue = false;
             
-            if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_04_' . microtime());
-            
             $this->solrTools->updateDocument($entry, $current, false, $ierror);
-            
-            if ($this->output != null && $this->debug == 100)
-                $this->output->writeln('t_05_' . microtime());
             
             if ($progress != null) {
                 if ($entry->neededUpdate()) {
@@ -501,10 +486,49 @@ class IndexService
         if (sizeof($data) == 0)
             return false;
         
+        if ($this->output != null) {
+            $progress = new ProgressBar($this->output, sizeof($data));
+            $progress->clear();
+        }
+        
+        if ($progress != null) {
+            $progress->setMessage('-', 'job');
+            $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'duration');
+            $progress->setMessage('', 'more');
+            $progress->setMessage('[removing]', 'infos');
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
+            $progress->start();
+        }
+        
         $forceExtract = false;
-        foreach ($data as $entry) {
+        foreach ($data as $doc) {
             $this->lockIndex(true);
-            $this->solrTools->removeDocument($entry);
+            
+            if ($progress != null) {
+                $progress->setMessage('<info>' . $doc->getOwner() . '</info>/' . $doc->getType());
+                
+                if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                    $progress->setMessage('(' . $dura . ')', 'duration');
+                
+                if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
+                    if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
+                        $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
+                    $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
+                    $this->lastProgressTick = time();
+                }
+                
+                $progress->advance();
+            }
+            
+            $this->solrTools->removeDocument($doc);
+        }
+        
+        if ($progress != null) {
+            $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
+            $progress->finish();
         }
         
         if (! $this->solrTools->commit(false, $ierror))
@@ -524,7 +548,7 @@ class IndexService
     public function removeOrphans($type, $userId, &$data, &$solrDocs)
     {
         $this->solrService->setOwner($userId);
-        if (sizeof($data) > 0 && ! $data[0]->isSynced())
+        if (reset($data) && ($sync = current($data)) && ! $sync->isSynced())
             $this->extract($type, $userId, $data, $solrDocs, false);
         
         if ($solrDocs == null || $solrDocs == '' || ! is_array($solrDocs))
@@ -566,8 +590,8 @@ class IndexService
             
             if (! in_array($doc->getId(), $docIds) && (! in_array($doc->getId(), $deleting))) {
                 array_push($deleting, $doc->getId());
-                $item = ItemDocument::getItem($solrDocs, $doc);
-                $item->removed(true);
+                // $item = ItemDocument::getItem($solrDocs, $doc);
+                $doc->removed(true);
             }
             
             if ($progress != null) {
@@ -748,7 +772,7 @@ class IndexService
                     $tick = false;
                     if (! in_array($doc->getId(), $docIds)) {
                         array_push($docIds, $doc->getId());
-                        $data[] = $doc;
+                        $data[$doc->getType() . '_' . $doc->getId()] = $doc;
                         $tick = true;
                     }
                     
