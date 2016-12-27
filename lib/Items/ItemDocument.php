@@ -554,6 +554,14 @@ class ItemDocument
         return $item;
     }
 
+    public static function fromItemQueue($type, $queue)
+    {
+        $item = new ItemDocument($type, $queue->getFileId());
+        $item->setOwner($queue->getUserId());
+        
+        return $item;
+    }
+
     public static function getItem(&$list, $item)
     {
         if ($list == null || $item == null || ! is_array($list))

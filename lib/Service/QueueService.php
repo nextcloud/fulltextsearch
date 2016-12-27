@@ -200,8 +200,8 @@ class QueueService
                     
                     $this->sourceService->file()->endUser();
                 } else {
-                    // animation on file delete ?
-                    $doc[] = new ItemDocument(ItemDocument::TYPE_FILE, $item->getFileId());
+                    
+                    $doc[] = ItemDocument::fromItemQueue(ItemDocument::TYPE_FILE, $item);
                     $this->indexService->removeDocuments($doc, $ierror);
                 }
                 break;
