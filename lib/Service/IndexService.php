@@ -667,6 +667,12 @@ class IndexService
             }
         }
         
+        $commit = $this->solrTools->commit(false, $ierror);
+        if (! $commit)
+            return false;
+        else
+            $this->lastCommitQueryTime = $commit->getQueryTime();
+        
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
