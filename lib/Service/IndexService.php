@@ -482,10 +482,49 @@ class IndexService
         if (sizeof($data) == 0)
             return false;
         
+        if ($this->output != null) {
+            $progress = new ProgressBar($this->output, sizeof($data));
+            $progress->clear();
+        }
+        
+        if ($progress != null) {
+            $progress->setMessage('-', 'job');
+            $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'duration');
+            $progress->setMessage('', 'more');
+            $progress->setMessage('[removing]', 'infos');
+            $progress->setFormat(self::PROGRESS_TEMPLATE . (($this->debug) ? self::PROGRESS_TEMPLATE_DEBUG : ''));
+            $progress->start();
+        }
+        
         $forceExtract = false;
-        foreach ($data as $entry) {
+        foreach ($data as $doc) {
             $this->lockIndex(true);
-            $this->solrTools->removeDocument($entry);
+            
+            if ($progress != null) {
+                $progress->setMessage('<info>' . $doc->getOwner() . '</info>/' . $doc->getType());
+                
+                if ($this->parent != null && ($dura = $this->getIndexDuration()) != - 1)
+                    $progress->setMessage('(' . $dura . ')', 'duration');
+                
+                if ((time() - self::REFRESH_INFO_SYSTEM) > $this->lastProgressTick) {
+                    if (! $infoSystem = $this->solrTools->getInfoSystem($ierror))
+                        $this->manageFailure($ierror, $progress, 'Failed to retreive Info System');
+                    $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
+                    $this->lastProgressTick = time();
+                }
+                
+                $progress->advance();
+            }
+            
+            $this->solrTools->removeDocument($doc);
+        }
+        
+        if ($progress != null) {
+            $progress->setMessage('', 'jvm');
+            $progress->setMessage('', 'infos');
+            $progress->setMessage('', 'duration');
+            $progress->finish();
         }
         
         if (! $this->solrTools->commit(false, $ierror))
