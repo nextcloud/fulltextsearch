@@ -68,6 +68,7 @@ OC.L10N.register(
     "Using Database" : "via Base de données ",
     "Background Index delay :" : "Intervalle de synchronisation en arrière plan :",
     "hours" : "heures",
+    "Use System Cron :" : "Utilisation du \"cron\" du système :",
     "Number of documents :" : "Nombre de documents :",
     "Number of segments :" : "Nombre de segments :",
     "we recommand doing the very first indexing of your files using the ./occ nextant:index command." : "Il est recommandé de lancer la première indexation en utilisant la commande ./occ nextant:index",
