@@ -77,7 +77,7 @@ class Application extends App
         });
         
         $container->registerService('IndexService', function ($c) {
-            return new IndexService($c->query('ConfigService'), $c->query('SourceService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
+            return new IndexService($c->query('GroupManager'), $c->query('ConfigService'), $c->query('SourceService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('MiscService'));
         });
         
         $container->registerService('BackgroundService', function ($c) {

@@ -46,6 +46,8 @@ class IndexService
     // const PROGRESS_TEMPLATE_DEBUG = "";
     const REFRESH_INFO_SYSTEM = 20;
 
+    private $groupManager;
+
     private $solrService;
 
     private $solrTools;
@@ -84,8 +86,10 @@ class IndexService
 
     private $initTime = 0;
 
-    public function __construct($configService, $sourceService, $solrService, $solrTools, $solrAdmin, $miscService)
+    public function __construct($groupManager, $configService, $sourceService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
+        $this->groupManager = $groupManager;
+        
         $this->configService = $configService;
         $this->sourceService = $sourceService;
         
@@ -233,7 +237,7 @@ class IndexService
             if ($this->output != null && $this->debug == 2) {
                 $this->output->writeln('');
                 $this->output->writeln('### FILE ' . $entry->getPath());
-                $this->output->writeln('_current: ' . var_export($entry->toArray(), true));
+                $this->output->writeln('_current: ' . var_export($entry->toArray(true), true));
                 $this->output->writeln('_solr: ' . var_export(ItemDocument::getItem($solrDocs, $entry), true));
             }
             
@@ -367,8 +371,8 @@ class IndexService
         if ($solrDocs === null)
             $solrDocs = $this->getDocuments($type, $userId, 0, $ierror);
         else 
-            if ($solrDocs === false)
-                $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $ierror);
+            if ($solrDocs === false && reset($data) && $sync = current($data))
+                $solrDocs = $this->getDocuments($type, $userId, $sync->getId(), $ierror);
         
         $progress = null;
         if ($this->output !== null) {
@@ -726,6 +730,31 @@ class IndexService
             if ($type != '')
                 $type .= '_';
             
+            $ownerQuery = '';
+            if ($userId != '') {
+                $query = $client->createSelect();
+                $helper = $query->getHelper();
+                
+                $ownerQuery = 'nextant_owner:' . $helper->escapePhrase($userId);
+                // OR (nextant_owner:__global'
+                
+                $groupQuery = '';
+                $groups = array_map(function ($value) {
+                    return (string) $value;
+                }, array_keys($this->groupManager->getUserIdGroups($userId)));
+                array_push($groups, '__all');
+                
+                $arrgroups = array();
+                foreach ($groups as $group)
+                    array_push($arrgroups, ' nextant_sharegroup:' . $helper->escapePhrase($group));
+                
+                if (sizeof($arrgroups) > 0)
+                    $groupQuery = implode(' OR ', $arrgroups);
+                
+                if ($groupQuery !== '')
+                    $ownerQuery = '(' . $ownerQuery . ') OR (nextant_owner:"__global" AND (nextant_share:' . $helper->escapePhrase($userId) . ' OR ' . $groupQuery . '))';
+            }
+            
             $page = 0;
             $docIds = array();
             while (true) {
@@ -738,8 +767,8 @@ class IndexService
                 
                 $query->setQuery('id:' . $type . (($fileId > 0) ? $fileId : '*'));
                 
-                if ($userId != '')
-                    $query->createFilterQuery('owner')->setQuery('nextant_owner:' . $helper->escapePhrase($userId));
+                if ($ownerQuery !== '')
+                    $query->createFilterQuery('owner')->setQuery($ownerQuery);
                 
                 $query->addSort('id', $query::SORT_ASC);
                 $query->setStart($page * self::GETALL_ROWS);
