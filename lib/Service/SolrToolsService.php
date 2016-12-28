@@ -168,7 +168,7 @@ class SolrToolsService
                 $modifs = true;
             if (! MiscService::arraysIdentical($final->getShareGroup(), $current->getShareGroup()))
                 $modifs = true;
-            if ($final->getPath() !== $current->getPath())
+            if ($final->getPath() !== $current->getPath() && $final->getOwner() !== '__global')
                 $modifs = true;
             if ($final->getOwner() !== $current->getOwner())
                 $modifs = true;
