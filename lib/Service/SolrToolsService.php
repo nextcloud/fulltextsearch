@@ -325,17 +325,22 @@ class SolrToolsService
         if (intval($document->getId()) == 0)
             return false;
         
-        if ($solr != null && $solr != '' && ($document->getMTime() == $solr->getMTime())) {
-            $document->indexed(true);
-            if (! $document->isExtractable())
-                return true;
-            
-            if ($solr->isExtracted()) {
-                $document->extracted(true);
-                return true;
-            }
-            
-            return false;
+        if ($solr != null && $solr != '') {
+            if ($document->getMTime() === $solr->getMTime()) {
+                $document->indexed(true);
+                
+                if (! $document->isExtractable())
+                    return true;
+                
+                if ($solr->isExtracted()) {
+                    $document->extracted(true);
+                    return true;
+                }
+                
+                return false;
+            } else 
+                if (! $document->isExtractable() && $this->configService->getAppValue('index_files_tree') === '1')
+                    return true;
         }
         
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
