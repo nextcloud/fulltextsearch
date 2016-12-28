@@ -403,7 +403,7 @@ class SolrService
             $doc->nextant_source = $document->getType();
             
             $doc->nextant_mtime = $document->getMTime();
-            $doc->nextant_owner = $this->owner;
+            $doc->nextant_owner = $document->getOwner();
             $doc->nextant_path = $document->getPath();
             $doc->nextant_share = $document->getShare();
             $doc->nextant_sharegroup = $document->getShareGroup();

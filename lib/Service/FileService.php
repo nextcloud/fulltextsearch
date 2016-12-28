@@ -179,8 +179,8 @@ class FileService
     {
         $item->synced(true);
         
-        // $this->miscService->log('-- local: ' . (($item->getStorage()
-        // ->isLocal()) ? 'y' : 'n') . ' -- external: ' . (($item->isExternal()) ? 'y' : 'n') . ' -- encrypted:' . (($item->isEncrypted()) ? 'y' : 'n') . ' -- test: ' . (($item->isTest()) ? 'y' : 'n') . ' -- ' . $item->getPath());
+        // $this->miscService->log('-- local: ' . (($item->istorageLocal()
+        // ) ? 'y' : 'n') . ' -- external: ' . (($item->isExternal()) ? 'y' : 'n') . ' -- encrypted:' . (($item->isEncrypted()) ? 'y' : 'n') . ' -- test: ' . (($item->isTest()) ? 'y' : 'n') . ' -- ' . $item->getPath());
         
         if ($item->isFederated() && $this->configService->getAppValue('index_files_federated') !== '1')
             return false;
@@ -225,7 +225,7 @@ class FileService
      */
     public function generateAbsolutePath(&$item, &$ierror = '')
     {
-        if ($item->getStorage()->isLocal()) {
+        if ($item->isStorageLocal()) {
             $item->setAbsolutePath($this->view->getLocalFile($item->getPath()));
             return true;
         }
@@ -303,7 +303,8 @@ class FileService
         $item->setMimetype($file->getMimeType());
         $item->setPath(str_replace('//', '/', $file->getPath()));
         $item->setSize($file->getSize());
-        $item->setStorage($file->getStorage());
+        $item->storageLocal((($file->getStorage()
+            ->isLocal()) ? true : false));
         
         if ($file->isEncrypted())
             $item->encrypted(true);
@@ -356,7 +357,7 @@ class FileService
             $item->deleted(in_array('deleted', $options));
             
             if ($item && $item != false && $item != null)
-                $data[] = $item;
+                $data[$item->getType() . '_' . $item->getId()] = $item;
         }
         
         return $data;
@@ -409,7 +410,7 @@ class FileService
         $item = $this->getDocumentFromFile($file);
         $item->deleted(in_array('deleted', $options));
         
-        $data[] = $item;
+        $data[$item->getType() . '_' . $item->getId()] = $item;
         
         return $data;
     }
@@ -455,7 +456,7 @@ class FileService
         $item = $this->getDocumentFromFile($file);
         $item->deleted(in_array('deleted', $options));
         
-        $data[] = $item;
+        $data[$item->getType() . '_' . $item->getId()] = $item;
         
         return $data;
     }

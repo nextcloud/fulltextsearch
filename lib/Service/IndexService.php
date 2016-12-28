@@ -46,6 +46,8 @@ class IndexService
     // const PROGRESS_TEMPLATE_DEBUG = "";
     const REFRESH_INFO_SYSTEM = 20;
 
+    private $groupManager;
+
     private $solrService;
 
     private $solrTools;
@@ -55,7 +57,6 @@ class IndexService
     private $configService;
 
     private $sourceService;
-
 
     private $miscService;
 
@@ -85,8 +86,10 @@ class IndexService
 
     private $initTime = 0;
 
-    public function __construct($configService, $sourceService, $solrService, $solrTools, $solrAdmin, $miscService)
+    public function __construct($groupManager, $configService, $sourceService, $solrService, $solrTools, $solrAdmin, $miscService)
     {
+        $this->groupManager = $groupManager;
+        
         $this->configService = $configService;
         $this->sourceService = $sourceService;
         
@@ -234,7 +237,7 @@ class IndexService
             if ($this->output != null && $this->debug == 2) {
                 $this->output->writeln('');
                 $this->output->writeln('### FILE ' . $entry->getPath());
-                $this->output->writeln('_current: ' . var_export($entry->toArray(), true));
+                $this->output->writeln('_current: ' . var_export($entry->toArray(true), true));
                 $this->output->writeln('_solr: ' . var_export(ItemDocument::getItem($solrDocs, $entry), true));
             }
             
@@ -314,6 +317,7 @@ class IndexService
                 }
                 
                 if ($this->configService->getAppValue('index_files_tree') === '1') {
+                    
                     $entry->extractable(false);
                     
                     if (! $this->force && $this->solrTools->isDocumentUpToDate($entry, ItemDocument::getItem($solrDocs, $entry)))
@@ -361,14 +365,14 @@ class IndexService
     {
         $this->solrService->setOwner($userId);
         
-        if (sizeof($data) > 0 && ! $data[0]->isSynced())
+        if (reset($data) && ($sync = current($data)) && ! $sync->isSynced())
             $this->extract($type, $userId, $data, $solrDocs, false);
         
         if ($solrDocs === null)
             $solrDocs = $this->getDocuments($type, $userId, 0, $ierror);
         else 
-            if ($solrDocs === false)
-                $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $ierror);
+            if ($solrDocs === false && reset($data) && $sync = current($data))
+                $solrDocs = $this->getDocuments($type, $userId, $sync->getId(), $ierror);
         
         $progress = null;
         if ($this->output !== null) {
@@ -406,10 +410,14 @@ class IndexService
                     $progress->setMessage('Solr memory: ' . $infoSystem->jvm->memory->used, 'jvm');
                     $this->lastProgressTick = time();
                 }
+                
                 $progress->advance();
             }
             
             $current = ItemDocument::getItem($solrDocs, $entry);
+            if ($current === null)
+                continue;
+            
             $continue = false;
             
             $this->solrTools->updateDocument($entry, $current, false, $ierror);
@@ -544,7 +552,7 @@ class IndexService
     public function removeOrphans($type, $userId, &$data, &$solrDocs)
     {
         $this->solrService->setOwner($userId);
-        if (sizeof($data) > 0 && ! $data[0]->isSynced())
+        if (reset($data) && ($sync = current($data)) && ! $sync->isSynced())
             $this->extract($type, $userId, $data, $solrDocs, false);
         
         if ($solrDocs == null || $solrDocs == '' || ! is_array($solrDocs))
@@ -586,8 +594,8 @@ class IndexService
             
             if (! in_array($doc->getId(), $docIds) && (! in_array($doc->getId(), $deleting))) {
                 array_push($deleting, $doc->getId());
-                $item = ItemDocument::getItem($solrDocs, $doc);
-                $item->removed(true);
+                // $item = ItemDocument::getItem($solrDocs, $doc);
+                $doc->removed(true);
             }
             
             if ($progress != null) {
@@ -663,6 +671,12 @@ class IndexService
             }
         }
         
+        $commit = $this->solrTools->commit(false, $ierror);
+        if (! $commit)
+            return false;
+        else
+            $this->lastCommitQueryTime = $commit->getQueryTime();
+        
         if ($progress != null) {
             $progress->setMessage('', 'jvm');
             $progress->setMessage('', 'infos');
@@ -716,6 +730,31 @@ class IndexService
             if ($type != '')
                 $type .= '_';
             
+            $ownerQuery = '';
+            if ($userId != '') {
+                $query = $client->createSelect();
+                $helper = $query->getHelper();
+                
+                $ownerQuery = 'nextant_owner:' . $helper->escapePhrase($userId);
+                // OR (nextant_owner:__global'
+                
+                $groupQuery = '';
+                $groups = array_map(function ($value) {
+                    return (string) $value;
+                }, array_keys($this->groupManager->getUserIdGroups($userId)));
+                array_push($groups, '__all');
+                
+                $arrgroups = array();
+                foreach ($groups as $group)
+                    array_push($arrgroups, ' nextant_sharegroup:' . $helper->escapePhrase($group));
+                
+                if (sizeof($arrgroups) > 0)
+                    $groupQuery = implode(' OR ', $arrgroups);
+                
+                if ($groupQuery !== '')
+                    $ownerQuery = '(' . $ownerQuery . ') OR (nextant_owner:"__global" AND (nextant_share:' . $helper->escapePhrase($userId) . ' OR ' . $groupQuery . '))';
+            }
+            
             $page = 0;
             $docIds = array();
             while (true) {
@@ -728,8 +767,8 @@ class IndexService
                 
                 $query->setQuery('id:' . $type . (($fileId > 0) ? $fileId : '*'));
                 
-                if ($userId != '')
-                    $query->createFilterQuery('owner')->setQuery('nextant_owner:' . $helper->escapePhrase($userId));
+                if ($ownerQuery !== '')
+                    $query->createFilterQuery('owner')->setQuery($ownerQuery);
                 
                 $query->addSort('id', $query::SORT_ASC);
                 $query->setStart($page * self::GETALL_ROWS);
@@ -768,7 +807,7 @@ class IndexService
                     $tick = false;
                     if (! in_array($doc->getId(), $docIds)) {
                         array_push($docIds, $doc->getId());
-                        $data[] = $doc;
+                        $data[$doc->getType() . '_' . $doc->getId()] = $doc;
                         $tick = true;
                     }
                     

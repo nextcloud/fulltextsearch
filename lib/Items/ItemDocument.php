@@ -57,7 +57,7 @@ class ItemDocument
 
     private $sharegroup;
 
-    private $storage;
+    private $storage_local;
 
     private $content_type;
 
@@ -318,14 +318,14 @@ class ItemDocument
         return '';
     }
 
-    public function setStorage($storage)
+    public function storageLocal($local)
     {
-        $this->storage = $storage;
+        $this->storage_local = $local;
     }
 
-    public function getStorage()
+    public function isStorageLocal()
     {
-        return $this->storage;
+        return $this->storage_local;
     }
 
     public function federated($fed)
@@ -562,14 +562,13 @@ class ItemDocument
         return $item;
     }
 
-    public static function getItem(&$list, $item)
+    public static function getItem($list, $item)
     {
         if ($list == null || $item == null || ! is_array($list))
             return null;
         
-        foreach ($list as $entry)
-            if ($entry->getId() === $item->getId() && $entry->getType() === $item->getType())
-                return $entry;
+        if (isset($list[$item->getType() . '_' . $item->getId()]))
+            return $list[$item->getType() . '_' . $item->getId()];
         
         return null;
     }
@@ -601,9 +600,7 @@ class ItemDocument
                 'mtime' => $this->getMTime(),
                 'share' => $this->getShare(),
                 'sharegroup' => $this->getSharegroup(),
-                'storage' => array(
-                    'local' => $this->getStorage()->isLocal()
-                ),
+                'storage_local' => (($this->isStorageLocal()) ? 'y' : 'n'),
                 'needextract' => $this->neededExtract(),
                 'needUpdate' => $this->neededUpdate(),
                 'external' => $this->isExternal(),
@@ -619,15 +616,15 @@ class ItemDocument
                 'failedExtract' => $this->isFailedExtract(),
                 'failedUpdate' => $this->isFailedUpdate(),
                 'temp' => $this->isTemp(),
-                'invalid' => $this->isInvalid(),
+                'valid' => $this->isValid(),
                 'synced' => $this->isSynced()
             );
         
         return $arr;
     }
 
-    public function toString()
+    public function toString($complete = false)
     {
-        return json_encode($this->toArray());
+        return json_encode($this->toArray($complete));
     }
 }
