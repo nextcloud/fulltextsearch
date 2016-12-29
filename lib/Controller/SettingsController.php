@@ -293,7 +293,7 @@ class SettingsController extends Controller
 
     private function test_extract(&$message)
     {
-        $doc = self::generateTestDocument(1, __DIR__ . '/../../LICENSE', '/LICENSE');
+        $doc = self::generateTestDocument(1, '_nextant_test', __DIR__ . '/../../LICENSE', '/LICENSE');
         
         $data = array(
             $doc
@@ -314,17 +314,18 @@ class SettingsController extends Controller
 
     private function test_update(&$message)
     {
-        $doc = self::generateTestDocument(1, __DIR__ . '/../../LICENSE', '/LICENSE2');
+        $doc = self::generateTestDocument(1, '_nextant_test', __DIR__ . '/../../LICENSE', '/LICENSE2');
         $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $ierror);
         
-        if ($asource == false || sizeof($asource) != 1) {
+        if ($asource === false || sizeof($asource) != 1 || (! key_exists('test_1', $asource))) {
             $message = $this->l10n->t('Error Updating field - Can\'t find original document - (Error #%1$s)', array(
                 $ierror->getCode()
             ));
             return false;
         }
         
-        $source = $asource[0];
+        $source = $asource['test_1'];
+        
         $doc->setPath('/LICENSE2');
         $doc->setShare(array(
             'nextant_test_share'
@@ -429,10 +430,11 @@ class SettingsController extends Controller
         return false;
     }
 
-    private static function generateTestDocument($docid, $absolutePath, $path)
+    private static function generateTestDocument($docid, $userid, $absolutePath, $path)
     {
         $doc = new ItemDocument(ItemDocument::TYPE_TEST, $docid);
         $doc->setAbsolutePath($absolutePath);
+        $doc->setOwner($userid);
         $doc->setPath($path);
         $doc->setMTime(time());
         

@@ -697,6 +697,9 @@ class IndexService
      */
     public function getDocuments($type = '', $userId = '', $fileId = 0, &$ierror = '')
     {
+        if ($ierror == null || $ierror === '')
+            $ierror = new ItemError();
+        
         if (! $this->solrService || ! $this->solrService->configured() || ! $this->solrService->getClient()) {
             $ierror = new ItemError(SolrService::ERROR_SOLRSERVICE_DOWN);
             return false;
