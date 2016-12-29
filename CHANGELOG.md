@@ -1,4 +1,4 @@
-**1.0.2**
+**1.0.3**
 - max_delay is now configurable.
 - possibility to not use the cron system from nextcloud.
 - new command nextant:background to be run in cron.
