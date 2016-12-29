@@ -115,12 +115,16 @@ class Live extends Base
         $stack = array();
         $lasttick = 0;
         
+        $item = null;
         while (true) {
             $catched = false;
             
             try {
                 $this->interrupted();
-                $item = $this->queueService->readQueue(true);
+                
+                if ($item === null)
+                    $item = $this->queueService->readQueue(true);
+                
                 if ($item !== null) {
                     if ($input->getOption('instant'))
                         $this->queueService->executeItem($item);
@@ -130,6 +134,8 @@ class Live extends Base
                 
                 if (! $this->configService->isLockedIndex())
                     $this->solrTools->commit(false, $ierror);
+                
+                $item = null;
             } catch (\Doctrine\DBAL\Exception\DriverException $dbde) {
                 $catched = true;
                 // $ierror = new ItemError(SolrService::EXCEPTION_HTTPEXCEPTION, $dbde->getStatusMessage());
@@ -158,10 +164,9 @@ class Live extends Base
                 
                 if ($dead)
                     break;
-            }
+            } else
+                $output->writeln('');
             
-            //
-            $output->writeln('');
         }
     }
 }
