@@ -52,7 +52,7 @@ class BookmarkService
         if (! \OCP\App::isEnabled('bookmarks'))
             return false;
         
-        if ($this->configService->getAppValue('index_bookmarks') == 1)
+        if ($this->configService->getAppValue('index_bookmarks') === '1')
             return true;
         
         return false;
