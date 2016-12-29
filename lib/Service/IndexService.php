@@ -179,8 +179,8 @@ class IndexService
         if ($solrDocs === null)
             $solrDocs = $this->getDocuments($type, $userId, 0, $ierror);
         else 
-            if ($solrDocs === false)
-                $solrDocs = $this->getDocuments($type, $userId, $data[0]->getId(), $ierror);
+            if ($solrDocs === false && reset($data) && $sync = current($data))
+                $solrDocs = $this->getDocuments($type, $userId, $sync->getId(), $ierror);
         
         $progress = null;
         if ($this->output !== null) {

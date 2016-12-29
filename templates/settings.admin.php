@@ -231,19 +231,30 @@ style('nextant', 'admin');
 						</tr>
 
 						<tr style="height: 30px;">
-							<td class="nextant_admin_left">
-	    <?php p($l->t('Background Index delay :')) ?></td>
-							<td><input type="text" name="solr_index_delay"
-								id="solr_index_delay" value="2" style="width: 50px;" /><?php p($l->t('hours')); ?></td>
+							<td class="nextant_admin_left" style="text-valign: top;">
+	    <?php p($l->t('Minimum Background Index delay :')) ?></td>
+							<td><input type="text" name="solr_index_delay_min"
+								id="solr_index_delay_min" value="2"
+								style="width: 50px; margin-right: 10px;" /><?php p($l->t('hours')); ?>
+								</td>
 						</tr>
 
+						<tr style="height: 30px;">
+							<td class="nextant_admin_left" style="text-valign: top;">
+	    <?php p($l->t('Maximum Background Index delay :')) ?></td>
+							<td><input type="text" name="solr_index_delay_max"
+								id="solr_index_delay_max" value="2"
+								style="width: 50px; margin-right: 10px;" /><?php p($l->t('days')); ?>
+								</td>
+						</tr>
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">					
-	    <?php p($l->t('Use System Cron :')); ?>
+	    <?php p($l->t('Nextcloud Cron :')); ?>
 						</td>
 							<td colspan="2"><input type="checkbox" name="solr_use_cron"
-								id="solr_use_cron" value="1" style="margin: 10px;" /></td>
+								id="solr_use_cron" value="1" style="margin: 10px;" />
+						
 						</tr>
 
 						<tr style="height: 30px;">

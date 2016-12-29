@@ -105,7 +105,7 @@ class BackgroundService
 
     private function cronIndex()
     {
-        if (($this->configService->timeIndexDelay('files') && $this->configService->neededIndexFiles()) || $this->configService->timeIndexDelay('files', 24)) {
+        if (($this->configService->timeIndexDelay('files') && $this->configService->neededIndexFiles()) || $this->configService->timeIndexDelay('files', 24 * $this->configService->getAppValue('index_delay_max'))) {
             // $this->miscService->log('___cronFiles');
             $this->configService->needIndexFiles(false);
             $this->cronIndexFiles();
@@ -113,7 +113,7 @@ class BackgroundService
             $this->configService->timeIndex('files');
         }
         
-        if (($this->configService->timeIndexDelay('bookmarks') && $this->configService->neededIndexBookmarks()) || $this->configService->timeIndexDelay('bookmarks', 24)) {
+        if (($this->configService->timeIndexDelay('bookmarks') && $this->configService->neededIndexBookmarks()) || $this->configService->timeIndexDelay('bookmarks', 24 * $this->configService->getAppValue('index_delay_max'))) {
             // $this->miscService->log('___cronBookmarks');
             $this->configService->needIndexBookmarks(false);
             $this->cronIndexBookmarks();

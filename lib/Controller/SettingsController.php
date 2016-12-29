@@ -122,7 +122,8 @@ class SettingsController extends Controller
             'index_live' => $this->configService->getAppValue('index_live'),
             'index_live_queuekey' => $this->configService->getAppValue('index_live_queuekey'),
             'use_cron' => $this->configService->getAppValue('use_cron'),
-            'index_delay' => $this->configService->getAppValue('index_delay'),
+            'index_delay_min' => $this->configService->getAppValue('index_delay_min'),
+            'index_delay_max' => $this->configService->getAppValue('index_delay_max'),
             'index_locked' => $this->configService->getAppValue('index_locked'),
             'index_files_last' => $this->configService->getAppValue('index_files_last'),
             'index_files_last_format' => date('r', $this->configService->getAppValue('index_files_last')),
@@ -170,7 +171,7 @@ class SettingsController extends Controller
         return $this->updateSubOptions(false, 'bookmarks');
     }
 
-    public function setOptionsStatus($resource_level, $index_live, $use_cron, $index_delay, $force_index)
+    public function setOptionsStatus($resource_level, $index_live, $use_cron, $index_delay_min, $index_delay_max, $force_index)
     {
         $this->configService->setAppValue('resource_level', $resource_level);
         
@@ -188,8 +189,9 @@ class SettingsController extends Controller
         
         $this->configService->setAppValue('use_cron', $use_cron);
         
-        if ($index_delay > 0)
-            $this->configService->setAppValue('index_delay', $index_delay);
+        $this->configService->setAppValue('index_delay_min', $index_delay_min);
+        if ($index_delay_max > 0)
+            $this->configService->setAppValue('index_delay_max', $index_delay_max);
         
         if ($force_index === '1') {
             $this->configService->setAppValue('configured', '1');

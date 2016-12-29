@@ -56,6 +56,8 @@ class ConfigService
         'index_live' => '1',
         'index_live_queuekey' => '19375',
         'index_delay' => '2',
+        'index_delay_min' => '2',
+        'index_delay_max' => '4',
         'use_cron' => '1',
         'index_locked' => '0',
         'index_files_last' => '0',
@@ -106,17 +108,7 @@ class ConfigService
 
     public function removeOldConfig()
     {
-        $this->deleteAppValue('display_result');
-        $this->deleteAppValue('solr_lock');
-        $this->deleteAppValue('needed_index');
-        $this->deleteAppValue('last_index');
-        $this->deleteAppValue('live_extract');
-        $this->deleteAppValue('live_docupdate');
-        $this->deleteAppValue('max_size');
-        $this->deleteAppValue('external_index');
-        $this->deleteAppValue('index_files_live_extract');
-        $this->deleteAppValue('index_files_live');
-        $this->deleteAppValue('index_files_live_update');
+        $this->setAppValue('index_delay_min', $this->getAppValue('index_delay'));
     }
 
     public function needIndexFiles($need)
@@ -158,7 +150,7 @@ class ConfigService
     public function timeIndexDelay($type, $delay = 0)
     {
         if ($delay == 0)
-            $delay = $this->getAppValue('index_delay');
+            $delay = $this->getAppValue('index_delay_min');
             
             // Uncomment this line to force index each tick of backgroundjob
             // $delay = 0;

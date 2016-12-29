@@ -180,7 +180,10 @@ $(document)
 								index_live : $('#solr_index_live').val(),
 								use_cron : ($('#solr_use_cron').is(':checked')) ? 1
 										: 0,
-								index_delay : $('#solr_index_delay').val(),
+								index_delay_min : $('#solr_index_delay_min')
+										.val(),
+								index_delay_max : $('#solr_index_delay_max')
+										.val(),
 								force_index : force_index
 							}
 
@@ -326,11 +329,14 @@ $(document)
 							$('#solr_index_live').val(response.index_live);
 							$('#solr_index_live_queuekey').val(
 									response.index_live_queuekey);
-							
+
 							$('#solr_use_cron').prop('checked',
 									(response.use_cron == 1));
-							
-							$('#solr_index_delay').val(response.index_delay);
+
+							$('#solr_index_delay_min').val(
+									response.index_delay_min);
+							$('#solr_index_delay_max').val(
+									response.index_delay_max);
 
 							if (response.index_files_tree == 1) {
 								$('#solr_index_files_nextant_only').attr(
@@ -728,14 +734,14 @@ $(document)
 						nextantSettings.savesuboptions_status();
 					});
 
-					$('#solr_use_cron')
-					.mousedown(
-							function() {
-								nextantSettings
-										.savesuboptions_status('use_cron');
-							});
-					
-					$('#solr_index_delay').on('input', function(e) {
+					$('#solr_use_cron').mousedown(function() {
+						nextantSettings.savesuboptions_status('use_cron');
+					});
+
+					$('#solr_index_delay_min').on('input', function(e) {
+						nextantSettings.savesuboptions_status();
+					});
+					$('#solr_index_delay_max').on('input', function(e) {
 						nextantSettings.savesuboptions_status();
 					});
 
