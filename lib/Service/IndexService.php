@@ -490,6 +490,7 @@ class IndexService
         if (sizeof($data) == 0)
             return false;
         
+        $progress = null;
         if ($this->output != null) {
             $progress = new ProgressBar($this->output, sizeof($data));
             $progress->clear();
