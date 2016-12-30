@@ -66,7 +66,6 @@ OC.L10N.register(
     "Disabled" : "Uitgeschakeld",
     "Using Semaphore" : "Semaphore wordt gebruikt",
     "Using Database" : "Database wordt gebruikt",
-    "Background Index delay :" : "Achtergrond index vertraging :",
     "hours" : "uur",
     "Number of documents :" : "Aantal documenten :",
     "Number of segments :" : "Aantal segmenten :",
