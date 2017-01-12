@@ -118,7 +118,7 @@ class Application extends App
         
         $container->registerService('LiveQueueMapper', function ($c) {
             return new LiveQueueMapper($c->query('ServerContainer')
-                ->getDb());
+                ->getDatabaseConnection());
         });
         
         $container->registerService('FilesEvents', function ($c) {
