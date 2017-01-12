@@ -38,6 +38,13 @@
 - Have a look to this [explanation on how Nextant works](https://github.com/nextcloud/nextant/wiki/Extracting,-Live-Update)
 - _(Optional)_ [Installing Tesseract](https://github.com/tesseract-ocr/tesseract/wiki) ([Optical Character Recognition](https://en.wikipedia.org/wiki/Optical_character_recognition) (OCR) Engine) will allow Nextant to extract text from image file and pdfs without a text layer.
 
+## Scripted installation (Ubuntu)
+The developers of the [Nextcloud VM](https://github.com/nextcloud/vm) has made a [script](https://raw.githubusercontent.com/nextcloud/vm/master/static/nextant.sh) that you can use.
+Please note that you must change the variables in the script to suit your config before you run it.
+
+To get the script, please type the folloing command: `wget https://github.com/nextcloud/vm/blob/master/static/nextant.sh` and then run the script with `sudo bash nextant.sh`.
+
+Please report any issues regarding the script in the [Nextcloud VM repo](https://github.com/nextcloud/vm/issues).
 
 ## Building the app
 
