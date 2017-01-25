@@ -287,6 +287,7 @@ class ConfigService
             'endpoint' => array(
                 'localhost' => array(
                     'timeout' => ($config['timeout'] < 5) ? 5 : $config['timeout'],
+                    'scheme' => $t['scheme'],
                     'host' => $t['host'],
                     'port' => $t['port'],
                     'core' => $config['solr_core'],
