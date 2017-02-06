@@ -66,6 +66,10 @@ $(document)
 										.is(':checked')) ? 1 : 0,
 								index_files_nextant_only : ($('#solr_index_files_nextant_only')
 										.is(':checked')) ? 1 : 0,
+								index_files_trash : ($('#solr_index_files_trash')
+										.is(':checked')) ? 1 : 0,
+								index_files_trash : ($('#solr_index_files_trash')
+										.is(':checked')) ? 1 : 0,
 								index_files_sharelink : ($('#solr_index_files_sharelink')
 										.is(':checked')) ? 1 : 0,
 								index_files_federated : ($('#solr_index_files_federated')
@@ -86,6 +90,10 @@ $(document)
 
 							if (switched == 'index_files_nextant_only')
 								data.index_files_nextant_only = (data.index_files_nextant_only == 1) ? 0
+										: 1;
+
+							if (switched == 'index_files_trash')
+								data.index_files_trash = (data.index_files_trash == 1) ? 0
 										: 1;
 
 							if (switched == 'index_files_sharelink')
@@ -261,6 +269,8 @@ $(document)
 									(response.index_files_tree == 1));
 							$('#solr_index_files_nextant_only').prop('checked',
 									(response.index_files_nextant_only == 1));
+							$('#solr_index_files_trash').prop('checked',
+									(response.index_files_trash == 1));
 							$('#solr_index_files_sharelink').prop('checked',
 									(response.index_files_sharelink == 1));
 							$('#solr_index_files_federated').prop('checked',
@@ -646,6 +656,13 @@ $(document)
 									function() {
 										nextantSettings
 												.savesuboptions_files('index_files_nextant_only');
+									});
+
+					$('#solr_index_files_trash')
+							.mousedown(
+									function() {
+										nextantSettings
+												.savesuboptions_files('index_files_trash');
 									});
 
 					$('#solr_index_files_sharelink')

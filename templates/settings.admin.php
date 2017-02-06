@@ -121,6 +121,14 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
+	    <?php p($l->t('Index File Trash:')) ?></td>
+								<td colspan="2"><input type="checkbox"
+									name="solr_index_files_trash" id="solr_index_files_trash"
+									value="1" style="margin: 10px;"></td>
+							</tr>
+
+							<tr style="height: 30px;">
+								<td class="nextant_admin_left">
 	    <?php p($l->t('Index Public Links :')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_sharelink"
@@ -224,12 +232,10 @@ style('nextant', 'admin');
 						</td>
 							<td colspan="2"><select id="solr_index_live" style="width: 200px">
 									<option value="0"><?php p($l->t('Disabled')); ?></option>
-								<!-- <option value="1"><?php p($l->t('Using Semaphore')); ?></option>  -->	
+									<!-- <option value="1"><?php p($l->t('Using Semaphore')); ?></option>  -->
 									<option value="2"><?php p($l->t('Using Database')); ?></option>
-							</select> 
-<!-- 							<input type="text" id="solr_index_live_queuekey"
-								style="width: 100px; font-size: 12px;" /> -->
-								</td>
+							</select> <!-- 							<input type="text" id="solr_index_live_queuekey"
+								style="width: 100px; font-size: 12px;" /> --></td>
 						</tr>
 
 						<tr style="height: 30px;">
