@@ -52,7 +52,8 @@ class LiveQueueMapper extends Mapper
     public function next($keepit = false)
     {
         try {
-            $sql = 'SELECT * FROM *PREFIX*' . self::TABLENAME . ' ORDER BY id ASC LIMIT 0, 1';
+            // $sql = 'SELECT * FROM *PREFIX*' . self::TABLENAME . ' ORDER BY id ASC LIMIT 0, 1';
+            $sql = 'SELECT * FROM *PREFIX*' . self::TABLENAME . ' ORDER BY id ASC LIMIT 1';
             $result = $this->findEntity($sql, []);
         } catch (\OCP\AppFramework\Db\DoesNotExistException $dnee) {
             return false;
