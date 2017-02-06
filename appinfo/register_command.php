@@ -28,6 +28,7 @@ $app = new \OCA\Nextant\AppInfo\Application();
 $c = $app->getContainer();
 
 $application->add(new OCA\Nextant\Command\Check($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('SettingsController')));
+$application->add(new OCA\Nextant\Command\Test($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('IndexService'), $c->query('SettingsController')));
 $application->add(new OCA\Nextant\Command\Clear($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrAdminService')));
 $application->add(new OCA\Nextant\Command\Index(OC::$server->getUserManager(), $c->query('RootFolder'), $c->query('IndexService'), $c->query('QueueService'), $c->query('SolrService'), $c->query('SolrToolsService'), $c->query('SolrAdminService'), $c->query('ConfigService'), $c->query('SourceService'), $c->query('MiscService')));
 $application->add(new OCA\Nextant\Command\Optimize($c->query('ConfigService'), $c->query('SolrService'), $c->query('SolrToolsService')));
