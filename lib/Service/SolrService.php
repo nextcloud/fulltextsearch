@@ -572,7 +572,11 @@ class SolrService
                 $addq = '';
                 switch ($is) {
                     case 'deleted':
-                        $addq = 'nextant_deleted:true';
+                        $addq = 'nextant_deleted:true  AND nextant_source:files';
+                        break;
+                    
+                    case 'files':
+                        $addq = 'nextant_deleted:false AND nextant_source:files';
                         break;
                 }
                 
