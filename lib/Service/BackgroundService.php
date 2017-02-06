@@ -106,7 +106,6 @@ class BackgroundService
     private function cronIndex()
     {
         if (($this->configService->timeIndexDelay('index_live') !== '1' && $this->configService->timeIndexDelay('files') && $this->configService->neededIndexFiles()) || $this->configService->timeIndexDelay('files', 24 * $this->configService->getAppValue('index_delay_max'))) {
-            // $this->miscService->log('___cronFiles');
             $this->configService->needIndexFiles(false);
             $this->cronIndexFiles();
             $this->cronUpdateFiles();
@@ -114,7 +113,6 @@ class BackgroundService
         }
         
         if (($this->configService->timeIndexDelay('index_live') !== '1' && $this->configService->timeIndexDelay('bookmarks') && $this->configService->neededIndexBookmarks()) || $this->configService->timeIndexDelay('bookmarks', 24 * $this->configService->getAppValue('index_delay_max'))) {
-            // $this->miscService->log('___cronBookmarks');
             $this->configService->needIndexBookmarks(false);
             $this->cronIndexBookmarks();
             $this->configService->timeIndex('bookmarks');
@@ -132,11 +130,13 @@ class BackgroundService
             
             $this->sourceService->file()->initUser($user->getUID(), true);
             $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
-                'deleted'
-            ));
             
-            $files = array_merge($files, $files_trashbin);
+            if ($this->configService->getAppValue('index_files_trash') === '1') {
+                $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
+                    'deleted'
+                ));
+                $files = array_merge($files, $files_trashbin);
+            }
             $solrDocs = null;
             $this->indexService->extract(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
             $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user->getUID(), $files, $solrDocs);
@@ -155,11 +155,14 @@ class BackgroundService
             
             $this->sourceService->file()->initUser($user->getUID(), true);
             $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
-                'deleted'
-            ));
             
-            $files = array_merge($files, $files_trashbin);
+            if ($this->configService->getAppValue('index_files_trash') === '1') {
+                $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
+                    'deleted'
+                ));
+                $files = array_merge($files, $files_trashbin);
+            }
+            
             $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user->getUID(), $files);
             
             $this->sourceService->file()->endUser();

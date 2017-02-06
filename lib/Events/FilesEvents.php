@@ -134,8 +134,7 @@ class FilesEvents
         if ($this->configService->getAppValue('index_live') !== '0') {
             $file = FileService::getFileInfoFromPath($path, Filesystem::getView());
             if ($file->getId() > 0) {
-                if (\OCP\App::isEnabled('files_trashbin'))
-                    
+                if ($this->configService->getAppValue('index_files_trash') === '1' && \OCP\App::isEnabled('files_trashbin'))
                     $this->queueService->liveIndex(new ItemQueue(FilesEvents::FILE_TRASH, array(
                         'userid' => $this->userId,
                         'fileid' => $file->getId()

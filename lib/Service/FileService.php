@@ -387,7 +387,7 @@ class FileService
         $data = array();
         $file = self::getFileInfoFromFileId($fileId, $view, $this->miscService);
         
-        if ($file == null) {
+        if ($file == null && $this->configService->getAppValue('index_files_trash') === '1') {
             $trashview = new View('/' . $this->userId . '/files_trashbin/files');
             $file = self::getFileInfoFromFileId($fileId, $trashview, $this->miscService);
             array_push($options, 'deleted');
@@ -622,7 +622,7 @@ class FileService
             $fileData = null;
         }
         
-        if ($fileData == null && $trashbin) {
+        if ($this->configService->getAppValue('index_files_trash') === '1' && $fileData == null && $trashbin) {
             try {
                 $trashview = new View('/' . $this->userId . '/files_trashbin/files');
                 $path = $trashview->getPath($item->getId());

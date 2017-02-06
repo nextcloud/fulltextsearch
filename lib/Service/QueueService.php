@@ -68,11 +68,11 @@ class QueueService
             case '0':
                 return;
             
-//             case '1':
-//                 $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
-//                 if (! msg_send($queue, 1, ItemQueue::toJson($item)))
-//                     $this->miscService->log('can\'t msg_send()');
-//                 break;
+            // case '1':
+            // $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
+            // if (! msg_send($queue, 1, ItemQueue::toJson($item)))
+            // $this->miscService->log('can\'t msg_send()');
+            // break;
             
             case '2':
                 $this->liveQueueMapper->insert(new LiveQueue($item));
@@ -86,9 +86,9 @@ class QueueService
             case '0':
                 return;
             
-//             case '1':
-//                 msg_remove_queue(msg_get_queue($this->configService->getAppValue('index_live_queuekey')));
-//                 break;
+            // case '1':
+            // msg_remove_queue(msg_get_queue($this->configService->getAppValue('index_live_queuekey')));
+            // break;
             
             case '2':
                 $this->liveQueueMapper->clear();
@@ -102,22 +102,22 @@ class QueueService
             case '0':
                 return;
             
-//             case '1':
-//                 $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
-                
-//                 $msg_type = null;
-//                 $msg = null;
-//                 $max_msg_size = 512;
-                
-//                 $infos = msg_stat_queue($queue);
-                
-//                 if (! $standby && $infos['msg_qnum'] === 0)
-//                     return false;
-                
-//                 if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg, true, 0, $error))
-//                     return false;
-                
-//                 return ItemQueue::fromJson($msg);
+            // case '1':
+            // $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
+            
+            // $msg_type = null;
+            // $msg = null;
+            // $max_msg_size = 512;
+            
+            // $infos = msg_stat_queue($queue);
+            
+            // if (! $standby && $infos['msg_qnum'] === 0)
+            // return false;
+            
+            // if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg, true, 0, $error))
+            // return false;
+            
+            // return ItemQueue::fromJson($msg);
             
             case '2':
                 $msg = null;
@@ -189,11 +189,14 @@ class QueueService
                     
                     $this->sourceService->file()->initUser($item->getUserId(), true);
                     $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
-                    $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
-                        'deleted'
-                    ));
                     
-                    $files = array_merge($files, $files_trashbin);
+                    if ($this->configService->getAppValue('index_files_trash') === '1') {
+                        $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
+                            'deleted'
+                        ));
+                        $files = array_merge($files, $files_trashbin);
+                    }
+                    
                     $solrDocs = null;
                     
                     $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $item->getUserId(), $files, $solrDocs);

@@ -260,11 +260,14 @@ class Index extends Base
             
             $this->sourceService->file()->initUser($user, true);
             $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
-                'deleted'
-            ));
             
-            $files = array_merge($files, $files_trashbin);
+            if ($this->configService->getAppValue('index_files_trash') === '1') {
+                $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
+                    'deleted'
+                ));
+                $files = array_merge($files, $files_trashbin);
+            }
+            
             $solrDocs = null;
             $this->indexService->extract(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
             $this->indexService->removeOrphans(ItemDocument::TYPE_FILE, $user, $files, $solrDocs);
@@ -332,11 +335,14 @@ class Index extends Base
             
             $this->sourceService->file()->initUser($user, true);
             $files = $this->sourceService->file()->getFilesPerUserId('/files', array());
-            $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
-                'deleted'
-            ));
             
-            $files = array_merge($files, $files_trashbin);
+            if ($this->configService->getAppValue('index_files_trash') === '1') {
+                $files_trashbin = $this->sourceService->file()->getFilesPerUserId('/files_trashbin', array(
+                    'deleted'
+                ));
+                $files = array_merge($files, $files_trashbin);
+            }
+            
             $this->indexService->updateDocuments(ItemDocument::TYPE_FILE, $user, $files);
             
             $this->sourceService->file()->endUser();
