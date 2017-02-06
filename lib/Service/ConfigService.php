@@ -78,7 +78,7 @@ class ConfigService
         'index_files_filters_office' => '1',
         'index_files_filters_image' => '0',
         'index_files_filters_audio' => '0',
-        'index_files_filters_extensions' => '',
+        'index_files_filters_extensions' => '.csv',
         
         'index_bookmarks' => 0,
         'index_bookmarks_needed' => 1
