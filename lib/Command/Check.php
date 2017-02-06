@@ -86,8 +86,8 @@ class Check extends Base
                 $info['solr_url'] = '**HIDDEN**';
                 $info['solr_core'] = '**HIDDEN**';
                 
-                $qk = $info['index_live_queuekey'];
-                $info['index_live_queuekey'] = substr($qk, 0, - 3) . '???';
+                // $qk = $info['index_live_queuekey'];
+                // $info['index_live_queuekey'] = substr($qk, 0, - 3) . '???';
             }
             
             $output->writeln(var_export($info, true));

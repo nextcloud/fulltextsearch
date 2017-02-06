@@ -221,29 +221,29 @@ $(document)
 							$('#solr_core').val(response.solr_core);
 							$('#solr_timeout').val(response.solr_timeout);
 
-							if (response.index_live == 1
-									&& response.ext_sysvmsg_loaded == false)
-								response.index_live = 2;
+							// if (response.index_live == 1
+							// && response.ext_sysvmsg_loaded == false)
+							// response.index_live = 2;
 
 							if (response.configured > 0) {
 								$('#nextant_suboptions :input').prop(
 										'disabled', false);
 								$('#nextant_help_link').unbind('click');
 								$('#nextant_suboptions').fadeTo(delay, 1);
-								$('#solr_index_live_queuekey').prop('disabled',
-										true);
-								if (response.index_live == 1)
-									$('#solr_index_live_queuekey').fadeTo(
-											delay, 0.85);
-								else
-									$('#solr_index_live_queuekey').fadeTo(
-											delay, 0);
-								if (response.ext_sysvmsg_loaded == false)
-									$('#solr_index_live option[value="1"]')
-											.prop('disabled', true);
-								else
-									$('#solr_index_live option[value="1"]')
-											.prop('disabled', false);
+								// $('#solr_index_live_queuekey').prop('disabled',
+								// true);
+								// if (response.index_live == 1)
+								// $('#solr_index_live_queuekey').fadeTo(
+								// delay, 0.85);
+								// else
+								// $('#solr_index_live_queuekey').fadeTo(
+								// delay, 0);
+								// if (response.ext_sysvmsg_loaded == false)
+								// $('#solr_index_live option[value="1"]')
+								// .prop('disabled', true);
+								// else
+								// $('#solr_index_live option[value="1"]')
+								// .prop('disabled', false);
 
 							} else {
 								$('#nextant_suboptions :input').attr(
@@ -327,8 +327,8 @@ $(document)
 									response.resource_level);
 
 							$('#solr_index_live').val(response.index_live);
-							$('#solr_index_live_queuekey').val(
-									response.index_live_queuekey);
+							// $('#solr_index_live_queuekey').val(
+							// response.index_live_queuekey);
 
 							$('#solr_use_cron').prop('checked',
 									(response.use_cron == 1));

@@ -120,7 +120,6 @@ class SettingsController extends Controller
             'index_bookmarks_needed' => $this->configService->getAppValue('index_bookmarks_needed'),
             'resource_level' => $this->configService->getAppValue('resource_level'),
             'index_live' => $this->configService->getAppValue('index_live'),
-            'index_live_queuekey' => $this->configService->getAppValue('index_live_queuekey'),
             'use_cron' => $this->configService->getAppValue('use_cron'),
             'index_delay_min' => $this->configService->getAppValue('index_delay_min'),
             'index_delay_max' => $this->configService->getAppValue('index_delay_max'),
@@ -132,6 +131,7 @@ class SettingsController extends Controller
             'ext_sysvmsg_loaded' => extension_loaded('sysvmsg'),
             'source' => $source
         );
+        // 'index_live_queuekey' => $this->configService->getAppValue('index_live_queuekey'),
         
         return $response;
     }
@@ -175,17 +175,17 @@ class SettingsController extends Controller
     {
         $this->configService->setAppValue('resource_level', $resource_level);
         
-        if ($index_live === '1') {
-            if (extension_loaded('sysvmsg')) {
-                
-                if ($this->configService->getAppValue('index_live') !== '1')
-                    $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
-                
-                $this->configService->setAppValue('index_live', $index_live);
-            }
-        } else {
-            $this->configService->setAppValue('index_live', $index_live);
-        }
+        // if ($index_live === '1') {
+        // if (extension_loaded('sysvmsg')) {
+        
+        // if ($this->configService->getAppValue('index_live') !== '1')
+        // $this->configService->setAppValue('index_live_queuekey', rand(20000, 990000));
+        
+        // $this->configService->setAppValue('index_live', $index_live);
+        // }
+        // } else {
+        $this->configService->setAppValue('index_live', $index_live);
+        // }
         
         $this->configService->setAppValue('use_cron', $use_cron);
         
@@ -418,8 +418,8 @@ class SettingsController extends Controller
             
             if ($this->configService->getAppValue('configured') !== '1') {
                 $this->configService->setAppValue('configured', '2');
-                if (! extension_loaded('sysvmsg'))
-                    $this->configService->setAppValue('index_live', '2');
+                // if (! extension_loaded('sysvmsg'))
+                // $this->configService->setAppValue('index_live', '2');
             }
             
             $message = $this->l10n->t('Your configuration has been saved');

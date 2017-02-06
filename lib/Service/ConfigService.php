@@ -53,7 +53,7 @@ class ConfigService
         'solr_timeout' => '30',
         
         'resource_level' => '4',
-        'index_live' => '1',
+        'index_live' => '2',
         'index_live_queuekey' => '19375',
         'index_delay' => '2',
         'index_delay_min' => '2',
@@ -108,7 +108,9 @@ class ConfigService
 
     public function removeOldConfig()
     {
-        $this->setAppValue('index_delay_min', $this->getAppValue('index_delay'));
+        if ($this->getAppValue('index_live') === '1')
+            $this->setAppValue('index_live', '2');
+        // $this->setAppValue('index_delay_min', $this->getAppValue('index_delay'));
     }
 
     public function needIndexFiles($need)

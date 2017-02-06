@@ -68,11 +68,11 @@ class QueueService
             case '0':
                 return;
             
-            case '1':
-                $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
-                if (! msg_send($queue, 1, ItemQueue::toJson($item)))
-                    $this->miscService->log('can\'t msg_send()');
-                break;
+//             case '1':
+//                 $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
+//                 if (! msg_send($queue, 1, ItemQueue::toJson($item)))
+//                     $this->miscService->log('can\'t msg_send()');
+//                 break;
             
             case '2':
                 $this->liveQueueMapper->insert(new LiveQueue($item));
@@ -86,9 +86,9 @@ class QueueService
             case '0':
                 return;
             
-            case '1':
-                msg_remove_queue(msg_get_queue($this->configService->getAppValue('index_live_queuekey')));
-                break;
+//             case '1':
+//                 msg_remove_queue(msg_get_queue($this->configService->getAppValue('index_live_queuekey')));
+//                 break;
             
             case '2':
                 $this->liveQueueMapper->clear();
@@ -102,22 +102,22 @@ class QueueService
             case '0':
                 return;
             
-            case '1':
-                $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
+//             case '1':
+//                 $queue = msg_get_queue($this->configService->getAppValue('index_live_queuekey'));
                 
-                $msg_type = null;
-                $msg = null;
-                $max_msg_size = 512;
+//                 $msg_type = null;
+//                 $msg = null;
+//                 $max_msg_size = 512;
                 
-                $infos = msg_stat_queue($queue);
+//                 $infos = msg_stat_queue($queue);
                 
-                if (! $standby && $infos['msg_qnum'] === 0)
-                    return false;
+//                 if (! $standby && $infos['msg_qnum'] === 0)
+//                     return false;
                 
-                if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg, true, 0, $error))
-                    return false;
+//                 if (! msg_receive($queue, 1, $msg_type, $max_msg_size, $msg, true, 0, $error))
+//                     return false;
                 
-                return ItemQueue::fromJson($msg);
+//                 return ItemQueue::fromJson($msg);
             
             case '2':
                 $msg = null;
