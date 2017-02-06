@@ -7,7 +7,7 @@
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@pontapreta.net>
- * @copyright Maxence Lange 2016
+ * @copyright Maxence Lange 2016-2017
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,7 @@ namespace OCA\Nextant\Controller;
 
 use \OCA\Nextant\Service\ConfigService;
 use \OCA\Nextant\Service\SolrService;
+use \OCA\Nextant\Service\TestService;
 use \OCA\Nextant\Items\ItemDocument;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -295,7 +296,7 @@ class SettingsController extends Controller
 
     private function test_extract(&$message)
     {
-        $doc = self::generateTestDocument(1, '_nextant_test', __DIR__ . '/../../LICENSE', '/LICENSE');
+        $doc = TestService::generateTestDocument(1, '_nextant_test', __DIR__ . '/../../LICENSE', '/LICENSE');
         
         $data = array(
             $doc
@@ -316,7 +317,7 @@ class SettingsController extends Controller
 
     private function test_update(&$message)
     {
-        $doc = self::generateTestDocument(1, '_nextant_test', __DIR__ . '/../../LICENSE', '/LICENSE2');
+        $doc = TestService::generateTestDocument(1, '_nextant_test', __DIR__ . '/../../LICENSE', '/LICENSE2');
         $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $ierror);
         
         if ($asource === false || sizeof($asource) != 1 || (! key_exists('test_1', $asource))) {
@@ -432,17 +433,7 @@ class SettingsController extends Controller
         return false;
     }
 
-    private static function generateTestDocument($docid, $userid, $absolutePath, $path)
-    {
-        $doc = new ItemDocument(ItemDocument::TYPE_TEST, $docid);
-        $doc->setAbsolutePath($absolutePath);
-        $doc->setOwner($userid);
-        $doc->setPath($path);
-        $doc->setMTime(time());
-        
-        return $doc;
-    }
-
+  
     public static function FileFiltersExtensionsAsArray($text)
     {
         $extensions = array();
