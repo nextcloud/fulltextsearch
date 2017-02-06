@@ -62,6 +62,7 @@ class BookmarkService
     {
         $item->synced(true);
         $item->extractable(true);
+        $item->valid(true);
         
         return true;
     }
