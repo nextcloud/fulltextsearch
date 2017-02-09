@@ -80,7 +80,6 @@ class Test extends Base {
 			return;
 		}
 
-		$client = $this->solrService->getClientConfig()['endpoint']['localhost'];
 		$tmpConfig = array(
 			'solr_url'     => $address,
 			'solr_core'    => $core,
@@ -89,7 +88,6 @@ class Test extends Base {
 
 		if (!$this->solrService->setClient($tmpConfig)) {
 			$output->writeln('Address is invalid');
-
 			return;
 		}
 
