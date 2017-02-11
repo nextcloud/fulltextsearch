@@ -4,6 +4,7 @@ OC.L10N.register(
     "Go to folder" : "Przejdź do folderu",
     "never" : "nigdy",
     "Nextant is not configured yet" : "Nextant nie jest jeszcze skonfigurowany",
+    "Ping querying your Solr Server" : "Pinguję twój serwer Solr",
     "Verifying Schema integrity" : "Sprawdzanie integralności Schema",
     "Test update document query" : "Test zapytania aktualizacji dokumentu",
     "Test search query" : "Test kwerendy wyszukiwania",
