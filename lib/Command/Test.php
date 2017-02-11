@@ -128,7 +128,7 @@ class Test extends Base {
 	private function test_ping($output) {
 		$output->write(' - Pinging Solr: ');
 		if (!$this->solrAdmin->ping($ierror)) {
-			$output->writeln('<error>fail</error> - ' . $ierror->getCode());
+			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
 
 			return false;
 		}
@@ -140,8 +140,9 @@ class Test extends Base {
 
 	private function test_schema($output) {
 		$output->write(' - Checking Solr schema: ');
+		$ierror = null;
 		if (!$this->solrAdmin->checkSchema($ierror)) {
-			$output->writeln('<error>fail</error> - ' . $ierror->getCode());
+			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
 
 			return false;
 		}
@@ -152,6 +153,7 @@ class Test extends Base {
 	}
 
 	private function test_extract($output) {
+		$ierror = null;
 		$output->write(' - Extracting test document: ');
 		$doc = TestService::generateTestDocument(
 			1, '_nextant_test', __DIR__ . '/../../LICENSE', '/LICENSE'
@@ -165,7 +167,7 @@ class Test extends Base {
 		);
 
 		if (!$doc->isProcessed()) {
-			$output->writeln('<error>fail</error> - ' . $ierror->getCode());
+			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
 
 			return false;
 		}
@@ -176,6 +178,7 @@ class Test extends Base {
 	}
 
 	private function test_update($output) {
+		$ierror = null;
 		$output->write(' - Updating test document: ');
 		$doc = TestService::generateTestDocument(
 			1, '_nextant_test', __DIR__ . '/../../LICENSE', '/LICENSE2'
@@ -184,7 +187,7 @@ class Test extends Base {
 			$this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $ierror);
 
 		if ($asource === false || sizeof($asource) != 1 || (!key_exists('test_1', $asource))) {
-			$output->writeln('<error>fail</error> - ' . $ierror->getCode());
+			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
 
 			return false;
 		}
@@ -212,13 +215,13 @@ class Test extends Base {
 		);
 
 		if (!$this->solrTools->commit(false, $ierror)) {
-			$output->writeln('<error>fail</error> - ' . $ierror->getCode());
+			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
 
 			return false;
 		}
 
 		if (!$source->isUpdated()) {
-			$output->writeln('<error>fail</error> - ' . $ierror->getCode());
+			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
 
 			return false;
 		}
@@ -230,7 +233,7 @@ class Test extends Base {
 
 	private function test_search($output) {
 		$output->write(' - Searching test document: ');
-
+		$ierror = null;
 		$keyword = 'LICENSE';
 		$this->solrService->setOwner('_nextant_test');
 		if ($result = $this->solrService->search($keyword, array(), $ierror)) {
@@ -255,12 +258,13 @@ class Test extends Base {
 			return false;
 		}
 
-		$output->writeln('<error>fail</error> - ' . $ierror->getCode());
+		$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
 
 		return false;
 	}
 
 	private function test_delete($output) {
+		$ierror = null;
 		$output->write(' - Deleting test document: ');
 
 		$doc = new ItemDocument(ItemDocument::TYPE_TEST, 1);
@@ -274,7 +278,7 @@ class Test extends Base {
 			return true;
 		}
 
-		$output->writeln('<error>fail</error> - ' . $ierror->getCode());
+		$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
 
 		return false;
 	}
