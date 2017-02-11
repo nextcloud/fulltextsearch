@@ -4,3 +4,7 @@ vendor/
 build/tools/
 
 \.idea/
+
+\.settings/
+
+\.project
