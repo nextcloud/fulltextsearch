@@ -71,7 +71,10 @@ class Test extends Base {
 		$this->setName('nextant:test')
 			 ->setDescription('test your Nextant configuration')
 			 ->addArgument('address', InputArgument::REQUIRED, 'address of the solr to test')
-			 ->addArgument('core', InputArgument::REQUIRED, 'core to test');
+			 ->addArgument('core', InputArgument::REQUIRED, 'core to test')
+			 ->addOption(
+				 'save', 's', InputOption::VALUE_NONE, 'Save configuration if test is successful'
+			 );
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
@@ -131,7 +134,24 @@ class Test extends Base {
 		}
 
 		$output->writeln('');
-		$output->writeln('All test results were fine');
+		$output->writeln('All test results were fine.');
+
+		if ($input->getOption("save")) {
+			$output->writeln('Saving configuration.');
+
+			$this->configService->setAppValue('solr_url', $address);
+			$this->configService->setAppValue('solr_core', $core);
+			$this->configService->setAppValue('solr_timeout', 30);
+
+			if ($this->configService->getAppValue('configured') !== '1') {
+				$this->configService->setAppValue('configured', '2');
+			}
+
+			if ($this->configService->getAppValue('configured') === '2')
+			{
+				$output->writeln('You will need a first index to finish installation of Nextant.');
+			}
+		}
 	}
 
 	private function test_ping($output) {
