@@ -27,8 +27,13 @@
 namespace OCA\Nextant\Command;
 
 use OC\Core\Command\Base;
-use OCA\Nextant\Service\SolrAdminService;
+use \OCA\Nextant\Service\SolrAdminService;
+use \OCA\Nextant\Service\SolrToolsService;
+use \OCA\Nextant\Service\SolrService;
 use \OCA\Nextant\Service\TestService;
+use \OCA\Nextant\Service\IndexService;
+use \OCA\Nextant\Service\ConfigService;
+use \OCA\Nextant\Controller\SettingsController;
 use \OCA\Nextant\Items\ItemDocument;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -48,8 +53,9 @@ class Test extends Base {
 	private $settingsController;
 
 	public function __construct(
-		$configService, $solrService, $solrTools, SolrAdminService $solrAdmin, $indexService,
-		$settingsController
+		ConfigService $configService, SolrService $solrService, SolrToolsService $solrTools,
+		SolrAdminService $solrAdmin, IndexService $indexService,
+		SettingsController $settingsController
 	) {
 		parent::__construct();
 		$this->configService = $configService;
@@ -72,11 +78,13 @@ class Test extends Base {
 
 		if (!$address = $input->getArgument('address')) {
 			$output->writeln('You need to specify the address to test');
+
 			return;
 		}
 
 		if (!$core = $input->getArgument('core')) {
 			$output->writeln('You need to specify the core');
+
 			return;
 		}
 
@@ -88,6 +96,7 @@ class Test extends Base {
 
 		if (!$this->solrService->setClient($tmpConfig)) {
 			$output->writeln('Address is invalid');
+
 			return;
 		}
 
@@ -128,7 +137,9 @@ class Test extends Base {
 	private function test_ping($output) {
 		$output->write(' - Pinging Solr: ');
 		if (!$this->solrAdmin->ping($ierror)) {
-			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
+			$output->writeln(
+				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+			);
 
 			return false;
 		}
@@ -142,7 +153,9 @@ class Test extends Base {
 		$output->write(' - Checking Solr schema: ');
 		$ierror = null;
 		if (!$this->solrAdmin->checkSchema($ierror)) {
-			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
+			$output->writeln(
+				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+			);
 
 			return false;
 		}
@@ -167,7 +180,9 @@ class Test extends Base {
 		);
 
 		if (!$doc->isProcessed()) {
-			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
+			$output->writeln(
+				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+			);
 
 			return false;
 		}
@@ -187,7 +202,9 @@ class Test extends Base {
 			$this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $ierror);
 
 		if ($asource === false || sizeof($asource) != 1 || (!key_exists('test_1', $asource))) {
-			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
+			$output->writeln(
+				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+			);
 
 			return false;
 		}
@@ -215,13 +232,17 @@ class Test extends Base {
 		);
 
 		if (!$this->solrTools->commit(false, $ierror)) {
-			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
+			$output->writeln(
+				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+			);
 
 			return false;
 		}
 
 		if (!$source->isUpdated()) {
-			$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
+			$output->writeln(
+				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+			);
 
 			return false;
 		}
