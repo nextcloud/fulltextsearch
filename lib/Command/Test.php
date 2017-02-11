@@ -138,7 +138,7 @@ class Test extends Base {
 		$output->write(' - Pinging Solr: ');
 		if (!$this->solrAdmin->ping($ierror)) {
 			$output->writeln(
-				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+				'<error>fail</error> - ' . (($ierror === null) ? "0" : $ierror->getCode())
 			);
 
 			return false;
@@ -152,9 +152,9 @@ class Test extends Base {
 	private function test_schema($output) {
 		$output->write(' - Checking Solr schema: ');
 		$ierror = null;
-		if (!$this->solrAdmin->checkSchema($ierror)) {
+		if (!$this->solrAdmin->checkSchema(true, $ierror)) {
 			$output->writeln(
-				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+				'<error>fail</error> - ' . (($ierror === null) ? "0" : $ierror->getCode())
 			);
 
 			return false;
@@ -181,7 +181,7 @@ class Test extends Base {
 
 		if (!$doc->isProcessed()) {
 			$output->writeln(
-				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+				'<error>fail</error> - ' . (($ierror === null) ? "0" : $ierror->getCode())
 			);
 
 			return false;
@@ -203,7 +203,7 @@ class Test extends Base {
 
 		if ($asource === false || sizeof($asource) != 1 || (!key_exists('test_1', $asource))) {
 			$output->writeln(
-				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+				'<error>fail</error> - ' . (($ierror === null) ? "0" : $ierror->getCode())
 			);
 
 			return false;
@@ -233,7 +233,7 @@ class Test extends Base {
 
 		if (!$this->solrTools->commit(false, $ierror)) {
 			$output->writeln(
-				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+				'<error>fail</error> - ' . (($ierror === null) ? "0" : $ierror->getCode())
 			);
 
 			return false;
@@ -241,7 +241,7 @@ class Test extends Base {
 
 		if (!$source->isUpdated()) {
 			$output->writeln(
-				'<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode()
+				'<error>fail</error> - ' . (($ierror === null) ? "0" : $ierror->getCode())
 			);
 
 			return false;
@@ -279,7 +279,9 @@ class Test extends Base {
 			return false;
 		}
 
-		$output->writeln('<error>fail</error> - ' . ($ierror === null) ? "0" : $ierror->getCode());
+		$output->writeln(
+			'<error>fail</error> - ' . (($ierror === null) ? "0" : $ierror->getCode())
+		);
 
 		return false;
 	}

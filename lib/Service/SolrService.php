@@ -66,6 +66,8 @@ class SolrService
     // can't reach solr - check uri
     const EXCEPTION_SOLRURI = 24;
 
+    const ERROR_SOLR_CANTFIXFIELD = 26;
+
     const EXCEPTION_INDEX_FAILED = 31;
     
     // can't extract - check solr configuration for the solr-cell plugin
@@ -470,7 +472,7 @@ class SolrService
         return false;
     }
 
-    public function search($string, $options = array(), &$ierror = '')
+    public function search($string, $options = array(), &$ierror = null)
     {
         $ierror = new ItemError();
         
