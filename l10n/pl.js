@@ -17,6 +17,7 @@ OC.L10N.register(
     "Were not able to verify/fix schema integrity (Error #%1$s)" : "Nie byliśmy w stanie sprawdzić/naprawić integralności schema (Error #%1$s)",
     "Text successfully extracted" : "Tekst pomyślnie wyodrębniony",
     "Error Updating field - Can't find original document - (Error #%1$s)" : "Błąd aktualizacji pola - nie można odnaleźć oryginalnego dokumentu - (Error #%1$s)",
+    "Error during commit (Error #%1$s)" : "Błąd przy zatwierdzaniu (Błąd#%1$s)",
     "Error during updating field (Error #%1$s)" : "Błąd podczas aktualizacji pola (Error #%1$s)",
     "Document successfully updated" : "Dokument pomyślnie zaktualizowany",
     "Found exactly what we were looking for" : "Znaleziono dokładnie to, czego szukasz",
@@ -24,10 +25,12 @@ OC.L10N.register(
     "Cannot find any document" : "Nie można znaleźć żadnego dokumentu",
     "Search failed. Please check the configuration of your Solr server (Error #%1$s)" : "Wyszukiwanie nie powiodło się. Proszę sprawdzić konfigurację serwera Solr (Error #%1$s)",
     "Test document deleted" : "Dokument testowy usunięty",
+    "We could not delete our test document. Please check the configuration of your Solr server (Error #%1$s)" : "Nie mogliśmy skasować swojego dokumentu testowego. Proszę sprawdzić konfigurację serwera Solr (Błąd #%1$s)",
     "Your configuration has been saved" : "Konfiguracja została zapisana",
     "Configuration failed to be saved. Please reload this page." : "Konfiguracja nie zostanie zapisana. Odśwież tę stronę.",
     "Nextant (Full-Text Search)" : "Nextant (Full-Text Search)",
     "Specify the address of your Solr, and the name of the core to use." : "Podaj adres swojego Solr i nazwę core do użycia.",
+    "If you do not have a Solr servlet running, you can find few guides on how to install one on the Wiki." : "Jeśli nie posiadasz własnego servletu Solr, możesz na Wiki znaleźć przewodniki instalacji.",
     "You can also find there more information about this interface." : "Można też tam znaleźć więcej informacji na temat tego interfejsu.",
     "Saving" : "Zapisuję",
     "Settings" : "Ustawienia",
@@ -59,8 +62,11 @@ OC.L10N.register(
     "Disabled" : "Wyłączone",
     "Using Database" : "Korzystanie z bazy danych",
     "hours" : "godziny",
+    "days" : "dni",
+    "Nextcloud Cron :" : "Zadania cron Nextclouda:",
     "Number of documents :" : "Liczba dokumentów:",
     "Number of segments :" : "Liczba segmentów:",
+    "we recommand doing the very first indexing of your files using the ./occ nextant:index command." : "Sugerujemy, aby pierwsze indeksowanie swoich plików zrobić poprzez komendę ./occ nextant:index.",
     "Force first index as a cronjob" : "Wymuś pierwsze indeksowanie poprzez cron",
     "Force index" : "Wymuś indeksowanie",
     "Indexing in progress" : "Indeksowanie w toku",
@@ -72,4 +78,4 @@ OC.L10N.register(
     "Audio File (mp3, flac)" : "Pliki audio (mp3, flac)",
     "Extensions you wish to ignore (.java .xml)" : "Rozszerzenia, które chcesz ignorować (.java .xml)"
 },
-"nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");
+"nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>=14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");
