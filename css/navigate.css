@@ -3,12 +3,12 @@
 .searchbox input[type="search"]:valid, .searchbox input[type="search"]:focus
 	{
 	width: 300px;
-	background: #fff3;
+	background: rgba(255,255,255,0.2);
 	border-radius: 15px;
 }
 
 .searchbox_querying {
-	border-color: #ffff !important;
+	border-color: rgba(255,255,255,1) !important;
 }
 
 #nextantList {
@@ -90,15 +90,15 @@ SPAN.nextant_hl {
 #nextant_suggestion {
 	z-index: 2000;
 	margin-top: 18px;
-	border: solid 1px #0000004D;
+	border: solid 1px rgba(0,0,0,0.3);
 	border-radius: 4px;
-	background: #fffc;
+	background: rgba(254,254,254,0.8);
 	width: 350px;
-	box-shadow: 2px 2px 5px #0000004D;
+	box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
 }
 
 DIV.nextant_suggestion_item {
-	border-top: dashed 1px #0003;
+	border-top: dashed 1px rgba(0,0,0,0.2);
 	padding: 4px;
 	padding-left: 12px;
 	padding-right: 12px;
