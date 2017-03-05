@@ -2,7 +2,7 @@ OC.L10N.register(
     "nextant",
     {
     "Go to folder" : "Zum Ordner wechseln",
-    "never" : "Nie",
+    "never" : "Niemals",
     "Nextant is not configured yet" : "Nextant wurde noch nicht eingerichtet",
     "Ping querying your Solr Server" : "Ping sucht Ihren Soir Server",
     "Verifying Schema integrity" : "Prüfe die Schemenintegrität",
