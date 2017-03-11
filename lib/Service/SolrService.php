@@ -312,6 +312,9 @@ class SolrService
             
             case 'mid':
                 return true;
+
+			case 'eml':
+				return true;
         }
         
         return false;
