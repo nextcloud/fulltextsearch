@@ -46,6 +46,7 @@ OC.L10N.register(
     "Edit your filters" : "Modifica i tuoi filtri",
     "Index Files Tree :" : "Indicizzazione albero dei file:",
     "Disable default search from Files" : "Disabilita la ricerca predefinita da File",
+    "Index File Trash:" : "Indicizzazione cestino:",
     "Index Public Links :" : "Indicizzazione collegamenti pubblici:",
     "Index Federated Shares :" : "Indicizzazione condivisioni federate:",
     "Index External Storages :" : "Indicizzazione archiviazioni esterne:",
