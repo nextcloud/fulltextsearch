@@ -11,7 +11,7 @@
     "All test went fine. Saving your configuration" : "Alle Tests waren erfolgreich. Die Konfiguration wird gespeichert",
     "The format of the address is not correct" : "Das Format der Adresse ist falsch",
     "Apache Solr is up, running and responding to ping query" : "Apache Soir läuft und antwortet auf Ping-Anfragen",
-    "Apache Solr is not responding to ping query (Error #%1$s)" : "Apache Soir antwortet nicht auf Ping-Anfragen (Fehler #%1$s)",
+    "Apache Solr is not responding to ping query (Error #%1$s)" : "Apache Solr antwortet nicht auf Ping-Anfragen (Fehler #%1$s)",
     "Schema is fine" : "Schema ist in Ordnung",
     "Were not able to verify/fix schema integrity (Error #%1$s)" : "Konnte Schemenintegrität nicht überprüfen/reparieren (Fehler #%1$s)",
     "Text successfully extracted" : "Text wurde erfolgreich extrahiert",
