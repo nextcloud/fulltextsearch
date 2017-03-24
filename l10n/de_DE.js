@@ -81,11 +81,11 @@ OC.L10N.register(
     "Indexing is scheduled within the next few hours (cron)" : "Indexierung ist für die nächsten Stunden geplant (Cron)",
     "Indexing in progress" : "Indexierung läuft",
     "Type of files to extract" : "Typ der Dateien die extrahiert werden sollen",
-    "Text File (Text, Html, Subtitles, Source Code, ...)" : "Text Datei (Text, Html, Subtitles, Source Code, ...)",
+    "Text File (Text, Html, Subtitles, Source Code, ...)" : "Text-Datei (Text, Html, Subtitles, Source Code, ...)",
     "E-pub / PDF / rtf" : "E-pub / PDF / rtf",
     "Office Documents" : "Office Dokumente",
     "Image (Jpeg, Tiff)" : "Bild (Jpeg, Tiff)",
-    "Audio File (mp3, flac)" : "Audio Datei (mp3, flac)",
+    "Audio File (mp3, flac)" : "Audio-Datei (mp3, flac)",
     "Extensions you wish to ignore (.java .xml)" : "Erweiterungen die ignoriert werden sollen  (.java .xml)"
 },
 "nplurals=2; plural=(n != 1);");
