@@ -12,6 +12,7 @@
     "The format of the address is not correct" : "地址格式不正确",
     "Apache Solr is up, running and responding to ping query" : "Apache Solr 启动, 运行和响应 ping 查询",
     "Apache Solr is not responding to ping query (Error #%1$s)" : "Apache Solr 没有响应 ping 请求 (错误 #%1$s)",
+    "Schema is fine" : "结构完好",
     "Text successfully extracted" : "已成功提取文本",
     "Error during commit (Error #%1$s)" : "提交错误 (错误 #%1$s)",
     "Error during updating field (Error #%1$s)" : "更新域时发生错误 (错误 #%1$s)",
