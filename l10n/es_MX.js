@@ -44,7 +44,7 @@ OC.L10N.register(
     "Maximum File Size (Mb) :" : "Tamaño de Máximo del Archivo (Mb):",
     "Edit your filters" : "Edite sus filtros",
     "Index Files Tree :" : "Indexar Árbol de Archivos:",
-    "Disable default search from Files" : "Deshabilitar búsqueda por defecto de Archivos",
+    "Disable default search from Files" : "Deshabilitar búsqueda predeterminada de Archivos",
     "Index File Trash:" : "Indexar Archivos de Basura:",
     "Index Public Links :" : "Indexar Ligas Públicas:",
     "Index Federated Shares :" : "Indexar Recursos Compartidos Federados:",
