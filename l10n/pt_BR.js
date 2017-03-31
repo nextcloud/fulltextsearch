@@ -75,7 +75,7 @@ OC.L10N.register(
     "Number of documents :" : "Número de documentos:",
     "Number of segments :" : "Número de segmentos:",
     "we recommand doing the very first indexing of your files using the ./occ nextant:index command." : "recomendamos fazer a primeira indexação de seus arquivos usando o ./occ comando nextant:index.",
-    "However, you can force it to be started as a background process." : "No entanto, você pode força-lo a ser iniciado como um processo em segundo plano.",
+    "However, you can force it to be started as a background process." : "No entanto, você pode forçá-lo a ser iniciado como um processo em segundo plano.",
     "Force first index as a cronjob" : "Forçar 0 primeiro índice como cronjob",
     "Force index" : "Forçar Índice",
     "Indexing is scheduled within the next few hours (cron)" : "A indexação está agendada para as próximas horas (cron)",
