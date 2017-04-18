@@ -6,6 +6,8 @@
     "Removing the test document" : "Slett testdokumentet",
     "All test went fine. Saving your configuration" : "Alle tester bestått. Lagrer oppsettet ditt",
     "The format of the address is not correct" : "Adresseformatet stemmer ikke",
+    "Text successfully extracted" : "Tekst utpakket",
+    "Extract failed. Please check the configuration of your Solr server (Error #%1$s)" : "Utpakking mislyktes. Sjekk oppsettet av din Solr-tjener (Feil #%1$s)",
     "Document successfully updated" : "Dokument oppdatert",
     "Found exactly what we were looking for" : "Fant akkurat hva vi leter etter",
     "We found something, but not what we were expecting." : "Vi fant noe, men ikke hva vi forventet.",
