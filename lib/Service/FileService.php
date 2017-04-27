@@ -344,7 +344,7 @@ class FileService
             return $data;
         
         $folder = $userFolder->get('/');
-        $files = $folder->search('');
+        $files = $folder->getDirectoryListing();
         
         foreach ($files as $file) {
             if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER && $this->configService->getAppValue('index_files_tree') !== '1')
