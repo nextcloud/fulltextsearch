@@ -106,7 +106,7 @@ class Check extends Base
         
         if (! $this->solrAdmin->checkSchema(($input->getOption('fix')), $ierror)) {
             if ($ierror->getCode() > 0) {
-                $this->output->writeln('*** Error #' . $ierror->getCode() . ' (' . $ierror->getMessage() . ')');
+                $output->writeln('*** Error #' . $ierror->getCode() . ' (' . $ierror->getMessage() . ')');
                 return;
             }
         }

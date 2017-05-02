@@ -34,6 +34,7 @@ use OC\Files\Filesystem;
 use OC\Files\View;
 use OC\Share\Share;
 use OCP\Files\NotFoundException;
+use OCP\Files\StorageNotAvailableException;
 
 class FileService
 {
@@ -235,8 +236,20 @@ class FileService
             $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
             return true;
         }
-        
-        // We generate a local tmp file from the remote one
+
+		// not local, not external nor encrypted, we generate temp file
+		if (! $item->isExternal() && ! $item->isEncrypted()) {
+			try {
+				$item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
+			} catch (StorageNotAvailableException $ex) {
+				$ierror = new ItemError(ItemError::EXCEPTION_INDEXDOCUMENT_WITHOUT_ABSOLUTEPATH, $ex->getHint());
+				return false;
+			}
+			return true;
+		}
+
+
+		// We generate a local tmp file from the remote one
         if ($item->isExternal() && $this->configService->getAppValue('index_files_external') === '1') {
             try {
                 $item->setAbsolutePath($this->view->toTmpFile($item->getPath()), true);
