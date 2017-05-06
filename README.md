@@ -34,17 +34,11 @@
 - Download the .zip from the appstore, unzip and place this app in **nextcloud/apps/** (or clone the github and build the app yourself)
 - Enable the app in the app list,
 - Edit the settings in the administration page.
+- Enable Nextant using the **./occ app:enable nextant** command
+- Test your Solr installation and save the configuration to Nextant using the **./occ nextant:test http://127.0.0.1:8983/solr/ nextant --save** command
 - Extract the current files from your cloud using the **./occ nextant:index** command 
 - Have a look to this [explanation on how Nextant works](https://github.com/nextcloud/nextant/wiki/Extracting,-Live-Update)
 - _(Optional)_ [Installing Tesseract](https://github.com/tesseract-ocr/tesseract/wiki) ([Optical Character Recognition](https://en.wikipedia.org/wiki/Optical_character_recognition) (OCR) Engine) will allow Nextant to extract text from image file and pdfs without a text layer.
-
-## Scripted installation (Ubuntu)
-The developers of the [Nextcloud VM](https://github.com/nextcloud/vm) has made a [script](https://raw.githubusercontent.com/nextcloud/vm/master/static/nextant.sh) that you can use.
-Please note that you must change the variables in the script to suit your config before you run it.
-
-To get the script, please type the folloing command: `wget https://github.com/nextcloud/vm/blob/master/static/nextant.sh` and then run the script with `sudo bash nextant.sh`.
-
-Please report any issues regarding the script in the [Nextcloud VM repo](https://github.com/nextcloud/vm/issues).
 
 ## Building the app
 
