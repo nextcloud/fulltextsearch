@@ -18,7 +18,7 @@ OC.L10N.register(
     "Were not able to verify/fix schema integrity (Error #%1$s)" : "Não foi possível verificar/consertar a integridade do schema (Erro #%1$s)",
     "Text successfully extracted" : "Texto extraído com sucesso",
     "Extract failed. Please check the configuration of your Solr server (Error #%1$s)" : "Falha na extração. Por favor, verifique a configuração do seu servidor Solr (Erro #%1$s)",
-    "Error Updating field - Can't find original document - (Error #%1$s)" : "Erro atualizando campo - Não é possível encontrar o documento original - (Erro #%1$s)",
+    "Error Updating field - Can't find original document - (Error #%1$s)" : "Erro atualizando campo - Não foi possível encontrar o documento original - (Erro #%1$s)",
     "Error during commit (Error #%1$s)" : "Erro durante a efetivação (Erro #%1$s)",
     "Error during updating field (Error #%1$s)" : "Erro durante a atualização de campo (Erro #%1$s)",
     "Document successfully updated" : "Documento atualizado com sucesso",
