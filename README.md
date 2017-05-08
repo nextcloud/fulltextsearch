@@ -31,7 +31,7 @@
 ## Installation
 
 - [You first need to install a Solr servlet](https://github.com/nextcloud/nextant/wiki)
-- Download the .tar.gz from the [https://apps.nextcloud.com/apps/nextant](appstore), unzip and place this app in **nextcloud/apps/** (or clone the github and build the app yourself)
+- Download the .tar.gz from the [appstore](https://apps.nextcloud.com/apps/nextant), unzip and place this app in **nextcloud/apps/** (or clone the github and build the app yourself)
 - Enable the app in the app list,
 - Edit the settings in the administration page.
 - Enable Nextant using the **./occ app:enable nextant** command
