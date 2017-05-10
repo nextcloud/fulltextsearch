@@ -30,6 +30,7 @@ OC.L10N.register(
     "We could not delete our test document. Please check the configuration of your Solr server (Error #%1$s)" : "Denemebelgesi silinemedi. Lütfen Solr sunucunuzun yapılandırmasını denetleyin (Hata #%1$s)",
     "Your configuration has been saved" : "Yapılandırmanız kaydedildi",
     "Configuration failed to be saved. Please reload this page." : "Yapılandırma kaydedilemedi. Lütfenbu sayfayı yeniden yükleyin.",
+    "Nextant" : "Nextant",
     "Nextant (Full-Text Search)" : "Nextant (Tam Metin Arama)",
     "Specify the address of your Solr, and the name of the core to use." : "Solr sunucunuzun adresini ve kullanılacak çekirdeğin adını yazın.",
     "If you do not have a Solr servlet running, you can find few guides on how to install one on the Wiki." : "Çalışan bir Solr sunucu yazılımınız yoksa, Wiki üzerinde nasıl kuracağınız ile ilgili bazı rehberler bulabilirsiniz.",

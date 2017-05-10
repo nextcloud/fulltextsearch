@@ -28,6 +28,7 @@
     "We could not delete our test document. Please check the configuration of your Solr server (Error #%1$s)" : "Échec de la suppression du document de test. Veuillez vérifier la configuration de votre serveur Solr (Erreur #%1$s)",
     "Your configuration has been saved" : "Votre configuration a été sauvegardée",
     "Configuration failed to be saved. Please reload this page." : "Votre configuration n’a PAS été sauvegardée. Merci de rafraîchir cette page.",
+    "Nextant" : "Nextant",
     "Nextant (Full-Text Search)" : "Nextant (Recherche de texte intégral)",
     "Specify the address of your Solr, and the name of the core to use." : "Renseignez l'adresse du serveur Solr et le nom du noyau (core) a utiliser.",
     "If you do not have a Solr servlet running, you can find few guides on how to install one on the Wiki." : "Si vous ne disposez pas d'un serveur Solr, vous trouverez des guides d'installation sur le Wiki.",

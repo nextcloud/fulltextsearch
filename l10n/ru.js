@@ -30,6 +30,7 @@ OC.L10N.register(
     "We could not delete our test document. Please check the configuration of your Solr server (Error #%1$s)" : "Не удается удалить проверочный документ. Проверьте настройки cервлета Solr (Ошибка #%1$s)",
     "Your configuration has been saved" : "Ваша конфигурация была сохранена",
     "Configuration failed to be saved. Please reload this page." : "Сбой при записи конфигурации. Перезагрузите эту страницу.",
+    "Nextant" : "Nextant",
     "Nextant (Full-Text Search)" : "Nextant (Полнотекстовый поиск)",
     "Specify the address of your Solr, and the name of the core to use." : "Укажите адрес вашего сервера Solr и имя ядра для использования.",
     "If you do not have a Solr servlet running, you can find few guides on how to install one on the Wiki." : "Если у вас не запущен сервлет Solr, можете ознакомиться с руководствами по его установке на Wiki.",

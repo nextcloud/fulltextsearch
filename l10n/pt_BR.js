@@ -30,6 +30,7 @@ OC.L10N.register(
     "We could not delete our test document. Please check the configuration of your Solr server (Error #%1$s)" : "Nós foi possível excluir o documento de teste. Por favor, verifique a configuração do seu servidor Solr (Erro #%1$s)",
     "Your configuration has been saved" : "Sua configuração foi salva",
     "Configuration failed to be saved. Please reload this page." : "Falha em salvar a configuração. Por favor, recarregue esta página.",
+    "Nextant" : "Próxima",
     "Nextant (Full-Text Search)" : "Nextant (Pesquisa por texto completo)",
     "Specify the address of your Solr, and the name of the core to use." : "Especifique o endereço do seu Solr e o nome do núcleo a usar.",
     "If you do not have a Solr servlet running, you can find few guides on how to install one on the Wiki." : "Se você não tem um servlet Solr em execução, você pode encontrar alguns guias de como instalar, no Wiki.",
