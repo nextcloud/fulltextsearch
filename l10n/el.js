@@ -49,6 +49,7 @@ OC.L10N.register(
     "Nextcloud Cron :" : "Nextcloud Cron :",
     "Number of documents :" : "Αριθμός των εγγράφων :",
     "Number of segments :" : "Πλήθος από τμήματα :",
+    "Indexing in progress" : "Ευρετηριοποίηση σε εξέλιξη",
     "Type of files to extract" : "Τύπος αρχείων για εξαγωγή",
     "Text File (Text, Html, Subtitles, Source Code, ...)" : "Αρχείο κειμένου (κείμενο, html, υπότιτλοι, πηγαίος κώδικας, ...)",
     "E-pub / PDF / rtf" : "E-pub / PDF / rtf",
