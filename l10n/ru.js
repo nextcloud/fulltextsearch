@@ -3,7 +3,7 @@ OC.L10N.register(
     {
     "Go to folder" : "Перейти в каталог",
     "never" : "никогда",
-    "Nextant is not configured yet" : "Nextant пока не сконфигурирован",
+    "Nextant is not configured yet" : "Nextant ещё не настроен",
     "Ping querying your Solr Server" : "Пингуем сервер Solr",
     "Verifying Schema integrity" : "Проверка целостности схемы",
     "Test simple text extract query" : "Проверка запроса извлечения простого текста",
