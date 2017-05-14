@@ -19,6 +19,8 @@ OC.L10N.register(
     "Error during commit (Error #%1$s)" : "提交错误 (错误 #%1$s)",
     "Error during updating field (Error #%1$s)" : "更新域时发生错误 (错误 #%1$s)",
     "Document successfully updated" : "更新文档成功",
+    "Found exactly what we were looking for" : "找到我们想要找的",
+    "We found something, but not what we were expecting." : "我们找到了一些结果，但并不是我们想要的。",
     "Cannot find any document" : "无法找到任何文档",
     "Test document deleted" : "测试文档已删除",
     "Your configuration has been saved" : "配置已保存",

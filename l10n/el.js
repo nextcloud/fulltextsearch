@@ -14,6 +14,7 @@ OC.L10N.register(
     "Text successfully extracted" : "Το κείμενο αποσυμπιέστηκε επιτυχώς ",
     "Extract failed. Please check the configuration of your Solr server (Error #%1$s)" : "Εξαγωγή απέτυχε. Παρακαλούμε ελέγξτε τις ρυθμίσεις του Solr εξυπηρετητή σας (Σφάλμα #%1$s)",
     "Error Updating field - Can't find original document - (Error #%1$s)" : "Σφάλμα ενημέρωσης πεδίου - Δεν μπορεί να βρεθεί το πρωτότυπο έγγραφο - (Σφάλμα #%1$s)",
+    "Error during commit (Error #%1$s)" : "Σφάλμα κατά την υποβολή (Σφάλμα #%1$s)",
     "Error during updating field (Error #%1$s)" : "Σφάλμα κατα την ενημέρωση πεδίου (Σφάλμα #%1$s)",
     "Document successfully updated" : "Το έγγραφο ενημερώθηκε επιτυχώς",
     "Found exactly what we were looking for" : "Βρέθηκε ακριβώς αυτό που ψάχναμε",
