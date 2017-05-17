@@ -351,6 +351,7 @@ class FileService
         $data = array();
         
         // Filesystem::tearDown();
+        $view = Filesystem::getView();
         
         $userFolder = FileService::getUserFolder($this->rootFolder, $this->userId, $dir);
         if (! $userFolder || $userFolder == null)
@@ -366,11 +367,20 @@ class FileService
             if ($file->isShared() && $file->getStorage()->isLocal() && ! in_array('forceshared', $options))
                 continue;
             
-            $item = $this->getDocumentFromFile($file);
-            $item->deleted(in_array('deleted', $options));
-            
-            if ($item && $item != false && $item != null)
-                $data[$item->getType() . '_' . $item->getId()] = $item;
+            if ($file->getType() == \OCP\Files\FileInfo::TYPE_FOLDER) {
+                $subfiles = $view->getDirectoryContent($file->getPath());
+                foreach ($subfiles as $subfile) {
+                    $result = $this->getFilesPerUserId($subfile->getPath(), $options);
+                    if (is_array($result) && sizeof($result) > 0)
+                        $data = array_merge($data, $result);
+                }
+            } else {
+                $item = $this->getDocumentFromFile($file);
+                $item->deleted(in_array('deleted', $options));
+
+                if ($item && $item != false && $item != null)
+                    $data[$item->getType() . '_' . $item->getId()] = $item;
+            }
         }
         
         return $data;
