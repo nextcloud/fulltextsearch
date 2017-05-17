@@ -19,6 +19,7 @@ OC.L10N.register(
     "You can also find there more information about this interface." : "Tamién pues alcontrar más información tocante a esta interfaz.",
     "Settings" : "Axustes",
     "Nextant Version :" : "Versión de Nextant:",
+    "Last index :" : "Índiz caberu:",
     "Checking" : "Comprobando",
     "Nextant Status" : "Estáu de Nextant",
     "Resource Level :" : "Nivel de recursu:",
