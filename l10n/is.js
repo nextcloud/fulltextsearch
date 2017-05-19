@@ -27,6 +27,7 @@ OC.L10N.register(
     "Indexing Files" : "Geri yfirlit fyrir skrár",
     "Maximum File Size (Mb) :" : "Hámarks skráastærð (Mb) :",
     "Edit your filters" : "Sýslaðu með síur",
+    "Indexing Bookmarks" : "Geri yfirlit fyrir bókamerki",
     "Checking" : "Athugun",
     "Nextant Status" : "Staða Nextant",
     "Resource Level :" : "Stig tilfanga :",

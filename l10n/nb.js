@@ -51,6 +51,7 @@ OC.L10N.register(
     "Text File (Text, Html, Subtitles, Source Code, ...)" : "Tekstfil (Tekst, Html, Undertekster, Kildekode, ...)",
     "E-pub / PDF / rtf" : "E-pub / PDF / rtf",
     "Office Documents" : "Dokumenter",
+    "Image (Jpeg, Tiff)" : "Bilde (JPEG, TIFF)",
     "Audio File (mp3, flac)" : "Lydfil (MP3, FLAC)",
     "Extensions you wish to ignore (.java .xml)" : "Endelser du vil ignorere (.java .xml)"
 },
