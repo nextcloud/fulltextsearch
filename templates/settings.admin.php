@@ -57,19 +57,19 @@ style('nextant', 'admin');
 					</tr>
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
-	    <?php p($l->t('Address of your Solr servlet :')) ?></td>
+	    <?php p($l->t('Address of your Solr servlet:')) ?></td>
 						<td><input type="text" name="solr_url" id="solr_url" value=""
 							style="width: 250px;"></td>
 					</tr>
 
 					<tr style="height: 30px;">
-						<td class="nextant_admin_left"><?php p($l->t('Core :')) ?></td>
+						<td class="nextant_admin_left"><?php p($l->t('Core:')) ?></td>
 						<td><input type="text" id="solr_core" value=""
 							style="width: 250px;"></td>
 					</tr>
 
 					<tr style="height: 30px;">
-						<td class="nextant_admin_left"><?php p($l->t('Timeout (in seconds) :')) ?></td>
+						<td class="nextant_admin_left"><?php p($l->t('Timeout (in seconds):')) ?></td>
 						<td><input type="text" id="solr_timeout" value=""
 							style="width: 100px;"></td>
 					</tr>
@@ -98,7 +98,7 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
-	    <?php p($l->t('Maximum File Size (Mb) :')) ?></td>
+	    <?php p($l->t('Maximum File Size (Mb):')) ?></td>
 								<td><input type="text" id="solr_index_files_max_size"
 									style="width: 100px;"></td>
 								<td style="width: 60px; padding-right: 10px;">[<span
@@ -108,7 +108,7 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
-	    <?php p($l->t('Index Files Tree :')) ?></td>
+	    <?php p($l->t('Index Files Tree:')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_tree" id="solr_index_files_tree"
 									value="1" style="margin: 10px;"> <span
@@ -129,7 +129,7 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
-	    <?php p($l->t('Index Public Links :')) ?></td>
+	    <?php p($l->t('Index Public Links:')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_sharelink"
 									id="solr_index_files_sharelink" value="1" style="margin: 10px;"></td>
@@ -137,7 +137,7 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
-	    <?php p($l->t('Index Federated Shares :')) ?></td>
+	    <?php p($l->t('Index Federated Shares:')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_federated"
 									id="solr_index_files_federated" value="1" style="margin: 10px;"></td>
@@ -145,7 +145,7 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
-	    <?php p($l->t('Index External Storages :')) ?></td>
+	    <?php p($l->t('Index External Storages:')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_external" id="solr_index_files_external"
 									value="1" style="margin: 10px;"></td>
@@ -153,7 +153,7 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
-	    <?php p($l->t('Index Encrypted Files :')) ?></td>
+	    <?php p($l->t('Index Encrypted Files:')) ?></td>
 								<td colspan="2"><input type="checkbox"
 									name="solr_index_files_encrypted"
 									id="solr_index_files_encrypted" value="1" style="margin: 10px;"></td>
@@ -161,7 +161,7 @@ style('nextant', 'admin');
 
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
-	    <?php p($l->t('Last index :')) ?></td>
+	    <?php p($l->t('Last index:')) ?></td>
 								<td colspan="2"><div id="solr_index_files_last"></div></td>
 							</tr>
 
@@ -194,7 +194,7 @@ style('nextant', 'admin');
 							</tr>
 							<tr style="height: 30px;">
 								<td class="nextant_admin_left">
-	    <?php p($l->t('Last index :')) ?></td>
+	    <?php p($l->t('Last index:')) ?></td>
 								<td><div id="solr_index_bookmarks_last"></div></td>
 							</tr>
 
@@ -214,7 +214,7 @@ style('nextant', 'admin');
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">					
-	    <?php p($l->t('Resource Level :')); ?>
+	    <?php p($l->t('Resource Level:')); ?>
 						</td>
 							<td colspan="2"><select name="solr_resource_level"
 								id="solr_resource_level" style="width: 200px">
@@ -228,7 +228,7 @@ style('nextant', 'admin');
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">					
-	    <?php p($l->t('Live Index :')); ?>
+	    <?php p($l->t('Live Index:')); ?>
 						</td>
 							<td colspan="2"><select id="solr_index_live" style="width: 200px">
 									<option value="0"><?php p($l->t('Disabled')); ?></option>
@@ -240,7 +240,7 @@ style('nextant', 'admin');
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left" style="text-valign: top;">
-	    <?php p($l->t('Minimum Background Index delay :')) ?></td>
+	    <?php p($l->t('Minimum Background Index delay:')) ?></td>
 							<td><input type="text" name="solr_index_delay_min"
 								id="solr_index_delay_min" value="2"
 								style="width: 50px; margin-right: 10px;" /><?php p($l->t('hours')); ?>
@@ -249,7 +249,7 @@ style('nextant', 'admin');
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left" style="text-valign: top;">
-	    <?php p($l->t('Maximum Background Index delay :')) ?></td>
+	    <?php p($l->t('Maximum Background Index delay:')) ?></td>
 							<td><input type="text" name="solr_index_delay_max"
 								id="solr_index_delay_max" value="2"
 								style="width: 50px; margin-right: 10px;" /><?php p($l->t('days')); ?>
@@ -258,7 +258,7 @@ style('nextant', 'admin');
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">					
-	    <?php p($l->t('Nextcloud Cron :')); ?>
+	    <?php p($l->t('Nextcloud Cron:')); ?>
 						</td>
 							<td colspan="2"><input type="checkbox" name="solr_use_cron"
 								id="solr_use_cron" value="1" style="margin: 10px;" />
@@ -267,12 +267,12 @@ style('nextant', 'admin');
 
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">
-	    <?php p($l->t('Number of documents :')) ?></td>
+	    <?php p($l->t('Number of documents:')) ?></td>
 							<td><div id="solr_current_docs"></div></td>
 						</tr>
 						<tr style="height: 30px;">
 							<td class="nextant_admin_left">
-	    <?php p($l->t('Number of segments :')) ?></td>
+	    <?php p($l->t('Number of segments:')) ?></td>
 							<td><div id="solr_current_segments"></div></td>
 						</tr>
 						<tr>
