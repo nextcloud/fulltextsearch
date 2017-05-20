@@ -224,7 +224,7 @@ class SettingsController extends Controller
         $message = '';
         $result = false;
         if (! $this->solrService->setClient($tmpConfig))
-            $message = $this->l10n->t('The format of the address is not correct');
+            $message = $this->l10n->t('Address-format incorrect');
         else {
             
             switch ($command) {
@@ -288,7 +288,7 @@ class SettingsController extends Controller
             return true;
         }
         
-        $message = $this->l10n->t('Were not able to verify/fix schema integrity (Error #%1$s)', array(
+        $message = $this->l10n->t('Unable to verify/fix schema integrity (Error #%1$s)', array(
             $ierror->getCode()
         ));
         return false;
@@ -305,11 +305,11 @@ class SettingsController extends Controller
         $this->indexService->extract(ItemDocument::TYPE_TEST, '_nextant_test', $data, $solrDocs, true, $ierror);
         
         if ($doc->isProcessed()) {
-            $message = $this->l10n->t('Text successfully extracted');
+            $message = $this->l10n->t('Text extracted');
             return true;
         }
         
-        $message = $this->l10n->t('Extract failed. Please check the configuration of your Solr server (Error #%1$s)', array(
+        $message = $this->l10n->t('Extraction failed. Please check the configuration of your Solr server (Error #%1$s)', array(
             $ierror->getCode()
         ));
         return false;
@@ -321,7 +321,7 @@ class SettingsController extends Controller
         $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $ierror);
         
         if ($asource === false || sizeof($asource) != 1 || (! key_exists('test_1', $asource))) {
-            $message = $this->l10n->t('Error Updating field - Can\'t find original document - (Error #%1$s)', array(
+            $message = $this->l10n->t('Error updating field - Can\'t find original document - (Error #%1$s)', array(
                 $ierror->getCode()
             ));
             return false;
@@ -351,13 +351,13 @@ class SettingsController extends Controller
         }
         
         if (! $source->isUpdated()) {
-            $message = $this->l10n->t('Error during updating field (Error #%1$s)', array(
+            $message = $this->l10n->t('Error while updating field (Error #%1$s)', array(
                 $ierror->getCode()
             ));
             return false;
         }
         
-        $message = $this->l10n->t('Document successfully updated');
+        $message = $this->l10n->t('Document updated');
         return true;
     }
 
@@ -370,13 +370,13 @@ class SettingsController extends Controller
                 
                 foreach ($result as $doc) {
                     if ($doc->getType() === ItemDocument::TYPE_TEST && $doc->getId() === 1) {
-                        $message = $this->l10n->t('Found exactly what we were looking for');
+                        $message = $this->l10n->t('Found it');
                         return true;
                     }
                 }
                 
                 // CHECK ID DOCUMENT
-                $message = $this->l10n->t('We found something, but not what we were expecting.');
+                $message = $this->l10n->t('Found something, but not what was expected.');
                 return false;
             }
             
@@ -398,11 +398,11 @@ class SettingsController extends Controller
         );
         $this->indexService->removeDocuments($data, $ierror);
         if ($doc->isRemoved()) {
-            $message = $this->l10n->t('Test document deleted');
+            $message = $this->l10n->t('Test-document deleted');
             return true;
         }
         
-        $message = $this->l10n->t('We could not delete our test document. Please check the configuration of your Solr server (Error #%1$s)', array(
+        $message = $this->l10n->t('Could not delete test-document. Please check the configuration of your Solr server (Error #%1$s)', array(
             $ierror->getCode()
         ));
         return false;
@@ -429,7 +429,7 @@ class SettingsController extends Controller
             return true;
         }
         
-        $message = $this->l10n->t('Configuration failed to be saved. Please reload this page.');
+        $message = $this->l10n->t('Configuration could not be saved. Please reload this page.');
         return false;
     }
 
