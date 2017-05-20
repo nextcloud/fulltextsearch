@@ -35,10 +35,10 @@ style('nextant', 'admin');
 			<td colspan="2"><em><?php p($l->t('Specify the address of your Solr, and the name of the core to use.')); ?>
 			<br /> <a href="https://github.com/nextcloud/nextant/wiki"
 					target="_blank">
-					<?php p($l->t('If you do not have a Solr servlet running, you can find few guides on how to install one on the Wiki.')); ?></a>
+					<?php p($l->t('If you do not have a Solr servlet running, you can find few guides on how to install one on the wiki.')); ?></a>
 					<br /> <a
 					href="https://github.com/nextcloud/nextant/wiki/Admin-Interface">
-						<?php p($l->t('You can also find there more information about this interface.')); ?></a></em></td>
+						<?php p($l->t('You can also find more information there about this interface.')); ?></a></em></td>
 		</tr>
 		<tr valign="top">
 			<td>
@@ -52,12 +52,12 @@ style('nextant', 'admin');
 					</tr>
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
-	    <?php p($l->t('Nextant Version :')) ?></td>
+	    <?php p($l->t('Nextant version:')) ?></td>
 						<td><div id="nextant_version"></div></td>
 					</tr>
 					<tr style="height: 30px;">
 						<td class="nextant_admin_left">
-	    <?php p($l->t('Address of your Solr Servlet :')) ?></td>
+	    <?php p($l->t('Address of your Solr servlet :')) ?></td>
 						<td><input type="text" name="solr_url" id="solr_url" value=""
 							style="width: 250px;"></td>
 					</tr>
@@ -285,7 +285,7 @@ style('nextant', 'admin');
 								<div id="nextant_first_index"
 									style="width: 270px; font-size: 12px; white-space: normal;">
 									<i>
-									<?php p($l->t('we recommand doing the very first indexing of your files using the ./occ nextant:index command.')); ?>
+									<?php p($l->t('it is recommended to do the very first indexing of your files using the ./occ nextant:index command.')); ?>
 									<?php p($l->t('However, you can force it to be started as a background process.')); ?>
 									</i> <br />
 									<button type="button" id="nextant_force_first_index"
@@ -375,11 +375,11 @@ style('nextant', 'admin');
 
 					<div class="solr_filters_item_large">
 						<input type="checkbox" name="solr_filters_text"
-							id="solr_filters_text" value="1" style="margin: 10px;"> <?php p($l->t('Text File (Text, Html, Subtitles, Source Code, ...)')); ?>
+							id="solr_filters_text" value="1" style="margin: 10px;"> <?php p($l->t('Text File (Text, HTML, Subtitles, Source Code…)')); ?>
 					</div>
 					<div class="solr_filters_item">
 						<input type="checkbox" name="solr_filters_pdf"
-							id="solr_filters_pdf" value="1" style="margin: 10px;"> <?php p($l->t('E-pub / PDF / rtf')); ?>
+							id="solr_filters_pdf" value="1" style="margin: 10px;"> <?php p($l->t('EPUB / PDF / RTF')); ?>
 					</div>
 					<div class="solr_filters_item">
 						<input type="checkbox" name="solr_filters_office"
@@ -387,11 +387,11 @@ style('nextant', 'admin');
 					</div>
 					<div class="solr_filters_item">
 						<input type="checkbox" name="solr_filters_image"
-							id="solr_filters_image" value="1" style="margin: 10px;"> <?php p($l->t('Image (Jpeg, Tiff)')); ?>
+							id="solr_filters_image" value="1" style="margin: 10px;"> <?php p($l->t('Image (JPEG, TIFF)')); ?>
 					</div>
 					<div class="solr_filters_item">
 						<input type="checkbox" name="solr_filters_audio"
-							id="solr_filters_audio" value="1" style="margin: 10px;"> <?php p($l->t('Audio File (mp3, flac)')); ?>
+							id="solr_filters_audio" value="1" style="margin: 10px;"> <?php p($l->t('Audio File (MP3, FLAC)')); ?>
 					</div>
 
 					<div class="solr_filters_item_large solr_filters_title"
