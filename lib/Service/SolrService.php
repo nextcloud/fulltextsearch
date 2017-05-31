@@ -583,6 +583,12 @@ class SolrService
                     case 'files':
                         $addq = 'nextant_deleted:false AND nextant_source:files';
                         break;
+
+					case 'bookmarks':
+					case 'bookmark':
+					case 'bm':
+						$addq = 'nextant_source:bookmarks';
+						break;
                 }
                 
                 if ($addq !== '')
