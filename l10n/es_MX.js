@@ -36,7 +36,7 @@ OC.L10N.register(
     "If you do not have a Solr servlet running, you can find few guides on how to install one on the wiki." : "Si no cuenta con su servlet Solr corriendo, puede encontrar algunas guías en cómo instalarlo en el wiki. ",
     "You can also find more information there about this interface." : "También puede encontrar más información acerca de esta interface. ",
     "Saving" : "Guardando",
-    "Settings" : "Ajustes",
+    "Settings" : "Configuraciones ",
     "Nextant version:" : "Versión de Nextant:",
     "Address of your Solr servlet:" : "Dirección de su servlet Solr:",
     "Core:" : "Núcleo:",
