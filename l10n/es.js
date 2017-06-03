@@ -22,6 +22,8 @@ OC.L10N.register(
     "Specify the address of your Solr, and the name of the core to use." : "Especifique la dirección de su servidor Solr, y el nombre del núcleo a usar.",
     "Saving" : "Guardando",
     "Settings" : "Ajustes",
+    "Core:" : "Núcleo:",
+    "Timeout (in seconds):" : "Desconexión (en segundos):",
     "Test and Save" : "Probar y guardar",
     "Indexing Files" : "Analizar archivos",
     "Edit your filters" : "Edite sus filtros",
