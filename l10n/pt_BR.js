@@ -82,7 +82,7 @@ OC.L10N.register(
     "Indexing is scheduled within the next few hours (cron)" : "A indexação está agendada para as próximas horas (Cron)",
     "Indexing in progress" : "Indexação em progresso",
     "Type of files to extract" : "Tipos de arquivo a extrair",
-    "Text File (Text, HTML, Subtitles, Source Code…)" : "Arquivo Texto (Texto, HTML, Legendas, Código Fonte…)",
+    "Text File (Text, HTML, Subtitles, Source Code…)" : "Arquivo de Texto (Texto, HTML, Legendas, Código Fonte…)",
     "EPUB / PDF / RTF" : "EPUB / PDF / RTF",
     "Office Documents" : "Documentos do Office",
     "Image (JPEG, TIFF)" : "Imagem (JPEG, TIFF)",
