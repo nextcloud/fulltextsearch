@@ -49,7 +49,7 @@ OC.L10N.register(
     "Disable default search from Files" : "Skru av forvalgt søk fra filer",
     "Index File Trash:" : "Indekser filpapirkurv:",
     "Index Public Links:" : "Indekser offentlige lenker:",
-    "Index Federated Shares:" : "Indekser føderale delinger:",
+    "Index Federated Shares:" : "Indekser sammenknyttede delinger:",
     "Index External Storages:" : "Indekser eksterne lager:",
     "Index Encrypted Files:" : "Indekser krypterte filer:",
     "Last index:" : "Siste indeksering:",

@@ -5,7 +5,7 @@
     "Ping querying your Solr Server" : "Solicitação ping ao seu servidor Solr",
     "Verifying Schema integrity" : "Verificando integridade do Schema",
     "Test simple text extract query" : "Testar uma consulta de extração simples de texto",
-    "Test update document query" : "Testar uma consulta de extração simples de documento",
+    "Test update document query" : "Testar uma consulta de atualização de documento",
     "Test search query" : "Testar uma consulta de pesquisa",
     "Removing the test document" : "Excluindo o documento de teste",
     "All test went fine. Saving your configuration" : "Todos os testes funcionaram. Salvando sua configuração",
