@@ -35,7 +35,7 @@ style('nextant', 'admin');
 			<td colspan="2"><em><?php p($l->t('Specify the address of your Solr, and the name of the core to use.')); ?>
 			<br /> <a href="https://github.com/nextcloud/nextant/wiki"
 					target="_blank">
-					<?php p($l->t('If you do not have a Solr servlet running, you can find few guides on how to install one on the wiki.')); ?></a>
+					<?php p($l->t('If you do not have a Solr servlet running, installation-guides can be found on the wiki.')); ?></a>
 					<br /> <a
 					href="https://github.com/nextcloud/nextant/wiki/Admin-Interface">
 						<?php p($l->t('You can also find more information there about this interface.')); ?></a></em></td>
@@ -188,7 +188,7 @@ style('nextant', 'admin');
 										<?php p($l->t('The App Bookmarks is not installed/enabled.')); ?>
 									</div>
 									<div id="nextant_bookmarks_appenabled">
-										<?php p($l->t('The App Bookmarks is enabled, your bookmarks will be index.')); ?>
+										<?php p($l->t('"App Bookmarks" enabled, your bookmarks will be indexed.')); ?>
 									</div>
 								</td>
 							</tr>
@@ -294,7 +294,7 @@ style('nextant', 'admin');
 								<button type="button" id="nextant_force_index"
 									style="width: 270px"><?php p($l->t('Force index')) ?></button>
 								<div id="nextant_index_scheduled">
-									<i><?php p($l->t('Indexing is scheduled within the next few hours (cron)')); ?></i>
+									<i><?php p($l->t('Indexing is scheduled within the next few hours (Cron)')); ?></i>
 								</div>
 								<div id="nextant_index_inprogress">
 									<i><?php p($l->t('Indexing in progress')); ?></i>
