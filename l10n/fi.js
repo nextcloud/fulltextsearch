@@ -24,7 +24,6 @@ OC.L10N.register(
     "Nextant Status" : "Nextant-tila",
     "hours" : "tuntia",
     "days" : "päivää",
-    "Indexing is scheduled within the next few hours (cron)" : "Indeksointi on ajoitettu seuraavan muutaman tunnin sisään (cron)",
     "Indexing in progress" : "Indeksointi käynnissä",
     "Type of files to extract" : "Purettavien tiedostojen tyypit",
     "Office Documents" : "Office-dokumentit",

@@ -36,7 +36,6 @@
     "hours" : "小时",
     "days" : "日",
     "Force index" : "强制索引",
-    "Indexing is scheduled within the next few hours (cron)" : "索引将安排在几小时内(corn)",
     "Indexing in progress" : "正在建立索引",
     "Type of files to extract" : "要解压的文件类型",
     "Office Documents" : "Office文档",
