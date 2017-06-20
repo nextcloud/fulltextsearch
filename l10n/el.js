@@ -16,6 +16,7 @@ OC.L10N.register(
     "Found it" : "Βρέθηκε",
     "Cannot find any document" : "Αδυναμία εύρεσης οποιουδήποτε εγγράφου",
     "Search failed. Please check the configuration of your Solr server (Error #%1$s)" : "Η αναζήτηση απέτυχε. Παρακαλούμε ελέγξτε τις ρυθμίσεις του Solr εξυπηρετητή σας. (Σφάλμα #%1$s)",
+    "Test-document deleted" : "Έγγραφο δοκιμής διαγράφηκε",
     "Your configuration has been saved" : "Οι ρυθμίσεις σας αποθηκεύτηκαν",
     "Specify the address of your Solr, and the name of the core to use." : "Προσδιορίστε την διεύθυνση του Solr σας, και το ονομα του πυρήνα προς χρησιμοποίηση. ",
     "Saving" : "Αποθήκευση",
