@@ -33,6 +33,7 @@ OC.L10N.register(
     "Nextant" : "Nextant",
     "Nextant (Full-Text Search)" : "Nextant (volledige tekst zoekfunctie)",
     "Specify the address of your Solr, and the name of the core to use." : "Geef het adres van Solr op, alsmede de naam van de te gebruiken kern.",
+    "If you do not have a Solr servlet running, installation-guides can be found on the wiki." : "Als je geen Solr servlet draait, vind je een handleiding voor de installatie in de wiki.",
     "You can also find more information there about this interface." : "Je kunt daar ook meer informatie over deze interface krijgen.",
     "Saving" : "Opslaan",
     "Settings" : "Instellingen",
