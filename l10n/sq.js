@@ -8,6 +8,7 @@ OC.L10N.register(
     "Test search query" : "Testo kërkesën",
     "Removing the test document" : "Duke fshirë dokumentat e testimit",
     "All test went fine. Saving your configuration" : "Të gjitha testet ishin në rregull. Duke  ruajtur konfigurimet tuaja",
+    "Address-format incorrect" : "Formati i adresës nuk është i saktë",
     "Schema is fine" : "Skema është në rregull",
     "Text extracted" : "Teksti u ekstraktua",
     "Document updated" : "Dokumenti u përditesua",

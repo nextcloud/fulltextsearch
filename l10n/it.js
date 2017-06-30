@@ -17,6 +17,7 @@ OC.L10N.register(
     "Schema is fine" : "Lo schema è corretto",
     "Text extracted" : "Testo estratto",
     "Error during commit (Error #%1$s)" : "Errore durante il commit (Errore #%1$s)",
+    "Error while updating field (Error #%1$s)" : "Errore durante l'aggiornamento del campo (Errore #%1$s)",
     "Document updated" : "Documento aggiornato",
     "Found it" : "Trovato",
     "Cannot find any document" : "Impossibile trovare alcun documento",

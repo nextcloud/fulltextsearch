@@ -13,6 +13,8 @@
     "Apache Solr is not responding to ping query (Error #%1$s)" : "Apache Solr 没有响应 ping 请求 (错误 #%1$s)",
     "Schema is fine" : "结构完好",
     "Error during commit (Error #%1$s)" : "提交错误 (错误 #%1$s)",
+    "Document updated" : "文档更新",
+    "Found it" : "查找",
     "Cannot find any document" : "无法找到任何文档",
     "Your configuration has been saved" : "配置已保存",
     "Nextant (Full-Text Search)" : "Nextant (全文搜索)",
