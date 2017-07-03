@@ -10,6 +10,7 @@
     "Apache Solr is up, running and responding to ping query" : "Apache Solr on valmis, käynnissä ja vastaa ping-kyselyyn",
     "Apache Solr is not responding to ping query (Error #%1$s)" : "Apache Solr ei vastaa ping-kyselyyn (Virhe #%1$s)",
     "Schema is fine" : "Skeema on kelvollinen",
+    "Document updated" : "Dokumentti päivitetty",
     "Cannot find any document" : "Yhtäkään dokumenttia ei löytynyt",
     "Your configuration has been saved" : "Määritykset on tallennettu",
     "Saving" : "Tallennetaan",
@@ -20,11 +21,16 @@
     "Indexing Bookmarks" : "Indeksoidaan kirjanmerkkejä",
     "Checking" : "Tarkistetaan",
     "Nextant Status" : "Nextant-tila",
+    "Disabled" : "Ei käytössä",
     "hours" : "tuntia",
     "days" : "päivää",
+    "Nextcloud Cron:" : "Nextcloud-cron:",
     "Indexing in progress" : "Indeksointi käynnissä",
     "Type of files to extract" : "Purettavien tiedostojen tyypit",
+    "Text File (Text, HTML, Subtitles, Source Code…)" : "Tekstitiedosto (teksti, HTML, tekstitykset, lähdekoodi...)",
     "Office Documents" : "Office-dokumentit",
+    "Image (JPEG, TIFF)" : "Kuva (JPEG, TIFF)",
+    "Audio File (MP3, FLAC)" : "Äänitiedosto (MP3, FLAC)",
     "Extensions you wish to ignore (.java .xml)" : "Ohitettavat päätteet (.java .xml)"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
