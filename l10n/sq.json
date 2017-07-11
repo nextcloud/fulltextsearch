@@ -17,6 +17,7 @@
     "Nextant (Full-Text Search)" : "Nextant( Kërkim tekst i plotë)",
     "Saving" : "Po ruhet",
     "Settings" : "Konfigurimet",
+    "Core:" : "Berthama:",
     "Test and Save" : "Testo dhe Ruaj",
     "Checking" : "Duke kontrolluar",
     "Higher performance" : "Performancë më e lartë",
@@ -24,7 +25,11 @@
     "Medium performance" : "Performancë mesatare",
     "Low performance" : "Performancë e ulët",
     "Lower performance" : "Performancë më e ulët",
+    "Disabled" : "Ç'aktivizuar",
     "hours" : "orët",
+    "days" : "ditë",
+    "Number of documents:" : "Numri i dokumenteve:",
+    "Number of segments:" : "Numri i segmenteve:",
     "Office Documents" : "Dokumentat Office",
     "Extensions you wish to ignore (.java .xml)" : "Shtesat që do doje të injoroje (.java .xml)"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
