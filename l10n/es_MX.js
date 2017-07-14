@@ -75,7 +75,7 @@ OC.L10N.register(
     "Nextcloud Cron:" : "Cron de Nexcloud:",
     "Number of documents:" : "Número de documentos:",
     "Number of segments:" : "Número de segmentos:",
-    "it is recommended to do the very first indexing of your files using the ./occ nextant:index command." : "le recomendamos hacer la primera indexación de sus archivos usando el comando ./occ nextant:index  ",
+    "it is recommended to do the very first indexing of your files using the ./occ nextant:index command." : "te recomendamos hacer la primera indexación de tus archivos usando el comando ./occ nextant:index  ",
     "However, you can force it to be started as a background process." : "Sin embargo, la puedes forzar para que inicie como un proceso de segundo plano. ",
     "Force first index as a cronjob" : "Forzar la primera indexación como una tarea calendarizada",
     "Force index" : "Forzar indexación",
