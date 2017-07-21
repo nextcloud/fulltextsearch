@@ -25,8 +25,11 @@ OC.L10N.register(
     "Nextant (Full-Text Search)" : "Nextant (全文搜索)",
     "Saving" : "保存中",
     "Settings" : "设置",
+    "Core:" : "核心：",
+    "Timeout (in seconds):" : "超时 (秒) :",
     "Test and Save" : "测试并保存",
     "Indexing Files" : "正在索引文件",
+    "Maximum File Size (Mb):" : "最大文件尺寸 (Mb)：",
     "Edit your filters" : "编辑过滤器",
     "Indexing Bookmarks" : "书签索引中",
     "The App Bookmarks is not installed/enabled." : "应用书签没有 安装/启用.",
@@ -45,7 +48,11 @@ OC.L10N.register(
     "Force index" : "强制索引",
     "Indexing in progress" : "正在建立索引",
     "Type of files to extract" : "要解压的文件类型",
+    "Text File (Text, HTML, Subtitles, Source Code…)" : "文本文件 (文本，HTML，字幕，源代码，...)",
+    "EPUB / PDF / RTF" : "EPUB / PDF / RTF",
     "Office Documents" : "Office文档",
+    "Image (JPEG, TIFF)" : "图片 (JPEG, TIFF)",
+    "Audio File (MP3, FLAC)" : "音频文件 (MP3, FLAC)",
     "Extensions you wish to ignore (.java .xml)" : "您希望忽略的程序拓展名 (.java .xml)"
 },
 "nplurals=1; plural=0;");
