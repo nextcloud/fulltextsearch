@@ -24,7 +24,7 @@ OC.L10N.register(
     "Test and Save" : "Δοκιμή και αποθήκευση",
     "Indexing Files" : "Καταλογοποίηση αρχείων",
     "Edit your filters" : "Επεξεργασία των φίλτρων σας",
-    "Disable default search from Files" : "Απενεργοποιείστε προεπιλεγμένη αναζήτηση από τα Αρχεία",
+    "Disable default search from Files" : "Απενεργοποιείστε την προεπιλεγμένη αναζήτηση από τα Αρχεία",
     "Checking" : "Γίνεται έλεγχος ",
     "Nextant Status" : "Κατάσταση Nextant ",
     "Higher performance" : "Μεγαλύτερη απόδοση",
