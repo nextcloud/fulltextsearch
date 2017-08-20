@@ -13,6 +13,7 @@ OC.L10N.register(
     "Text extracted" : "Það tókst að ná í texta",
     "Document updated" : "Uppfærði skjal",
     "Found it" : "Fann það",
+    "Found something, but not what was expected." : "Fann eitthvað, en ekki það sem von var á.",
     "Cannot find any document" : "Get ekki fundið neitt skjal",
     "Test-document deleted" : "Eyddi prófunarskjali",
     "Your configuration has been saved" : "Stillingarnar þínar hafa verið vistaðar",
