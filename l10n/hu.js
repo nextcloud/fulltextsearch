@@ -34,6 +34,7 @@ OC.L10N.register(
     "The App Bookmarks is not installed/enabled." : "Az Könyvjelzők alkalmazás nincs telepítve/engedélyezve.",
     "Checking" : "Ellenőrzés",
     "Nextant Status" : "Nextant állapot",
+    "Resource Level:" : "Erőforrás szint:",
     "Higher performance" : "Legmagasabb teljesítmény",
     "High performance" : "Magas teljesítmény",
     "Medium performance" : "Közepes teljesítmény",
