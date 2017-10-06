@@ -31,11 +31,12 @@ use Exception;
 use OCA\FullNextSearch\Model\ExtendedBase;
 use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\MiscService;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Index extends ExtendedBase {
+class Reset extends ExtendedBase {
 
 	/** @var IndexService */
 	private $indexService;
@@ -60,30 +61,19 @@ class Index extends ExtendedBase {
 
 	protected function configure() {
 		parent::configure();
-		$this->setName('fullnextsearch:index')
-			 ->setDescription('Index files');
+		$this->setName('fullnextsearch:reset')
+			 ->setDescription('reset index')
+			 ->addArgument('provider', InputArgument::OPTIONAL, 'provider');
 	}
 
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$output->writeln('index');
+		$output->writeln('reset');
 
 		$this->setOutput($output);
 		try {
 
-			$users = \OC::$server->getUserManager()
-								 ->search('');
-
-			foreach ($users as $user) {
-				if ($user->getUID() === 'test1') {
-					continue;
-				}
-
-				$this->hasBeenInterrupted();
-
-				$output->writeln(' USER: ' . $user->getUID());
-				$this->indexService->indexContentFromUser($user->getUID(), $this);
-			}
+			$this->indexService->resetIndex($input->getArgument('provider'));
 
 		} catch (Exception $e) {
 			throw $e;

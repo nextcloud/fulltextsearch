@@ -1,13 +1,12 @@
 <?php
-
 /**
- * Nextcloud - nextant
+ * FullNextSearch - Full Text Search your Nextcloud.
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
- * @author Maxence Lange <maxence@pontapreta.net>
- * @copyright Maxence Lange 2016
+ * @author Maxence Lange <maxence@artificial-owl.com>
+ * @copyright 2017
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,22 +22,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ *
  */
-namespace OCA\Nextant\AppInfo;
 
-/**
- * Additional autoloader registration, e.g.
- * registering composer autoloaders
- */
-$composerInstalled = false;
-// $solariumInstalled = false;
-$composerDir = __DIR__ . '/../vendor/';
+namespace OCA\FullNextSearch\AppInfo;
 
-if (is_dir($composerDir) && file_exists($composerDir . 'autoload.php')) {
-    require_once $composerDir . 'autoload.php';
-    $composerInstalled = true;
-}
-
-//if (! $composerInstalled) {
-//	$app->getContainer ()->query ( 'MiscService' )->log ( 'You\'ll need to build this apps. Please check documentation', 2 );
+//$composerDir = __DIR__ . '/../vendor/';
+//
+//if (is_dir($composerDir) && file_exists($composerDir . 'autoload.php')) {
+//	require_once $composerDir . 'autoload.php';
 //}
+//

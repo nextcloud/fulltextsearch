@@ -25,53 +25,72 @@
  *
  */
 
-namespace OCA\FullNextSearch\Service;
+namespace OCA\FullNextSearch;
 
-use OCA\FullNextSearch\AppInfo\Application;
-use OCP\ILogger;
+use OCA\FullNextSearch\Model\SearchDocument;
+use OCA\FullNextSearch\Model\SearchResult;
 
-class MiscService {
+interface INextSearchProvider {
 
-	/** @var ILogger */
-	private $logger;
-
-	public function __construct(ILogger $logger) {
-		$this->logger = $logger;
-	}
-
-	public function log($message, $level = 2) {
-		$data = array(
-			'app'   => Application::APP_NAME,
-			'level' => $level
-		);
-
-		$this->logger->log($level, $message, $data);
-	}
 
 	/**
-	 * @param $arr
-	 * @param $k
+	 * must returns a unique Id
 	 *
-	 * @param string $default
-	 *
-	 * @return array|string|integer
+	 * @return string
 	 */
-	public static function get($arr, $k, $default = '') {
-		if (!key_exists($k, $arr)) {
-			return $default;
-		}
-
-		return $arr[$k];
-	}
+	public function getId();
 
 
-	public static function noEndSlash($path) {
-		if (substr($path, -1) === '/') {
-			$path = substr($path, 0, -1);
-		}
+	/**
+	 * must returns a display name
+	 *
+	 * @return string
+	 */
+	public function getName();
 
-		return $path;
-	}
+
+	/**
+	 * Load the search provider
+	 */
+	public function load();
+
+
+	/**
+	 * Called on switch to new user
+	 *
+	 * @param string $userId
+	 *
+	 * @return
+	 */
+	public function initUser($userId);
+
+
+	/**
+	 * Called when user is not needed anymore.
+	 */
+	public function endUser();
+
+
+	/**
+	 * Called at the end of the use of the provider
+	 */
+	public function unload();
+
+	/**
+	 * generate documents prior to the indexing
+	 *
+	 * @param int $chunkSize
+	 *
+	 * @return SearchDocument[]
+	 */
+	public function generateDocuments($chunkSize);
+
+
+	/**
+	 * @param SearchResult $searchResult
+	 *
+	 * @return mixed
+	 */
+	public function parseSearchResult(SearchResult $searchResult);
 
 }
-

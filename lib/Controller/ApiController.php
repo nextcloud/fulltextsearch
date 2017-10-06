@@ -27,18 +27,20 @@
 
 namespace OCA\FullNextSearch\Controller;
 
+use Exception;
 use OCA\FullNextSearch\AppInfo\Application;
-use OCA\FullNextSearch\Service\ConfigService;
+use OCA\FullNextSearch\Model\SearchResult;
 use OCA\FullNextSearch\Service\MiscService;
+use OCA\FullNextSearch\Service\SearchService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
-class SettingsController extends Controller {
+class ApiController extends Controller {
 
-	/** @var ConfigService */
-	private $configService;
+	/** @var SearchService */
+	private $searchService;
 
 	/** @var MiscService */
 	private $miscService;
@@ -48,67 +50,86 @@ class SettingsController extends Controller {
 	 * NavigationController constructor.
 	 *
 	 * @param IRequest $request
-	 * @param ConfigService $configService
+	 * @param SearchService $searchService
 	 * @param MiscService $miscService
 	 */
-	function __construct(IRequest $request, ConfigService $configService, MiscService $miscService) {
+	function __construct(IRequest $request, SearchService $searchService, MiscService $miscService) {
 		parent::__construct(Application::APP_NAME, $request);
-		$this->configService = $configService;
+		$this->searchService = $searchService;
 		$this->miscService = $miscService;
 	}
 
 
 	/**
 	 * @NoAdminRequired
+	 * @NoSubAdminRequired
+	 *
+	 * @param string $providerId
+	 * @param string $search
 	 *
 	 * @return DataResponse
 	 */
-	public function getSettingsPersonal() {
-		$data = [];
+	public function search($providerId, $search) {
 
-		return new DataResponse($data, Http::STATUS_OK);
+		try {
+			$result = $this->searchService->search($providerId, null, $search);
+			$meta = $this->generateMeta($result);
+
+			return $this->success(
+				['search' => $search, 'provider' => $providerId, 'result' => $result, 'meta' => $meta]
+			);
+		} catch (Exception $e) {
+			return $this->fail(
+				['search' => $search, 'provider' => $providerId, 'error' => $e->getMessage()]
+			);
+		}
 	}
 
-	/**
-	 * @param $data
-	 *
-	 * @NoAdminRequired
-	 *
-	 * @return DataResponse
-	 */
-	public function setSettingsPersonal($data) {
-//		$this->configService->setUserValue(
-//			ConfigService::APP_TEST_PERSONAL, $data[ConfigService::APP_TEST_PERSONAL]
-//		);
-
-		return $this->getSettingsAdmin();
-	}
-
 
 	/**
-	 * @return DataResponse
+	 * @param SearchResult[] $result
+	 *
+	 * @return array
 	 */
-	public function getSettingsAdmin() {
-		$data = [
-			ConfigService::SEARCH_PLATFORM => $this->configService->getAppValue(
-				ConfigService::SEARCH_PLATFORM
-			)
+	private function generateMeta($result) {
+
+		$meta = [
+			'size' => 0
 		];
 
-		return new DataResponse($data, Http::STATUS_OK);
+		foreach ($result as $searchResult) {
+			$meta['size'] += $searchResult->getSize();
+		}
+
+		return $meta;
 	}
+
 
 	/**
 	 * @param $data
 	 *
 	 * @return DataResponse
 	 */
-	public function setSettingsAdmin($data) {
-		$this->configService->setAppValue(
-			ConfigService::SEARCH_PLATFORM, $data[ConfigService::SEARCH_PLATFORM]
-		);
+	protected function fail($data) {
+		$this->miscService->log(json_encode($data));
 
-		return $this->getSettingsAdmin();
+		return new DataResponse(
+			array_merge($data, array('status' => 0)),
+			Http::STATUS_NON_AUTHORATIVE_INFORMATION
+		);
+	}
+
+
+	/**
+	 * @param $data
+	 *
+	 * @return DataResponse
+	 */
+	protected function success($data) {
+		return new DataResponse(
+			array_merge($data, array('status' => 1)),
+			Http::STATUS_CREATED
+		);
 	}
 
 }

@@ -28,17 +28,19 @@
 namespace OCA\FullNextSearch\Command;
 
 use Exception;
-use OCA\FullNextSearch\Model\ExtendedBase;
-use OCA\FullNextSearch\Service\IndexService;
+use OC\Core\Command\Base;
+use OCA\FullNextSearch\Model\SearchResult;
 use OCA\FullNextSearch\Service\MiscService;
+use OCA\FullNextSearch\Service\SearchService;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Index extends ExtendedBase {
+class Search extends Base {
 
-	/** @var IndexService */
-	private $indexService;
+	/** @var SearchService */
+	private $searchService;
 
 	/** @var MiscService */
 	private $miscService;
@@ -47,12 +49,14 @@ class Index extends ExtendedBase {
 	/**
 	 * Index constructor.
 	 *
-	 * @param IndexService $indexService
+	 * @param SearchService $searchService
 	 * @param MiscService $miscService
+	 *
+	 * @internal param IndexService $indexService
 	 */
-	public function __construct(IndexService $indexService, MiscService $miscService) {
+	public function __construct(SearchService $searchService, MiscService $miscService) {
 		parent::__construct();
-		$this->indexService = $indexService;
+		$this->searchService = $searchService;
 
 		$this->miscService = $miscService;
 	}
@@ -60,33 +64,38 @@ class Index extends ExtendedBase {
 
 	protected function configure() {
 		parent::configure();
-		$this->setName('fullnextsearch:index')
-			 ->setDescription('Index files');
+		$this->setName('fullnextsearch:search')
+			 ->setDescription('Search something')
+			 ->addArgument('user', InputArgument::OPTIONAL, 'user')
+			 ->addArgument('string', InputArgument::OPTIONAL, 'needle');
+
 	}
 
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$output->writeln('index');
+		$output->writeln('search');
 
-		$this->setOutput($output);
 		try {
+			$result = $this->searchService->search(
+				'files', $input->getArgument('user'), $input->getArgument('string')
+			);
 
-			$users = \OC::$server->getUserManager()
-								 ->search('');
-
-			foreach ($users as $user) {
-				if ($user->getUID() === 'test1') {
-					continue;
-				}
-
-				$this->hasBeenInterrupted();
-
-				$output->writeln(' USER: ' . $user->getUID());
-				$this->indexService->indexContentFromUser($user->getUID(), $this);
+			foreach ($result as $searchResult) {
+				$this->displaySearchResult($searchResult);
 			}
 
 		} catch (Exception $e) {
 			throw $e;
+		}
+	}
+
+
+	private function displaySearchResult(SearchResult $searchResult) {
+
+		echo '> ' . $searchResult->getProvider()
+								 ->getName() . "\n";
+		foreach ($searchResult->getDocuments() as $document) {
+			echo ' - ' . $document->getId() . ' score:' . $document->getScore() . "\n";
 		}
 	}
 

@@ -1,13 +1,12 @@
 <?php
-
 /**
- * Nextcloud - nextant
+ * FullNextSearch - Full Text Search your Nextcloud.
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
- * @author Maxence Lange <maxence@pontapreta.net>
- * @copyright Maxence Lange 2016
+ * @author Maxence Lange <maxence@artificial-owl.com>
+ * @copyright 2017
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,280 +22,160 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ *
  */
-namespace OCA\Nextant\Service;
 
-use \OCA\Nextant\Controller\SettingsController;
+namespace OCA\FullNextSearch\Service;
+
+use OCA\FullNextSearch\AppInfo\Application;
 use OCP\IConfig;
+use OCP\Util;
 
-class ConfigService
-{
+class ConfigService {
 
-    const SEARCH_DISPLAY_NEXTANT = 1;
+	const APP_NAVIGATION = 'app_navigation';
+	const SEARCH_PLATFORM = 'search_platform';
+	const CHUNK_INDEX = 'index_chunk';
 
-    const SEARCH_DISPLAY_FILES = 2;
+	private $defaults = [
+		self::SEARCH_PLATFORM   => '',
+		self::CHUNK_INDEX       => '1000',
+		self::APP_NAVIGATION => '0'
+	];
 
-    const RESOURCE_LEVEL_LOWER = '1';
+	/** @var IConfig */
+	private $config;
 
-    const RESOURCE_LEVEL_LOW = '2';
+	/** @var string */
+	private $userId;
 
-    const RESOURCE_LEVEL_MID = '3';
+	/** @var MiscService */
+	private $miscService;
 
-    const RESOURCE_LEVEL_HIGH = '4';
+	/**
+	 * ConfigService constructor.
+	 *
+	 * @param IConfig $config
+	 * @param string $userId
+	 * @param MiscService $miscService
+	 */
+	public function __construct(
+		IConfig $config, $userId, MiscService $miscService
+	) {
+		$this->config = $config;
+		$this->userId = $userId;
+		$this->miscService = $miscService;
+	}
 
-    const RESOURCE_LEVEL_HIGHER = '5';
+	/**
+	 * Get a value by key
+	 *
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+	public function getAppValue($key) {
+		$defaultValue = null;
+		if (array_key_exists($key, $this->defaults)) {
+			$defaultValue = $this->defaults[$key];
+		}
 
-    private $defaults = [
-        'configured' => '0',
-        'solr_url' => 'http://127.0.0.1:8983/solr/',
-        'solr_core' => 'nextant',
-        'solr_timeout' => '30',
-        
-        'resource_level' => '4',
-        'index_live' => '2',
-        'index_live_queuekey' => '19375',
-        'index_delay' => '2',
-        'index_delay_min' => '2',
-        'index_delay_max' => '4',
-        'use_cron' => '1',
-        'index_locked' => '0',
-        'index_files_last' => '0',
-        'index_bookmarks_last' => '0',
-        
-        'index_files' => '1',
-        'index_files_needed' => '1',
-        'index_files_update_needed' => '1',
-        'index_files_tree' => '0',
-        'index_files_nextant_only' => '0',
-        'index_files_trash' => '1',
-        'index_files_sharelink' => '0',
-        'index_files_federated' => '0',
-        'index_files_external' => '0',
-        'index_files_encrypted' => '0',
-        'index_files_max_size' => '40',
-        'index_files_filters_text' => '1',
-        'index_files_filters_pdf' => '1',
-        'index_files_filters_office' => '1',
-        'index_files_filters_image' => '0',
-        'index_files_filters_audio' => '0',
-        'index_files_filters_extensions' => '.csv',
-        
-        'index_bookmarks' => 0,
-        'index_bookmarks_needed' => 1
-    ];
+		return $this->config->getAppValue(Application::APP_NAME, $key, $defaultValue);
+	}
 
-    private $appName;
+	/**
+	 * Set a value by key
+	 *
+	 * @param string $key
+	 * @param string $value
+	 *
+	 * @return void
+	 */
+	public function setAppValue($key, $value) {
+		$this->config->setAppValue(Application::APP_NAME, $key, $value);
+	}
 
-    private $config;
+	/**
+	 * remove a key
+	 *
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+	public function deleteAppValue($key) {
+		return $this->config->deleteAppValue(Application::APP_NAME, $key);
+	}
 
-    private $miscService;
+	/**
+	 * Get a user value by key
+	 *
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+	public function getUserValue($key) {
+		$defaultValue = null;
+		if (array_key_exists($key, $this->defaults)) {
+			$defaultValue = $this->defaults[$key];
+		}
 
-    private $fileFilters = null;
+		return $this->config->getUserValue(
+			$this->userId, Application::APP_NAME, $key, $defaultValue
+		);
+	}
 
-    public function __construct($appName, IConfig $config, $miscService)
-    {
-        $this->appName = $appName;
-        $this->config = $config;
-        $this->miscService = $miscService;
-    }
+	/**
+	 * Set a user value by key
+	 *
+	 * @param string $key
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public function setUserValue($key, $value) {
+		return $this->config->setUserValue($this->userId, Application::APP_NAME, $key, $value);
+	}
 
-    public function reset()
-    {
-        foreach ($this->defaults as $k => $v) {
-            $this->setAppValue($k, $v);
-        }
-    }
+	/**
+	 * Get a user value by key and user
+	 *
+	 * @param string $userId
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+	public function getValueForUser($userId, $key) {
+		return $this->config->getUserValue($userId, Application::APP_NAME, $key);
+	}
 
-    public function removeOldConfig()
-    {
-        if ($this->getAppValue('index_live') === '1')
-            $this->setAppValue('index_live', '2');
-        // $this->setAppValue('index_delay_min', $this->getAppValue('index_delay'));
-    }
+	/**
+	 * Set a user value by key
+	 *
+	 * @param string $userId
+	 * @param string $key
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public function setValueForUser($userId, $key, $value) {
+		return $this->config->setUserValue($userId, Application::APP_NAME, $key, $value);
+	}
 
-    public function needIndexFiles($need)
-    {
-        if ($need)
-            $this->setAppValue('index_files_needed', '1');
-        else
-            $this->setAppValue('index_files_needed', '0');
-    }
+	/**
+	 * return the cloud version.
+	 * if $complete is true, return a string x.y.z
+	 *
+	 * @param boolean $complete
+	 *
+	 * @return string|integer
+	 */
+	public function getCloudVersion($complete = false) {
+		$ver = Util::getVersion();
 
-    public function neededIndexFiles()
-    {
-        return ($this->getAppValue('index_files_needed') == '1');
-    }
+		if ($complete) {
+			return implode('.', $ver);
+		}
 
-    public function needIndexBookmarks($need)
-    {
-        if ($need)
-            $this->setAppValue('index_bookmarks_needed', '1');
-        else
-            $this->setAppValue('index_bookmarks_needed', '0');
-    }
-
-    public function neededIndexBookmarks()
-    {
-        return ($this->getAppValue('index_bookmarks_needed') == '1');
-    }
-
-    public function stopIndex()
-    {
-        $this->setAppValue('configured', '2');
-    }
-
-    public function timeIndex($type)
-    {
-        $this->setAppValue('index_' . $type . '_last', time());
-    }
-
-    public function timeIndexDelay($type, $delay = 0)
-    {
-        if ($delay == 0)
-            $delay = $this->getAppValue('index_delay_min');
-            
-            // Uncomment this line to force index each tick of backgroundjob
-            // $delay = 0;
-        return ($this->getAppValue('index_' . $type . '_last') < (time() - (3600 * $delay)));
-    }
-
-    public function lockIndex($lock)
-    {
-        if ($lock)
-            $this->setAppValue('index_locked', time());
-        else
-            $this->setAppValue('index_locked', '0');
-    }
-
-    /**
-     * returns false if index is not locked or number of seconds since last tick
-     * after 10 minutes, lock is reseted
-     *
-     * @return boolean|number
-     */
-    public function isLockedIndex(&$delay = 0)
-    {
-        $lock = $this->getAppValue('index_locked');
-        if ($lock === '0')
-            return false;
-        
-        $delay = time() - $lock;
-        if ($delay > 600)
-            $this->lockIndex(false);
-        else
-            return true;
-        
-        return false;
-    }
-
-    /**
-     * returns the current resource level.
-     *
-     * @return number
-     */
-    public function resourceLevel()
-    {
-        return $this->getAppValue('resource_level');
-    }
-
-    /**
-     * Get a value by key
-     *
-     * @param string $key            
-     * @return string
-     */
-    public function getAppValue($key)
-    {
-        $defaultValue = null;
-        if (array_key_exists($key, $this->defaults))
-            $defaultValue = $this->defaults[$key];
-        return $this->config->getAppValue($this->appName, $key, $defaultValue);
-    }
-
-    /**
-     * Set a value by key
-     *
-     * @param string $key            
-     * @param string $value            
-     * @return string
-     */
-    public function setAppValue($key, $value)
-    {
-        return $this->config->setAppValue($this->appName, $key, $value);
-    }
-
-    /**
-     * remove a key
-     *
-     * @param string $key            
-     * @return string
-     */
-    public function deleteAppValue($key)
-    {
-        return $this->config->deleteAppValue($this->appName, $key);
-    }
-
-    public function getFileFilters()
-    {
-        if ($this->fileFilters == null)
-            $this->fileFilters = array(
-                'text' => $this->getAppValue('index_files_filters_text'),
-                'pdf' => $this->getAppValue('index_files_filters_pdf'),
-                'office' => $this->getAppValue('index_files_filters_office'),
-                'image' => $this->getAppValue('index_files_filters_image'),
-                'audio' => $this->getAppValue('index_files_filters_audio'),
-                'extensions' => SettingsController::FileFiltersExtensionsAsArray($this->getAppValue('index_files_filters_extensions'))
-            );
-        
-        return $this->fileFilters;
-    }
-
-    public function getCloudVersion($complete = false)
-    {
-        $ver = \OCP\Util::getVersion();
-        
-        if ($complete)
-            return implode('.', $ver);
-        
-        return $ver[0];
-    }
-
-    /**
-     * generate an array to pass config to Solarium
-     *
-     * @return array
-     */
-    public function toSolarium($config = null)
-    {
-        if ($config == null)
-            $config = array();
-        
-        if (! key_exists('solr_url', $config))
-            $config['solr_url'] = $this->getAppValue('solr_url');
-        
-        if (! key_exists('solr_core', $config))
-            $config['solr_core'] = $this->getAppValue('solr_core');
-        
-        if (! key_exists('timeout', $config))
-            $config['timeout'] = $this->getAppValue('solr_timeout');
-        
-        $url = $config['solr_url'];
-        $t = parse_url($url);
-        
-        if (! key_exists('host', $t) || ! key_exists('port', $t) || ! key_exists('path', $t))
-            return false;
-        
-        return array(
-            'endpoint' => array(
-                'localhost' => array(
-                    'timeout' => ($config['timeout'] < 5) ? 5 : $config['timeout'],
-                    'scheme' => $t['scheme'],
-                    'host' => $t['host'],
-                    'port' => $t['port'],
-                    'core' => $config['solr_core'],
-                    'path' => str_replace('//', '/', $t['path'])
-                )
-            )
-        );
-    }
+		return $ver[0];
+	}
 }

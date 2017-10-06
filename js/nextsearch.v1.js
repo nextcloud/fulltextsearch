@@ -1,5 +1,4 @@
-<?php
-/**
+/*
  * FullNextSearch - Full Text Search your Nextcloud.
  *
  * This file is licensed under the Affero General Public License version 3 or
@@ -25,15 +24,59 @@
  *
  */
 
-return [
-	'routes' => [
-		['name' => 'Navigation#navigate', 'url' => '/', 'verb' => 'GET'],
-		['name' => 'Settings#getSettingsPersonal', 'url' => '/settings/personal', 'verb' => 'GET'],
-		['name' => 'Settings#setSettingsPersonal', 'url' => '/settings/personal', 'verb' => 'POST'],
-		['name' => 'Settings#getSettingsAdmin', 'url' => '/settings/admin', 'verb' => 'GET'],
-		['name' => 'Settings#setSettingsAdmin', 'url' => '/settings/admin', 'verb' => 'POST'],
-		['name' => 'Api#search', 'url' => '/v1/search/{providerId}/', 'verb' => 'GET'],
-	]
-];
+/** global: OCA */
+/** global: Notyf */
+/** global: settings */
+/** global: nav */
+/** global: api */
 
 
+(function () {
+
+	/**
+	 * @constructs NextSearch
+	 */
+	var NextSearch = function () {
+		$.extend(NextSearch.prototype, settings);
+		$.extend(NextSearch.prototype, nav);
+		$.extend(NextSearch.prototype, api);
+
+		settings.generateDefaultTemplate();
+	};
+
+
+	/**
+	 * @constructs Notification
+	 */
+	var Notification = function () {
+		this.initialize();
+	};
+
+	Notification.prototype = {
+
+		initialize: function () {
+
+			var notyf = new Notyf({
+				delay: 5000
+			});
+
+			this.onSuccess = function (text) {
+				notyf.confirm(text);
+			};
+
+			this.onFail = function (text) {
+				notyf.alert(text);
+			};
+
+		}
+
+	};
+
+	OCA.NextSearch = NextSearch;
+	OCA.NextSearch.api = new NextSearch();
+
+	OCA.Notification = Notification;
+	OCA.notification = new Notification();
+
+
+})();

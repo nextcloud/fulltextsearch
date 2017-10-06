@@ -27,15 +27,28 @@
 
 namespace OCA\FullNextSearch\Service;
 
-use \Exception;
-use OC\Core\Command\Base;
-use OCA\FullNextSearch\Exceptions\InterruptException;
-use OCA\FullNextSearch\INextSearchPlatform;
-use OCA\FullNextSearch\INextSearchProvider;
-use OCA\FullNextSearch\Model\ExtendedBase;
+use OC\App\AppManager;
+use OCA\Circles\Api\v1\Circles;
+use OCA\FullNextSearch\Model\DocumentAccess;
+use OCA\FullNextSearch\Model\SearchResult;
+use OCP\IGroupManager;
+use OCP\IUser;
+use OCP\IUserManager;
 
-class IndexService {
 
+class SearchService {
+
+	/** @var string */
+	private $userId;
+
+	/** @var AppManager */
+	private $appManager;
+
+	/** @var IUserManager */
+	private $userManager;
+
+	/** @var IGroupManager */
+	private $groupManager;
 
 	/** @var ConfigService */
 	private $configService;
@@ -53,15 +66,24 @@ class IndexService {
 	/**
 	 * IndexService constructor.
 	 *
+	 * @param string $userId
+	 * @param AppManager $appManager
+	 * @param IUserManager $userManager
+	 * @param IGroupManager $groupManager
 	 * @param ConfigService $configService
 	 * @param ProviderService $providerService
 	 * @param PlatformService $platformService
 	 * @param MiscService $miscService
 	 */
 	function __construct(
+		$userId, AppManager $appManager, IUserManager $userManager, IGroupManager $groupManager,
 		ConfigService $configService, ProviderService $providerService, PlatformService $platformService,
 		MiscService $miscService
 	) {
+		$this->userId = $userId;
+		$this->appManager = $appManager;
+		$this->userManager = $userManager;
+		$this->groupManager = $groupManager;
 		$this->configService = $configService;
 		$this->providerService = $providerService;
 		$this->platformService = $platformService;
@@ -70,81 +92,60 @@ class IndexService {
 
 //				echo memory_get_usage() . "\n";
 
-	/**
-	 * @param $userId
-	 * @param ExtendedBase|null $command
-	 */
-	public function indexContentFromUser($userId, ExtendedBase $command = null) {
-		$providers = $this->providerService->getProviders();
-		$platform = $this->platformService->getPlatform();
-
-		foreach ($providers AS $provider) {
-
-			$provider->initUser($userId);
-			$platform->initProvider($provider);
-
-			for ($i = 0; $i < 1000; $i++) {
-
-				try {
-					$this->indexChunk($platform, $provider, $command);
-				} catch (InterruptException $e) {
-					throw $e;
-				} catch (Exception $e) {
-					continue(2);
-				}
-			}
-
-			$provider->endUser();
-		}
-	}
-
-
-	public function resetIndex($providerId = null) {
-		$platform = $this->platformService->getPlatform();
-
-		if ($providerId === null) {
-			$providers = $this->providerService->getProviders();
-		} else {
-			$providers = [$this->providerService->getProvider($providerId)];
-		}
-
-		foreach ($providers AS $provider) {
-			$platform->resetProvider($provider);
-		}
-	}
-
 
 	/**
-	 * @param INextSearchPlatform $platform
-	 * @param INextSearchProvider $provider
-	 * @param ExtendedBase|null $command
-	 */
-	private function indexChunk(
-		INextSearchPlatform $platform, INextSearchProvider $provider, $command
-	) {
-		$items = $provider->generateDocuments(
-			(int)$this->configService->getAppValue(ConfigService::CHUNK_INDEX)
-		);
-
-		$platform->indexDocuments($provider, $items, $this->validCommand($command));
-	}
-
-
-	/**
-	 * @param null|ExtendedBase $command
+	 * @param string $providerId
+	 * @param string $userId
+	 * @param string $search
 	 *
-	 * @return null|ExtendedBase
+	 * @return SearchResult[]
 	 */
-	private function validCommand($command) {
-		if ($command === null) {
-			return null;
+	public function search($providerId, $userId, $search) {
+
+		if ($userId === null) {
+			$userId = $this->userId;
 		}
 
-		if ($command instanceof Base) {
-			return $command;
+		$providers = $this->providerService->getFilteredProviders($providerId);
+		$platform = $this->platformService->getPlatform();
+
+		$user = $this->userManager->get($userId);
+		$access = $this->getDocumentAccessFromUser($user);
+		$result = [];
+		foreach ($providers AS $provider) {
+			$searchResult = $platform->search($provider, $access, $search);
+
+			$provider->parseSearchResult($searchResult);
+			if (sizeof($searchResult->getDocuments()) > 0) {
+				$result[] = $searchResult;
+			}
 		}
 
-		return null;
+		return $result;
 	}
+
+
+	/**
+	 * @param IUser $user
+	 *
+	 * @return DocumentAccess
+	 */
+	private function getDocumentAccessFromUser(IUser $user) {
+		$rights = new DocumentAccess();
+
+		$rights->setViewer($user->getUID());
+		$rights->setGroups($this->groupManager->getUserGroupIds($user));
+
+		if ($this->appManager->isEnabledForUser('circles', $user)) {
+			try {
+				$rights->setCircles(Circles::joinedCircleIds($user->getUID()));
+			} catch (\Exception $e) {
+				$this->miscService->log('Circles is set as enabled but: ' . $e->getMessage());
+			}
+		}
+
+		return $rights;
+	}
+
 
 }

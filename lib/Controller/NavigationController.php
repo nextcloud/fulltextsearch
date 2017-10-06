@@ -31,11 +31,10 @@ use OCA\FullNextSearch\AppInfo\Application;
 use OCA\FullNextSearch\Service\ConfigService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http;
-use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 
-class SettingsController extends Controller {
+class NavigationController extends Controller {
 
 	/** @var ConfigService */
 	private $configService;
@@ -59,56 +58,24 @@ class SettingsController extends Controller {
 
 
 	/**
+	 * @NoCSRFRequired
 	 * @NoAdminRequired
+	 * @NoSubAdminRequired
 	 *
-	 * @return DataResponse
+	 * @return TemplateResponse
 	 */
-	public function getSettingsPersonal() {
-		$data = [];
-
-		return new DataResponse($data, Http::STATUS_OK);
-	}
-
-	/**
-	 * @param $data
-	 *
-	 * @NoAdminRequired
-	 *
-	 * @return DataResponse
-	 */
-	public function setSettingsPersonal($data) {
-//		$this->configService->setUserValue(
-//			ConfigService::APP_TEST_PERSONAL, $data[ConfigService::APP_TEST_PERSONAL]
-//		);
-
-		return $this->getSettingsAdmin();
+	public function navigate() {
+		return new TemplateResponse(Application::APP_NAME, 'navigate', []);
 	}
 
 
 	/**
-	 * @return DataResponse
-	 */
-	public function getSettingsAdmin() {
-		$data = [
-			ConfigService::SEARCH_PLATFORM => $this->configService->getAppValue(
-				ConfigService::SEARCH_PLATFORM
-			)
-		];
-
-		return new DataResponse($data, Http::STATUS_OK);
-	}
-
-	/**
-	 * @param $data
+	 * compat NC 12 and lower
 	 *
-	 * @return DataResponse
+	 * @return TemplateResponse
 	 */
-	public function setSettingsAdmin($data) {
-		$this->configService->setAppValue(
-			ConfigService::SEARCH_PLATFORM, $data[ConfigService::SEARCH_PLATFORM]
-		);
-
-		return $this->getSettingsAdmin();
+	public function nc12personal() {
+		return new TemplateResponse(Application::APP_NAME, 'settings.personal', [], '');
 	}
 
 }

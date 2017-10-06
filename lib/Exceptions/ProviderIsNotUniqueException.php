@@ -25,15 +25,9 @@
  *
  */
 
-return [
-	'routes' => [
-		['name' => 'Navigation#navigate', 'url' => '/', 'verb' => 'GET'],
-		['name' => 'Settings#getSettingsPersonal', 'url' => '/settings/personal', 'verb' => 'GET'],
-		['name' => 'Settings#setSettingsPersonal', 'url' => '/settings/personal', 'verb' => 'POST'],
-		['name' => 'Settings#getSettingsAdmin', 'url' => '/settings/admin', 'verb' => 'GET'],
-		['name' => 'Settings#setSettingsAdmin', 'url' => '/settings/admin', 'verb' => 'POST'],
-		['name' => 'Api#search', 'url' => '/v1/search/{providerId}/', 'verb' => 'GET'],
-	]
-];
+namespace OCA\FullNextSearch\Exceptions;
 
+class ProviderIsNotUniqueException extends \Exception {
+
+}
 
