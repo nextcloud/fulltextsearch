@@ -1,6 +1,6 @@
 # fullnextsearch
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/daita/fullnextsearch/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/daita/fullnextsearch/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nextcloud/nextant/badges/quality-score.png?b=fullnextsearch)](https://scrutinizer-ci.com/g/nextcloud/nextant/?b=fullnextsearch)
 
 Nextant 2.0
 
