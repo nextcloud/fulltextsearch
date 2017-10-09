@@ -110,7 +110,7 @@ class SearchResult implements \JsonSerializable {
 
 
 	/**
-	 * TODO: remove rawResult by default
+	 * @return array
 	 */
 	public function jsonSerialize() {
 
@@ -121,7 +121,6 @@ class SearchResult implements \JsonSerializable {
 				'id'   => $provider->getId(),
 				'name' => $provider->getName()
 			],
-			'raw'       => $this->getRawResult(),
 			'documents' => $this->getDocuments(),
 			'size'      => $this->getSize()
 		];

@@ -29,6 +29,7 @@ namespace OCA\FullNextSearch\Command;
 
 use Exception;
 use OC\Core\Command\Base;
+use OCA\FullNextSearch\Model\SearchDocument;
 use OCA\FullNextSearch\Model\SearchResult;
 use OCA\FullNextSearch\Service\MiscService;
 use OCA\FullNextSearch\Service\SearchService;
@@ -94,7 +95,10 @@ class Search extends Base {
 
 		echo '> ' . $searchResult->getProvider()
 								 ->getName() . "\n";
-		foreach ($searchResult->getDocuments() as $document) {
+
+		/** @var SearchDocument[] $result */
+		$result = $searchResult->getDocuments();
+		foreach ($result as $document) {
 			echo ' - ' . $document->getId() . ' score:' . $document->getScore() . "\n";
 		}
 	}

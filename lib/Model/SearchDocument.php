@@ -42,6 +42,9 @@ class SearchDocument implements \JsonSerializable {
 	/** @var string */
 	private $content;
 
+	/** @var string */
+	private $link = '';
+
 	/** @var array */
 	private $excerpts = [];
 
@@ -49,7 +52,7 @@ class SearchDocument implements \JsonSerializable {
 	private $score;
 
 	/** @var array */
-	private $infos;
+	private $info;
 
 
 	public function __construct($id) {
@@ -130,6 +133,21 @@ class SearchDocument implements \JsonSerializable {
 
 
 	/**
+	 * @param string $link
+	 */
+	public function setLink($link) {
+		$this->link = $link;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLink() {
+		return $this->link;
+	}
+
+
+	/**
 	 * @param array $excerpts
 	 */
 	public function setExcerpts($excerpts) {
@@ -173,7 +191,7 @@ class SearchDocument implements \JsonSerializable {
 	 * @return $this
 	 */
 	public function setInfo($info, $value) {
-		$this->infos[$info] = $value;
+		$this->info[$info] = $value;
 
 		return $this;
 	}
@@ -186,11 +204,11 @@ class SearchDocument implements \JsonSerializable {
 	 * @return mixed
 	 */
 	public function getInfo($info, $default = '') {
-		if (!key_exists($info, $this->infos)) {
+		if (!key_exists($info, $this->info)) {
 			return $default;
 		}
 
-		return $this->infos[$info];
+		return $this->info[$info];
 	}
 
 
@@ -201,6 +219,7 @@ class SearchDocument implements \JsonSerializable {
 		return [
 			'id'       => $this->getId(),
 			'title'    => $this->getTitle(),
+			'link'     => $this->getLink(),
 			'excerpts' => $this->getExcerpts(),
 			'score'    => $this->getScore()
 		];

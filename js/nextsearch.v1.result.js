@@ -33,6 +33,7 @@ var result = {
 
 	displayResult: function (res) {
 
+		console.log('___' + JSON.stringify(res));
 		if (Number(res.meta.size) < 1) {
 			OCA.notification.onFail('Search returned no result');
 			return;

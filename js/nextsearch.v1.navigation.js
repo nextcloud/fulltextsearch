@@ -192,6 +192,15 @@ var nav = {
 			if (entry.excerpts.length > 1) {
 				divResult.find('#line2').text(entry.excerpts[1]);
 			}
+
+			if (entry.link !== '') {
+				divResult.on('click', function () {
+					window.open(entry.link, '_self');
+				});
+				divResult.find('div').each(function () {
+					$(this).css('cursor', 'pointer');
+				});
+			}
 		},
 
 
