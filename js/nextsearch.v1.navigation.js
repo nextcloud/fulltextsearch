@@ -83,8 +83,12 @@ var nav = {
 					continue;
 				}
 
+
 				var divResult = nav.generateDivResult(entry, nav.generateTemplateEntry(entry));
 				nav.fillDivResult(divResult, entry);
+				nav.onEntryGenerated(divResult);
+
+
 				if (precItem === null) {
 					divProviderResult.prepend(divResult);
 				} else {
@@ -197,6 +201,15 @@ var nav = {
 		},
 
 
+		onEntryGenerated: function (divResult) {
+
+			if (settings.parentHasMethod('onEntryGenerated')) {
+				settings.parent.onEntryGenerated(divResult);
+			}
+
+		},
+
+
 		generateTemplateEntry: function (document) {
 			var divTemplate = settings.entryTemplate;
 			if (divTemplate === null) {
@@ -219,10 +232,6 @@ var nav = {
 			divResult.attr('data-id', entry.id);
 			divResult.attr('data-result', JSON.stringify(entry));
 			divResult.append(divResultContent);
-
-			if (settings.parentHasMethod('onEntryGenerated')) {
-				settings.parent.onEntryGenerated(divResult);
-			}
 
 			return divResult;
 		},

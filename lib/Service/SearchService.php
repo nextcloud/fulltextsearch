@@ -30,6 +30,7 @@ namespace OCA\FullNextSearch\Service;
 use OC\App\AppManager;
 use OCA\Circles\Api\v1\Circles;
 use OCA\FullNextSearch\INextSearchPlatform;
+use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\DocumentAccess;
 use OCA\FullNextSearch\Model\SearchResult;
 use OCP\IGroupManager;
@@ -142,6 +143,7 @@ class SearchService {
 
 		return $result;
 	}
+
 
 	/**
 	 * @param IUser $user
