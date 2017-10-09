@@ -58,7 +58,7 @@ class IndexService {
 	 * @param PlatformService $platformService
 	 * @param MiscService $miscService
 	 */
-	function __construct(
+	public function __construct(
 		ConfigService $configService, ProviderService $providerService, PlatformService $platformService,
 		MiscService $miscService
 	) {

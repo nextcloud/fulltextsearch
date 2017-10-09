@@ -58,7 +58,7 @@ class ProviderService {
 	 *
 	 * @throws Exception
 	 */
-	function __construct(AppManager $appManager, MiscService $miscService) {
+	public function __construct(AppManager $appManager, MiscService $miscService) {
 		$this->appManager = $appManager;
 		$this->miscService = $miscService;
 	}

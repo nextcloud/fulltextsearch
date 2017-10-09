@@ -83,12 +83,7 @@ var nav = {
 					continue;
 				}
 
-
 				var divResult = nav.generateDivResult(entry, nav.generateTemplateEntry(entry));
-				nav.fillDivResult(divResult, entry);
-				nav.onEntryGenerated(divResult);
-
-
 				if (precItem === null) {
 					divProviderResult.prepend(divResult);
 				} else {
@@ -128,14 +123,13 @@ var nav = {
 			newResult = result.recalibrateResult(newResult, oldResult);
 			for (var i = 0; i < newResult.length; i++) {
 				var entry = newResult[i];
-				if (i > 0) {
-					precId = newResult[i - 1].id;
-				}
 
 				var pos = result.getResultIndex(entry.id, oldResult);
 				if (pos > -1 && pos !== i) {
 					nav.animateMoveDivResult(entry.id, divProviderResult, precId);
 				}
+
+				precId = newResult[i].id;
 			}
 		},
 
@@ -232,6 +226,9 @@ var nav = {
 			divResult.attr('data-id', entry.id);
 			divResult.attr('data-result', JSON.stringify(entry));
 			divResult.append(divResultContent);
+
+			nav.fillDivResult(divResult, entry);
+			nav.onEntryGenerated(divResult);
 
 			return divResult;
 		},

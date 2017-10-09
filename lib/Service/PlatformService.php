@@ -64,7 +64,7 @@ class PlatformService {
 	 * @param MiscService $miscService
 	 *
 	 */
-	function __construct(AppManager $appManager, ConfigService $configService, MiscService $miscService
+	public function __construct(AppManager $appManager, ConfigService $configService, MiscService $miscService
 	) {
 		$this->appManager = $appManager;
 

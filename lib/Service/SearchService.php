@@ -77,7 +77,7 @@ class SearchService {
 	 * @param PlatformService $platformService
 	 * @param MiscService $miscService
 	 */
-	function __construct(
+	public function __construct(
 		$userId, AppManager $appManager, IUserManager $userManager, IGroupManager $groupManager,
 		ConfigService $configService, ProviderService $providerService, PlatformService $platformService,
 		MiscService $miscService
@@ -91,8 +91,6 @@ class SearchService {
 		$this->platformService = $platformService;
 		$this->miscService = $miscService;
 	}
-
-//				echo memory_get_usage() . "\n";
 
 
 	/**
