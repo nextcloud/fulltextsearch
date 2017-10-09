@@ -25,6 +25,9 @@
  */
 
 /** global: OCA */
+/** global: settings */
+/** global: curr */
+/** global: nav */
 
 var result = {
 

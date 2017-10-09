@@ -59,7 +59,9 @@ Example.prototype = {
 
 
 	searchResult: function (result) {
-		elements.search_json.text(JSON.stringify(result));
+		if (elements.search_json !== null) {
+			elements.search_json.text(JSON.stringify(result));
+		}
 	},
 
 

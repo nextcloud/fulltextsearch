@@ -29,6 +29,7 @@ namespace OCA\FullNextSearch\Service;
 
 use OC\App\AppManager;
 use OCA\Circles\Api\v1\Circles;
+use OCA\FullNextSearch\INextSearchPlatform;
 use OCA\FullNextSearch\Model\DocumentAccess;
 use OCA\FullNextSearch\Model\SearchResult;
 use OCP\IGroupManager;
@@ -111,6 +112,24 @@ class SearchService {
 
 		$user = $this->userManager->get($userId);
 		$access = $this->getDocumentAccessFromUser($user);
+		$result = $this->searchFromProviders($platform, $providers, $access, $search);
+
+		return $result;
+	}
+
+
+	/**
+	 * @param INextSearchPlatform $platform
+	 * @param INextSearchProvider[] $providers
+	 * @param DocumentAccess $access
+	 * @param string $search
+	 *
+	 * @return array
+	 */
+	private function searchFromProviders(
+		INextSearchPlatform $platform, array $providers, DocumentAccess $access, $search
+	) {
+
 		$result = [];
 		foreach ($providers AS $provider) {
 			$searchResult = $platform->search($provider, $access, $search);
@@ -123,7 +142,6 @@ class SearchService {
 
 		return $result;
 	}
-
 
 	/**
 	 * @param IUser $user

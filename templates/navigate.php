@@ -18,7 +18,7 @@ Full Next Search
 
 <div id="search_result"></div>
 
-<div id="search_json"></div>
+<!-- <div id="search_json"></div> -->
 
 
 <script id="template_entry" type="text/template">

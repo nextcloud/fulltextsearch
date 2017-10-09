@@ -52,7 +52,7 @@ class SearchDocument implements \JsonSerializable {
 	private $infos;
 
 
-	function __construct($id) {
+	public function __construct($id) {
 		$this->id = $id;
 	}
 

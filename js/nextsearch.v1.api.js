@@ -44,7 +44,6 @@ var api = {
 				search: search
 			}
 		}).done(function (res) {
-			console.log('. ' + JSON.stringify(res));
 			result.displayResult(res);
 			api.onCallback(callback, res);
 		}).fail(function () {

@@ -50,7 +50,7 @@ class NavigationController extends Controller {
 	 * @param ConfigService $configService
 	 * @param MiscService $miscService
 	 */
-	function __construct(IRequest $request, ConfigService $configService, MiscService $miscService) {
+	public function __construct(IRequest $request, ConfigService $configService, MiscService $miscService) {
 		parent::__construct(Application::APP_NAME, $request);
 		$this->configService = $configService;
 		$this->miscService = $miscService;

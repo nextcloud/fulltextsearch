@@ -53,7 +53,7 @@ class DocumentAccess {
 	 *
 	 * @param string $ownerId
 	 */
-	function __construct($ownerId = '') {
+	public function __construct($ownerId = '') {
 		$this->ownerId = $ownerId;
 	}
 

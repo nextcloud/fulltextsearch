@@ -73,6 +73,10 @@ class PlatformService {
 	}
 
 
+	/**
+	 * @return INextSearchPlatform
+	 * @throws Exception
+	 */
 	public function getPlatform() {
 		try {
 			$this->loadPlatform();

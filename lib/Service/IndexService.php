@@ -85,26 +85,45 @@ class IndexService {
 			$provider->initUser($userId);
 			$platform->initProvider($provider);
 
-			for ($i = 0; $i < 1000; $i++) {
+			$this->indexChunks($platform, $provider, $command);
+			$provider->endUser();
+		}
 
-				try {
-					$this->indexChunk($platform, $provider, $command);
-				} catch (InterruptException $e) {
-					throw $e;
-				} catch (Exception $e) {
-					continue(2);
-				}
+	}
+
+
+	/**
+	 * @param INextSearchPlatform $platform
+	 * @param INextSearchProvider $provider
+	 * @param ExtendedBase $command
+	 *
+	 * @throws InterruptException
+	 */
+	private function indexChunks(
+		INextSearchPlatform $platform, INextSearchProvider $provider, ExtendedBase $command
+	) {
+
+		for ($i = 0; $i < 10000; $i++) {
+
+			try {
+				$this->indexChunk($platform, $provider, $command);
+			} catch (InterruptException $e) {
+				throw $e;
+			} catch (Exception $e) {
+				return;
 			}
 
-			$provider->endUser();
 		}
 	}
 
 
-	public function resetIndex($providerId = null) {
+	/**
+	 * @param string $providerId
+	 */
+	public function resetIndex($providerId = '') {
 		$platform = $this->platformService->getPlatform();
 
-		if ($providerId === null) {
+		if ($providerId === '') {
 			$providers = $this->providerService->getProviders();
 		} else {
 			$providers = [$this->providerService->getProvider($providerId)];

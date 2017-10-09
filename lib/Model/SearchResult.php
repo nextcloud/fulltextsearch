@@ -40,8 +40,7 @@ class SearchResult implements \JsonSerializable {
 	/** @var INextSearchProvider */
 	private $provider;
 
-	function __construct() {
-//		$this->id = $id;
+	public function __construct() {
 	}
 
 

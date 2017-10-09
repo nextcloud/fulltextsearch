@@ -73,7 +73,12 @@ class Reset extends ExtendedBase {
 		$this->setOutput($output);
 		try {
 
-			$this->indexService->resetIndex($input->getArgument('provider'));
+			$providerId = $input->getArgument('provider');
+			if ($providerId === null) {
+				$providerId = '';
+			}
+
+			$this->indexService->resetIndex($providerId);
 
 		} catch (Exception $e) {
 			throw $e;
