@@ -73,6 +73,8 @@ class IndexService {
 	/**
 	 * @param $userId
 	 * @param ExtendedBase|null $command
+	 *
+	 * @throws InterruptException
 	 */
 	public function indexContentFromUser($userId, ExtendedBase $command = null) {
 		$providers = $this->providerService->getProviders();

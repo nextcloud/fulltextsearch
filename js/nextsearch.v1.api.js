@@ -27,6 +27,7 @@
 
 /** global: OC */
 /** global: settings */
+/** global: result */
 /** global: search */
 /** global: nav */
 
@@ -35,7 +36,7 @@ var api = {
 
 
 	search: function (type, search, callback) {
-		var result = {status: -1};
+		var res = {status: -1};
 		$.ajax({
 			method: 'GET',
 			url: OC.generateUrl('/apps/fullnextsearch/v1/search/' + type),
@@ -44,11 +45,11 @@ var api = {
 			}
 		}).done(function (res) {
 			console.log('. ' + JSON.stringify(res));
-			nav.displayResult(res);
+			result.displayResult(res);
 			api.onCallback(callback, res);
 		}).fail(function () {
 			nav.failedToAjax();
-			api.onCallback(callback, result);
+			api.onCallback(callback, res);
 		});
 	},
 

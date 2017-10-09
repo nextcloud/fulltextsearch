@@ -27,6 +27,7 @@
 /** global: OCA */
 /** global: Notyf */
 /** global: settings */
+/** global: result */
 /** global: nav */
 /** global: api */
 
@@ -38,6 +39,7 @@
 	 */
 	var NextSearch = function () {
 		$.extend(NextSearch.prototype, settings);
+		$.extend(NextSearch.prototype, result);
 		$.extend(NextSearch.prototype, nav);
 		$.extend(NextSearch.prototype, api);
 

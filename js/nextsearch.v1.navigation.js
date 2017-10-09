@@ -27,6 +27,7 @@
 /** global: OCA */
 /** global: api */
 /** global: search */
+/** global: result */
 /** global: settings */
 
 
@@ -52,22 +53,6 @@ var curr = {
 
 var nav = {
 
-		displayResult: function (res) {
-
-			if (Number(res.meta.size) < 1) {
-				OCA.notification.onFail('Search returned no result');
-				return;
-			}
-
-			var searchResult = res.result;
-
-			for (var i = 0; i < searchResult.length; i++) {
-				nav.displayProviderResult(searchResult[i]);
-			}
-
-			OCA.notification.onSuccess('Search returned ' + res.meta.size + ' result(s)');
-		},
-
 
 		failedToAjax: function () {
 			OCA.notification.onSuccess(
@@ -75,26 +60,6 @@ var nav = {
 			window.setTimeout(function () {
 				window.location.reload(true);
 			}, 4000);
-		},
-
-
-		displayProviderResult: function (result) {
-
-			if (settings.resultContainer === null) {
-				return;
-			}
-
-			var current = curr.getProviderResult(result.provider.id);
-			var divProvider = nav.getDivProvider(result.provider.id, result.provider.name);
-
-			nav.managerDivProviderResult(divProvider.children('.provider_result'), result.documents,
-				current.documents);
-
-			divProvider.slideDown(settings.delay_provider, function () {
-				$(this).fadeTo(settings.delay_provider, 1);
-			});
-
-			curr.setProviderResult(result.provider.id, result);
 		},
 
 
@@ -113,7 +78,7 @@ var nav = {
 			var precItem = null;
 			for (var i = 0; i < newResult.length; i++) {
 				var entry = newResult[i];
-				if (nav.getResultIndex(entry.id, oldResult) > -1) {
+				if (result.getResultIndex(entry.id, oldResult) > -1) {
 					precItem = nav.getDivResult(entry.id, divProviderResult);
 					continue;
 				}
@@ -139,7 +104,7 @@ var nav = {
 		divProviderResultRemoveItems: function (divProviderResult, newResult, oldResult) {
 			for (var i = 0; i < oldResult.length; i++) {
 				var entry = oldResult[i];
-				if (nav.getResultIndex(entry.id, newResult) === -1) {
+				if (result.getResultIndex(entry.id, newResult) === -1) {
 					var divResult = nav.getDivResult(entry.id, divProviderResult);
 					divResult.fadeTo(settings.delay_result, 0, function () {
 						$(this).slideUp(settings.delay_result, function () {
@@ -155,14 +120,15 @@ var nav = {
 
 			var precId = '';
 
-			oldResult = nav.recalibrateResult(oldResult, newResult);
+			oldResult = result.recalibrateResult(oldResult, newResult);
+			newResult = result.recalibrateResult(newResult, oldResult);
 			for (var i = 0; i < newResult.length; i++) {
 				var entry = newResult[i];
 				if (i > 0) {
 					precId = newResult[i - 1].id;
 				}
 
-				var pos = nav.getResultIndex(entry.id, oldResult);
+				var pos = result.getResultIndex(entry.id, oldResult);
 				if (pos > -1 && pos !== i) {
 					nav.animateMoveDivResult(entry.id, divProviderResult, precId);
 				}
@@ -185,33 +151,6 @@ var nav = {
 				});
 			}
 
-		},
-
-
-		recalibrateResult: function (oldResult, newResult) {
-			var tmpResult = [];
-			for (var i = 0; i < oldResult.length; i++) {
-				if (nav.getResultIndex(oldResult[i].id, newResult) > -1) {
-					tmpResult.push(oldResult[i]);
-				}
-			}
-
-			return tmpResult;
-		},
-
-
-		getResultIndex: function (id, result) {
-			if (!result) {
-				return -1;
-			}
-
-			for (var i = 0; i < result.length; i++) {
-				if (result[i].id === id) {
-					return i;
-				}
-			}
-
-			return -1;
 		},
 
 

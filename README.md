@@ -30,7 +30,7 @@ smaller chunk _might_ need less memory (default is 1000)
 >     ./occ config:app:set --value '50' fullnextsearch index_chunk
 
 
-**Important:** each module will require some settings, please have a look to those README files to complete your configuration:
+**Important:** each module will require few settings, please have a look to those README files to complete your configuration:
 
 - https://github.com/daita/fullnextsearch_elasticsearch/blob/master/README.md
 - https://github.com/daita/files_fullnextsearch/blob/master/README.md
