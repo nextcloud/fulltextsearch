@@ -58,11 +58,12 @@ interface INextSearchProvider {
 	/**
 	 * Called on switch to new user
 	 *
+	 * @param INextSearchPlatform $platform
 	 * @param string $userId
 	 *
 	 * @return
 	 */
-	public function initUser($userId);
+	public function init(INextSearchPlatform $platform, $userId);
 
 
 	/**
