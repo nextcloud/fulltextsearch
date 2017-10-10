@@ -36,11 +36,6 @@ use OCA\FullNextSearch\Model\SearchResult;
 interface INextSearchPlatform {
 
 	/**
-	 * Load the search provider
-	 */
-	public function load();
-
-	/**
 	 * must returns a unique Id
 	 *
 	 * @return string
@@ -48,28 +43,29 @@ interface INextSearchPlatform {
 	public function getId();
 
 
-	/** on first use */
-	public function create();
-
-
-	/** on test */
-	public function test();
-
-
-	/** on upgrade */
-	public function upgrade();
+	public function getName();
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * Load the search provider
 	 */
-	public function reset($provider);
+	public function loadPlatform();
+
+
+	/** no used yet */
+	public function testPlatform();
 
 
 	/**
 	 *
 	 */
-	public function init();
+	public function initPlatform();
+
+
+	/**
+	 * @param INextSearchProvider $provider
+	 */
+	public function resetPlatform($provider);
 
 
 	/**
@@ -96,6 +92,6 @@ interface INextSearchPlatform {
 	 *
 	 * @return SearchResult
 	 */
-	public function search(INextSearchProvider $provider, DocumentAccess $access, $string);
+	public function searchDocuments(INextSearchProvider $provider, DocumentAccess $access, $string);
 
 }

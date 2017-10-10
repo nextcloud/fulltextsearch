@@ -34,7 +34,7 @@ interface INextSearchProvider {
 
 
 	/**
-	 * must returns a unique Id
+	 * return a unique Id of the Provider
 	 *
 	 * @return string
 	 */
@@ -42,7 +42,7 @@ interface INextSearchProvider {
 
 
 	/**
-	 * must returns a display name
+	 * return a display name of the Provider
 	 *
 	 * @return string
 	 */
@@ -50,35 +50,39 @@ interface INextSearchProvider {
 
 
 	/**
-	 * Load the search provider
+	 * Called when loading the provider
 	 */
-	public function load();
+	public function loadProvider();
 
 
 	/**
-	 * Called on switch to new user
+	 * initialize a new index
 	 *
 	 * @param INextSearchPlatform $platform
 	 * @param string $userId
 	 *
 	 * @return
 	 */
-	public function init(INextSearchPlatform $platform, $userId);
+	public function initializeIndex(INextSearchPlatform $platform, $userId);
 
 
 	/**
-	 * Called when user is not needed anymore.
+	 * Index is over
 	 */
-	public function endUser();
+	public function finalizeIndex();
 
 
 	/**
-	 * Called at the end of the use of the provider
+	 * not used yet.
 	 */
-	public function unload();
+	public function unloadProvider();
+
 
 	/**
-	 * generate documents prior to the indexing
+	 * generate documents prior to the indexing.
+	 * $chunksize is a maximum chunk size, please use it if possible.
+	 *
+	 * throw NoResultException if no more result
 	 *
 	 * @param int $chunkSize
 	 *
@@ -88,10 +92,12 @@ interface INextSearchProvider {
 
 
 	/**
+	 * after a search, improve the result
+	 *
 	 * @param SearchResult $searchResult
 	 *
 	 * @return mixed
 	 */
-	public function parseSearchResult(SearchResult $searchResult);
+	public function improveSearchResult(SearchResult $searchResult);
 
 }

@@ -131,9 +131,9 @@ class SearchService {
 
 		$result = [];
 		foreach ($providers AS $provider) {
-			$searchResult = $platform->search($provider, $access, $search);
+			$searchResult = $platform->searchDocuments($provider, $access, $search);
 
-			$provider->parseSearchResult($searchResult);
+			$provider->improveSearchResult($searchResult);
 			if (sizeof($searchResult->getDocuments()) > 0) {
 				$result[] = $searchResult;
 			}

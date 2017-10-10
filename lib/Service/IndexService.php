@@ -80,13 +80,13 @@ class IndexService {
 		$providers = $this->providerService->getProviders();
 		$platform = $this->platformService->getPlatform();
 
-		$platform->init();
+		$platform->initPlatform();
 		foreach ($providers AS $provider) {
 
-			$provider->init($platform, $userId);
+			$provider->initializeIndex($platform, $userId);
 
 			$this->indexChunks($platform, $provider, $command);
-			$provider->endUser();
+			$provider->finalizeIndex();
 
 			$this->providerService->setProviderAsIndexed($provider, true);
 		}
@@ -126,7 +126,7 @@ class IndexService {
 		$platform = $this->platformService->getPlatform();
 
 		if ($providerId === '') {
-			$platform->reset(null);
+			$platform->resetPlatform(null);
 			$this->providerService->setProvidersAsNotIndexed();
 
 			return;
@@ -135,7 +135,7 @@ class IndexService {
 		}
 
 		foreach ($providers AS $provider) {
-			$platform->reset($provider);
+			$platform->resetPlatform($provider);
 			$this->providerService->setProviderAsIndexed($provider, false);
 		}
 	}
