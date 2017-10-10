@@ -28,6 +28,7 @@
 namespace OCA\FullNextSearch\Service;
 
 use OCA\FullNextSearch\AppInfo\Application;
+use OCA\FullNextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCP\IConfig;
 use OCP\Util;
 
@@ -36,11 +37,13 @@ class ConfigService {
 	const APP_NAVIGATION = 'app_navigation';
 	const SEARCH_PLATFORM = 'search_platform';
 	const CHUNK_INDEX = 'index_chunk';
+	const PROVIDER_INDEXED = 'provider_indexed';
 
 	private $defaults = [
-		self::SEARCH_PLATFORM   => '',
-		self::CHUNK_INDEX       => '1000',
-		self::APP_NAVIGATION => '0'
+		self::SEARCH_PLATFORM  => '',
+		self::CHUNK_INDEX      => '1000',
+		self::APP_NAVIGATION   => '0',
+		self::PROVIDER_INDEXED => ''
 	];
 
 	/** @var IConfig */
@@ -160,6 +163,53 @@ class ConfigService {
 	public function setValueForUser($userId, $key, $value) {
 		return $this->config->setUserValue($userId, Application::APP_NAME, $key, $value);
 	}
+
+
+	/**
+	 * @param string $providerId
+	 * @param string $options
+	 * @param string $value
+	 */
+	public function setProviderOptions($providerId, $options, $value) {
+		$arr = json_decode($this->getAppValue($options), true);
+		if ($arr === null) {
+			$arr = [];
+		}
+
+		$arr[$providerId] = $value;
+
+		$this->setAppValue($options, json_encode($arr));
+	}
+
+
+	/**
+	 * @param string $options
+	 */
+	public function resetProviderOptions($options) {
+		$this->setAppValue($options, '');
+	}
+
+
+	/**
+	 * @param string $providerId
+	 * @param string $options
+	 *
+	 * @return string
+	 * @throws ProviderOptionsDoesNotExistException
+	 */
+	public function getProviderOptions($providerId, $options) {
+		$arr = json_decode($this->getAppValue($options), true);
+		if ($arr === null) {
+			$arr = [];
+		}
+
+		if (!key_exists($providerId, $arr)) {
+			throw new ProviderOptionsDoesNotExistException();
+		}
+
+		return $arr[$providerId];
+	}
+
 
 	/**
 	 * return the cloud version.

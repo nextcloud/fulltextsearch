@@ -87,6 +87,8 @@ class IndexService {
 
 			$this->indexChunks($platform, $provider, $command);
 			$provider->endUser();
+
+			$this->providerService->setProviderAsIndexed($provider, true);
 		}
 
 	}
@@ -125,6 +127,8 @@ class IndexService {
 
 		if ($providerId === '') {
 			$platform->reset(null);
+			$this->providerService->setProvidersAsNotIndexed();
+
 			return;
 		} else {
 			$providers = [$this->providerService->getProvider($providerId)];
@@ -132,6 +136,7 @@ class IndexService {
 
 		foreach ($providers AS $provider) {
 			$platform->reset($provider);
+			$this->providerService->setProviderAsIndexed($provider, false);
 		}
 	}
 
@@ -168,5 +173,6 @@ class IndexService {
 
 		return null;
 	}
+
 
 }

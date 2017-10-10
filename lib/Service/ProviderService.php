@@ -33,12 +33,16 @@ use OC_App;
 use OCA\FullNextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullNextSearch\Exceptions\ProviderIsNotCompatibleException;
 use OCA\FullNextSearch\Exceptions\ProviderIsNotUniqueException;
+use OCA\FullNextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCA\FullNextSearch\INextSearchProvider;
 
 class ProviderService {
 
 	/** @var AppManager */
 	private $appManager;
+
+	/** @var ConfigService */
+	private $configService;
 
 	/** @var MiscService */
 	private $miscService;
@@ -54,12 +58,15 @@ class ProviderService {
 	 * ProviderService constructor.
 	 *
 	 * @param AppManager $appManager
+	 * @param ConfigService $configService
 	 * @param MiscService $miscService
 	 *
-	 * @throws Exception
 	 */
-	public function __construct(AppManager $appManager, MiscService $miscService) {
+	public function __construct(
+		AppManager $appManager, ConfigService $configService, MiscService $miscService
+	) {
 		$this->appManager = $appManager;
+		$this->configService = $configService;
 		$this->miscService = $miscService;
 	}
 
@@ -151,6 +158,18 @@ class ProviderService {
 		}
 
 		throw new ProviderDoesNotExistException('Provider \'' . $providerId . '\' does not exist');
+	}
+
+
+	public function setProviderAsIndexed(INextSearchProvider $provider, $boolean) {
+		$this->configService->setProviderOptions(
+			$provider->getId(), ConfigService::PROVIDER_INDEXED, (($boolean) ? '1' : '0')
+		);
+	}
+
+
+	public function setProvidersAsNotIndexed() {
+		$this->configService->resetProviderOptions(ConfigService::PROVIDER_INDEXED);
 	}
 
 
