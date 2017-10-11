@@ -44,7 +44,7 @@
 			</field>
 
 			<field>
-				<name>type</name>
+				<name>provider_id</name>
 				<type>text</type>
 				<length>255</length>
 				<notnull>true</notnull>
@@ -74,7 +74,7 @@
 				<primary>true</primary>
 				<unique>true</unique>
 				<field>
-					<name>type</name>
+					<name>provider_id</name>
 				</field>
 				<field>
 					<name>document_id</name>
