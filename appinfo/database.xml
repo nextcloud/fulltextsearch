@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+  ~ FullNextSearch - Full Text Search your Nextcloud.
+  ~
+  ~ This file is licensed under the Affero General Public License version 3 or
+  ~ later. See the COPYING file.
+  ~
+  ~ @author Maxence Lange <maxence@artificial-owl.com>
+  ~ @copyright 2017
+  ~ @license GNU AGPL version 3 or any later version
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  -->
+
+<database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/database.xsd">
+
+	<name>*dbname*</name>
+	<create>true</create>
+	<overwrite>false</overwrite>
+	<charset>utf8</charset>
+
+	<table>
+		<name>*dbprefix*fullnextsearch_last_indexes</name>
+
+		<declaration>
+			<field>
+				<name>owner_id</name>
+				<type>text</type>
+				<length>64</length>
+				<notnull>true</notnull>
+			</field>
+
+			<field>
+				<name>type</name>
+				<type>text</type>
+				<length>255</length>
+				<notnull>true</notnull>
+			</field>
+
+			<field>
+				<name>document_id</name>
+				<type>integer</type>
+				<length>4</length>
+				<notnull>true</notnull>
+			</field>
+
+			<field>
+				<name>status</name>
+				<type>integer</type>
+				<length>1</length>
+				<notnull>true</notnull>
+			</field>
+
+			<field>
+				<name>indexed</name>
+				<type>timestamp</type>
+			</field>
+
+			<index>
+				<name>unique_document</name>
+				<primary>true</primary>
+				<unique>true</unique>
+				<field>
+					<name>type</name>
+				</field>
+				<field>
+					<name>document_id</name>
+				</field>
+			</index>
+
+		</declaration>
+	</table>
+
+</database>
