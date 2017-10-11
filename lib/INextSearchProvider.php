@@ -67,6 +67,22 @@ interface INextSearchProvider {
 
 
 	/**
+	 * return the number of document left to index
+	 *
+	 * @return int
+	 */
+	public function getSizeIndexLeft();
+
+
+	/**
+	 * return the total number of documents to index
+	 *
+	 * @return int
+	 */
+	public function getSizeIndexTotal();
+
+
+	/**
 	 * Index is over
 	 */
 	public function finalizeIndex();
