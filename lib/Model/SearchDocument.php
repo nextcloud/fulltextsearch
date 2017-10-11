@@ -29,12 +29,17 @@ namespace OCA\FullNextSearch\Model;
 
 class SearchDocument implements \JsonSerializable {
 
-
 	/** @var string|int */
 	private $id;
 
+	/** @var string */
+	private $providerId;
+
 	/** @var DocumentAccess */
 	private $access;
+
+//	/** @var DocumentIndex */
+//	private $index;
 
 	/** @var string */
 	private $title;
@@ -55,7 +60,8 @@ class SearchDocument implements \JsonSerializable {
 	private $info;
 
 
-	public function __construct($id) {
+	public function __construct($providerId, $id) {
+		$this->providerId = $providerId;
 		$this->id = $id;
 	}
 
@@ -80,6 +86,44 @@ class SearchDocument implements \JsonSerializable {
 
 
 	/**
+	 * @param string $providerId
+	 *
+	 * @return $this
+	 */
+	public function setProviderId($providerId) {
+		$this->providerId = $providerId;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getProviderId() {
+		return $this->providerId;
+	}
+
+
+//	/**
+//	 * @param DocumentIndex $index
+//	 *
+//	 * @return $this
+//	 */
+//	public function setIndex(DocumentIndex $index) {
+//		$this->index = $index;
+//
+//		return $this;
+//	}
+//
+//	/**
+//	 * @return DocumentIndex
+//	 */
+//	public function getIndex() {
+//		return $this->index;
+//	}
+
+
+	/**
 	 * @param DocumentAccess $access
 	 *
 	 * @return $this
@@ -100,9 +144,13 @@ class SearchDocument implements \JsonSerializable {
 
 	/**
 	 * @param string $title
+	 *
+	 * @return $this
 	 */
 	public function setTitle($title) {
 		$this->title = $title;
+
+		return $this;
 	}
 
 	/**
@@ -134,9 +182,13 @@ class SearchDocument implements \JsonSerializable {
 
 	/**
 	 * @param string $link
+	 *
+	 * @return $this
 	 */
 	public function setLink($link) {
 		$this->link = $link;
+
+		return $this;
 	}
 
 	/**
@@ -149,9 +201,13 @@ class SearchDocument implements \JsonSerializable {
 
 	/**
 	 * @param array $excerpts
+	 *
+	 * @return $this
 	 */
 	public function setExcerpts($excerpts) {
 		$this->excerpts = $excerpts;
+
+		return $this;
 	}
 
 	/**
@@ -171,9 +227,13 @@ class SearchDocument implements \JsonSerializable {
 
 	/**
 	 * @param string $score
+	 *
+	 * @return $this
 	 */
 	public function setScore($score) {
 		$this->score = $score;
+
+		return $this;
 	}
 
 	/**
@@ -219,6 +279,7 @@ class SearchDocument implements \JsonSerializable {
 		return [
 			'id'       => $this->getId(),
 			'title'    => $this->getTitle(),
+			'index'    => $this->getIndex(),
 			'link'     => $this->getLink(),
 			'excerpts' => $this->getExcerpts(),
 			'score'    => $this->getScore()
