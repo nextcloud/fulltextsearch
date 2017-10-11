@@ -61,7 +61,7 @@ class DocumentAccess {
 	/**
 	 * @return string
 	 */
-	public function getOwner() {
+	public function getOwnerId() {
 		return $this->ownerId;
 	}
 
@@ -69,14 +69,14 @@ class DocumentAccess {
 	/**
 	 * @param string $viewerId
 	 */
-	public function setViewer($viewerId) {
+	public function setViewerId($viewerId) {
 		$this->viewerId = $viewerId;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getViewer() {
+	public function getViewerId() {
 		return $this->viewerId;
 	}
 

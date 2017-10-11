@@ -151,7 +151,7 @@ class SearchService {
 	private function getDocumentAccessFromUser(IUser $user) {
 		$rights = new DocumentAccess();
 
-		$rights->setViewer($user->getUID());
+		$rights->setViewerId($user->getUID());
 		$rights->setGroups($this->groupManager->getUserGroupIds($user));
 
 		if ($this->appManager->isEnabledForUser('circles', $user)) {
