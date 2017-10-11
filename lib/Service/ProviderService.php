@@ -161,6 +161,25 @@ class ProviderService {
 	}
 
 
+	/**
+	 * @param string $providerId
+	 *
+	 * @return bool
+	 */
+	public function isProviderIndexed($providerId) {
+		$indexed = $this->configService->getProviderOptions(
+			$providerId, ConfigService::PROVIDER_INDEXED
+		);
+
+		if ($indexed === '1') {
+			return true;
+		}
+
+		return false;
+
+	}
+
+
 	public function setProviderAsIndexed(INextSearchProvider $provider, $boolean) {
 		$this->configService->setProviderOptions(
 			$provider->getId(), ConfigService::PROVIDER_INDEXED, (($boolean) ? '1' : '0')

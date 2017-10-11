@@ -84,7 +84,6 @@ class IndexService {
 		foreach ($providers AS $provider) {
 
 			$provider->initializeIndex($platform, $userId);
-
 			$this->indexChunks($platform, $provider, $command);
 			$provider->finalizeIndex();
 

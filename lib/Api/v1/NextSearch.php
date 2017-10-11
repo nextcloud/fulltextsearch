@@ -29,6 +29,7 @@ namespace OCA\FullNextSearch\Api\v1;
 
 
 use OCA\FullNextSearch\AppInfo\Application;
+use OCA\FullNextSearch\Service\ProviderService;
 use OCA\FullNextSearch\Service\SearchService;
 use OCP\Util;
 
@@ -84,4 +85,17 @@ class NextSearch {
 				 ->search($providerId, null, $search);
 	}
 
+
+	/**
+	 * @param $providerId
+	 *
+	 * @return mixed
+	 */
+	public static function isProviderIndexed($providerId) {
+		$c = self::getContainer();
+
+		return $c->query(ProviderService::class)
+				 ->isProviderIndexed($providerId);
+
+	}
 }
