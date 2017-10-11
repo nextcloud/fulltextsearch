@@ -36,11 +36,11 @@ var elements = {
 	search_json: null
 };
 
-const Example = function () {
+const Navigate = function () {
 	this.init();
 };
 
-Example.prototype = {
+Navigate.prototype = {
 
 	init: function () {
 		var self = this;
@@ -80,10 +80,10 @@ Example.prototype = {
 };
 
 
-OCA.NextSearch.Example = Example;
+OCA.NextSearch.Navigate = Navigate;
 
 $(document).ready(function () {
-	OCA.NextSearch.example = new Example();
+	OCA.NextSearch.navigate = new Navigate();
 });
 
 
