@@ -29,18 +29,18 @@ namespace OCA\FullNextSearch\Db;
 
 
 use OCA\FullNextSearch\INextSearchProvider;
-use OCA\FullNextSearch\Model\DocumentIndex;
+use OCA\FullNextSearch\Model\Index;
 
 class IndexesRequest extends IndexesRequestBuilder {
 
 
 	/**
-	 * @param DocumentIndex $index
+	 * @param Index $index
 	 *
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function create(DocumentIndex $index) {
+	public function create(Index $index) {
 
 		try {
 			$qb = $this->getIndexesInsertSql();
@@ -60,11 +60,11 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 
 	/**
-	 * @param DocumentIndex $index
+	 * @param Index $index
 	 *
 	 * @return bool
 	 */
-	public function update(DocumentIndex $index) {
+	public function update(Index $index) {
 
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('owner_id', $qb->createNamedParameter($index->getOwnerId()))
@@ -81,9 +81,9 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 
 	/**
-	 * @param DocumentIndex $index
+	 * @param Index $index
 	 */
-	public function delete(DocumentIndex $index) {
+	public function delete(Index $index) {
 
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToProviderId($qb, $index->getProviderId());
@@ -98,7 +98,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 *
 	 * @param INextSearchProvider $provider
 	 *
-	 * @return DocumentIndex[]
+	 * @return Index[]
 	 */
 	public function getIndexesFromProvider(INextSearchProvider $provider) {
 		$qb = $this->getIndexesSelectSql();

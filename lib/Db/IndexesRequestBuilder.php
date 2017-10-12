@@ -28,7 +28,7 @@
 namespace OCA\FullNextSearch\Db;
 
 
-use OCA\FullNextSearch\Model\DocumentIndex;
+use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Service\ConfigService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -110,10 +110,10 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	/**
 	 * @param array $data
 	 *
-	 * @return DocumentIndex
+	 * @return Index
 	 */
 	protected function parseIndexesSelectSql($data) {
-		$index = new DocumentIndex($data['provider_id'], $data['document_id']);
+		$index = new Index($data['provider_id'], $data['document_id']);
 		$index->setStatus($data['status'])
 			  ->setOwnerId($data['owner_id'])
 			  ->setLastIndex($data['indexed']);

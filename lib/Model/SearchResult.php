@@ -31,7 +31,7 @@ use OCA\FullNextSearch\INextSearchProvider;
 
 class SearchResult implements \JsonSerializable {
 
-	/** @var SearchDocument[] */
+	/** @var IndexDocument[] */
 	private $documents;
 
 	/** @var string */
@@ -45,7 +45,7 @@ class SearchResult implements \JsonSerializable {
 
 
 	/**
-	 * @param SearchDocument[] $documents
+	 * @param IndexDocument[] $documents
 	 *
 	 * @return $this
 	 */
@@ -56,18 +56,18 @@ class SearchResult implements \JsonSerializable {
 	}
 
 	/**
-	 * @return SearchDocument[]
+	 * @return IndexDocument[]
 	 */
 	public function getDocuments() {
 		return $this->documents;
 	}
 
 	/**
-	 * @param SearchDocument $document
+	 * @param IndexDocument $document
 	 *
 	 * @return $this
 	 */
-	public function addDocument(SearchDocument $document) {
+	public function addDocument(IndexDocument $document) {
 		$this->documents[] = $document;
 
 		return $this;

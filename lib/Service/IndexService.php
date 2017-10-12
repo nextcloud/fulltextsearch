@@ -35,10 +35,10 @@ use OCA\FullNextSearch\Exceptions\InterruptException;
 use OCA\FullNextSearch\Exceptions\NoResultException;
 use OCA\FullNextSearch\INextSearchPlatform;
 use OCA\FullNextSearch\INextSearchProvider;
-use OCA\FullNextSearch\Model\DocumentIndex;
+use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Model\ExtendedBase;
-use OCA\FullNextSearch\Model\ProviderIndex;
-use OCA\FullNextSearch\Model\SearchDocument;
+use OCA\FullNextSearch\Model\ProviderIndexes;
+use OCA\FullNextSearch\Model\IndexDocument;
 
 class IndexService {
 
@@ -90,14 +90,14 @@ class IndexService {
 		$providers = $this->providerService->getProviders();
 		$platform = $this->platformService->getPlatform();
 
-		$platform->initPlatform();
+		$platform->initializeIndex();
 		foreach ($providers AS $provider) {
 
-			$items = $provider->initializeIndex($platform, $userId);
-			$documents = $this->removeUpToDateDocuments($provider, $items);
+			$documents = $provider->generateIndexableDocuments($platform, $userId);
+			//$maxSize = sizeof($documents);
+			$toIndex = $this->removeUpToDateDocuments($provider, $documents);
 
-			$this->indexChunks($platform, $provider, $documents, $command);
-			$provider->finalizeIndex();
+			$this->indexChunks($platform, $provider, $toIndex, $command);
 
 			$this->providerService->setProviderAsIndexed($provider, true);
 		}
@@ -107,16 +107,16 @@ class IndexService {
 
 	/**
 	 * @param INextSearchProvider $provider
-	 * @param SearchDocument[] $items
+	 * @param IndexDocument[] $items
 	 *
-	 * @return SearchDocument[]
+	 * @return IndexDocument[]
 	 */
 	private function removeUpToDateDocuments(INextSearchProvider $provider, array $items) {
 
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
 		foreach ($items as $item) {
-			if (!$currIndex->documentIsUpToDate($item)) {
+			if (!$currIndex->isDocumentUpToDate($item)) {
 				$result[] = $item;
 			}
 		}
@@ -128,24 +128,23 @@ class IndexService {
 	/**
 	 * @param INextSearchProvider $provider
 	 *
-	 * @return ProviderIndex
+	 * @return ProviderIndexes
 	 */
 	private function getProviderIndexFromProvider(INextSearchProvider $provider) {
 		$indexes = $this->indexesRequest->getIndexesFromProvider($provider);
 
-		return new ProviderIndex($indexes);
+		return new ProviderIndexes($indexes);
 	}
 
 
 	/**
 	 * @param INextSearchPlatform $platform
 	 * @param INextSearchProvider $provider
-	 * @param SearchDocument[] $documents
+	 * @param IndexDocument[] $documents
 	 * @param ExtendedBase $command
 	 *
-	 * @return DocumentIndex[]
-	 * @throws DatabaseException
-	 * @throws InterruptException
+	 * @return Index[]
+	 * @throws Exception
 	 */
 	private function indexChunks(
 		INextSearchPlatform $platform, INextSearchProvider $provider, $documents, ExtendedBase $command
@@ -160,12 +159,10 @@ class IndexService {
 				$chunk = array_splice($documents, 0, $chunkSize);
 				$index =
 					array_merge($index, $this->indexChunk($platform, $provider, $chunk, $command));
-			} catch (InterruptException $e) {
-				throw $e;
-			} catch (DatabaseException $e) {
-				throw $e;
-			} catch (Exception $e) {
+			} catch (NoResultException $e) {
 				return $index;
+			} catch (Exception $e) {
+				throw $e;
 			}
 
 		}
@@ -177,10 +174,10 @@ class IndexService {
 	/**
 	 * @param INextSearchPlatform $platform
 	 * @param INextSearchProvider $provider
-	 * @param SearchDocument[] $chunk
+	 * @param IndexDocument[] $chunk
 	 * @param ExtendedBase|null $command
 	 *
-	 * @return DocumentIndex[]
+	 * @return Index[]
 	 * @throws NoResultException
 	 */
 	private function indexChunk(
@@ -190,7 +187,7 @@ class IndexService {
 			throw new NoResultException();
 		}
 
-		$documents = $provider->generateDocuments($chunk);
+		$documents = $provider->fillIndexDocuments($chunk);
 		$indexes = $platform->indexDocuments($provider, $documents, $this->validCommand($command));
 		$this->updateIndexes($indexes);
 
@@ -199,7 +196,7 @@ class IndexService {
 
 
 	/**
-	 * @param DocumentIndex[] $indexes
+	 * @param Index[] $indexes
 	 *
 	 * @throws DatabaseException
 	 */
@@ -223,7 +220,7 @@ class IndexService {
 		$platform = $this->platformService->getPlatform();
 
 		if ($providerId === '') {
-			$platform->resetPlatform(null);
+			$platform->removeIndex(null);
 			$this->providerService->setProvidersAsNotIndexed();
 
 			return;
@@ -232,7 +229,7 @@ class IndexService {
 		}
 
 		foreach ($providers AS $provider) {
-			$platform->resetPlatform($provider);
+			$platform->removeIndex($provider);
 			$this->providerService->setProviderAsIndexed($provider, false);
 		}
 	}

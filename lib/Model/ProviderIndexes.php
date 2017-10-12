@@ -28,9 +28,9 @@
 
 namespace OCA\FullNextSearch\Model;
 
-class ProviderIndex {
+class ProviderIndexes {
 
-	/** @var DocumentIndex[] */
+	/** @var Index[] */
 	private $indexes;
 
 
@@ -40,7 +40,7 @@ class ProviderIndex {
 
 
 	/**
-	 * @return DocumentIndex[]
+	 * @return Index[]
 	 */
 	public function getIndexes() {
 		return $this->indexes;
@@ -50,7 +50,7 @@ class ProviderIndex {
 	/**
 	 * @param string $documentId
 	 *
-	 * @return null|DocumentIndex
+	 * @return null|Index
 	 */
 	public function getIndex($documentId) {
 		foreach ($this->indexes as $index) {
@@ -63,7 +63,7 @@ class ProviderIndex {
 	}
 
 
-	public function documentIsUpToDate(SearchDocument $document) {
+	public function isDocumentUpToDate(IndexDocument $document) {
 		$index = $this->getIndex($document->getId());
 		if ($index === null) {
 			return false;

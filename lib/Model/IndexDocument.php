@@ -27,7 +27,7 @@
 
 namespace OCA\FullNextSearch\Model;
 
-class SearchDocument implements \JsonSerializable {
+class IndexDocument implements \JsonSerializable {
 
 	/** @var string|int */
 	private $id;
@@ -288,7 +288,6 @@ class SearchDocument implements \JsonSerializable {
 		return [
 			'id'       => $this->getId(),
 			'title'    => $this->getTitle(),
-			'index'    => $this->getIndex(),
 			'link'     => $this->getLink(),
 			'excerpts' => $this->getExcerpts(),
 			'score'    => $this->getScore()

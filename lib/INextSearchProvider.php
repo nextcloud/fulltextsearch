@@ -27,8 +27,8 @@
 
 namespace OCA\FullNextSearch;
 
-use OCA\FullNextSearch\Model\ProviderIndex;
-use OCA\FullNextSearch\Model\SearchDocument;
+use OCA\FullNextSearch\Model\ProviderIndexes;
+use OCA\FullNextSearch\Model\IndexDocument;
 use OCA\FullNextSearch\Model\SearchResult;
 
 interface INextSearchProvider {
@@ -57,52 +57,25 @@ interface INextSearchProvider {
 
 
 	/**
-	 * initialize a new index
+	 * returns all indexable document for a user.
+	 * There is no need to fill the document with content at this point.
 	 *
 	 * @param INextSearchPlatform $platform
 	 * @param string $userId
+	 *
+	 * @return IndexDocument[]
 	 */
-	public function initializeIndex(INextSearchPlatform $platform, $userId);
+	public function generateIndexableDocuments(INextSearchPlatform $platform, $userId);
 
 
 	/**
-	 * return the number of document left to index
+	 * fill a chunk of documents with more content, prior to index.
 	 *
-	 * @return int
-	 */
-	public function getSizeIndexLeft();
-
-
-	/**
-	 * return the total number of documents to index
+	 * @param IndexDocument[] $chunk
 	 *
-	 * @return int
+	 * @return IndexDocument[]
 	 */
-	public function getSizeIndexTotal();
-
-
-	/**
-	 * Index is over
-	 */
-	public function finalizeIndex();
-
-
-	/**
-	 * not used yet.
-	 */
-	public function unloadProvider();
-
-
-	/**
-	 * generate documents prior to the indexing.
-	 *
-	 * throw NoResultException if no more result
-	 *
-	 * @param SearchDocument[] $chunk
-	 *
-	 * @return SearchDocument[]
-	 */
-	public function generateDocuments($chunk);
+	public function fillIndexDocuments($chunk);
 
 
 	/**
@@ -113,5 +86,11 @@ interface INextSearchProvider {
 	 * @return mixed
 	 */
 	public function improveSearchResult(SearchResult $searchResult);
+
+
+	/**
+	 * not used yet.
+	 */
+	public function unloadProvider();
 
 }

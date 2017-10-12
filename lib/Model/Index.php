@@ -27,7 +27,7 @@
 
 namespace OCA\FullNextSearch\Model;
 
-class DocumentIndex implements \JsonSerializable {
+class Index implements \JsonSerializable {
 
 	const STATUS_OK = 1;
 	const STATUS_FAILED = 5;
