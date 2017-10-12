@@ -35,7 +35,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\IL10N;
 
-class LastIndexesRequestBuilder extends CoreRequestBuilder {
+class IndexesRequestBuilder extends CoreRequestBuilder {
 
 
 	/**
@@ -55,10 +55,9 @@ class LastIndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getLastIndexesInsertSql() {
+	protected function getIndexesInsertSql() {
 		$qb = $this->dbConnection->getQueryBuilder();
-		$qb->insert(self::TABLE_LAST_INDEXES)
-		   ->setValue('indexed', $qb->createFunction('NOW()'));
+		$qb->insert(self::TABLE_LAST_INDEXES);
 
 		return $qb;
 	}
@@ -69,10 +68,9 @@ class LastIndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getLastIndexesUpdateSql() {
+	protected function getIndexesUpdateSql() {
 		$qb = $this->dbConnection->getQueryBuilder();
-		$qb->update(self::TABLE_LAST_INDEXES)
-		   ->set('indexed', $qb->createFunction('NOW()'));
+		$qb->update(self::TABLE_LAST_INDEXES);
 
 		return $qb;
 	}
@@ -83,7 +81,7 @@ class LastIndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getLastIndexesSelectSql() {
+	protected function getIndexesSelectSql() {
 		$qb = $this->dbConnection->getQueryBuilder();
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
@@ -101,7 +99,7 @@ class LastIndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getLastIndexesDeleteSql() {
+	protected function getIndexesDeleteSql() {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->delete(self::TABLE_LAST_INDEXES);
 
@@ -114,7 +112,7 @@ class LastIndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return DocumentIndex
 	 */
-	protected function parseLastIndexesSelectSql($data) {
+	protected function parseIndexesSelectSql($data) {
 		$index = new DocumentIndex($data['provider_id'], $data['document_id']);
 		$index->setStatus($data['status'])
 			  ->setOwnerId($data['owner_id'])

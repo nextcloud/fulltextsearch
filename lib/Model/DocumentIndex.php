@@ -39,10 +39,10 @@ class DocumentIndex implements \JsonSerializable {
 	private $documentId;
 
 	/** @var string */
-	private $ownerId;
+	private $ownerId = '';
 
 	/** @var int */
-	private $status;
+	private $status = -1;
 
 	/** @var string */
 	private $lastIndex;
@@ -112,7 +112,11 @@ class DocumentIndex implements \JsonSerializable {
 	 *
 	 * @return $this
 	 */
-	public function setLastIndex($lastIndex) {
+	public function setLastIndex($lastIndex = '') {
+		if ($lastIndex === '') {
+			$lastIndex = time();
+		}
+
 		$this->lastIndex = $lastIndex;
 
 		return $this;

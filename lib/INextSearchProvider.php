@@ -27,6 +27,7 @@
 
 namespace OCA\FullNextSearch;
 
+use OCA\FullNextSearch\Model\ProviderIndex;
 use OCA\FullNextSearch\Model\SearchDocument;
 use OCA\FullNextSearch\Model\SearchResult;
 
@@ -60,8 +61,6 @@ interface INextSearchProvider {
 	 *
 	 * @param INextSearchPlatform $platform
 	 * @param string $userId
-	 *
-	 * @return
 	 */
 	public function initializeIndex(INextSearchPlatform $platform, $userId);
 
@@ -96,15 +95,14 @@ interface INextSearchProvider {
 
 	/**
 	 * generate documents prior to the indexing.
-	 * $chunksize is a maximum chunk size, please use it if possible.
 	 *
 	 * throw NoResultException if no more result
 	 *
-	 * @param int $chunkSize
+	 * @param SearchDocument[] $chunk
 	 *
 	 * @return SearchDocument[]
 	 */
-	public function generateDocuments($chunkSize);
+	public function generateDocuments($chunk);
 
 
 	/**

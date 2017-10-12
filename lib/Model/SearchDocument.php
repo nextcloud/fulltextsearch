@@ -38,8 +38,8 @@ class SearchDocument implements \JsonSerializable {
 	/** @var DocumentAccess */
 	private $access;
 
-//	/** @var DocumentIndex */
-//	private $index;
+	/** @var int */
+	private $modifiedTime = 0;
 
 	/** @var string */
 	private $title;
@@ -67,7 +67,7 @@ class SearchDocument implements \JsonSerializable {
 
 
 	/**
-	 * @param int|string $id
+	 * @param string $id
 	 *
 	 * @return $this
 	 */
@@ -78,7 +78,7 @@ class SearchDocument implements \JsonSerializable {
 	}
 
 	/**
-	 * @return int|string
+	 * @return string
 	 */
 	public function getId() {
 		return $this->id;
@@ -104,23 +104,32 @@ class SearchDocument implements \JsonSerializable {
 	}
 
 
-//	/**
-//	 * @param DocumentIndex $index
-//	 *
-//	 * @return $this
-//	 */
-//	public function setIndex(DocumentIndex $index) {
-//		$this->index = $index;
-//
-//		return $this;
-//	}
-//
-//	/**
-//	 * @return DocumentIndex
-//	 */
-//	public function getIndex() {
-//		return $this->index;
-//	}
+	/**
+	 * @param int $modifiedTime
+	 *
+	 * @return $this
+	 */
+	public function setModifiedTime($modifiedTime) {
+		$this->modifiedTime = $modifiedTime;
+
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getModifiedTime() {
+		return $this->modifiedTime;
+	}
+
+	/**
+	 * @param int $time
+	 *
+	 * @return bool
+	 */
+	public function isOlderThan($time) {
+		return ($this->modifiedTime < $time);
+	}
 
 
 	/**

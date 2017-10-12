@@ -28,9 +28,10 @@
 namespace OCA\FullNextSearch\Db;
 
 
+use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\DocumentIndex;
 
-class LastIndexesRequest extends LastIndexesRequestBuilder {
+class IndexesRequest extends IndexesRequestBuilder {
 
 
 	/**
@@ -42,11 +43,12 @@ class LastIndexesRequest extends LastIndexesRequestBuilder {
 	public function create(DocumentIndex $index) {
 
 		try {
-			$qb = $this->getLastIndexesInsertSql();
+			$qb = $this->getIndexesInsertSql();
 			$qb->setValue('owner_id', $qb->createNamedParameter($index->getOwnerId()))
 			   ->setValue('provider_id', $qb->createNamedParameter($index->getProviderId()))
 			   ->setValue('document_id', $qb->createNamedParameter($index->getDocumentId()))
-			   ->setValue('status', $qb->createNamedParameter($index->getStatus()));
+			   ->setValue('status', $qb->createNamedParameter($index->getStatus()))
+			   ->setValue('indexed', $qb->createNamedParameter($index->getLastIndex()));
 
 			$qb->execute();
 
@@ -59,17 +61,22 @@ class LastIndexesRequest extends LastIndexesRequestBuilder {
 
 	/**
 	 * @param DocumentIndex $index
+	 *
+	 * @return bool
 	 */
 	public function update(DocumentIndex $index) {
 
-		$qb = $this->getLastIndexesUpdateSql();
+		$qb = $this->getIndexesUpdateSql();
 		$qb->set('owner_id', $qb->createNamedParameter($index->getOwnerId()))
-		   ->set('status', $qb->createNamedParameter($index->getStatus()));
+		   ->set('status', $qb->createNamedParameter($index->getStatus()))
+		   ->set('indexed', $qb->createNamedParameter($index->getLastIndex()));
 
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
 
-		$qb->execute();
+		$result = $qb->execute();
+
+		return ($result > 0);
 	}
 
 
@@ -78,7 +85,7 @@ class LastIndexesRequest extends LastIndexesRequestBuilder {
 	 */
 	public function delete(DocumentIndex $index) {
 
-		$qb = $this->getLastIndexesDeleteSql();
+		$qb = $this->getIndexesDeleteSql();
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
 
@@ -89,18 +96,18 @@ class LastIndexesRequest extends LastIndexesRequestBuilder {
 	/**
 	 * return list of last indexes from a providerId.
 	 *
-	 * @param string $providerId
+	 * @param INextSearchProvider $provider
 	 *
 	 * @return DocumentIndex[]
 	 */
-	public function getLastIndexesFromProviderId($providerId) {
-		$qb = $this->getLastIndexesSelectSql();
-		$this->limitToProviderId($qb, $providerId);
+	public function getIndexesFromProvider(INextSearchProvider $provider) {
+		$qb = $this->getIndexesSelectSql();
+		$this->limitToProviderId($qb, $provider->getId());
 
 		$indexes = [];
 		$cursor = $qb->execute();
 		while ($data = $cursor->fetch()) {
-			$indexes[] = $this->parseLastIndexesSelectSql($data);
+			$indexes[] = $this->parseIndexesSelectSql($data);
 		}
 		$cursor->closeCursor();
 
