@@ -83,11 +83,31 @@ class IndexesRequest extends IndexesRequestBuilder {
 	/**
 	 * @param Index $index
 	 */
-	public function delete(Index $index) {
-
+	public function deleteIndex(Index $index) {
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
+
+		$qb->execute();
+	}
+
+
+	/**
+	 * @param string $providerId
+	 */
+	public function deleteFromProviderId($providerId) {
+		$qb = $this->getIndexesDeleteSql();
+		$this->limitToProviderId($qb, $providerId());
+
+		$qb->execute();
+	}
+
+
+	/**
+	 *
+	 */
+	public function reset() {
+		$qb = $this->getIndexesDeleteSql();
 
 		$qb->execute();
 	}

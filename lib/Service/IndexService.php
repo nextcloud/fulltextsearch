@@ -222,6 +222,7 @@ class IndexService {
 		if ($providerId === '') {
 			$platform->removeIndex(null);
 			$this->providerService->setProvidersAsNotIndexed();
+			$this->indexesRequest->reset();
 
 			return;
 		} else {
@@ -231,6 +232,7 @@ class IndexService {
 		foreach ($providers AS $provider) {
 			$platform->removeIndex($provider);
 			$this->providerService->setProviderAsIndexed($provider, false);
+			$this->indexesRequest->deleteFromProviderId($provider->getId);
 		}
 	}
 
