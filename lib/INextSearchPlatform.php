@@ -47,6 +47,8 @@ interface INextSearchPlatform {
 	public function getName();
 
 
+	public function getClient();
+
 	/**
 	 * Load the search platform
 	 */
@@ -58,9 +60,13 @@ interface INextSearchPlatform {
 
 
 	/**
-	 * Init an index
+	 * Init an index regarding a provider
+	 *
+	 * @param INextSearchProvider $provider
+	 *
+	 * @return
 	 */
-	public function initializeIndex();
+	public function initializeIndex(INextSearchProvider $provider);
 
 
 	/**

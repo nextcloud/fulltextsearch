@@ -61,6 +61,17 @@ Add and **EDIT** those lines into _elasticsearch.yml_ (usually in /etc/elasticse
 This is where you define the login and password for your nextcloud, and the index to reach. In the lines above, we have 2 clouds (cloud1 and cloud2), each one having its own credentials to access its own index (my_index and another_index)
 
 
+### ingest-attachment
+
+If you want to index non-plaintext content (PDF, by example) you will need:
+
+>     sudo bin/elasticsearch-plugin install ingest-attachment
+
+Usually, the elasticsearch-plugin executable is in _/usr/share/elasticsearch/bin/_
+
+### Restart the service
+
+Restart elasticsearch.
 
 # 2. FullNextSearch
 

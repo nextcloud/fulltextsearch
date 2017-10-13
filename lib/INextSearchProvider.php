@@ -60,12 +60,11 @@ interface INextSearchProvider {
 	 * returns all indexable document for a user.
 	 * There is no need to fill the document with content at this point.
 	 *
-	 * @param INextSearchPlatform $platform
 	 * @param string $userId
 	 *
 	 * @return IndexDocument[]
 	 */
-	public function generateIndexableDocuments(INextSearchPlatform $platform, $userId);
+	public function generateIndexableDocuments($userId);
 
 
 	/**
@@ -76,6 +75,25 @@ interface INextSearchProvider {
 	 * @return IndexDocument[]
 	 */
 	public function fillIndexDocuments($chunk);
+
+
+	/**
+	 * @param INextSearchPlatform $platform
+	 */
+	public function onInitializingIndex(INextSearchPlatform $platform);
+
+
+	/**
+	 * @param INextSearchPlatform $platform
+	 * @param IndexDocument $document
+	 */
+	public function onIndexingDocument(INextSearchPlatform $platform, IndexDocument $document);
+
+
+	/**
+	 * @param INextSearchPlatform $platform
+	 */
+	public function onRemovingIndex(INextSearchPlatform $platform);
 
 
 	/**

@@ -90,9 +90,9 @@ class IndexService {
 		INextSearchProvider $provider, $userId, ExtendedBase $command = null
 	) {
 		$platform = $this->platformService->getPlatform();
-		$platform->initializeIndex();
+		$platform->initializeIndex($provider);
 
-		$documents = $provider->generateIndexableDocuments($platform, $userId);
+		$documents = $provider->generateIndexableDocuments($userId);
 		//$maxSize = sizeof($documents);
 		$toIndex = $this->removeUpToDateDocuments($provider, $documents);
 

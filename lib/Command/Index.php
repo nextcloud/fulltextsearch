@@ -104,6 +104,7 @@ class Index extends ExtendedBase {
 		$users = $this->userManager->search('');
 
 		foreach ($users as $user) {
+
 			$this->hasBeenInterrupted();
 
 			$output->writeln(' USER: ' . $user->getUID());
