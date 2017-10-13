@@ -81,27 +81,22 @@ class IndexService {
 //				echo memory_get_usage() . "\n";
 
 	/**
+	 * @param INextSearchProvider $provider
 	 * @param $userId
 	 * @param ExtendedBase|null $command
 	 *
-	 * @throws InterruptException
 	 */
-	public function indexContentFromUser($userId, ExtendedBase $command = null) {
-		$providers = $this->providerService->getProviders();
+	public function indexProviderContentFromUser(
+		INextSearchProvider $provider, $userId, ExtendedBase $command = null
+	) {
 		$platform = $this->platformService->getPlatform();
-
 		$platform->initializeIndex();
-		foreach ($providers AS $provider) {
 
-			$documents = $provider->generateIndexableDocuments($platform, $userId);
-			//$maxSize = sizeof($documents);
-			$toIndex = $this->removeUpToDateDocuments($provider, $documents);
+		$documents = $provider->generateIndexableDocuments($platform, $userId);
+		//$maxSize = sizeof($documents);
+		$toIndex = $this->removeUpToDateDocuments($provider, $documents);
 
-			$this->indexChunks($platform, $provider, $toIndex, $command);
-
-			$this->providerService->setProviderAsIndexed($provider, true);
-		}
-
+		$this->indexChunks($platform, $provider, $toIndex, $command);
 	}
 
 

@@ -28,17 +28,26 @@
 namespace OCA\FullNextSearch\Command;
 
 use Exception;
+use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\ExtendedBase;
 use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\MiscService;
+use OCA\FullNextSearch\Service\ProviderService;
+use OCP\IUserManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
 class Index extends ExtendedBase {
 
+	/** @var IUserManager */
+	private $userManager;
+
 	/** @var IndexService */
 	private $indexService;
+
+	/** @var ProviderService */
+	private $providerService;
 
 	/** @var MiscService */
 	private $miscService;
@@ -47,13 +56,20 @@ class Index extends ExtendedBase {
 	/**
 	 * Index constructor.
 	 *
+	 * @param IUserManager $userManager
 	 * @param IndexService $indexService
+	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
 	 */
-	public function __construct(IndexService $indexService, MiscService $miscService) {
+	public function __construct(
+		IUserManager $userManager, IndexService $indexService, ProviderService $providerService,
+		MiscService $miscService
+	) {
 		parent::__construct();
-		$this->indexService = $indexService;
+		$this->userManager = $userManager;
 
+		$this->indexService = $indexService;
+		$this->providerService = $providerService;
 		$this->miscService = $miscService;
 	}
 
@@ -71,18 +87,9 @@ class Index extends ExtendedBase {
 		$this->setOutput($output);
 		try {
 
-			$users = \OC::$server->getUserManager()
-								 ->search('');
-
-			foreach ($users as $user) {
-				if ($user->getUID() === 'test1') {
-					continue;
-				}
-
-				$this->hasBeenInterrupted();
-
-				$output->writeln(' USER: ' . $user->getUID());
-				$this->indexService->indexContentFromUser($user->getUID(), $this);
+			$providers = $this->providerService->getProviders();
+			foreach ($providers as $provider) {
+				$this->indexProvider($provider, $input, $output);
 			}
 
 		} catch (Exception $e) {
@@ -90,6 +97,22 @@ class Index extends ExtendedBase {
 		}
 	}
 
+
+	private function indexProvider(
+		INextSearchProvider $provider, InputInterface $input, OutputInterface $output
+	) {
+		$users = $this->userManager->search('');
+
+		foreach ($users as $user) {
+			$this->hasBeenInterrupted();
+
+			$output->writeln(' USER: ' . $user->getUID());
+			$this->indexService->indexProviderContentFromUser($provider, $user->getUID(), $this);
+		}
+
+		$this->providerService->setProviderAsIndexed($provider, true);
+
+	}
 
 }
 

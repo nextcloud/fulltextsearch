@@ -167,9 +167,13 @@ class ProviderService {
 	 * @return bool
 	 */
 	public function isProviderIndexed($providerId) {
-		$indexed = $this->configService->getProviderOptions(
-			$providerId, ConfigService::PROVIDER_INDEXED
-		);
+		try {
+			$indexed = $this->configService->getProviderOptions(
+				$providerId, ConfigService::PROVIDER_INDEXED
+			);
+		} catch (ProviderOptionsDoesNotExistException $e) {
+			return false;
+		}
 
 		if ($indexed === '1') {
 			return true;
