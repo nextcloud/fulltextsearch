@@ -32,19 +32,10 @@
 var result = {
 
 	displayResult: function (res) {
-
-		if (Number(res.meta.size) < 1) {
-			OCA.notification.onFail('Search returned no result');
-			return;
-		}
-
 		var searchResult = res.result;
-
 		for (var i = 0; i < searchResult.length; i++) {
 			result.displayProviderResult(searchResult[i]);
 		}
-
-		OCA.notification.onSuccess('Search returned ' + res.meta.size + ' result(s)');
 	},
 
 

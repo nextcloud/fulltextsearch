@@ -59,9 +59,14 @@ Navigate.prototype = {
 
 
 	searchResult: function (result) {
+
 		if (elements.search_json !== null) {
 			elements.search_json.text(JSON.stringify(result));
 		}
+
+//			OCA.notification.onFail('Search returned no result');
+//		OCA.notification.onSuccess('Search returned ' + res.meta.size + ' result(s)');
+
 	},
 
 
@@ -79,8 +84,9 @@ Navigate.prototype = {
 	}
 };
 
-
 OCA.NextSearch.Example = Navigate;
+
+
 
 $(document).ready(function () {
 	OCA.NextSearch.example = new Navigate();

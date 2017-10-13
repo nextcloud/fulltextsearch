@@ -25,7 +25,6 @@
  */
 
 /** global: OCA */
-/** global: Notyf */
 /** global: settings */
 /** global: result */
 /** global: nav */
@@ -45,40 +44,8 @@
 
 		settings.generateDefaultTemplate();
 	};
-
-
-	/**
-	 * @constructs Notification
-	 */
-	var Notification = function () {
-		this.initialize();
-	};
-
-	Notification.prototype = {
-
-		initialize: function () {
-
-			var notyf = new Notyf({
-				delay: 5000
-			});
-
-			this.onSuccess = function (text) {
-				notyf.confirm(text);
-			};
-
-			this.onFail = function (text) {
-				notyf.alert(text);
-			};
-
-		}
-
-	};
-
+	
 	OCA.NextSearch = NextSearch;
 	OCA.NextSearch.api = new NextSearch();
-
-	OCA.Notification = Notification;
-	OCA.notification = new Notification();
-
 
 })();

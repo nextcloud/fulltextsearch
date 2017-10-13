@@ -53,13 +53,12 @@ var curr = {
 
 var nav = {
 
-
 		failedToAjax: function () {
-			OCA.notification.onSuccess(
-				'Failed to connect to cloud, page will be refresh within few seconds');
-			window.setTimeout(function () {
-				window.location.reload(true);
-			}, 4000);
+			// OCA.notification.onFail(
+			// 	'Failed to connect to cloud, page will refresh within few seconds');
+			// window.setTimeout(function () {
+			// 	window.location.reload(true);
+			// }, 4000);
 		},
 
 
