@@ -9,7 +9,7 @@
 This is the core app of the Full Next Search app, and by itself won't do anything. To work, you will need to add few more apps (modules):
 
 - A gateway to a _Search Platform_. It is an app that will communicate to a search platform (like Elastic Search, Solr, ...). right now, only one app is doing this: [FullNextSearch_ElasticSearch](https://github.com/daita/fullnextsearch_elasticsearch)
-- Few _Content Provider_. Those apps will browse a specific type of content to generate the index. As of today, only your files can be indexed: [Files_FullNextSearch](https://github.com/daita/files_fullnextsearch)
+- Some _Content Provider_. Those apps will browse a specific type of content to generate the index. As of today, only your files can be indexed: [Files_FullNextSearch](https://github.com/daita/files_fullnextsearch)
 
 
 
@@ -17,6 +17,7 @@ This is the core app of the Full Next Search app, and by itself won't do anythin
 
 You can download the app from the store, or download the source from the git repository and copy it in **apps/**.
 
+[Complete installation instruction](https://github.com/nextcloud/nextant/blob/fullnextsearch/INSTALL.md)
 
 
 ### Configuration
