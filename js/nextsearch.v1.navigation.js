@@ -228,6 +228,11 @@ var nav = {
 				divTemplate = settings.entryTemplateDefault;
 			}
 
+			if (!divTemplate.length) {
+				console.log('FullNextSearch Error: template_entry is not defined');
+				return;
+			}
+
 			var tmpl = divTemplate.html();
 			tmpl = tmpl.replace(/%%id%%/g, escapeHTML(document.id));
 

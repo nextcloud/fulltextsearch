@@ -45,8 +45,8 @@ Navigate.prototype = {
 	init: function () {
 		var self = this;
 
-		nextSearch.setEntryTemplateId('template_entry', self);
-		nextSearch.setResultContainerId('search_result');
+		nextSearch.setEntryTemplateId($('#template_entry'), self);
+		nextSearch.setResultContainerId($('#search_result'));
 
 		elements.search_input = $('#search_input');
 		elements.search_submit = $('#search_submit');
@@ -80,10 +80,10 @@ Navigate.prototype = {
 };
 
 
-OCA.NextSearch.Navigate = Navigate;
+OCA.NextSearch.Example = Navigate;
 
 $(document).ready(function () {
-	OCA.NextSearch.navigate = new Navigate();
+	OCA.NextSearch.example = new Navigate();
 });
 
 

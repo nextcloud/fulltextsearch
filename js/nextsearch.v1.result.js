@@ -33,7 +33,6 @@ var result = {
 
 	displayResult: function (res) {
 
-		console.log('___' + JSON.stringify(res));
 		if (Number(res.meta.size) < 1) {
 			OCA.notification.onFail('Search returned no result');
 			return;
@@ -69,7 +68,6 @@ var result = {
 	},
 
 
-
 	recalibrateResult: function (oldResult, newResult) {
 		var tmpResult = [];
 		for (var i = 0; i < oldResult.length; i++) {
@@ -80,8 +78,6 @@ var result = {
 
 		return tmpResult;
 	},
-
-
 
 
 	getResultIndex: function (id, result) {
@@ -97,7 +93,6 @@ var result = {
 
 		return -1;
 	}
-
 
 
 };

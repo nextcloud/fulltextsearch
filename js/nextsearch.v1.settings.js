@@ -38,30 +38,29 @@ var settings = {
 
 	generateDefaultTemplate: function () {
 
-		var tmpl = $('<div>', {
-			class: 'result_entry_default'
-		});
+		var divLeft = $('<div>', {class: 'result_entry_left'});
+		divLeft.append($('<div>', {id: 'title'}));
+		divLeft.append($('<div>', {id: 'line1'}));
+		divLeft.append($('<div>', {id: 'line2'}));
 
-		var left = $('<div>', {class: 'result_entry_left'});
-		left.append($('<div>', {id: 'title'}));
+		var divRight = $('<div>', {class: 'result_entry_right'});
+		divRight.append($('<div>', {id: 'score'}));
 
-		var right = $('<div>', {class: 'result_entry_right'});
-		right.append($('<div>', {id: 'score'}));
+		var div = $('<div>', {class: 'result_entry_default'});
+		div.append(divLeft);
+		div.append(divRight);
 
-		tmpl.append(left);
-		tmpl.append(right);
-
-		settings.entryTemplateDefault = $('<div>').append(tmpl);
+		settings.entryTemplateDefault = $('<div>').append(div);
 	},
 
 
-	setEntryTemplateId: function (templateId, parent) {
-		settings.entryTemplate = $('#' + templateId);
+	setEntryTemplateId: function (template, parent) {
+		settings.entryTemplate = template;
 		settings.parent = parent;
 	},
 
-	setResultContainerId: function (containerId) {
-		settings.resultContainer = $('#' + containerId);
+	setResultContainerId: function (container) {
+		settings.resultContainer = container;
 	},
 
 	parentHasMethod: function (method) {
