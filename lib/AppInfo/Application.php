@@ -78,7 +78,7 @@ class Application extends App {
 			'id'    => self::APP_NAME,
 			'order' => 5,
 			'href'  => $urlGen->linkToRoute('fullnextsearch.Navigation.navigate'),
-			'icon'  => $urlGen->imagePath(self::APP_NAME, 'ruler.svg'),
+			'icon'  => $urlGen->imagePath(self::APP_NAME, 'fullnextsearch.svg'),
 			'name'  => $navName
 		];
 	}
