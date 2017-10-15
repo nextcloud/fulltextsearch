@@ -30,11 +30,12 @@
 var settings = {
 
 	parent: null,
-	delay_provider: 600,
-	delay_result: 300,
+	delay_provider: 300,
+	delay_result: 150,
 	resultContainer: null,
 	entryTemplate: null,
 	entryTemplateDefault: null,
+	divNoResult: null,
 
 	generateDefaultTemplate: function () {
 
@@ -54,6 +55,14 @@ var settings = {
 	},
 
 
+	generateNoResultDiv: function () {
+		var div = $('<div>', {id: 'noresult'});
+		div.html('no result');
+		div.hide();
+		settings.divNoResult = div;
+	},
+
+
 	setEntryTemplateId: function (template, parent) {
 		settings.entryTemplate = template;
 		settings.parent = parent;
@@ -61,6 +70,7 @@ var settings = {
 
 	setResultContainerId: function (container) {
 		settings.resultContainer = container;
+		settings.resultContainer.prepend(settings.divNoResult);
 	},
 
 	parentHasMethod: function (method) {

@@ -1,0 +1,28 @@
+#search_header {
+	height: 200px;
+	width: 100%;
+	text-align: center;
+	background-color: #f6f6f6;
+	border-bottom: solid #d7d7d7 1px;
+}
+
+#search_input {
+	width: 400px;
+	position: relative;
+	top: 50%;
+	transform: perspective(1px) translateY(-50%);
+}
+
+#search_result {
+	margin: 50px 80px 0px 50px;
+}
+
+.provider_result {
+	margin-left: 30px;
+}
+
+#noresult {
+	font-style: italic;
+	position: absolute;
+	left: 100px;
+}

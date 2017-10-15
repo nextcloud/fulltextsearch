@@ -31,9 +31,11 @@ const nextSearch = OCA.NextSearch.api;
 
 
 var elements = {
+	searchTimeout: null,
 	search_input: null,
 	search_submit: null,
-	search_json: null
+	search_json: null,
+	divHeader: null
 };
 
 const Navigate = function () {
@@ -51,10 +53,43 @@ Navigate.prototype = {
 		elements.search_input = $('#search_input');
 		elements.search_submit = $('#search_submit');
 		elements.search_json = $('#search_json');
+		elements.divHeader = $('#search_header');
 
-		elements.search_submit.on('click', function () {
-			nextSearch.search('files', elements.search_input.val(), self.searchResult);
+		elements.search_input.on('input', function () {
+			self.resetSearch();
+			if (elements.searchTimeout === null && self.initSearch(false)) {
+				elements.searchTimeout = _.delay(function () {
+					self.initSearch(false);
+					elements.searchTimeout = null;
+				}, 3000);
+			}
 		});
+
+		$(document).keypress(function (e) {
+			if (e.which === 13) {
+				self.initSearch(true);
+			}
+		});
+	},
+
+
+	initSearch: function (force) {
+		var search = elements.search_input.val();
+
+		if (!force && search.length < 3) {
+			return false;
+		}
+
+		nextSearch.search('files', search, this.searchResult);
+
+		return true;
+	},
+
+
+	resetSearch: function () {
+		// if (elements.search_input.val() !== '') {
+		// 	return;
+		// }
 	},
 
 
@@ -86,7 +121,6 @@ Navigate.prototype = {
 };
 
 OCA.NextSearch.Example = Navigate;
-
 
 
 $(document).ready(function () {

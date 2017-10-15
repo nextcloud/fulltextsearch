@@ -32,18 +32,34 @@
 var result = {
 
 	displayResult: function (res) {
+
+		if (settings.resultContainer === null) {
+			return;
+		}
+
 		var searchResult = res.result;
+		if (searchResult.length === 0) {
+			result.displayNoResult();
+			return;
+		}
+
 		for (var i = 0; i < searchResult.length; i++) {
 			result.displayProviderResult(searchResult[i]);
 		}
 	},
 
 
+	displayNoResult: function () {
+		settings.divNoResult.fadeTo(settings.delay_result, 1);
+		settings.resultContainer.find('.provider_header').each(function () {
+			$(this).fadeTo(settings.delay_result, 0);
+		});
+	},
+
+
 	displayProviderResult: function (result) {
 
-		if (settings.resultContainer === null) {
-			return;
-		}
+		settings.divNoResult.fadeTo(settings.delay_result, 0);
 
 		var current = curr.getProviderResult(result.provider.id);
 		var divProvider = nav.getDivProvider(result.provider.id, result.provider.name);

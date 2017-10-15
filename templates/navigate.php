@@ -6,15 +6,16 @@ use OCP\Util;
 
 NextSearch::addJavascriptAPI();
 Util::addScript(NextSearch::appName(), 'navigate');
-
+Util::addStyle(NextSearch::appName(), 'navigate');
 
 ?>
 
-Full Next Search
+<div id="search_header">
+	<input id="search_input" placeholder="Full Next Search">
+<!--	<input id="search_submit" type="submit"-->
+<!--		   value="--><?php //p($l->t('Search on %s', [$_['themingName']])); ?><!--">-->
+</div>
 
-
-<input id="search_input" value="">
-<input id="search_submit" type="submit" value="go">
 
 <div id="search_result"></div>
 

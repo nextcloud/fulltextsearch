@@ -43,8 +43,9 @@
 		$.extend(NextSearch.prototype, api);
 
 		settings.generateDefaultTemplate();
+		settings.generateNoResultDiv();
 	};
-	
+
 	OCA.NextSearch = NextSearch;
 	OCA.NextSearch.api = new NextSearch();
 

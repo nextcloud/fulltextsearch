@@ -32,9 +32,13 @@ use OCA\FullNextSearch\Service\ConfigService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\IConfig;
 use OCP\IRequest;
 
 class NavigationController extends Controller {
+
+	/** @var IConfig */
+	private $config;
 
 	/** @var ConfigService */
 	private $configService;
@@ -47,11 +51,15 @@ class NavigationController extends Controller {
 	 * NavigationController constructor.
 	 *
 	 * @param IRequest $request
+	 * @param IConfig $config
 	 * @param ConfigService $configService
 	 * @param MiscService $miscService
 	 */
-	public function __construct(IRequest $request, ConfigService $configService, MiscService $miscService) {
+	public function __construct(
+		IRequest $request, IConfig $config, ConfigService $configService, MiscService $miscService
+	) {
 		parent::__construct(Application::APP_NAME, $request);
+		$this->config = $config;
 		$this->configService = $configService;
 		$this->miscService = $miscService;
 	}
@@ -65,7 +73,12 @@ class NavigationController extends Controller {
 	 * @return TemplateResponse
 	 */
 	public function navigate() {
-		return new TemplateResponse(Application::APP_NAME, 'navigate', []);
+
+		$themingName = $this->config->getAppValue('theming', 'name', 'Nextcloud');
+
+		$data = ['themingName' => $themingName];
+
+		return new TemplateResponse(Application::APP_NAME, 'navigate', $data);
 	}
 
 
