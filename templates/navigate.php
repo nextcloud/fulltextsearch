@@ -11,7 +11,7 @@ Util::addStyle(NextSearch::appName(), 'navigate');
 ?>
 
 <div id="search_header">
-	<input id="search_input" placeholder="Full Next Search">
+	<input id="search_input" placeholder="<?php p($l->t('Search on %s', [$_['themingName']])); ?>">
 <!--	<input id="search_submit" type="submit"-->
 <!--		   value="--><?php //p($l->t('Search on %s', [$_['themingName']])); ?><!--">-->
 </div>
