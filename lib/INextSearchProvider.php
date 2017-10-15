@@ -85,15 +85,24 @@ interface INextSearchProvider {
 
 	/**
 	 * @param INextSearchPlatform $platform
-	 * @param IndexDocument $document
+	 * @param array $arr
 	 */
-	public function onIndexingDocument(INextSearchPlatform $platform, IndexDocument $document);
+	public function onIndexingDocument(INextSearchPlatform $platform, $arr);
 
 
 	/**
 	 * @param INextSearchPlatform $platform
 	 */
 	public function onRemovingIndex(INextSearchPlatform $platform);
+
+
+	/**
+	 * @param INextSearchPlatform $platform
+	 * @param array $arr
+	 *
+	 * @return
+	 */
+	public function onSearchingQuery(INextSearchPlatform $platform, $arr);
 
 
 	/**

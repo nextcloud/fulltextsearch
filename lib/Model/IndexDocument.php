@@ -29,6 +29,9 @@ namespace OCA\FullNextSearch\Model;
 
 class IndexDocument implements \JsonSerializable {
 
+	const NOT_ENCODED = 0;
+	const ENCODED_BASE64 = 1;
+
 	/** @var string|int */
 	private $id;
 
@@ -59,6 +62,8 @@ class IndexDocument implements \JsonSerializable {
 	/** @var array */
 	private $info;
 
+	/** @var int */
+	private $contentEncoded;
 
 	public function __construct($providerId, $id) {
 		$this->providerId = $providerId;
@@ -175,8 +180,9 @@ class IndexDocument implements \JsonSerializable {
 	 *
 	 * @return $this
 	 */
-	public function setContent($content) {
+	public function setContent($content, $encoded = 0) {
 		$this->content = $content;
+		$this->contentEncoded = $encoded;
 
 		return $this;
 	}
@@ -187,6 +193,15 @@ class IndexDocument implements \JsonSerializable {
 	public function getContent() {
 		return $this->content;
 	}
+
+
+	/**
+	 * @return int
+	 */
+	public function isContentEncoded() {
+		return $this->contentEncoded;
+	}
+
 
 
 	/**
@@ -265,7 +280,6 @@ class IndexDocument implements \JsonSerializable {
 		return $this;
 	}
 
-
 	/**
 	 * @param string $info
 	 * @param mixed $default
@@ -278,6 +292,24 @@ class IndexDocument implements \JsonSerializable {
 		}
 
 		return $this->info[$info];
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function getInfoAll() {
+
+		$info = [];
+		foreach ($this->info as $k => $v) {
+			if (substr($k, 0, 1) === '_') {
+				continue;
+			}
+
+			$info[$k] = $v;
+		}
+
+		return $info;
 	}
 
 
