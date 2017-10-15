@@ -87,7 +87,7 @@ interface INextSearchProvider {
 	 * @param INextSearchPlatform $platform
 	 * @param array $arr
 	 */
-	public function onIndexingDocument(INextSearchPlatform $platform, $arr);
+	public function onIndexingDocument(INextSearchPlatform $platform, &$arr);
 
 
 	/**
@@ -102,7 +102,7 @@ interface INextSearchProvider {
 	 *
 	 * @return
 	 */
-	public function onSearchingQuery(INextSearchPlatform $platform, $arr);
+	public function onSearchingQuery(INextSearchPlatform $platform, &$arr);
 
 
 	/**
