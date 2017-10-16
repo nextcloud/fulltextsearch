@@ -1,5 +1,4 @@
 
-
 .provider_result {
 	font-style: italic;
 }
@@ -44,4 +43,26 @@
 	font-weight: bold;
 	font-style: italic;
 }
+
+.next_search_div {
+	position: relative;
+	width: 250px;
+	height: 36px;
+	margin-right: 20px;
+}
+
+.icon-fullnextsearch, .icon-close-fullnextsearch {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	cursor: pointer;
+}
+
+.search_input {
+	background: #0f0;
+	width: 212px;
+	height: 30px;
+	margin: 2px !important;
+}
+
 
