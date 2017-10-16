@@ -141,7 +141,7 @@ class IndexService {
 		INextSearchPlatform $platform, INextSearchProvider $provider, $documents, ExtendedBase $command
 	) {
 		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
-		for ($i = 0; $i < 10000; $i++) {
+		for ($i = 0; $i < sizeof($documents); $i++) {
 
 			try {
 				$chunk = array_splice($documents, 0, $chunkSize);
@@ -157,7 +157,7 @@ class IndexService {
 				throw $e;
 			}
 
-			echo sizeof($documents) . '   - RAM: ' . (memory_get_usage() / 1024 / 1024) . "\n";
+			echo '- RAM: ' . (memory_get_usage() / 1024 / 1024) . "\n";
 		}
 	}
 
