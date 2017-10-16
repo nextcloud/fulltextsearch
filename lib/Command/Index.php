@@ -32,6 +32,7 @@ use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\ExtendedBase;
 use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\MiscService;
+use OCA\FullNextSearch\Service\PlatformService;
 use OCA\FullNextSearch\Service\ProviderService;
 use OCP\IUserManager;
 use Symfony\Component\Console\Input\InputInterface;
@@ -46,6 +47,9 @@ class Index extends ExtendedBase {
 	/** @var IndexService */
 	private $indexService;
 
+	/** @var PlatformService */
+	private $platformService;
+
 	/** @var ProviderService */
 	private $providerService;
 
@@ -58,17 +62,19 @@ class Index extends ExtendedBase {
 	 *
 	 * @param IUserManager $userManager
 	 * @param IndexService $indexService
+	 * @param PlatformService $platformService
 	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IUserManager $userManager, IndexService $indexService, ProviderService $providerService,
-		MiscService $miscService
+		IUserManager $userManager, IndexService $indexService, PlatformService $platformService,
+		ProviderService $providerService, MiscService $miscService
 	) {
 		parent::__construct();
 		$this->userManager = $userManager;
 
 		$this->indexService = $indexService;
+		$this->platformService = $platformService;
 		$this->providerService = $providerService;
 		$this->miscService = $miscService;
 	}
@@ -101,6 +107,9 @@ class Index extends ExtendedBase {
 	private function indexProvider(
 		INextSearchProvider $provider, InputInterface $input, OutputInterface $output
 	) {
+		$platform = $this->platformService->getPlatform();
+		$platform->initializeIndex($provider);
+
 		$users = $this->userManager->search('');
 
 		foreach ($users as $user) {
@@ -108,7 +117,9 @@ class Index extends ExtendedBase {
 			$this->hasBeenInterrupted();
 
 			$output->writeln(' USER: ' . $user->getUID());
-			$this->indexService->indexProviderContentFromUser($provider, $user->getUID(), $this);
+			$this->indexService->indexProviderContentFromUser(
+				$platform, $provider, $user->getUID(), $this
+			);
 		}
 
 		$this->providerService->setProviderAsIndexed($provider, true);

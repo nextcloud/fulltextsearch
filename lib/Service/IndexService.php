@@ -81,17 +81,14 @@ class IndexService {
 //				echo memory_get_usage() . "\n";
 
 	/**
+	 * @param INextSearchPlatform $platform
 	 * @param INextSearchProvider $provider
-	 * @param $userId
+	 * @param string $userId
 	 * @param ExtendedBase|null $command
-	 *
 	 */
 	public function indexProviderContentFromUser(
-		INextSearchProvider $provider, $userId, ExtendedBase $command = null
+		INextSearchPlatform $platform, INextSearchProvider $provider, $userId, ExtendedBase $command = null
 	) {
-		$platform = $this->platformService->getPlatform();
-		$platform->initializeIndex($provider);
-
 		$documents = $provider->generateIndexableDocuments($userId);
 		//$maxSize = sizeof($documents);
 		$toIndex = $this->removeUpToDateDocuments($provider, $documents);
