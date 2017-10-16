@@ -203,7 +203,6 @@ class IndexDocument implements \JsonSerializable {
 	}
 
 
-
 	/**
 	 * @param string $link
 	 *
@@ -312,6 +311,20 @@ class IndexDocument implements \JsonSerializable {
 		return $info;
 	}
 
+
+	public function __destruct() {
+		unset($this->id);
+		unset($this->providerId);
+		unset($this->access);
+		unset($this->modifiedTime);
+		unset($this->title);
+		unset($this->content);
+		unset($this->link);
+		unset($this->excerpts);
+		unset($this->score);
+		unset($this->info);
+		unset($this->contentEncoded);
+	}
 
 	/**
 	 * @return array

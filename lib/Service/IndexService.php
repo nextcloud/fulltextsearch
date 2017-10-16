@@ -78,7 +78,6 @@ class IndexService {
 		$this->miscService = $miscService;
 	}
 
-//				echo memory_get_usage() . "\n";
 
 	/**
 	 * @param INextSearchPlatform $platform
@@ -87,7 +86,8 @@ class IndexService {
 	 * @param ExtendedBase|null $command
 	 */
 	public function indexProviderContentFromUser(
-		INextSearchPlatform $platform, INextSearchProvider $provider, $userId, ExtendedBase $command = null
+		INextSearchPlatform $platform, INextSearchProvider $provider, $userId,
+		ExtendedBase $command = null
 	) {
 		$documents = $provider->generateIndexableDocuments($userId);
 		//$maxSize = sizeof($documents);
@@ -135,31 +135,36 @@ class IndexService {
 	 * @param IndexDocument[] $documents
 	 * @param ExtendedBase $command
 	 *
-	 * @return Index[]
 	 * @throws Exception
 	 */
 	private function indexChunks(
 		INextSearchPlatform $platform, INextSearchProvider $provider, $documents, ExtendedBase $command
 	) {
 
-		$index = [];
-		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
+		$test = new IndexDocument('dd', 'dd');
+		unset($test);
 
+
+		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
 		for ($i = 0; $i < 10000; $i++) {
+
 
 			try {
 				$chunk = array_splice($documents, 0, $chunkSize);
-				$index =
-					array_merge($index, $this->indexChunk($platform, $provider, $chunk, $command));
+				$this->indexChunk($platform, $provider, $chunk, $command);
+
+				/** @var IndexDocument $doc */
+				foreach ($chunk as $doc) {
+					$doc->__destruct();
+				}
 			} catch (NoResultException $e) {
-				return $index;
+				return;
 			} catch (Exception $e) {
 				throw $e;
 			}
 
+			echo sizeof($documents) . '   - RAM: ' . (memory_get_usage() / 1024 / 1024) . "\n";
 		}
-
-		return $index;
 	}
 
 
@@ -169,7 +174,6 @@ class IndexService {
 	 * @param IndexDocument[] $chunk
 	 * @param ExtendedBase|null $command
 	 *
-	 * @return Index[]
 	 * @throws NoResultException
 	 */
 	private function indexChunk(
@@ -182,8 +186,6 @@ class IndexService {
 		$documents = $provider->fillIndexDocuments($chunk);
 		$indexes = $platform->indexDocuments($provider, $documents, $this->validCommand($command));
 		$this->updateIndexes($indexes);
-
-		return $indexes;
 	}
 
 
