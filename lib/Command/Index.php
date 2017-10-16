@@ -80,6 +80,9 @@ class Index extends ExtendedBase {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function configure() {
 		parent::configure();
 		$this->setName('fullnextsearch:index')
@@ -87,6 +90,13 @@ class Index extends ExtendedBase {
 	}
 
 
+	/**
+	 * @param InputInterface $input
+	 * @param OutputInterface $output
+	 *
+	 * @return int|null|void
+	 * @throws Exception
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$output->writeln('index');
 
@@ -104,6 +114,11 @@ class Index extends ExtendedBase {
 	}
 
 
+	/**
+	 * @param INextSearchProvider $provider
+	 * @param InputInterface $input
+	 * @param OutputInterface $output
+	 */
 	private function indexProvider(
 		INextSearchProvider $provider, InputInterface $input, OutputInterface $output
 	) {
