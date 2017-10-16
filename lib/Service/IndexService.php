@@ -140,14 +140,8 @@ class IndexService {
 	private function indexChunks(
 		INextSearchPlatform $platform, INextSearchProvider $provider, $documents, ExtendedBase $command
 	) {
-
-		$test = new IndexDocument('dd', 'dd');
-		unset($test);
-
-
 		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
 		for ($i = 0; $i < 10000; $i++) {
-
 
 			try {
 				$chunk = array_splice($documents, 0, $chunkSize);
@@ -155,7 +149,7 @@ class IndexService {
 
 				/** @var IndexDocument $doc */
 				foreach ($chunk as $doc) {
-					$doc->__destruct();
+					$doc->__destruct(); // because.
 				}
 			} catch (NoResultException $e) {
 				return;
