@@ -3,9 +3,19 @@
 
 # 1. Elasticsearch
 
-Install on Debian were done using this documentation : https://www.elastic.co/guide/en/elasticsearch/reference/master/deb.html
+Install on Debian is done using this documentation : https://www.elastic.co/guide/en/elasticsearch/reference/5.6/deb.html
 
 (Please keep me updated of any other documentation about installation of the last version (5.6) on other OS)
+
+>     wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+>     sudo apt-get install apt-transport-https
+
+>     echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
+
+>     sudo apt-get update && sudo apt-get install elasticsearch
+
+
 
 
 ## security:
@@ -27,6 +37,11 @@ There is 2 ways to implement Basic Authentication to your ElasticSearch:
 ### setup ReadonlyREST
 
 [Installation of ReadonlyREST](https://readonlyrest.com/documentation/index.html#Overview--Installing)
+
+_Note: If you cannot find ReadonlyREST available for your current version of elasticsearch, you can downgrade using:_
+>     apt-get install elasticsearch=5.6.1
+
+### Restart the service
 
 
 This is a simple configuration so you can setup multiple clouds on the same server, each one using it's own credentials:
@@ -60,6 +75,9 @@ Add and **EDIT** those lines into _elasticsearch.yml_ (usually in /etc/elasticse
 
 This is where you define the login and password for your nextcloud, and the index to reach. In the lines above, we have 2 clouds (cloud1 and cloud2), each one having its own credentials to access its own index (my_index and another_index)
 
+_Note: yaml can be really sensitive to copypasta, [if you have issue, please use this link](https://raw.githubusercontent.com/nextcloud/nextant/fullnextsearch/docs/elasticsearch-readonlyrest.yml)_
+
+
 
 ### ingest-attachment
 
@@ -68,6 +86,9 @@ If you want to index non-plaintext content (PDF, by example) you will need:
 >     sudo bin/elasticsearch-plugin install ingest-attachment
 
 Usually, the elasticsearch-plugin executable is in _/usr/share/elasticsearch/bin/_
+
+
+
 
 ### Restart the service
 
@@ -85,7 +106,7 @@ install all 3 apps (from git or from appstore):
 
  
 
-### basic configuration of the apps:
+### basic (but needed) configuration of the apps:
 
 - set the search platform to ElasticSearch:
 >     ./occ config:app:set --value 'OCA\FullNextSearch_ElasticSearch\Platform\ElasticSearchPlatform' fullnextsearch search_platform
@@ -97,12 +118,14 @@ install all 3 apps (from git or from appstore):
 >     ./occ config:app:set --value 'my_index' fullnextsearch_elasticsearch elastic_index
 
 
-
+c
 # enjoy.
 
 You will need to initiate a first index manually:
 
 >     ./occ fullnextsearch:index
 
+To reset the index:
 
+>     ./occ fullnextsearch:reset
 
