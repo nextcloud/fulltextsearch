@@ -10,7 +10,7 @@
 
 ]]>
 	</description>
-	<version>0.0.6</version>
+	<version>0.1.0</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullNextSearch</namespace>
@@ -18,9 +18,9 @@
 		<admin>https://github.com/nextcloud/nextant/blob/fullnextsearch/INSTALL.md</admin>
 	</documentation>
 	<category>tools</category>
-	<website>https://github.com/daita/fullnextsearch</website>
-	<bugs>https://github.com/daita/fullnextsearch/issues</bugs>
-	<repository>https://github.com/daita/fullnextsearch.git</repository>
+	<website>https://github.com/nextcloud/nextant</website>
+	<bugs>https://github.com/nextcloud/nextant/issues</bugs>
+	<repository>https://github.com/nextcloud/nextant.git</repository>
 	<!--<screenshot>-->
 	<!--</screenshot>-->
 	<dependencies>
