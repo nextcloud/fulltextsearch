@@ -25,17 +25,18 @@
  */
 
 /** global: OCA */
-/** global: settings */
+/** global: next_settings */
 /** global: curr */
 /** global: nav */
 
 var result = {
 
 	displayResult: function (res) {
-
-		if (settings.resultContainer === null) {
+		if (next_settings.resultContainer === null) {
 			return;
 		}
+
+		nav.onResultDisplayed();
 
 		var searchResult = res.result;
 		if (searchResult.length === 0) {
@@ -50,16 +51,16 @@ var result = {
 
 
 	displayNoResult: function () {
-		settings.divNoResult.fadeTo(settings.delay_result, 1);
-		settings.resultContainer.find('.provider_header').each(function () {
-			$(this).fadeTo(settings.delay_result, 0);
+		next_settings.divNoResult.fadeTo(next_settings.delay_result, 1);
+		next_settings.resultContainer.find('.provider_header').each(function () {
+			$(this).fadeTo(next_settings.delay_result, 0);
 		});
 	},
 
 
 	displayProviderResult: function (result) {
 
-		settings.divNoResult.fadeTo(settings.delay_result, 0);
+		next_settings.divNoResult.fadeTo(next_settings.delay_result, 0);
 
 		var current = curr.getProviderResult(result.provider.id);
 		var divProvider = nav.getDivProvider(result.provider.id, result.provider.name);
@@ -67,8 +68,8 @@ var result = {
 		nav.managerDivProviderResult(divProvider.children('.provider_result'), result.documents,
 			current.documents);
 
-		divProvider.slideDown(settings.delay_provider, function () {
-			$(this).fadeTo(settings.delay_provider, 1);
+		divProvider.slideDown(next_settings.delay_provider, function () {
+			$(this).fadeTo(next_settings.delay_provider, 1);
 		});
 
 		curr.setProviderResult(result.provider.id, result);

@@ -26,7 +26,7 @@
 
 
 /** global: OC */
-/** global: settings */
+/** global: next_settings */
 /** global: result */
 /** global: search */
 /** global: nav */

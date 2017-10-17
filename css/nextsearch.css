@@ -58,8 +58,8 @@
 	cursor: pointer;
 }
 
-.search_input {
-	background: #0f0;
+#next_search_input {
+	background: #fffc;
 	width: 212px;
 	height: 30px;
 	margin: 2px !important;

@@ -27,13 +27,15 @@
 /** global: search */
 /** global: api */
 
-var settings = {
+var next_settings = {
 
 	parent: null,
 	delay_provider: 300,
 	delay_result: 150,
 	resultContainer: null,
 	entryTemplate: null,
+	searchProviderId: '',
+	lockSearchbox: false,
 	entryTemplateDefault: null,
 	divNoResult: null,
 
@@ -51,7 +53,7 @@ var settings = {
 		div.append(divLeft);
 		div.append(divRight);
 
-		settings.entryTemplateDefault = $('<div>').append(div);
+		next_settings.entryTemplateDefault = $('<div>').append(div);
 	},
 
 
@@ -59,24 +61,29 @@ var settings = {
 		var div = $('<div>', {id: 'noresult'});
 		div.html('no result');
 		div.hide();
-		settings.divNoResult = div;
+		next_settings.divNoResult = div;
 	},
 
 
 	setEntryTemplateId: function (template, parent) {
-		settings.entryTemplate = template;
-		settings.parent = parent;
+		next_settings.entryTemplate = template;
+		next_settings.parent = parent;
 	},
 
 	setResultContainerId: function (container) {
-		settings.resultContainer = container;
-		settings.resultContainer.prepend(settings.divNoResult);
+		next_settings.resultContainer = container;
+		next_settings.resultContainer.prepend(next_settings.divNoResult);
+	},
+
+	addSearchBar: function (providerId) {
+		next_settings.searchProviderId = providerId;
+		searchbar.init();
 	},
 
 	parentHasMethod: function (method) {
-		if (settings.parent === null) {
+		if (next_settings.parent === null) {
 			return false;
 		}
-		return (typeof eval('settings.parent. ' + method) === "function");
+		return (typeof eval('next_settings.parent. ' + method) === "function");
 	}
 };

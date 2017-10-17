@@ -80,7 +80,7 @@ Navigate.prototype = {
 			return false;
 		}
 
-		nextSearch.search('files', search, this.searchResult);
+		nextSearch.search('_all', search, this.searchResult);
 
 		return true;
 	},

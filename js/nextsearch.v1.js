@@ -25,7 +25,7 @@
  */
 
 /** global: OCA */
-/** global: settings */
+/** global: next_settings */
 /** global: result */
 /** global: nav */
 /** global: api */
@@ -37,13 +37,14 @@
 	 * @constructs NextSearch
 	 */
 	var NextSearch = function () {
-		$.extend(NextSearch.prototype, settings);
+		$.extend(NextSearch.prototype, next_settings);
 		$.extend(NextSearch.prototype, result);
+		$.extend(NextSearch.prototype, searchbar);
 		$.extend(NextSearch.prototype, nav);
 		$.extend(NextSearch.prototype, api);
 
-		settings.generateDefaultTemplate();
-		settings.generateNoResultDiv();
+		next_settings.generateDefaultTemplate();
+		next_settings.generateNoResultDiv();
 	};
 
 	OCA.NextSearch = NextSearch;

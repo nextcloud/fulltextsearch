@@ -28,7 +28,7 @@
 /** global: api */
 /** global: search */
 /** global: result */
-/** global: settings */
+/** global: next_settings */
 
 
 var curr = {
@@ -89,8 +89,8 @@ var nav = {
 					precItem.after(divResult);
 				}
 
-				divResult.slideDown(settings.delay_result, function () {
-					$(this).children('.result_template').fadeTo(settings.delay_result, 1);
+				divResult.slideDown(next_settings.delay_result, function () {
+					$(this).children('.result_template').fadeTo(next_settings.delay_result, 1);
 				});
 
 				precItem = divResult;
@@ -104,8 +104,8 @@ var nav = {
 				var entry = oldResult[i];
 				if (result.getResultIndex(entry.id, newResult) === -1) {
 					var divResult = nav.getDivResult(entry.id, divProviderResult);
-					divResult.fadeTo(settings.delay_result, 0, function () {
-						$(this).slideUp(settings.delay_result, function () {
+					divResult.fadeTo(next_settings.delay_result, 0, function () {
+						$(this).slideUp(next_settings.delay_result, function () {
 							$(this).remove();
 						});
 					});
@@ -138,12 +138,12 @@ var nav = {
 			var divResult = nav.getDivResult(entryId, divProviderResult);
 
 			if (precId === '') {
-				divResult.fadeTo(settings.delay_result, 0.35, function () {
+				divResult.fadeTo(next_settings.delay_result, 0.35, function () {
 					$(this).prependTo(divProviderResult).fadeTo(100, 1);
 				});
 			} else {
 				var precItem = nav.getDivResult(precId, divProviderResult);
-				divResult.fadeTo(settings.delay_result, 0.35, function () {
+				divResult.fadeTo(next_settings.delay_result, 0.35, function () {
 					$(this).insertAfter(precItem).fadeTo(100, 1);
 				});
 			}
@@ -153,7 +153,7 @@ var nav = {
 
 		getDivProvider: function (providerId, providerName) {
 			var ret = null;
-			settings.resultContainer.children('.provider_header').each(function () {
+			next_settings.resultContainer.children('.provider_header').each(function () {
 				if ($(this).attr('data-id') === providerId) {
 					ret = $(this);
 				}
@@ -161,7 +161,7 @@ var nav = {
 
 			if (ret === null) {
 				ret = nav.generateDivProvider(providerId, providerName);
-				settings.resultContainer.append(ret);
+				next_settings.resultContainer.append(ret);
 			}
 
 			return ret;
@@ -214,17 +214,38 @@ var nav = {
 
 		onEntryGenerated: function (divResult) {
 
-			if (settings.parentHasMethod('onEntryGenerated')) {
-				settings.parent.onEntryGenerated(divResult);
-			}
+			nav.deleteEmptyDiv(divResult, '#line1');
+			nav.deleteEmptyDiv(divResult, '#line2');
 
+			if (next_settings.parentHasMethod('onEntryGenerated')) {
+				next_settings.parent.onEntryGenerated(divResult);
+			}
+		},
+
+		onSearchReset: function () {
+			if (next_settings.parentHasMethod('onSearchReset')) {
+				next_settings.parent.onSearchReset();
+			}
+		},
+
+		onResultDisplayed: function () {
+			if (next_settings.parentHasMethod('onResultDisplayed')) {
+				next_settings.parent.onResultDisplayed();
+			}
+		},
+
+		deleteEmptyDiv: function (entry, divId) {
+			var div = entry.find(divId);
+			if (div.text() === '') {
+				div.remove();
+			}
 		},
 
 
 		generateTemplateEntry: function (document) {
-			var divTemplate = settings.entryTemplate;
+			var divTemplate = next_settings.entryTemplate;
 			if (divTemplate === null) {
-				divTemplate = settings.entryTemplateDefault;
+				divTemplate = next_settings.entryTemplateDefault;
 			}
 
 			if (!divTemplate.length) {
