@@ -29,6 +29,9 @@ namespace OCA\FullNextSearch\Api\v1;
 
 
 use OCA\FullNextSearch\AppInfo\Application;
+use OCA\FullNextSearch\Model\ExtendedIndex;
+use OCA\FullNextSearch\Model\Index;
+use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\ProviderService;
 use OCA\FullNextSearch\Service\SearchService;
 use OCP\Util;
@@ -66,6 +69,9 @@ class NextSearch {
 	}
 
 
+	/**
+	 *
+	 */
 	public static function addJavascriptAPI() {
 		Util::addStyle(Application::APP_NAME, 'nextsearch');
 		Util::addScript(Application::APP_NAME, 'nextsearch.v1.api');
@@ -77,6 +83,63 @@ class NextSearch {
 	}
 
 
+	/**
+	 * @param string $providerId
+	 * @param string|int $documentId
+	 *
+	 * @return ExtendedIndex
+	 */
+	public static function getIndex($providerId, $documentId) {
+		$c = self::getContainer();
+
+		return $c->query(IndexService::class)
+				 ->getIndex($providerId, $documentId);
+	}
+
+	/**
+	 * @param Index $index
+	 *
+	 * @return mixed
+	 */
+	public static function updateIndex($index) {
+		return self::updateIndexes([$index]);
+	}
+
+
+	/**
+	 * @param string $providerId
+	 * @param string|int $documentId
+	 * @param int $status
+	 *
+	 * @return mixed
+	 */
+	public static function updateIndexStatus($providerId, $documentId, $status) {
+		$c = self::getContainer();
+
+		return $c->query(IndexService::class)
+				 ->updateIndexStatus($providerId, $documentId, $status);
+	}
+
+
+	/**
+	 * @param Index[] $indexes
+	 *
+	 * @return mixed
+	 */
+	public static function updateIndexes($indexes) {
+		$c = self::getContainer();
+
+		return $c->query(IndexService::class)
+				 ->updateIndexes($indexes);
+	}
+
+
+	/**
+	 * @param string $providerId
+	 * @param string|int $search
+	 *
+	 * @return mixed
+	 */
 	public static function search($providerId, $search) {
 		$c = self::getContainer();
 

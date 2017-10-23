@@ -28,7 +28,9 @@
 namespace OCA\FullNextSearch\Db;
 
 
+use OCA\FullNextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullNextSearch\INextSearchProvider;
+use OCA\FullNextSearch\Model\ExtendedIndex;
 use OCA\FullNextSearch\Model\Index;
 
 class IndexesRequest extends IndexesRequestBuilder {
@@ -66,17 +68,28 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 */
 	public function update(Index $index) {
 
+		try {
+			$this->getIndex($index->getProviderId(), $index->getDocumentId());
+		} catch (IndexDoesNotExistException $e) {
+			return false;
+		}
+
+//		$index->setStatus($current->getStatus());
+
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('owner_id', $qb->createNamedParameter($index->getOwnerId()))
-		   ->set('status', $qb->createNamedParameter($index->getStatus()))
-		   ->set('indexed', $qb->createNamedParameter($index->getLastIndex()));
+		   ->set('status', $qb->createNamedParameter($index->getStatus()));
+
+		if ($index->getLastIndex() > 0) {
+			$qb->set('indexed', $qb->createNamedParameter($index->getLastIndex()));
+		}
 
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
 
-		$result = $qb->execute();
+		$qb->execute();
 
-		return ($result > 0);
+		return true;
 	}
 
 
@@ -110,6 +123,32 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$qb = $this->getIndexesDeleteSql();
 
 		$qb->execute();
+	}
+
+
+	/**
+	 * return index.
+	 *
+	 * @param string $providerId
+	 * @param string|int $documentId
+	 *
+	 * @return ExtendedIndex
+	 * @throws IndexDoesNotExistException
+	 */
+	public function getIndex($providerId, $documentId) {
+		$qb = $this->getIndexesSelectSql();
+		$this->limitToProviderId($qb, $providerId);
+		$this->limitToDocumentId($qb, $documentId);
+
+		$cursor = $qb->execute();
+		$data = $cursor->fetch();
+		$cursor->closeCursor();
+
+		if ($data === false) {
+			throw new IndexDoesNotExistException($this->l10n->t('Index not found'));
+		}
+
+		return $this->parseIndexesSelectSql($data);
 	}
 
 
