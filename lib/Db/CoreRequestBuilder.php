@@ -37,7 +37,7 @@ use OCP\IL10N;
 
 class CoreRequestBuilder {
 
-	const TABLE_LAST_INDEXES = 'fullnextsearch_last_indexes';
+	const TABLE_LAST_INDEXES = 'fullnextsearch_indexes';
 
 	/** @var IDBConnection */
 	protected $dbConnection;

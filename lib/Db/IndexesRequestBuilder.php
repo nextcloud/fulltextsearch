@@ -28,6 +28,7 @@
 namespace OCA\FullNextSearch\Db;
 
 
+use OCA\FullNextSearch\Model\ExtendedIndex;
 use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Service\ConfigService;
 use OCA\FullNextSearch\Service\MiscService;
@@ -85,7 +86,9 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
-		$qb->select('li.owner_id', 'li.provider_id', 'li.document_id', 'li.status', 'li.indexed')
+		$qb->select(
+			'li.owner_id', 'li.provider_id', 'li.document_id', 'li.status', 'li.err', 'li.indexed'
+		)
 		   ->from(self::TABLE_LAST_INDEXES, 'li');
 
 		$this->defaultSelectAlias = 'li';
@@ -110,11 +113,12 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	/**
 	 * @param array $data
 	 *
-	 * @return Index
+	 * @return ExtendedIndex
 	 */
 	protected function parseIndexesSelectSql($data) {
-		$index = new Index($data['provider_id'], $data['document_id']);
+		$index = new ExtendedIndex($data['provider_id'], $data['document_id']);
 		$index->setStatus($data['status'])
+			  ->setError($data['err'])
 			  ->setOwnerId($data['owner_id'])
 			  ->setLastIndex($data['indexed']);
 
