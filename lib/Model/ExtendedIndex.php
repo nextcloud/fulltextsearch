@@ -28,57 +28,9 @@
 
 namespace OCA\FullNextSearch\Model;
 
-class ProviderIndexes {
 
-	/** @var Index[] */
-	private $indexes;
+class ExtendedIndex extends Index {
 
-
-	public function __construct($indexes) {
-		$this->indexes = $indexes;
-	}
-
-
-	/**
-	 * @return Index[]
-	 */
-	public function getIndexes() {
-		return $this->indexes;
-	}
-
-
-	/**
-	 * @param string $documentId
-	 *
-	 * @return null|Index
-	 */
-	public function getIndex($documentId) {
-		foreach ($this->indexes as $index) {
-			if ($index->getDocumentId() === (string)$documentId) {
-				return $index;
-			}
-		}
-
-		return null;
-	}
-
-
-	public function isDocumentIndexUpToDate(IndexDocument $document) {
-		$index = $this->getIndex($document->getId());
-		if ($index === null) {
-			$index = new Index($document->getProviderId(), $document->getId());
-			$index->setStatus(Index::STATUS_INDEX_THIS);
-			$index->setLastIndex();
-		}
-
-		$document->setIndex($index);
-
-		if ($index->getStatus() !== Index::STATUS_INDEX_DONE) {
-			return false;
-		}
-
-		return ($index->getLastIndex() >= $document->getModifiedTime());
-	}
 
 
 }

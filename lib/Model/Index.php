@@ -29,8 +29,14 @@ namespace OCA\FullNextSearch\Model;
 
 class Index implements \JsonSerializable {
 
-	const STATUS_OK = 1;
-	const STATUS_FAILED = 5;
+	const STATUS_INDEX_THIS = 1;
+	const STATUS_INDEX_DONE = 2;
+	const STATUS_DOCUMENT_REMOVE = 4;
+
+	const ERROR_FAILED = 1;
+	const ERROR_FAILED2 = 2;
+	const ERROR_FAILED3 = 4;
+
 
 	/** @var string */
 	private $providerId;
@@ -42,10 +48,13 @@ class Index implements \JsonSerializable {
 	private $ownerId = '';
 
 	/** @var int */
-	private $status = -1;
+	private $status = 0;
+
+	/** @var int */
+	private $err = 0;
 
 	/** @var string */
-	private $lastIndex;
+	private $lastIndex = '0';
 
 
 	public function __construct($providerId, $documentId) {
@@ -89,12 +98,17 @@ class Index implements \JsonSerializable {
 
 
 	/**
-	 * @param string $status
+	 * @param int $status
+	 * @param bool $reset
 	 *
 	 * @return $this
 	 */
-	public function setStatus($status) {
-		$this->status = $status;
+	public function setStatus($status, $reset = false) {
+		if ($reset === true) {
+			$this->status = $status;
+		} else if (!$this->isStatus($status)) {
+			$this->status += $status;
+		}
 
 		return $this;
 	}
@@ -104,6 +118,34 @@ class Index implements \JsonSerializable {
 	 */
 	public function getStatus() {
 		return $this->status;
+	}
+
+	/**
+	 * @param int $status
+	 *
+	 * @return int
+	 */
+	public function isStatus($status) {
+		return ((int)$status & $this->getStatus());
+	}
+
+
+	/**
+	 * @param string $err
+	 *
+	 * @return $this
+	 */
+	public function setError($err) {
+		$this->err = $err;
+
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getError() {
+		return $this->err;
 	}
 
 
@@ -129,6 +171,7 @@ class Index implements \JsonSerializable {
 		return $this->lastIndex;
 	}
 
+
 	/**
 	 * @return array
 	 */
@@ -138,7 +181,7 @@ class Index implements \JsonSerializable {
 			'providerId' => $this->getProviderId(),
 			'documentId' => $this->getDocumentId(),
 			'lastIndex'  => $this->getLastIndex(),
-			'status'     => $this->getStatus()
+			'status'     => (int)$this->getStatus()
 		];
 	}
 

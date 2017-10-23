@@ -31,10 +31,12 @@ use \Exception;
 use OC\Core\Command\Base;
 use OCA\FullNextSearch\Db\IndexesRequest;
 use OCA\FullNextSearch\Exceptions\DatabaseException;
+use OCA\FullNextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullNextSearch\Exceptions\InterruptException;
 use OCA\FullNextSearch\Exceptions\NoResultException;
 use OCA\FullNextSearch\INextSearchPlatform;
 use OCA\FullNextSearch\INextSearchProvider;
+use OCA\FullNextSearch\Model\ExtendedIndex;
 use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Model\ExtendedBase;
 use OCA\FullNextSearch\Model\ProviderIndexes;
@@ -91,7 +93,7 @@ class IndexService {
 	) {
 		$documents = $provider->generateIndexableDocuments($userId);
 		//$maxSize = sizeof($documents);
-		$toIndex = $this->removeUpToDateDocuments($provider, $documents);
+		$toIndex = $this->updateDocumentsWithCurrentIndex($provider, $documents);
 
 		$this->indexChunks($platform, $provider, $toIndex, $command);
 	}
@@ -103,12 +105,12 @@ class IndexService {
 	 *
 	 * @return IndexDocument[]
 	 */
-	private function removeUpToDateDocuments(INextSearchProvider $provider, array $items) {
+	private function updateDocumentsWithCurrentIndex(INextSearchProvider $provider, array $items) {
 
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
 		foreach ($items as $item) {
-			if (!$currIndex->isDocumentUpToDate($item)) {
+			if (!$currIndex->isDocumentIndexUpToDate($item)) {
 				$result[] = $item;
 			}
 		}
@@ -188,7 +190,8 @@ class IndexService {
 	 *
 	 * @throws DatabaseException
 	 */
-	private function updateIndexes($indexes) {
+	public function updateIndexes($indexes) {
+
 		try {
 			foreach ($indexes as $index) {
 				if (!$this->indexesRequest->update($index)) {
@@ -198,6 +201,35 @@ class IndexService {
 		} catch (Exception $e) {
 			throw new DatabaseException($e->getMessage());
 		}
+	}
+
+
+	/**
+	 * @param string $providerId
+	 * @param string|int $documentId
+	 * @param int $status
+	 */
+	public function updateIndexStatus($providerId, $documentId, $status) {
+		try {
+			$curr = $this->getIndex($providerId, $documentId);
+		} catch (IndexDoesNotExistException $e) {
+			$curr = new Index($providerId, $documentId);
+			$curr->setStatus(Index::STATUS_INDEX_THIS);
+		}
+
+		$curr->setStatus($status);
+		$this->updateIndexes([$curr]);
+	}
+
+
+	/**
+	 * @param string $providerId
+	 * @param string|int $documentId
+	 *
+	 * @return ExtendedIndex
+	 */
+	public function getIndex($providerId, $documentId) {
+		return $this->indexesRequest->getIndex($providerId, $documentId);
 	}
 
 

@@ -41,6 +41,9 @@ class IndexDocument implements \JsonSerializable {
 	/** @var DocumentAccess */
 	private $access;
 
+	/** @var Index */
+	private $index;
+
 	/** @var int */
 	private $modifiedTime = 0;
 
@@ -106,6 +109,21 @@ class IndexDocument implements \JsonSerializable {
 	 */
 	public function getProviderId() {
 		return $this->providerId;
+	}
+
+
+	/**
+	 * @param Index $index
+	 */
+	public function setIndex(Index $index) {
+		$this->index = $index;
+	}
+
+	/**
+	 * @return Index
+	 */
+	public function getIndex() {
+		return $this->index;
 	}
 
 
@@ -177,6 +195,7 @@ class IndexDocument implements \JsonSerializable {
 
 	/**
 	 * @param string $content
+	 * @param int $encoded
 	 *
 	 * @return $this
 	 */
