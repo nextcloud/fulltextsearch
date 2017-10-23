@@ -194,12 +194,24 @@ class IndexService {
 
 		try {
 			foreach ($indexes as $index) {
-				if (!$this->indexesRequest->update($index)) {
-					$this->indexesRequest->create($index);
-				}
+				$this->updateIndex($index);
 			}
 		} catch (Exception $e) {
 			throw new DatabaseException($e->getMessage());
+		}
+	}
+
+
+	/**
+	 * @param Index $index
+	 */
+	private function updateIndex(Index $index) {
+
+		if ($index->isStatus(Index::STATUS_DOCUMENT_REMOVED)) {
+			$this->indexesRequest->deleteIndex($index);
+
+		} else if (!$this->indexesRequest->update($index)) {
+			$this->indexesRequest->create($index);
 		}
 	}
 

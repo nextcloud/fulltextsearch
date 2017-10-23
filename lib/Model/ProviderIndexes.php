@@ -72,7 +72,7 @@ class ProviderIndexes {
 		}
 
 		$document->setIndex($index);
-
+		
 		if ($index->getStatus() !== Index::STATUS_INDEX_DONE) {
 			return false;
 		}

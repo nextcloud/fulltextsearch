@@ -31,7 +31,8 @@ class Index implements \JsonSerializable {
 
 	const STATUS_INDEX_THIS = 1;
 	const STATUS_INDEX_DONE = 2;
-	const STATUS_DOCUMENT_REMOVE = 4;
+	const STATUS_REMOVE_DOCUMENT = 4;
+	const STATUS_DOCUMENT_REMOVED = 8;
 
 	const ERROR_FAILED = 1;
 	const ERROR_FAILED2 = 2;

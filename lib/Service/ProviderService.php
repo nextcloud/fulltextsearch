@@ -203,10 +203,8 @@ class ProviderService {
 	 */
 	private function loadProvidersFromApp($appId) {
 		$appInfo = OC_App::getAppInfo($appId);
-		if (!key_exists('fullnextsearch', $appInfo)
-			|| !key_exists(
-				'provider', $appInfo['fullnextsearch']
-			)) {
+		if (!is_array($appInfo) || !key_exists('fullnextsearch', $appInfo)
+			|| !key_exists('provider', $appInfo['fullnextsearch'])) {
 			return;
 		}
 

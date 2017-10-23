@@ -64,7 +64,8 @@ class PlatformService {
 	 * @param MiscService $miscService
 	 *
 	 */
-	public function __construct(AppManager $appManager, ConfigService $configService, MiscService $miscService
+	public function __construct(
+		AppManager $appManager, ConfigService $configService, MiscService $miscService
 	) {
 		$this->appManager = $appManager;
 
@@ -153,10 +154,8 @@ class PlatformService {
 	 */
 	private function loadPlatformsFromApp($appId) {
 		$appInfo = OC_App::getAppInfo($appId);
-		if (!key_exists('fullnextsearch', $appInfo)
-			|| !key_exists(
-				'platform', $appInfo['fullnextsearch']
-			)) {
+		if (!is_array($appInfo) || !key_exists('fullnextsearch', $appInfo)
+			|| !key_exists('platform', $appInfo['fullnextsearch'])) {
 			return;
 		}
 
