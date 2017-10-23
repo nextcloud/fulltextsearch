@@ -74,11 +74,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 			return false;
 		}
 
-//		$index->setStatus($current->getStatus());
-
 		$qb = $this->getIndexesUpdateSql();
-		$qb->set('owner_id', $qb->createNamedParameter($index->getOwnerId()))
-		   ->set('status', $qb->createNamedParameter($index->getStatus()));
+		$qb->set('status', $qb->createNamedParameter($index->getStatus()));
+
+		if ($index->getOwnerId() !== '') {
+			$qb->set('owner_id', $qb->createNamedParameter($index->getOwnerId()));
+		}
 
 		if ($index->getLastIndex() > 0) {
 			$qb->set('indexed', $qb->createNamedParameter($index->getLastIndex()));
@@ -149,6 +150,24 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 
 		return $this->parseIndexesSelectSql($data);
+	}
+
+
+	/**
+	 * @return Index[]
+	 */
+	public function getQueuedIndexes() {
+		$qb = $this->getIndexesSelectSql();
+		$this->limitToQueuedIndexes($qb);
+
+		$indexes = [];
+		$cursor = $qb->execute();
+		while ($data = $cursor->fetch()) {
+			$indexes[] = $this->parseIndexesSelectSql($data);
+		}
+		$cursor->closeCursor();
+
+		return $indexes;
 	}
 
 

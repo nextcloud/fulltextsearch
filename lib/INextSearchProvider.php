@@ -27,6 +27,7 @@
 
 namespace OCA\FullNextSearch;
 
+use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Model\ProviderIndexes;
 use OCA\FullNextSearch\Model\IndexDocument;
 use OCA\FullNextSearch\Model\SearchResult;
@@ -75,6 +76,16 @@ interface INextSearchProvider {
 	 * @return IndexDocument[]
 	 */
 	public function fillIndexDocuments($chunk);
+
+
+	/**
+	 * update a document regarding the current Index' status
+	 *
+	 * @param Index $index
+	 *
+	 * @return IndexDocument
+	 */
+	public function updateDocument(Index $index);
 
 
 	/**

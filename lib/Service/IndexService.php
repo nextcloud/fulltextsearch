@@ -27,20 +27,19 @@
 
 namespace OCA\FullNextSearch\Service;
 
-use \Exception;
+use Exception;
 use OC\Core\Command\Base;
 use OCA\FullNextSearch\Db\IndexesRequest;
 use OCA\FullNextSearch\Exceptions\DatabaseException;
 use OCA\FullNextSearch\Exceptions\IndexDoesNotExistException;
-use OCA\FullNextSearch\Exceptions\InterruptException;
 use OCA\FullNextSearch\Exceptions\NoResultException;
 use OCA\FullNextSearch\INextSearchPlatform;
 use OCA\FullNextSearch\INextSearchProvider;
+use OCA\FullNextSearch\Model\ExtendedBase;
 use OCA\FullNextSearch\Model\ExtendedIndex;
 use OCA\FullNextSearch\Model\Index;
-use OCA\FullNextSearch\Model\ExtendedBase;
-use OCA\FullNextSearch\Model\ProviderIndexes;
 use OCA\FullNextSearch\Model\IndexDocument;
+use OCA\FullNextSearch\Model\ProviderIndexes;
 
 class IndexService {
 
@@ -186,6 +185,22 @@ class IndexService {
 
 
 	/**
+	 * @param INextSearchPlatform $platform
+	 * @param INextSearchProvider $provider
+	 * @param Index $index
+	 *
+	 * @internal param int|string $documentId
+	 */
+	public function updateDocument(
+		INextSearchPlatform $platform, INextSearchProvider $provider, Index $index
+	) {
+		$document = $provider->updateDocument($index);
+		$index = $platform->indexDocument($provider, $document);
+		$this->updateIndex($index);
+	}
+
+
+	/**
 	 * @param Index[] $indexes
 	 *
 	 * @throws DatabaseException
@@ -242,6 +257,14 @@ class IndexService {
 	 */
 	public function getIndex($providerId, $documentId) {
 		return $this->indexesRequest->getIndex($providerId, $documentId);
+	}
+
+
+	/**
+	 * @return Index[]
+	 */
+	public function getQueuedIndexes() {
+		return $this->indexesRequest->getQueuedIndexes();
 	}
 
 

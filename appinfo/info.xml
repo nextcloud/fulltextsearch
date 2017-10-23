@@ -29,6 +29,7 @@
 
 	<commands>
 		<command>OCA\FullNextSearch\Command\Index</command>
+		<command>OCA\FullNextSearch\Command\Live</command>
 		<command>OCA\FullNextSearch\Command\Reset</command>
 		<command>OCA\FullNextSearch\Command\Search</command>
 	</commands>

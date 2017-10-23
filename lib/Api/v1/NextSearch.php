@@ -97,11 +97,16 @@ class NextSearch {
 	}
 
 	/**
-	 * @param Index $index
+	 * @param $providerId
+	 * @param $documentId
+	 * @param string $ownerId
 	 *
 	 * @return mixed
 	 */
-	public static function updateIndex($index) {
+	public static function createIndex($providerId, $documentId, $ownerId = '') {
+		$index = new Index($providerId, $documentId);
+		$index->setOwnerId($ownerId);
+
 		return self::updateIndexes([$index]);
 	}
 
@@ -119,6 +124,8 @@ class NextSearch {
 		return $c->query(IndexService::class)
 				 ->updateIndexStatus($providerId, $documentId, $status);
 	}
+
+
 
 
 	/**

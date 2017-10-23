@@ -29,6 +29,7 @@ namespace OCA\FullNextSearch\Db;
 
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Service\ConfigService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -73,7 +74,6 @@ class CoreRequestBuilder {
 	}
 
 
-
 	/**
 	 * Limit the request to the OwnerId
 	 *
@@ -107,7 +107,6 @@ class CoreRequestBuilder {
 	}
 
 
-
 	/**
 	 * @param IQueryBuilder $qb
 	 * @param string $field
@@ -117,6 +116,13 @@ class CoreRequestBuilder {
 		$expr = $qb->expr();
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
 		$qb->andWhere($expr->eq($pf . $field, $qb->createNamedParameter($value)));
+	}
+
+
+	protected function limitToQueuedIndexes(IQueryBuilder &$qb) {
+		$expr = $qb->expr();
+		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
+		$qb->andWhere($expr->neq($pf . 'status', $qb->createNamedParameter(Index::STATUS_INDEX_DONE)));
 	}
 
 }
