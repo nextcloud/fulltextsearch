@@ -33,16 +33,9 @@
 	<charset>utf8</charset>
 
 	<table>
-		<name>*dbprefix*fullnextsearch_last_indexes</name>
+		<name>*dbprefix*fullnextsearch_indexes</name>
 
 		<declaration>
-			<field>
-				<name>owner_id</name>
-				<type>text</type>
-				<length>64</length>
-				<notnull>true</notnull>
-			</field>
-
 			<field>
 				<name>provider_id</name>
 				<type>text</type>
@@ -58,7 +51,21 @@
 			</field>
 
 			<field>
+				<name>owner_id</name>
+				<type>text</type>
+				<length>64</length>
+				<notnull>true</notnull>
+			</field>
+
+			<field>
 				<name>status</name>
+				<type>integer</type>
+				<length>1</length>
+				<notnull>true</notnull>
+			</field>
+
+			<field>
+				<name>err</name>
 				<type>integer</type>
 				<length>1</length>
 				<notnull>true</notnull>
@@ -68,7 +75,7 @@
 				<name>indexed</name>
 				<type>integer</type>
 				<length>6</length>
-				<notnull>true</notnull>
+				<notnull>false</notnull>
 			</field>
 
 			<index>
