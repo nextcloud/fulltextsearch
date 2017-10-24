@@ -103,47 +103,27 @@ class Live extends ExtendedBase {
 		$platform = $this->platformService->getPlatform();
 
 		$this->setOutput($output);
-		try {
 
-
+		while(true) {
 			$indexes = $this->indexService->getQueuedIndexes();
 			foreach ($indexes as $index) {
-				$provider = $this->providerService->getProvider($index->getProviderId());
-				$this->indexService->updateDocument($platform, $provider, $index);
+				$this->hasBeenInterrupted();
+
+				try {
+					$provider = $this->providerService->getProvider($index->getProviderId());
+					$this->indexService->updateDocument($platform, $provider, $index);
+				} catch (Exception $e) {
+					// TODO - upgrade error number - after too many errors, delete index
+					// TODO - do not count error if elasticsearch is down.
+				}
 			}
 
-		} catch (Exception $e) {
-			throw $e;
-		}
-	}
+			sleep(30);
 
-
-	/**
-	 * @param INextSearchProvider $provider
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 */
-	private function indexProvider(
-		INextSearchProvider $provider, InputInterface $input, OutputInterface $output
-	) {
-		$platform = $this->platformService->getPlatform();
-		$platform->initializeIndex($provider);
-
-		$users = $this->userManager->search('');
-
-		foreach ($users as $user) {
-
-			$this->hasBeenInterrupted();
-
-			$output->writeln(' USER: ' . $user->getUID());
-			$this->indexService->indexProviderContentFromUser(
-				$platform, $provider, $user->getUID(), $this
-			);
 		}
 
-		$this->providerService->setProviderAsIndexed($provider, true);
-
 	}
+
 
 }
 
