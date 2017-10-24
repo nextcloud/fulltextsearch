@@ -106,6 +106,7 @@ class SearchService {
 			$userId = $this->userId;
 		}
 
+		$search = trim(str_replace('  ', ' ', $search));
 		$providers = $this->providerService->getFilteredProviders($providerId);
 		$platform = $this->platformService->getPlatform();
 
