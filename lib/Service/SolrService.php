@@ -206,7 +206,8 @@ class SolrService
             if (key_exists('extension', $pinfo) && in_array('.' . $pinfo['extension'], $filters['extensions']))
                 return false;
         }
-        
+         *
+
         switch (FileService::getBaseTypeFromMime($mimetype)) {
             case 'text':
                 if ($filters['text'] !== '1')
@@ -242,6 +243,11 @@ class SolrService
                 return true;
             
             case 'image/tiff':
+                if ($filters['image'] !== '1')
+                    return false;
+                return true;
+	    
+	    case 'image/png':
                 if ($filters['image'] !== '1')
                     return false;
                 return true;
