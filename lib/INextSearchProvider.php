@@ -28,7 +28,6 @@
 namespace OCA\FullNextSearch;
 
 use OCA\FullNextSearch\Model\Index;
-use OCA\FullNextSearch\Model\ProviderIndexes;
 use OCA\FullNextSearch\Model\IndexDocument;
 use OCA\FullNextSearch\Model\SearchResult;
 

@@ -29,6 +29,7 @@ namespace OCA\FullNextSearch\Service;
 
 use OC\App\AppManager;
 use OCA\Circles\Api\v1\Circles;
+use OCA\FullNextSearch\Exceptions\EmptySearchException;
 use OCA\FullNextSearch\INextSearchPlatform;
 use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\DocumentAccess;
@@ -102,6 +103,8 @@ class SearchService {
 	 */
 	public function search($providerId, $userId, $search) {
 
+		$this->searchCannotBeEmpty($search);
+
 		if ($userId === null) {
 			$userId = $this->userId;
 		}
@@ -115,6 +118,18 @@ class SearchService {
 		$result = $this->searchFromProviders($platform, $providers, $access, $search);
 
 		return $result;
+	}
+
+
+	/**
+	 * @param string $search
+	 *
+	 * @throws EmptySearchException
+	 */
+	private function searchCannotBeEmpty($search) {
+		if ($search === null || $search === '') {
+			throw new EmptySearchException('search cannot be empty');
+		}
 	}
 
 

@@ -33,6 +33,7 @@ return [
 		['name' => 'Settings#getSettingsAdmin', 'url' => '/settings/admin', 'verb' => 'GET'],
 		['name' => 'Settings#setSettingsAdmin', 'url' => '/settings/admin', 'verb' => 'POST'],
 		['name' => 'Api#search', 'url' => '/v1/search/{providerId}/', 'verb' => 'GET'],
+		['name' => 'Api#searchFromRemote', 'url' => '/v1/remote/{providerId}/', 'verb' => 'GET']
 	]
 ];
 

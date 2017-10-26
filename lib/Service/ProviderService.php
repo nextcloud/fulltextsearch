@@ -124,17 +124,16 @@ class ProviderService {
 		return $this->providers;
 	}
 
-
 	/**
-	 * @return array
+	 * @return INextSearchProvider[]
 	 */
-	public function getConfiguredProviderIds() {
+	public function getConfiguredProviders() {
 		$this->loadProviders();
 
 		$providers = [];
 		foreach ($this->providers as $provider) {
 			if ($this->isProviderIndexed($provider->getId())) {
-				$providers[] = $provider->getId();
+				$providers[] = $provider;
 			}
 		}
 
@@ -150,9 +149,13 @@ class ProviderService {
 	public function getFilteredProviders($providerId) {
 		$this->loadProviders();
 
-		$providers = $this->getProviders();
+		$providers = $this->getConfiguredProviders();
 		if ($providerId === '_all') {
 			return $providers;
+		}
+
+		if (!$this->isProviderIndexed($providerId)) {
+			return [];
 		}
 
 		return [$this->getProvider($providerId)];
@@ -258,4 +261,23 @@ class ProviderService {
 			}
 		}
 	}
+
+
+	/**
+	 * @param INextSearchProvider[] $providers
+	 *
+	 * @return array
+	 */
+	public function serialize($providers) {
+		$arr = [];
+		foreach ($providers as $provider) {
+			$arr[] = [
+				'id'   => $provider->getId(),
+				'name' => $provider->getName()
+			];
+		}
+
+		return $arr;
+	}
+
 }
