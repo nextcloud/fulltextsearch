@@ -32,7 +32,7 @@ use OCA\FullNextSearch\INextSearchProvider;
 class SearchResult implements \JsonSerializable {
 
 	/** @var IndexDocument[] */
-	private $documents;
+	private $documents = [];
 
 	/** @var string */
 	private $rawResult;
