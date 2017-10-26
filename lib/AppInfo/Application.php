@@ -27,6 +27,7 @@
 
 namespace OCA\FullNextSearch\AppInfo;
 
+use OCA\FullNextSearch\Capabilities;
 use OCA\FullNextSearch\Service\ConfigService;
 use OCP\AppFramework\App;
 

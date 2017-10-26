@@ -4,6 +4,7 @@
 namespace OCA\FullNextSearch;
 
 use OCA\FullNextSearch\Service\ConfigService;
+use OCA\FullNextSearch\Service\ProviderService;
 use OCP\Capabilities\ICapability;
 
 
@@ -15,17 +16,17 @@ use OCP\Capabilities\ICapability;
 class Capabilities implements ICapability {
 
 
-	/** @var ConfigService */
-	private $configService;
+	/** @var ProviderService */
+	private $providerService;
 
 
 	/**
 	 * Capabilities constructor.
 	 *
-	 * @param ConfigService $configService
+	 * @param ProviderService $providerService
 	 */
-	public function __construct(ConfigService $configService) {
-		$this->configService = $configService;
+	public function __construct(ProviderService $providerService) {
+		$this->providerService = $providerService;
 	}
 
 
@@ -35,12 +36,15 @@ class Capabilities implements ICapability {
 	 * @return array
 	 */
 	public function getCapabilities() {
+
 		return [
 			'fullnextsearch' => [
-				'configured' => (($this->configService->isConfigured()) ? '1' : '0'),
+				'providers' => $this->providerService->getConfiguredProviderIds()
 			]
 		];
 	}
+
+
 }
 
 

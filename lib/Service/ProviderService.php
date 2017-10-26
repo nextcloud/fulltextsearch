@@ -126,6 +126,23 @@ class ProviderService {
 
 
 	/**
+	 * @return array
+	 */
+	public function getConfiguredProviderIds() {
+		$this->loadProviders();
+
+		$providers = [];
+		foreach ($this->providers as $provider) {
+			if ($this->isProviderIndexed($provider->getId())) {
+				$providers[] = $provider->getId();
+			}
+		}
+
+		return $providers;
+	}
+
+
+	/**
 	 * @param string $providerId
 	 *
 	 * @return INextSearchProvider[]
