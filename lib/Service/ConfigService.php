@@ -70,6 +70,12 @@ class ConfigService {
 		$this->miscService = $miscService;
 	}
 
+
+	public function isConfigured() {
+		return true;
+	}
+
+
 	/**
 	 * Get a value by key
 	 *
