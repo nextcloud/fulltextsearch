@@ -3,7 +3,6 @@
 
 namespace OCA\FullNextSearch;
 
-use OCA\FullNextSearch\Service\ConfigService;
 use OCA\FullNextSearch\Service\ProviderService;
 use OCP\Capabilities\ICapability;
 

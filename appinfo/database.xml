@@ -93,4 +93,29 @@
 		</declaration>
 	</table>
 
+	<table>
+		<name>*dbprefix*fullnextsearch_ticks</name>
+
+		<declaration>
+			<field>
+				<name>source</name>
+				<type>text</type>
+				<length>128</length>
+			</field>
+
+			<field>
+				<name>data</name>
+				<type>text</type>
+				<length>512</length>
+			</field>
+
+			<field>
+				<name>tick</name>
+				<type>integer</type>
+				<length>6</length>
+			</field>
+
+		</declaration>
+	</table>
+
 </database>
