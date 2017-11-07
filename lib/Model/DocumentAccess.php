@@ -28,7 +28,7 @@
 namespace OCA\FullNextSearch\Model;
 
 
-class DocumentAccess {
+class DocumentAccess implements \JsonSerializable {
 
 	/** @var string */
 	private $ownerId;
@@ -140,4 +140,18 @@ class DocumentAccess {
 		return $this->links;
 	}
 
+
+	/**
+	 *
+	 */
+	public function jsonSerialize() {
+		return [
+			'ownerId'  => $this->getOwnerId(),
+			'viewerId' => $this->getViewerId(),
+			'users'    => $this->getUsers(),
+			'groups'   => $this->getGroups(),
+			'circles'  => $this->getCircles(),
+			'links'    => $this->getLinks()
+		];
+	}
 }
