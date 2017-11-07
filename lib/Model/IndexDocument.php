@@ -57,6 +57,9 @@ class IndexDocument implements \JsonSerializable {
 	private $link = '';
 
 	/** @var array */
+	private $more = [];
+
+	/** @var array */
 	private $excerpts = [];
 
 	/** @var string */
@@ -242,6 +245,25 @@ class IndexDocument implements \JsonSerializable {
 
 
 	/**
+	 * @param array $more
+	 *
+	 * @return $this
+	 */
+	public function setMore($more) {
+		$this->more = $more;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getMore() {
+		return $this->more;
+	}
+
+
+	/**
 	 * @param array $excerpts
 	 *
 	 * @return $this
@@ -339,6 +361,7 @@ class IndexDocument implements \JsonSerializable {
 		unset($this->title);
 		unset($this->content);
 		unset($this->link);
+		unset($this->more);
 		unset($this->excerpts);
 		unset($this->score);
 		unset($this->info);
@@ -353,6 +376,7 @@ class IndexDocument implements \JsonSerializable {
 			'id'       => $this->getId(),
 			'title'    => $this->getTitle(),
 			'link'     => $this->getLink(),
+			'more'     => $this->getMore(),
 			'excerpts' => $this->getExcerpts(),
 			'score'    => $this->getScore()
 		];
