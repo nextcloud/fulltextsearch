@@ -87,6 +87,6 @@ OC.L10N.register(
     "Office Documents" : "Dokumenter",
     "Image (JPEG, TIFF)" : "Bilde (JPEG, TIFF)",
     "Audio File (MP3, FLAC)" : "Lydfil (MP3, FLAC)",
-    "Extensions you wish to ignore (.java .xml)" : "Endelser du vil ignorere (.java .xml)"
+    "Extensions you wish to ignore (.java .xml)" : "Filendelser du ønsker å ignorere (.java .xml)"
 },
 "nplurals=2; plural=(n != 1);");
