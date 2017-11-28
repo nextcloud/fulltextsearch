@@ -132,7 +132,7 @@
 				$searchbox += ' <input id="searchbox" name="query" value="" required="" autocomplete="off" tabindex="5" type="search">';
 				$searchbox += '</form>';
 
-				$('#logo-claim').after($searchbox);
+				$('#header-right').before($searchbox);
 				setTimeout(function() {
 					$('#searchbox').fadeIn(500);
 				}, 1000);
