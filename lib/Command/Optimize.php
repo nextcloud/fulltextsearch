@@ -72,12 +72,14 @@ class Optimize extends Base
         $infos = $this->solrTools->getInfoCore();
         $output->writeln('Your index contains ' . $infos->index->segmentCount . ' segments.');
         
-        $helper = $this->getHelper('question');
-        if (! $input->getOption('commit')) {
-            $question = new ConfirmationQuestion('<question>Your core will not be accessible while optimize is running. Continue with this action? (y/N) </question> ', false);
-            
-            if (! $helper->ask($input, $output, $question)) {
-                return;
+        if (! $input->getOption("no-interaction")) {
+            $helper = $this->getHelper('question');
+            if (! $input->getOption('commit')) {
+                $question = new ConfirmationQuestion('<question>Your core will not be accessible while optimize is running. Continue with this action? (y/N) </question> ', false);
+                
+                if (! $helper->ask($input, $output, $question)) {
+                    return;
+                }
             }
         }
         
