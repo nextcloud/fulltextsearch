@@ -59,12 +59,6 @@ class Index extends ExtendedBase {
 	private $miscService;
 
 
-//	/** @var InputInterface */
-//	private $input;
-//
-//	/** @var OutputInterface */
-//	private $output;
-
 	/** @var Runner */
 	private $runner;
 
@@ -86,7 +80,7 @@ class Index extends ExtendedBase {
 		parent::__construct();
 		$this->userManager = $userManager;
 
-		$this->runner = new Runner($runningService, 'cli_index');
+		$this->runner = new Runner($runningService, 'commandIndex');
 		$this->indexService = $indexService;
 		$this->platformService = $platformService;
 		$this->providerService = $providerService;
