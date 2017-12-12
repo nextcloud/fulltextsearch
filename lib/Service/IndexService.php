@@ -152,9 +152,11 @@ class IndexService {
 	private function indexChunks(INextSearchPlatform $platform, INextSearchProvider $provider, $documents
 	) {
 		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
-		for ($i = 0; $i < sizeof($documents); $i++) {
 
-			$this->runner->update('indexChunk');
+		$max = sizeof($documents);
+		for ($i = 0; $i < $max; $i++) {
+
+			$this->updateRunner('indexChunk');
 			try {
 				$chunk = array_splice($documents, 0, $chunkSize);
 				$this->indexChunk($platform, $provider, $chunk);
