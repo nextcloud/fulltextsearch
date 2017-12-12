@@ -30,16 +30,21 @@ namespace OCA\FullNextSearch\Command;
 use Exception;
 use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\ExtendedBase;
+use OCA\FullNextSearch\Model\Runner;
 use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCA\FullNextSearch\Service\PlatformService;
 use OCA\FullNextSearch\Service\ProviderService;
+use OCA\FullNextSearch\Service\RunningService;
 use OCP\IUserManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
 class Live extends ExtendedBase {
+
+	const CYCLE_DELAY = 30;
+
 
 	/** @var IUserManager */
 	private $userManager;
@@ -57,22 +62,27 @@ class Live extends ExtendedBase {
 	private $miscService;
 
 
+	/** @var Runner */
+	private $runner;
+
 	/**
 	 * Index constructor.
 	 *
 	 * @param IUserManager $userManager
+	 * @param RunningService $runningService
 	 * @param IndexService $indexService
 	 * @param PlatformService $platformService
 	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IUserManager $userManager, IndexService $indexService, PlatformService $platformService,
-		ProviderService $providerService, MiscService $miscService
+		IUserManager $userManager, RunningService $runningService, IndexService $indexService,
+		PlatformService $platformService, ProviderService $providerService, MiscService $miscService
 	) {
 		parent::__construct();
 		$this->userManager = $userManager;
 
+		$this->runner = new Runner($runningService, 'commandLive');
 		$this->indexService = $indexService;
 		$this->platformService = $platformService;
 		$this->providerService = $providerService;
@@ -98,29 +108,68 @@ class Live extends ExtendedBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$output->writeln('live');
+
+
+		try {
+			$this->runner->sourceIsCommandLine($this, $output);
+			$this->runner->start();
+			$this->runner->output('live.');
+
+		} catch (Exception $e) {
+			$this->runner->exception($e->getMessage(), true);
+			throw $e;
+		}
+
+		$this->liveCycle();
+		$this->runner->stop();
+
+	}
+
+
+	private function liveCycle() {
 
 		$platform = $this->platformService->getPlatform();
+		while (true) {
 
-		$this->setOutput($output);
-
-		while(true) {
 			$indexes = $this->indexService->getQueuedIndexes();
+
 			foreach ($indexes as $index) {
-				$this->hasBeenInterrupted();
+				$this->runner->update('indexing');
 
 				try {
 					$provider = $this->providerService->getProvider($index->getProviderId());
 					$this->indexService->updateDocument($platform, $provider, $index);
 				} catch (Exception $e) {
+					$this->runner->exception($e->getMessage(), false);
 					// TODO - upgrade error number - after too many errors, delete index
 					// TODO - do not count error if elasticsearch is down.
 				}
 			}
 
-			sleep(30);
+			$this->runner->update('waiting');
 
+			sleep(self::CYCLE_DELAY);
 		}
+
+//
+//		try {
+//			$this->runner->sourceIsCommandLine($this, $output);
+//			$this->runner->start();
+//			$this->runner->output('indexing.');
+//
+//			$providers = $this->providerService->getProviders();
+//			foreach ($providers as $provider) {
+//				$this->indexProvider($provider);
+//			}
+//
+//		} catch (Exception $e) {
+//			$this->runner->exception($e->getMessage(), true);
+//			throw $e;
+//		}
+//
+//		$this->runner->stop();
+//
+
 
 	}
 
