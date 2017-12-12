@@ -25,64 +25,9 @@
  *
  */
 
-namespace OCA\FullNextSearch\Service;
+namespace OCA\FullNextSearch\Exceptions;
 
-use OCA\FullNextSearch\AppInfo\Application;
-use OCP\ILogger;
+class TickDoesNotExistException extends \Exception {
 
-class MiscService {
-
-	/** @var ILogger */
-	private $logger;
-
-	public function __construct(ILogger $logger) {
-		$this->logger = $logger;
-	}
-
-	public function log($message, $level = 2) {
-		$data = array(
-			'app'   => Application::APP_NAME,
-			'level' => $level
-		);
-
-		$this->logger->log($level, $message, $data);
-	}
-
-	/**
-	 * @param $arr
-	 * @param $k
-	 *
-	 * @param string $default
-	 *
-	 * @return array|string|integer
-	 */
-	public static function get($arr, $k, $default = '') {
-		if (!key_exists($k, $arr)) {
-			return $default;
-		}
-
-		return $arr[$k];
-	}
-
-
-	public static function noEndSlash($path) {
-		if (substr($path, -1) === '/') {
-			$path = substr($path, 0, -1);
-		}
-
-		return $path;
-	}
-
-
-	/**
-	 * @param string $time
-	 *
-	 * @return float
-	 */
-	public static function getMicroTime($time) {
-		list($usec, $sec) = explode(' ', $time);
-
-		return ((float)$usec + (float)$sec);
-	}
 }
 

@@ -98,6 +98,16 @@
 
 		<declaration>
 			<field>
+				<name>id</name>
+				<type>integer</type>
+				<length>7</length>
+				<unsigned>true</unsigned>
+				<notnull>true</notnull>
+				<autoincrement>true</autoincrement>
+				<primary>true</primary>
+			</field>
+
+			<field>
 				<name>source</name>
 				<type>text</type>
 				<length>128</length>
@@ -106,7 +116,19 @@
 			<field>
 				<name>data</name>
 				<type>text</type>
-				<length>512</length>
+				<length>3000</length>
+			</field>
+
+			<field>
+				<name>status</name>
+				<type>text</type>
+				<length>32</length>
+			</field>
+
+			<field>
+				<name>action</name>
+				<type>text</type>
+				<length>64</length>
 			</field>
 
 			<field>

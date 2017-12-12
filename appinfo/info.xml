@@ -10,7 +10,7 @@
 
 ]]>
 	</description>
-	<version>0.1.2</version>
+	<version>0.1.7</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullNextSearch</namespace>
@@ -28,6 +28,7 @@
 	</dependencies>
 
 	<commands>
+		<command>OCA\FullNextSearch\Command\Stop</command>
 		<command>OCA\FullNextSearch\Command\Index</command>
 		<command>OCA\FullNextSearch\Command\Live</command>
 		<command>OCA\FullNextSearch\Command\Reset</command>

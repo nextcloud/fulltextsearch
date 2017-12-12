@@ -52,6 +52,8 @@ class ExtendedBase extends Base {
 
 	/**
 	 * @param OutputInterface $output
+	 *
+	 * @deprecated
 	 */
 	public function setOutput(OutputInterface $output) {
 		$this->output = $output;
@@ -59,6 +61,7 @@ class ExtendedBase extends Base {
 
 	/**
 	 * @return OutputInterface
+	 * @deprecated
 	 */
 	public function getOutput() {
 		return $this->output;

@@ -30,10 +30,12 @@ namespace OCA\FullNextSearch\Command;
 use Exception;
 use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\ExtendedBase;
+use OCA\FullNextSearch\Model\Runner;
 use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCA\FullNextSearch\Service\PlatformService;
 use OCA\FullNextSearch\Service\ProviderService;
+use OCA\FullNextSearch\Service\RunningService;
 use OCP\IUserManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,22 +59,34 @@ class Index extends ExtendedBase {
 	private $miscService;
 
 
+//	/** @var InputInterface */
+//	private $input;
+//
+//	/** @var OutputInterface */
+//	private $output;
+
+	/** @var Runner */
+	private $runner;
+
+
 	/**
 	 * Index constructor.
 	 *
 	 * @param IUserManager $userManager
+	 * @param RunningService $runningService
 	 * @param IndexService $indexService
 	 * @param PlatformService $platformService
 	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IUserManager $userManager, IndexService $indexService, PlatformService $platformService,
-		ProviderService $providerService, MiscService $miscService
+		IUserManager $userManager, RunningService $runningService, IndexService $indexService,
+		PlatformService $platformService, ProviderService $providerService, MiscService $miscService
 	) {
 		parent::__construct();
 		$this->userManager = $userManager;
 
+		$this->runner = new Runner($runningService, 'cli_index');
 		$this->indexService = $indexService;
 		$this->platformService = $platformService;
 		$this->providerService = $providerService;
@@ -98,30 +112,32 @@ class Index extends ExtendedBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$output->writeln('index');
 
-		$this->setOutput($output);
 		try {
+			$this->runner->sourceIsCommandLine($this, $output);
+			$this->runner->start();
+
+			$this->runner->output('indexing.');
+			sleep(20);
 
 			$providers = $this->providerService->getProviders();
 			foreach ($providers as $provider) {
-				$this->indexProvider($provider, $input, $output);
+				$this->indexProvider($provider);
 			}
 
 		} catch (Exception $e) {
+			$this->runner->exception($e->getMessage(), true);
 			throw $e;
 		}
+
+		$this->runner->stop();
 	}
 
 
 	/**
 	 * @param INextSearchProvider $provider
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
 	 */
-	private function indexProvider(
-		INextSearchProvider $provider, InputInterface $input, OutputInterface $output
-	) {
+	private function indexProvider(INextSearchProvider $provider) {
 		$platform = $this->platformService->getPlatform();
 		$platform->initializeIndex($provider);
 
@@ -129,11 +145,11 @@ class Index extends ExtendedBase {
 
 		foreach ($users as $user) {
 
-			$this->hasBeenInterrupted();
+			//$this->hasBeenInterrupted();
 
-			$output->writeln(' USER: ' . $user->getUID());
+			$this->runner->output(' USER: ' . $user->getUID());
 			$this->indexService->indexProviderContentFromUser(
-				$platform, $provider, $user->getUID(), $this
+				$platform, $provider, $user->getUID(), $this->runner, $this
 			);
 		}
 

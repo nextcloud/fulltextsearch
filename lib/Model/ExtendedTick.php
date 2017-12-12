@@ -25,64 +25,41 @@
  *
  */
 
-namespace OCA\FullNextSearch\Service;
 
-use OCA\FullNextSearch\AppInfo\Application;
-use OCP\ILogger;
+namespace OCA\FullNextSearch\Model;
 
-class MiscService {
 
-	/** @var ILogger */
-	private $logger;
+class ExtendedTick extends Tick {
 
-	public function __construct(ILogger $logger) {
-		$this->logger = $logger;
+	/**
+	 * @param string $key
+	 * @param string|int $value
+	 *
+	 * @return $this
+	 */
+	public function setInfo($key, $value) {
+		$this->data[$key] = $value;
+
+		return $this;
 	}
 
-	public function log($message, $level = 2) {
-		$data = array(
-			'app'   => Application::APP_NAME,
-			'level' => $level
-		);
-
-		$this->logger->log($level, $message, $data);
+	public function unsetInfo($key) {
+		unset($this->data[$key]);
 	}
 
 	/**
-	 * @param $arr
-	 * @param $k
+	 * @param $key
+	 * @param int|string $default
 	 *
-	 * @param string $default
-	 *
-	 * @return array|string|integer
+	 * @return int|string
 	 */
-	public static function get($arr, $k, $default = '') {
-		if (!key_exists($k, $arr)) {
+	public function getInfo($key, $default = '') {
+		if (!array_key_exists($key, $this->data)) {
 			return $default;
 		}
 
-		return $arr[$k];
+		return $this->data[$key];
+
 	}
 
-
-	public static function noEndSlash($path) {
-		if (substr($path, -1) === '/') {
-			$path = substr($path, 0, -1);
-		}
-
-		return $path;
-	}
-
-
-	/**
-	 * @param string $time
-	 *
-	 * @return float
-	 */
-	public static function getMicroTime($time) {
-		list($usec, $sec) = explode(' ', $time);
-
-		return ((float)$usec + (float)$sec);
-	}
 }
-

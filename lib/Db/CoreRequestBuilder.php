@@ -38,7 +38,8 @@ use OCP\IL10N;
 
 class CoreRequestBuilder {
 
-	const TABLE_LAST_INDEXES = 'fullnextsearch_indexes';
+	const TABLE_INDEXES = 'fullnextsearch_indexes';
+	const TABLE_TICKS = 'fullnextsearch_ticks';
 
 	/** @var IDBConnection */
 	protected $dbConnection;
@@ -71,6 +72,17 @@ class CoreRequestBuilder {
 		$this->dbConnection = $connection;
 		$this->configService = $configService;
 		$this->miscService = $miscService;
+	}
+
+
+	/**
+	 * Limit the request to the Id
+	 *
+	 * @param IQueryBuilder $qb
+	 * @param int $id
+	 */
+	protected function limitToId(IQueryBuilder &$qb, $id) {
+		$this->limitToDBField($qb, 'id', $id);
 	}
 
 
@@ -108,6 +120,28 @@ class CoreRequestBuilder {
 
 
 	/**
+	 * Limit the request to the Source
+	 *
+	 * @param IQueryBuilder $qb
+	 * @param string $source
+	 */
+	protected function limitToSource(IQueryBuilder &$qb, $source) {
+		$this->limitToDBField($qb, 'id', $source);
+	}
+
+
+	/**
+	 * Limit the request to the Source
+	 *
+	 * @param IQueryBuilder $qb
+	 * @param string $status
+	 */
+	protected function limitToStatus(IQueryBuilder &$qb, $status) {
+		$this->limitToDBField($qb, 'status', $status);
+	}
+
+
+	/**
 	 * @param IQueryBuilder $qb
 	 * @param string $field
 	 * @param string|integer $value
@@ -119,6 +153,9 @@ class CoreRequestBuilder {
 	}
 
 
+	/**
+	 * @param IQueryBuilder $qb
+	 */
 	protected function limitToQueuedIndexes(IQueryBuilder &$qb) {
 		$expr = $qb->expr();
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';

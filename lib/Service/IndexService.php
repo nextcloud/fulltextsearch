@@ -40,6 +40,7 @@ use OCA\FullNextSearch\Model\ExtendedIndex;
 use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Model\IndexDocument;
 use OCA\FullNextSearch\Model\ProviderIndexes;
+use OCA\FullNextSearch\Model\Runner;
 
 class IndexService {
 
@@ -84,17 +85,23 @@ class IndexService {
 	 * @param INextSearchPlatform $platform
 	 * @param INextSearchProvider $provider
 	 * @param string $userId
+	 * @param Runner $runner
 	 * @param ExtendedBase|null $command
 	 */
 	public function indexProviderContentFromUser(
 		INextSearchPlatform $platform, INextSearchProvider $provider, $userId,
-		ExtendedBase $command = null
+		Runner $runner, ExtendedBase $command = null
 	) {
+		$runner->update('generateIndex');
 		$documents = $provider->generateIndexableDocuments($userId);
+
 		//$maxSize = sizeof($documents);
+
+		$runner->update('updateCurrentIndex');
 		$toIndex = $this->updateDocumentsWithCurrentIndex($provider, $documents);
 
-		$this->indexChunks($platform, $provider, $toIndex, $command);
+		$runner->update('indexChunk');
+		$this->indexChunks($platform, $provider, $toIndex, $runner, $command);
 	}
 
 
@@ -134,12 +141,13 @@ class IndexService {
 	 * @param INextSearchPlatform $platform
 	 * @param INextSearchProvider $provider
 	 * @param IndexDocument[] $documents
+	 * @param Runner $runner
 	 * @param ExtendedBase $command
 	 *
 	 * @throws Exception
 	 */
 	private function indexChunks(
-		INextSearchPlatform $platform, INextSearchProvider $provider, $documents, ExtendedBase $command
+		INextSearchPlatform $platform, INextSearchProvider $provider, $documents, Runner $runner, ExtendedBase $command
 	) {
 		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
 		for ($i = 0; $i < sizeof($documents); $i++) {

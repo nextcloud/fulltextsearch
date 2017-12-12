@@ -29,18 +29,20 @@ namespace OCA\FullNextSearch\Db;
 
 
 use OCA\FullNextSearch\Model\ExtendedIndex;
+use OCA\FullNextSearch\Model\ExtendedTick;
 use OCA\FullNextSearch\Model\Index;
+use OCA\FullNextSearch\Model\Tick;
 use OCA\FullNextSearch\Service\ConfigService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\IL10N;
 
-class IndexesRequestBuilder extends CoreRequestBuilder {
+class TickRequestBuilder extends CoreRequestBuilder {
 
 
 	/**
-	 * WebsitesRequestBuilder constructor.
+	 * TicksRequestBuilder constructor.
 	 *
 	 * {@inheritdoc}
 	 */
@@ -56,9 +58,9 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getIndexesInsertSql() {
+	protected function getTickInsertSql() {
 		$qb = $this->dbConnection->getQueryBuilder();
-		$qb->insert(self::TABLE_INDEXES);
+		$qb->insert(self::TABLE_TICKS);
 
 		return $qb;
 	}
@@ -69,9 +71,9 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getIndexesUpdateSql() {
+	protected function getTickUpdateSql() {
 		$qb = $this->dbConnection->getQueryBuilder();
-		$qb->update(self::TABLE_INDEXES);
+		$qb->update(self::TABLE_TICKS);
 
 		return $qb;
 	}
@@ -82,16 +84,16 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getIndexesSelectSql() {
+	protected function getTickSelectSql() {
 		$qb = $this->dbConnection->getQueryBuilder();
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
 		$qb->select(
-			'li.owner_id', 'li.provider_id', 'li.document_id', 'li.status', 'li.err', 'li.indexed'
+			't.id', 't.source', 't.data', 't.tick', 't.status', 't.action'
 		)
-		   ->from(self::TABLE_INDEXES, 'li');
+		   ->from(self::TABLE_TICKS, 't');
 
-		$this->defaultSelectAlias = 'li';
+		$this->defaultSelectAlias = 't';
 
 		return $qb;
 	}
@@ -102,7 +104,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getIndexesDeleteSql() {
+	protected function getTickDeleteSql() {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->delete(self::TABLE_INDEXES);
 
@@ -113,16 +115,16 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	/**
 	 * @param array $data
 	 *
-	 * @return ExtendedIndex
+	 * @return ExtendedTick
 	 */
-	protected function parseIndexesSelectSql($data) {
-		$index = new ExtendedIndex($data['provider_id'], $data['document_id']);
-		$index->setStatus($data['status'])
-			  ->setError($data['err'])
-			  ->setOwnerId($data['owner_id'])
-			  ->setLastIndex($data['indexed']);
+	protected function parseTickSelectSql($data) {
+		$tick = new ExtendedTick($data['source'], $data['id']);
+		$tick->setData(json_decode($data['data'], true))
+			 ->setTick($data['tick'])
+			 ->setStatus($data['status'])
+			 ->setAction($data['action']);
 
-		return $index;
+		return $tick;
 	}
 
 }
