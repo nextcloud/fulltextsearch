@@ -116,9 +116,7 @@ class Index extends ExtendedBase {
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);
 			$this->runner->start();
-
 			$this->runner->output('indexing.');
-			sleep(20);
 
 			$providers = $this->providerService->getProviders();
 			foreach ($providers as $provider) {
@@ -149,7 +147,7 @@ class Index extends ExtendedBase {
 
 			$this->runner->output(' USER: ' . $user->getUID());
 			$this->indexService->indexProviderContentFromUser(
-				$platform, $provider, $user->getUID(), $this->runner, $this
+				$this->runner, $platform, $provider, $user->getUID()
 			);
 		}
 

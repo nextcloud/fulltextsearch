@@ -29,6 +29,7 @@ namespace OCA\FullNextSearch;
 
 use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Model\IndexDocument;
+use OCA\FullNextSearch\Model\Runner;
 use OCA\FullNextSearch\Model\SearchResult;
 
 interface INextSearchProvider {
@@ -55,6 +56,11 @@ interface INextSearchProvider {
 	 */
 	public function loadProvider();
 
+
+	/**
+	 * @param Runner $runner
+	 */
+	public function setRunner(Runner $runner);
 
 	/**
 	 * returns all indexable document for a user.

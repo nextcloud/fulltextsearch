@@ -32,10 +32,9 @@ use OCA\FullNextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullNextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullNextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullNextSearch\Model\ExtendedTick;
+use OCA\FullNextSearch\Model\Runner;
 
 class RunningService {
-
-	const TICK_TTL = 300;
 
 	/** @var TickRequest */
 	private $tickRequest;
@@ -91,18 +90,16 @@ class RunningService {
 	 * @throws TickIsNotAliveException
 	 */
 	public function update($runId, $action = '') {
-		$tick = null;
 		$tick = $this->tickRequest->getTickById($runId);
 
+		$this->isStillAlive($tick, true);
+		$tick->setTick();
 
-		if (!$this->isStillAlive($tick)) {
-			throw new TickIsNotAliveException();
-		}
-		if ($action !== '') {
+		if ($action !== '' && $action !== $tick->getAction()) {
 			$this->assignActionToTick($tick, $action);
 		}
 
-		$tick->setTick();
+		echo 'UPDATE IN DB' . "\n";
 		$this->tickRequest->update($tick);
 	}
 
@@ -162,11 +159,21 @@ class RunningService {
 
 	/**
 	 * @param ExtendedTick $tick
+	 * @param bool $exception
 	 *
 	 * @return bool
+	 * @throws TickIsNotAliveException
 	 */
-	public function isStillAlive(ExtendedTick $tick) {
-		return ($tick->getStatus() === 'run');
+	public function isStillAlive(ExtendedTick $tick, $exception = false) {
+		if ($tick->getStatus() !== 'run') {
+			if ($exception) {
+				throw new TickIsNotAliveException();
+			} else {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 
@@ -178,7 +185,7 @@ class RunningService {
 
 		$isAlreadyRunning = false;
 		foreach ($ticks as $tick) {
-			if ($tick->getTick() < (time() - self::TICK_TTL)) {
+			if ($tick->getTick() < (time() - Runner::TICK_TTL)) {
 				$tick->setStatus('timeout');
 				$this->tickRequest->update($tick);
 			} else {

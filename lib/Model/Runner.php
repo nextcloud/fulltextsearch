@@ -37,6 +37,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Runner {
 
 
+	const TICK_TTL = 300;
+	const TICK_MINIMUM = 10;
+
+
 	/** @var RunningService */
 	private $runningService;
 
@@ -51,6 +55,14 @@ class Runner {
 
 	/** @var OutputInterface */
 	private $outputInterface = null;
+
+	/** @var int */
+	private $oldTick = 0;
+
+	/** @var string */
+	private $oldAction = '';
+
+
 
 	/**
 	 * Runner constructor.
@@ -70,13 +82,23 @@ class Runner {
 
 
 	public function update($action) {
+
+		$tick = time();
 		$this->commandBase->hasBeenInterrupted();
+
+		if ($this->oldAction === $action && ($this->oldTick + self::TICK_MINIMUM > $tick)) {
+			return;
+		}
+
 		try {
 			$this->runningService->update($this->tickId, $action);
 		} catch (TickIsNotAliveException $e) {
 			$this->output('Force Quit');
 			exit();
 		}
+
+		$this->oldAction = $action;
+		$this->oldTick = $tick;
 	}
 
 

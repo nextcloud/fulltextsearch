@@ -60,6 +60,9 @@ class IndexService {
 	private $miscService;
 
 
+	/** @var Runner */
+	private $runner;
+
 	/**
 	 * IndexService constructor.
 	 *
@@ -86,22 +89,22 @@ class IndexService {
 	 * @param INextSearchProvider $provider
 	 * @param string $userId
 	 * @param Runner $runner
-	 * @param ExtendedBase|null $command
 	 */
 	public function indexProviderContentFromUser(
-		INextSearchPlatform $platform, INextSearchProvider $provider, $userId,
-		Runner $runner, ExtendedBase $command = null
+		Runner $runner, INextSearchPlatform $platform, INextSearchProvider $provider, $userId
 	) {
-		$runner->update('generateIndex');
+		$platform->setRunner($runner);
+		$provider->setRunner($runner);
+
+		$this->runner = $runner;
+		$this->runner->update('generateIndex' . $provider->getName());
 		$documents = $provider->generateIndexableDocuments($userId);
 
 		//$maxSize = sizeof($documents);
 
-		$runner->update('updateCurrentIndex');
 		$toIndex = $this->updateDocumentsWithCurrentIndex($provider, $documents);
 
-		$runner->update('indexChunk');
-		$this->indexChunks($platform, $provider, $toIndex, $runner, $command);
+		$this->indexChunks($platform, $provider, $toIndex);
 	}
 
 
@@ -116,6 +119,7 @@ class IndexService {
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
 		foreach ($items as $item) {
+			$this->runner->update('compareWithCurrentIndex');
 			if (!$currIndex->isDocumentIndexUpToDate($item)) {
 				$result[] = $item;
 			}
@@ -141,20 +145,18 @@ class IndexService {
 	 * @param INextSearchPlatform $platform
 	 * @param INextSearchProvider $provider
 	 * @param IndexDocument[] $documents
-	 * @param Runner $runner
-	 * @param ExtendedBase $command
 	 *
 	 * @throws Exception
 	 */
-	private function indexChunks(
-		INextSearchPlatform $platform, INextSearchProvider $provider, $documents, Runner $runner, ExtendedBase $command
+	private function indexChunks(INextSearchPlatform $platform, INextSearchProvider $provider, $documents
 	) {
 		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
 		for ($i = 0; $i < sizeof($documents); $i++) {
 
+			$this->runner->update('indexChunk');
 			try {
 				$chunk = array_splice($documents, 0, $chunkSize);
-				$this->indexChunk($platform, $provider, $chunk, $command);
+				$this->indexChunk($platform, $provider, $chunk);
 
 				/** @var IndexDocument $doc */
 				foreach ($chunk as $doc) {
@@ -175,19 +177,16 @@ class IndexService {
 	 * @param INextSearchPlatform $platform
 	 * @param INextSearchProvider $provider
 	 * @param IndexDocument[] $chunk
-	 * @param ExtendedBase|null $command
 	 *
 	 * @throws NoResultException
 	 */
-	private function indexChunk(
-		INextSearchPlatform $platform, INextSearchProvider $provider, $chunk, $command
-	) {
+	private function indexChunk(INextSearchPlatform $platform, INextSearchProvider $provider, $chunk) {
 		if (sizeof($chunk) === 0) {
 			throw new NoResultException();
 		}
 
 		$documents = $provider->fillIndexDocuments($chunk);
-		$indexes = $platform->indexDocuments($provider, $documents, $this->validCommand($command));
+		$indexes = $platform->indexDocuments($provider, $documents);
 		$this->updateIndexes($indexes);
 	}
 
@@ -297,24 +296,6 @@ class IndexService {
 			$this->providerService->setProviderAsIndexed($provider, false);
 			$this->indexesRequest->deleteFromProviderId($provider->getId);
 		}
-	}
-
-
-	/**
-	 * @param null|ExtendedBase $command
-	 *
-	 * @return null|ExtendedBase
-	 */
-	private function validCommand($command) {
-		if ($command === null) {
-			return null;
-		}
-
-		if ($command instanceof Base) {
-			return $command;
-		}
-
-		return null;
 	}
 
 
