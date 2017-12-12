@@ -43,7 +43,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Live extends ExtendedBase {
 
-	const CYCLE_DELAY = 30;
+	const CYCLE_DELAY = 10;
 
 
 	/** @var IUserManager */
