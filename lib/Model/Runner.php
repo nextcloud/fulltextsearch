@@ -28,7 +28,6 @@
 
 namespace OCA\FullNextSearch\Model;
 
-use OC\Core\Command\Base;
 use OCA\FullNextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullNextSearch\Service\RunningService;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -38,8 +37,8 @@ class Runner {
 
 
 	const TICK_TTL = 300;
-	const TICK_MINIMUM = 10;
-
+	const TICK_MINIMUM = 2;
+	const INFO_UPDATE = 10;
 
 	/** @var RunningService */
 	private $runningService;
@@ -62,7 +61,8 @@ class Runner {
 	/** @var string */
 	private $oldAction = '';
 
-
+	/** @var int */
+	private $ramTick = 0;
 
 	/**
 	 * Runner constructor.
@@ -97,8 +97,19 @@ class Runner {
 			exit();
 		}
 
+		$this->updateInfo($tick);
 		$this->oldAction = $action;
 		$this->oldTick = $tick;
+	}
+
+
+	private function updateInfo($tick) {
+		if (($this->ramTick + self::INFO_UPDATE) > $tick) {
+			return;
+		}
+
+		echo '- RAM: ' . (memory_get_usage() / 1024 / 1024) . "\n";
+		$this->ramTick = $tick;
 	}
 
 

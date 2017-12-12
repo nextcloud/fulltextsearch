@@ -99,7 +99,6 @@ class RunningService {
 			$this->assignActionToTick($tick, $action);
 		}
 
-		echo 'UPDATE IN DB' . "\n";
 		$this->tickRequest->update($tick);
 	}
 

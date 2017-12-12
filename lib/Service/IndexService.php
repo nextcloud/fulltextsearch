@@ -123,6 +123,7 @@ class IndexService {
 			if (!$currIndex->isDocumentIndexUpToDate($item)) {
 				$result[] = $item;
 			}
+
 		}
 
 		return $result;
@@ -167,8 +168,6 @@ class IndexService {
 			} catch (Exception $e) {
 				throw $e;
 			}
-
-			echo '- RAM: ' . (memory_get_usage() / 1024 / 1024) . "\n";
 		}
 	}
 
