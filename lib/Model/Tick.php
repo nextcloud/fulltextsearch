@@ -43,6 +43,9 @@ class Tick {
 	/** @var int */
 	private $tick;
 
+	/** @var int */
+	private $firstTick;
+
 	/** @var string */
 	private $status;
 
@@ -120,6 +123,29 @@ class Tick {
 		}
 
 		$this->tick = $tick;
+
+		return $this;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getFirstTick() {
+		return $this->firstTick;
+	}
+
+	/**
+	 * @param int $tick
+	 *
+	 * @return $this
+	 */
+	public function setFirstTick($tick = 0) {
+		if ($tick === 0) {
+			$tick = time();
+		}
+
+		$this->firstTick = $tick;
 
 		return $this;
 	}

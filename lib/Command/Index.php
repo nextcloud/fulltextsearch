@@ -82,6 +82,8 @@ class Index extends ExtendedBase {
 
 		$this->runner = new Runner($runningService, 'commandIndex');
 		$this->indexService = $indexService;
+		$this->indexService->setRunner($this->runner);
+
 		$this->platformService = $platformService;
 		$this->providerService = $providerService;
 		$this->miscService = $miscService;
@@ -114,6 +116,7 @@ class Index extends ExtendedBase {
 
 			$providers = $this->providerService->getProviders();
 			foreach ($providers as $provider) {
+				$provider->setRunner($this->runner);
 				$this->indexProvider($provider);
 			}
 
@@ -132,6 +135,7 @@ class Index extends ExtendedBase {
 	private function indexProvider(INextSearchProvider $provider) {
 		$platform = $this->platformService->getPlatform();
 		$platform->initializeIndex($provider);
+		$platform->setRunner($this->runner);
 
 		$users = $this->userManager->search('');
 
@@ -141,7 +145,7 @@ class Index extends ExtendedBase {
 
 			$this->runner->output(' USER: ' . $user->getUID());
 			$this->indexService->indexProviderContentFromUser(
-				$this->runner, $platform, $provider, $user->getUID()
+				$platform, $provider, $user->getUID()
 			);
 		}
 

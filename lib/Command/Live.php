@@ -28,6 +28,7 @@
 namespace OCA\FullNextSearch\Command;
 
 use Exception;
+use OCA\FullNextSearch\Exceptions\InterruptException;
 use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\ExtendedBase;
 use OCA\FullNextSearch\Model\Runner;
@@ -109,7 +110,6 @@ class Live extends ExtendedBase {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 
-
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);
 			$this->runner->start();
@@ -120,15 +120,18 @@ class Live extends ExtendedBase {
 			throw $e;
 		}
 
+		$this->indexService->setRunner($this->runner);
+
 		$this->liveCycle();
 		$this->runner->stop();
-
 	}
 
 
 	private function liveCycle() {
 
 		$platform = $this->platformService->getPlatform();
+		$platform->setRunner($this->runner);
+
 		while (true) {
 
 			$indexes = $this->indexService->getQueuedIndexes();
@@ -138,6 +141,7 @@ class Live extends ExtendedBase {
 
 				try {
 					$provider = $this->providerService->getProvider($index->getProviderId());
+					$provider->setRunner($this->runner);
 					$this->indexService->updateDocument($platform, $provider, $index);
 				} catch (Exception $e) {
 					$this->runner->exception($e->getMessage(), false);
@@ -151,25 +155,7 @@ class Live extends ExtendedBase {
 			sleep(self::CYCLE_DELAY);
 		}
 
-//
-//		try {
-//			$this->runner->sourceIsCommandLine($this, $output);
-//			$this->runner->start();
-//			$this->runner->output('indexing.');
-//
-//			$providers = $this->providerService->getProviders();
-//			foreach ($providers as $provider) {
-//				$this->indexProvider($provider);
-//			}
-//
-//		} catch (Exception $e) {
-//			$this->runner->exception($e->getMessage(), true);
-//			throw $e;
-//		}
-//
-//		$this->runner->stop();
-//
-
+		$this->runner->stop();
 
 	}
 

@@ -77,6 +77,7 @@ class RunningService {
 		$tick = new ExtendedTick($source);
 		$tick->setStatus('run')
 			 ->setTick()
+			 ->setFirstTick()
 			 ->setInfo('runStart ', time());
 
 		return $this->tickRequest->create($tick);
@@ -127,7 +128,7 @@ class RunningService {
 		$tick = $this->tickRequest->getTickById($runId);
 		$tick->setStatus('stop')
 			 ->setTick()
-			 ->setInfo('stopTime', time())
+			 ->setInfo('runStop', time())
 			 ->setInfo('totalDocuments', 42);
 
 		if ($reason !== '') {
@@ -214,7 +215,7 @@ class RunningService {
 	 * @param string $action
 	 */
 	private function assignActionToTick(ExtendedTick &$tick, $action) {
-		$now = MiscService::getMicroTime(microtime(true));
+		$now = microtime(true);
 		$preAction = $tick->getAction();
 
 		if ($preAction !== '') {

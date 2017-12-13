@@ -66,7 +66,7 @@ class IndexDocument implements \JsonSerializable {
 	private $score;
 
 	/** @var array */
-	private $info;
+	private $info = [];
 
 	/** @var int */
 	private $contentEncoded;
@@ -373,12 +373,15 @@ class IndexDocument implements \JsonSerializable {
 	 */
 	public function jsonSerialize() {
 		return [
-			'id'       => $this->getId(),
-			'title'    => $this->getTitle(),
-			'link'     => $this->getLink(),
-			'more'     => $this->getMore(),
-			'excerpts' => $this->getExcerpts(),
-			'score'    => $this->getScore()
+			'id'           => $this->getId(),
+			'providerId'   => $this->getProviderId(),
+			'access'       => $this->getAccess(),
+			'modifiedTime' => $this->getModifiedTime(),
+			'title'        => $this->getTitle(),
+			'link'         => $this->getLink(),
+			'more'         => $this->getMore(),
+			'excerpts'     => $this->getExcerpts(),
+			'score'        => $this->getScore()
 		];
 	}
 

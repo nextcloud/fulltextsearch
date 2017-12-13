@@ -61,7 +61,7 @@ class IndexService {
 
 
 	/** @var Runner */
-	private $runner;
+	private $runner = null;
 
 	/**
 	 * IndexService constructor.
@@ -85,25 +85,39 @@ class IndexService {
 
 
 	/**
+	 * @param Runner $runner
+	 */
+	public function setRunner(Runner $runner) {
+		$this->runner = $runner;
+	}
+
+
+	/**
+	 * @param $action
+	 */
+	private function updateRunner($action) {
+		if ($this->runner === null) {
+			return;
+		}
+
+		$this->runner->update($action);
+	}
+
+
+	/**
 	 * @param INextSearchPlatform $platform
 	 * @param INextSearchProvider $provider
 	 * @param string $userId
-	 * @param Runner $runner
 	 */
 	public function indexProviderContentFromUser(
-		Runner $runner, INextSearchPlatform $platform, INextSearchProvider $provider, $userId
+		INextSearchPlatform $platform, INextSearchProvider $provider, $userId
 	) {
-		$platform->setRunner($runner);
-		$provider->setRunner($runner);
-
-		$this->runner = $runner;
-		$this->runner->update('generateIndex' . $provider->getName());
+		$this->updateRunner('generateIndex' . $provider->getName());
 		$documents = $provider->generateIndexableDocuments($userId);
 
 		//$maxSize = sizeof($documents);
 
 		$toIndex = $this->updateDocumentsWithCurrentIndex($provider, $documents);
-
 		$this->indexChunks($platform, $provider, $toIndex);
 	}
 
@@ -119,7 +133,7 @@ class IndexService {
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
 		foreach ($items as $item) {
-			$this->runner->update('compareWithCurrentIndex');
+			$this->updateRunner('compareWithCurrentIndex');
 			if (!$currIndex->isDocumentIndexUpToDate($item)) {
 				$result[] = $item;
 			}
@@ -203,6 +217,12 @@ class IndexService {
 		INextSearchPlatform $platform, INextSearchProvider $provider, Index $index
 	) {
 		$document = $provider->updateDocument($index);
+		if ($document === null) {
+			$this->indexesRequest->deleteIndex($index);
+
+			return;
+		}
+
 		$index = $platform->indexDocument($provider, $document);
 		$this->updateIndex($index);
 	}

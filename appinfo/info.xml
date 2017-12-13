@@ -10,7 +10,7 @@
 
 ]]>
 	</description>
-	<version>0.1.7</version>
+	<version>0.1.9</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullNextSearch</namespace>
@@ -24,8 +24,12 @@
 	<!--<screenshot>-->
 	<!--</screenshot>-->
 	<dependencies>
-		<nextcloud min-version="12" max-version="13"/>
+		<nextcloud min-version="12" max-version="14"/>
 	</dependencies>
+
+	<background-jobs>
+		<job>OCA\FullNextSearch\Cron\Index</job>
+	</background-jobs>
 
 	<commands>
 		<command>OCA\FullNextSearch\Command\Stop</command>

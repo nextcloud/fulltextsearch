@@ -28,6 +28,7 @@
 
 namespace OCA\FullNextSearch\Model;
 
+use OCA\FullNextSearch\Exceptions\InterruptException;
 use OCA\FullNextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullNextSearch\Service\RunningService;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -84,7 +85,12 @@ class Runner {
 	public function update($action) {
 
 		$tick = time();
-		$this->commandBase->hasBeenInterrupted();
+		try {
+			$this->hasBeenInterrupted();
+		} catch (InterruptException $e) {
+			$this->stop();
+			throw $e;
+		}
 
 		if ($this->oldAction === $action && ($this->oldTick + self::TICK_MINIMUM > $tick)) {
 			return;
@@ -103,12 +109,19 @@ class Runner {
 	}
 
 
+	private function hasBeenInterrupted() {
+		if ($this->commandBase === null) {
+			return;
+		}
+		$this->commandBase->hasBeenInterrupted();
+	}
+
 	private function updateInfo($tick) {
 		if (($this->ramTick + self::INFO_UPDATE) > $tick) {
 			return;
 		}
 
-		echo '- RAM: ' . (memory_get_usage() / 1024 / 1024) . "\n";
+		$this->output('- RAM: ' . (memory_get_usage() / 1024 / 1024));
 		$this->ramTick = $tick;
 	}
 
@@ -116,6 +129,7 @@ class Runner {
 	public function exception($reason, $stop) {
 		if (!$stop) {
 			$this->output('Exception: ' . $reason);
+			// TODO: feed an array of exceptions for log;
 		}
 		$this->runningService->exception($this->tickId, $reason, $stop);
 	}
