@@ -132,6 +132,12 @@
 			</field>
 
 			<field>
+				<name>first_tick</name>
+				<type>integer</type>
+				<length>6</length>
+			</field>
+
+			<field>
 				<name>tick</name>
 				<type>integer</type>
 				<length>6</length>

@@ -48,6 +48,7 @@ class TickRequest extends TickRequestBuilder {
 			$qb->setValue('source', $qb->createNamedParameter($tick->getSource()))
 			   ->setValue('data', $qb->createNamedParameter(json_encode($tick->getData())))
 			   ->setValue('action', $qb->createNamedParameter($tick->getAction()))
+			   ->setValue('first_tick', $qb->createNamedParameter($tick->getFirstTick()))
 			   ->setValue('tick', $qb->createNamedParameter($tick->getTick()))
 			   ->setValue('status', $qb->createNamedParameter($tick->getStatus()));
 

@@ -89,7 +89,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
 		$qb->select(
-			't.id', 't.source', 't.data', 't.tick', 't.status', 't.action'
+			't.id', 't.source', 't.data', 't.first_tick', 't.tick', 't.status', 't.action'
 		)
 		   ->from(self::TABLE_TICKS, 't');
 
@@ -121,7 +121,8 @@ class TickRequestBuilder extends CoreRequestBuilder {
 		$tick = new ExtendedTick($data['source'], $data['id']);
 		$tick->setData(json_decode($data['data'], true))
 			 ->setTick($data['tick'])
-			 ->setStatus($data['status'])
+			->setFirstTick($data['first_tick'])
+			->setStatus($data['status'])
 			 ->setAction($data['action']);
 
 		return $tick;
