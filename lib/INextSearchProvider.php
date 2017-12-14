@@ -62,6 +62,7 @@ interface INextSearchProvider {
 	 */
 	public function setRunner(Runner $runner);
 
+
 	/**
 	 * returns all indexable document for a user.
 	 * There is no need to fill the document with content at this point.
