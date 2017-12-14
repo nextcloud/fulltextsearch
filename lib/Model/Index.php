@@ -29,6 +29,7 @@ namespace OCA\FullNextSearch\Model;
 
 class Index implements \JsonSerializable {
 
+	const STATUS_INDEX_IGNORE = 16;
 	const STATUS_INDEX_THIS = 1;
 	const STATUS_INDEX_DONE = 2;
 	const STATUS_REMOVE_DOCUMENT = 4;

@@ -201,8 +201,28 @@ class IndexService {
 		}
 
 		$documents = $provider->fillIndexDocuments($chunk);
-		$indexes = $platform->indexDocuments($provider, $documents);
+		$toIndex = $this->filterDocumentsToIndex($documents);
+		$indexes = $platform->indexDocuments($provider, $toIndex);
 		$this->updateIndexes($indexes);
+	}
+
+
+	/**
+	 * @param IndexDocument[] $documents
+	 *
+	 * @return array
+	 */
+	private function filterDocumentsToIndex($documents) {
+		$toIndex = [];
+		foreach ($documents as $document) {
+			echo '====' . $document->getIndex()->getStatus() . "\n";
+			if (!$document->getIndex()
+						  ->isStatus(Index::STATUS_INDEX_IGNORE)) {
+				$toIndex[] = $document;
+			}
+		}
+
+		return $toIndex;
 	}
 
 
