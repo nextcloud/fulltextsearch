@@ -47,7 +47,7 @@ OC.L10N.register(
     "Edit your filters" : "Bewerk je filters",
     "Index Files Tree:" : "Index bestandsboom:",
     "Disable default search from Files" : "De standaard zoekfunctie voor bestanden uitzetten",
-    "Index File Trash:" : "Indexbestand Prullenbak:",
+    "Index File Trash:" : "Indexbestand prullenbak:",
     "Index Public Links:" : "Index publieke links:",
     "Index Federated Shares:" : "Index gefedereerde shares:",
     "Index External Storages:" : "Index externe opslag:",
