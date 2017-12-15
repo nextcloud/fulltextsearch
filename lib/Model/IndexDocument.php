@@ -47,6 +47,9 @@ class IndexDocument implements \JsonSerializable {
 	/** @var int */
 	private $modifiedTime = 0;
 
+	/** @var array */
+	private $tags = [];
+
 	/** @var string */
 	private $title;
 
@@ -174,6 +177,36 @@ class IndexDocument implements \JsonSerializable {
 	 */
 	public function getAccess() {
 		return $this->access;
+	}
+
+
+	/**
+	 * @param array $tags
+	 *
+	 * @return $this
+	 */
+	public function setTags($tags) {
+		$this->tags = $tags;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getTags() {
+		return $this->tags;
+	}
+
+	/**
+	 * @param $tag
+	 *
+	 * @return $this
+	 */
+	public function addTag($tag) {
+		$this->tags[] = $tag;
+
+		return $this;
 	}
 
 
