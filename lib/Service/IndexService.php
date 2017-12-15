@@ -215,7 +215,8 @@ class IndexService {
 	private function filterDocumentsToIndex($documents) {
 		$toIndex = [];
 		foreach ($documents as $document) {
-			echo '====' . $document->getIndex()->getStatus() . "\n";
+			// TODO - rework the index/not_index
+//			echo '==st==' . $document->getIndex()->getStatus() . "\n";
 			if (!$document->getIndex()
 						  ->isStatus(Index::STATUS_INDEX_IGNORE)) {
 				$toIndex[] = $document;

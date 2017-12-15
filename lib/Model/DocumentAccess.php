@@ -59,13 +59,17 @@ class DocumentAccess implements \JsonSerializable {
 
 
 	/**
-	 * @return string
+	 * @param $ownerId
+	 *
+	 * @return $this
 	 */
 	public function setOwnerId($ownerId) {
 		if ($ownerId === false) {
 			$ownerId = '';
 		}
 		$this->ownerId = $ownerId;
+
+		return $this;
 	}
 
 
@@ -110,7 +114,7 @@ class DocumentAccess implements \JsonSerializable {
 	 * @param array $users
 	 */
 	public function addUsers($users) {
-		$this->users = array_merg($this->users, $users);
+		$this->users = array_merge($this->users, $users);
 	}
 
 
@@ -133,7 +137,7 @@ class DocumentAccess implements \JsonSerializable {
 	 * @param array $groups
 	 */
 	public function addGroups($groups) {
-		$this->groups = array_merg($this->groups, $groups);
+		$this->groups = array_merge($this->groups, $groups);
 	}
 
 
@@ -151,6 +155,12 @@ class DocumentAccess implements \JsonSerializable {
 		return $this->circles;
 	}
 
+	/**
+	 * @param array $circles
+	 */
+	public function addCircles($circles) {
+		$this->circles = array_merge($this->circles, $circles);
+	}
 
 	/**
 	 * @param array $links
