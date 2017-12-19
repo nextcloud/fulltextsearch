@@ -28,14 +28,14 @@
 namespace OCA\FullNextSearch\Service;
 
 use Exception;
-use OC\Core\Command\Base;
 use OCA\FullNextSearch\Db\IndexesRequest;
 use OCA\FullNextSearch\Exceptions\DatabaseException;
 use OCA\FullNextSearch\Exceptions\IndexDoesNotExistException;
+use OCA\FullNextSearch\Exceptions\InterruptException;
 use OCA\FullNextSearch\Exceptions\NoResultException;
+use OCA\FullNextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullNextSearch\INextSearchPlatform;
 use OCA\FullNextSearch\INextSearchProvider;
-use OCA\FullNextSearch\Model\ExtendedBase;
 use OCA\FullNextSearch\Model\ExtendedIndex;
 use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Model\IndexDocument;
@@ -94,6 +94,9 @@ class IndexService {
 
 	/**
 	 * @param $action
+	 *
+	 * @throws InterruptException
+	 * @throws TickDoesNotExistException
 	 */
 	private function updateRunner($action) {
 		if ($this->runner === null) {
@@ -108,6 +111,8 @@ class IndexService {
 	 * @param INextSearchPlatform $platform
 	 * @param INextSearchProvider $provider
 	 * @param string $userId
+	 *
+	 * @throws Exception
 	 */
 	public function indexProviderContentFromUser(
 		INextSearchPlatform $platform, INextSearchProvider $provider, $userId
@@ -127,6 +132,8 @@ class IndexService {
 	 * @param IndexDocument[] $items
 	 *
 	 * @return IndexDocument[]
+	 * @throws InterruptException
+	 * @throws TickDoesNotExistException
 	 */
 	private function updateDocumentsWithCurrentIndex(INextSearchProvider $provider, array $items) {
 
@@ -194,6 +201,7 @@ class IndexService {
 	 * @param IndexDocument[] $chunk
 	 *
 	 * @throws NoResultException
+	 * @throws DatabaseException
 	 */
 	private function indexChunk(INextSearchPlatform $platform, INextSearchProvider $provider, $chunk) {
 		if (sizeof($chunk) === 0) {
@@ -233,6 +241,7 @@ class IndexService {
 	 * @param Index $index
 	 *
 	 * @internal param int|string $documentId
+	 * @throws Exception
 	 */
 	public function updateDocument(
 		INextSearchPlatform $platform, INextSearchProvider $provider, Index $index
@@ -268,6 +277,8 @@ class IndexService {
 
 	/**
 	 * @param Index $index
+	 *
+	 * @throws Exception
 	 */
 	private function updateIndex(Index $index) {
 
@@ -284,6 +295,8 @@ class IndexService {
 	 * @param string $providerId
 	 * @param string|int $documentId
 	 * @param int $status
+	 *
+	 * @throws DatabaseException
 	 */
 	public function updateIndexStatus($providerId, $documentId, $status) {
 		try {
@@ -303,6 +316,7 @@ class IndexService {
 	 * @param string|int $documentId
 	 *
 	 * @return ExtendedIndex
+	 * @throws IndexDoesNotExistException
 	 */
 	public function getIndex($providerId, $documentId) {
 		return $this->indexesRequest->getIndex($providerId, $documentId);
@@ -319,6 +333,8 @@ class IndexService {
 
 	/**
 	 * @param string $providerId
+	 *
+	 * @throws Exception
 	 */
 	public function resetIndex($providerId = '') {
 		$platform = $this->platformService->getPlatform();

@@ -29,7 +29,6 @@ namespace OCA\FullNextSearch\AppInfo;
 
 use OCA\FullNextSearch\Capabilities;
 use OCA\FullNextSearch\Service\ConfigService;
-use OCA\FullNextSearch\Service\ProviderService;
 use OCP\AppFramework\App;
 
 class Application extends App {
@@ -58,6 +57,8 @@ class Application extends App {
 
 	/**
 	 * Register Navigation Tab
+	 *
+	 * @throws \OCP\AppFramework\QueryException
 	 */
 	public function registerNavigation() {
 

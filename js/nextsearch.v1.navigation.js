@@ -197,6 +197,9 @@ var nav = {
 		},
 
 
+		/**
+		 * @namespace entry.excerpts
+		 */
 		fillDivResultExcepts: function (divResult, entry) {
 			if (entry.excerpts === null) {
 				return;

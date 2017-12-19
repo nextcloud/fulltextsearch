@@ -34,6 +34,7 @@ use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\ProviderService;
 use OCA\FullNextSearch\Service\SearchService;
+use OCP\AppFramework\QueryException;
 use OCP\Util;
 
 class NextSearch {
@@ -88,6 +89,7 @@ class NextSearch {
 	 * @param string|int $documentId
 	 *
 	 * @return ExtendedIndex
+	 * @throws QueryException
 	 */
 	public static function getIndex($providerId, $documentId) {
 		$c = self::getContainer();
@@ -102,6 +104,7 @@ class NextSearch {
 	 * @param string $ownerId
 	 *
 	 * @return mixed
+	 * @throws QueryException
 	 */
 	public static function createIndex($providerId, $documentId, $ownerId = '') {
 		$index = new Index($providerId, $documentId);
@@ -117,6 +120,7 @@ class NextSearch {
 	 * @param int $status
 	 *
 	 * @return mixed
+	 * @throws QueryException
 	 */
 	public static function updateIndexStatus($providerId, $documentId, $status) {
 		$c = self::getContainer();
@@ -126,12 +130,11 @@ class NextSearch {
 	}
 
 
-
-
 	/**
 	 * @param Index[] $indexes
 	 *
 	 * @return mixed
+	 * @throws QueryException
 	 */
 	public static function updateIndexes($indexes) {
 		$c = self::getContainer();
@@ -146,6 +149,7 @@ class NextSearch {
 	 * @param string|int $search
 	 *
 	 * @return mixed
+	 * @throws QueryException
 	 */
 	public static function search($providerId, $search) {
 		$c = self::getContainer();
@@ -159,6 +163,7 @@ class NextSearch {
 	 * @param $providerId
 	 *
 	 * @return mixed
+	 * @throws QueryException
 	 */
 	public static function isProviderIndexed($providerId) {
 		$c = self::getContainer();

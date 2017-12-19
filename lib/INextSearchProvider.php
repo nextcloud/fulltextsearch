@@ -117,7 +117,7 @@ interface INextSearchProvider {
 	 * @param INextSearchPlatform $platform
 	 * @param array $arr
 	 *
-	 * @return
+	 * @return array
 	 */
 	public function onSearchingQuery(INextSearchPlatform $platform, &$arr);
 

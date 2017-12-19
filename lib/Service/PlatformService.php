@@ -34,6 +34,7 @@ use OCA\FullNextSearch\Exceptions\PlatformDoesNotExistException;
 use OCA\FullNextSearch\Exceptions\PlatformIsNotCompatibleException;
 use OCA\FullNextSearch\Exceptions\PlatformNotSelectedException;
 use OCA\FullNextSearch\INextSearchPlatform;
+use OCP\AppFramework\QueryException;
 
 class PlatformService {
 
@@ -113,6 +114,13 @@ class PlatformService {
 	}
 
 
+	/**
+	 * @throws Exception
+	 * @throws PlatformDoesNotExistException
+	 * @throws PlatformIsNotCompatibleException
+	 * @throws PlatformNotSelectedException
+	 * @throws QueryException
+	 */
 	private function loadPlatform() {
 		if ($this->platform !== null) {
 			return;
@@ -133,6 +141,11 @@ class PlatformService {
 	}
 
 
+	/**
+	 * @return string
+	 * @throws PlatformDoesNotExistException
+	 * @throws PlatformNotSelectedException
+	 */
 	private function getSelectedPlatform() {
 		$selected = $this->configService->getAppValue(ConfigService::SEARCH_PLATFORM);
 

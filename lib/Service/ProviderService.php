@@ -35,6 +35,7 @@ use OCA\FullNextSearch\Exceptions\ProviderIsNotCompatibleException;
 use OCA\FullNextSearch\Exceptions\ProviderIsNotUniqueException;
 use OCA\FullNextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCA\FullNextSearch\INextSearchProvider;
+use OCP\AppFramework\QueryException;
 
 class ProviderService {
 
@@ -98,6 +99,8 @@ class ProviderService {
 	 * @param string $providerId
 	 *
 	 * @throws ProviderIsNotCompatibleException
+	 * @throws ProviderIsNotUniqueException
+	 * @throws QueryException
 	 */
 	public function loadProvider($providerId) {
 
@@ -117,6 +120,7 @@ class ProviderService {
 
 	/**
 	 * @return INextSearchProvider[]
+	 * @throws Exception
 	 */
 	public function getProviders() {
 		$this->loadProviders();
@@ -126,6 +130,7 @@ class ProviderService {
 
 	/**
 	 * @return INextSearchProvider[]
+	 * @throws Exception
 	 */
 	public function getConfiguredProviders() {
 		$this->loadProviders();
@@ -145,6 +150,8 @@ class ProviderService {
 	 * @param string $providerId
 	 *
 	 * @return INextSearchProvider[]
+	 * @throws Exception
+	 * @throws ProviderDoesNotExistException
 	 */
 	public function getFilteredProviders($providerId) {
 		$this->loadProviders();
@@ -166,6 +173,7 @@ class ProviderService {
 	 * @param string $providerId
 	 *
 	 * @return INextSearchProvider
+	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
 	public function getProvider($providerId) {
@@ -219,7 +227,9 @@ class ProviderService {
 	/**
 	 * @param string $appId
 	 *
+	 * @throws ProviderIsNotCompatibleException
 	 * @throws ProviderIsNotUniqueException
+	 * @throws QueryException
 	 */
 	private function loadProvidersFromApp($appId) {
 		$appInfo = OC_App::getAppInfo($appId);
@@ -235,6 +245,10 @@ class ProviderService {
 
 	/**
 	 * @param string|array $providers
+	 *
+	 * @throws ProviderIsNotCompatibleException
+	 * @throws ProviderIsNotUniqueException
+	 * @throws QueryException
 	 */
 	private function loadProvidersFromList($providers) {
 		if (!is_array($providers)) {

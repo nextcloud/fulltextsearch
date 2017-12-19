@@ -29,14 +29,20 @@ namespace OCA\FullNextSearch;
 
 use OCA\FullNextSearch\Controller\NavigationController;
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\AppFramework\QueryException;
 
 $app = new AppInfo\Application();
 
 /** @var TemplateResponse $response */
-$response = $app->getContainer()
-				->query(NavigationController::class)
-				->nc12personal();
+try {
+	$response = $app->getContainer()
+					->query(NavigationController::class)
+					->nc12personal();
 
-return $response->render();
+	return $response->render();
+} catch (QueryException $e) {
+	\OC::$server->getLogger()->log(2, 'QueryException: ' . $e->getMessage());
+}
+
 
 

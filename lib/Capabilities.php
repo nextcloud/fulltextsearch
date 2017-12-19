@@ -3,6 +3,7 @@
 
 namespace OCA\FullNextSearch;
 
+use Exception;
 use OCA\FullNextSearch\Service\ProviderService;
 use OCP\Capabilities\ICapability;
 
@@ -42,6 +43,7 @@ class Capabilities implements ICapability {
 	 * only if the 'files' provider is in the list
 	 *
 	 * @return array
+	 * @throws Exception
 	 */
 	public function getCapabilities() {
 

@@ -29,8 +29,10 @@ namespace OCA\FullNextSearch\Command;
 
 use Exception;
 use OCA\FullNextSearch\Model\ExtendedBase;
+use OCA\FullNextSearch\Model\Runner;
 use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\MiscService;
+use OCA\FullNextSearch\Service\RunningService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,17 +46,24 @@ class Reset extends ExtendedBase {
 	/** @var MiscService */
 	private $miscService;
 
+	/** @var Runner */
+	private $runner;
+
 
 	/**
 	 * Index constructor.
 	 *
+	 * @param RunningService $runningService
 	 * @param IndexService $indexService
 	 * @param MiscService $miscService
 	 */
-	public function __construct(IndexService $indexService, MiscService $miscService) {
+	public function __construct(
+		RunningService $runningService, IndexService $indexService, MiscService $miscService
+	) {
 		parent::__construct();
 		$this->indexService = $indexService;
 
+		$this->runner = new Runner($runningService, 'commandReset');
 		$this->miscService = $miscService;
 	}
 
@@ -67,25 +76,51 @@ class Reset extends ExtendedBase {
 	}
 
 
+	/**
+	 * @param InputInterface $input
+	 * @param OutputInterface $output
+	 *
+	 * @return int|null|void
+	 * @throws Exception
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$output->writeln('reset');
 
-		$this->setOutput($output);
+
 		try {
+			$this->runner->sourceIsCommandLine($this, $output);
+			$this->runner->start();
+			$this->runner->output('reset.');
 
-			$providerId = $input->getArgument('provider');
-			if ($providerId === null) {
-				$providerId = '';
-			}
+		} catch (Exception $e) {
+			$this->runner->exception($e->getMessage(), true);
+			throw $e;
+		}
 
-			$this->indexService->resetIndex($providerId);
+		$this->indexService->setRunner($this->runner);
+		try {
+			$this->indexService->resetIndex($this->getProviderIdFromArgument($input));
 
 		} catch (Exception $e) {
 			throw $e;
 		}
+
+		$this->runner->stop();
 	}
 
 
+	/**
+	 * @param InputInterface $input
+	 *
+	 * @return string
+	 */
+	private function getProviderIdFromArgument(InputInterface $input) {
+		$providerId = $input->getArgument('provider');
+		if ($providerId === null) {
+			$providerId = '';
+		}
+
+		return $providerId;
+	}
 }
 
 

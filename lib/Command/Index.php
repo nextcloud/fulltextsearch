@@ -131,6 +131,8 @@ class Index extends ExtendedBase {
 
 	/**
 	 * @param INextSearchProvider $provider
+	 *
+	 * @throws Exception
 	 */
 	private function indexProvider(INextSearchProvider $provider) {
 		$platform = $this->platformService->getPlatform();
@@ -141,7 +143,9 @@ class Index extends ExtendedBase {
 
 		foreach ($users as $user) {
 
-			//$this->hasBeenInterrupted();
+			if ($user->getUID() === 'test1') {
+				continue;
+			}
 
 			$this->runner->output(' USER: ' . $user->getUID());
 			$this->indexService->indexProviderContentFromUser(

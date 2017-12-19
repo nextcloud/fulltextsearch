@@ -29,7 +29,7 @@ namespace OCA\FullNextSearch\Command;
 
 use Exception;
 use OCA\FullNextSearch\Exceptions\InterruptException;
-use OCA\FullNextSearch\INextSearchProvider;
+use OCA\FullNextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullNextSearch\Model\ExtendedBase;
 use OCA\FullNextSearch\Model\Runner;
 use OCA\FullNextSearch\Service\IndexService;
@@ -127,6 +127,11 @@ class Live extends ExtendedBase {
 	}
 
 
+	/**
+	 * @throws Exception
+	 * @throws InterruptException
+	 * @throws TickDoesNotExistException
+	 */
 	private function liveCycle() {
 
 		$platform = $this->platformService->getPlatform();

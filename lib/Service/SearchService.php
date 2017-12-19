@@ -30,6 +30,7 @@ namespace OCA\FullNextSearch\Service;
 use OC\App\AppManager;
 use OCA\Circles\Api\v1\Circles;
 use OCA\FullNextSearch\Exceptions\EmptySearchException;
+use OCA\FullNextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullNextSearch\INextSearchPlatform;
 use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\DocumentAccess;
@@ -100,6 +101,9 @@ class SearchService {
 	 * @param string $search
 	 *
 	 * @return SearchResult[]
+	 * @throws EmptySearchException
+	 * @throws \Exception
+	 * @throws ProviderDoesNotExistException
 	 */
 	public function search($providerId, $userId, $search) {
 

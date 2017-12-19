@@ -58,6 +58,8 @@ var result = {
 	},
 
 
+	/** @namespace result.provider */
+	/** @namespace result.documents */
 	displayProviderResult: function (result) {
 
 		next_settings.divNoResult.fadeTo(next_settings.delay_result, 0);

@@ -69,8 +69,6 @@ interface INextSearchPlatform {
 	 * Init an index regarding a provider
 	 *
 	 * @param INextSearchProvider $provider
-	 *
-	 * @return
 	 */
 	public function initializeIndex(INextSearchProvider $provider);
 

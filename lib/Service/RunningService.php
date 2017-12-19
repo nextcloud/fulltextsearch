@@ -67,6 +67,7 @@ class RunningService {
 	 *
 	 * @return int
 	 * @throws RunnerAlreadyUpException
+	 * @throws \Exception
 	 */
 	public function start($source) {
 
@@ -88,6 +89,7 @@ class RunningService {
 	 * @param int $runId
 	 * @param string $action
 	 *
+	 * @throws TickDoesNotExistException
 	 * @throws TickIsNotAliveException
 	 */
 	public function update($runId, $action = '') {
@@ -115,6 +117,7 @@ class RunningService {
 				$this->stop($runId, $reason);
 			} catch (TickDoesNotExistException $e) {
 				/** exception will be managed somewhere else */
+				// TODO: Check if above statement is correct.
 			}
 		}
 	}
@@ -123,6 +126,8 @@ class RunningService {
 	/**
 	 * @param int $runId
 	 * @param string $reason
+	 *
+	 * @throws TickDoesNotExistException
 	 */
 	public function stop($runId, $reason = '') {
 		$tick = $this->tickRequest->getTickById($runId);
@@ -144,6 +149,7 @@ class RunningService {
 	 * @param $runId
 	 *
 	 * @return bool
+	 * @throws TickIsNotAliveException
 	 */
 	public function isAlive($runId) {
 		$tick = null;

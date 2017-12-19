@@ -29,7 +29,6 @@ namespace OCA\FullNextSearch\Db;
 
 
 use OCA\FullNextSearch\Model\ExtendedIndex;
-use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Service\ConfigService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCP\DB\QueryBuilder\IQueryBuilder;

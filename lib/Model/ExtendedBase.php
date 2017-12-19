@@ -43,6 +43,10 @@ class ExtendedBase extends Base {
 	}
 
 
+	/**
+	 * @return bool|void
+	 * @throws InterruptException
+	 */
 	public function hasBeenInterrupted() {
 		if (parent::hasBeenInterrupted()) {
 			throw new InterruptException('Interrupted by user.');

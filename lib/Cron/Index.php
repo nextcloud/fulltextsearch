@@ -31,13 +31,14 @@ namespace OCA\FullNextSearch\Cron;
 use Exception;
 use OC\BackgroundJob\TimedJob;
 use OCA\FullNextSearch\AppInfo\Application;
-use OCA\FullNextSearch\INextSearchProvider;
+use OCA\FullNextSearch\Exceptions\InterruptException;
 use OCA\FullNextSearch\Model\Runner;
 use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCA\FullNextSearch\Service\PlatformService;
 use OCA\FullNextSearch\Service\ProviderService;
 use OCA\FullNextSearch\Service\RunningService;
+use OCP\AppFramework\QueryException;
 use OCP\IUserManager;
 
 class Index extends TimedJob {
@@ -65,6 +66,13 @@ class Index extends TimedJob {
 	}
 
 
+	/**
+	 * @param $argument
+	 *
+	 * @throws Exception
+	 * @throws InterruptException
+	 * @throws QueryException
+	 */
 	protected function run($argument) {
 		$app = new Application();
 		$c = $app->getContainer();
@@ -91,6 +99,10 @@ class Index extends TimedJob {
 	}
 
 
+	/**
+	 * @throws Exception
+	 * @throws InterruptException
+	 */
 	private function liveCycle() {
 
 		$platform = $this->platformService->getPlatform();

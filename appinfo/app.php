@@ -27,8 +27,13 @@
 
 namespace OCA\FullNextSearch\AppInfo;
 
-$app = new Application();
+use OCP\AppFramework\QueryException;
 
-$app->registerNavigation();
-$app->registerSettingsAdmin();
-$app->registerSettingsPersonal();
+
+try {
+	$app = new Application();
+	$app->registerNavigation();
+	$app->registerSettingsAdmin();
+	$app->registerSettingsPersonal();
+} catch (QueryException $e) {
+}
