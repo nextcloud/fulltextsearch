@@ -1,6 +1,0 @@
-<?php
-
-
-?>
-
-Full Next Search

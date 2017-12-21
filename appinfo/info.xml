@@ -42,8 +42,6 @@
 	<settings>
 		<admin>OCA\FullNextSearch\Settings\Admin</admin>
 		<admin-section>OCA\FullNextSearch\Settings\AdminSection</admin-section>
-		<personal>OCA\FullNextSearch\Settings\Personal</personal>
-		<personal-section>OCA\FullNextSearch\Settings\PersonalSection</personal-section>
 	</settings>
 
 </info>

@@ -26,7 +26,7 @@ Add the app in the top bar (optional)
 
 >     ./occ config:app:set --value '1' fullnextsearch app_navigation
 
-smaller chunk _might_ need less memory (default is 1000)
+smaller chunk _might_ need less memory (default is 50)
 
 >     ./occ config:app:set --value '50' fullnextsearch index_chunk
 

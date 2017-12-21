@@ -25,14 +25,55 @@
  *
  */
 
-return [
-	'routes' => [
-		['name' => 'Navigation#navigate', 'url' => '/', 'verb' => 'GET'],
-		['name' => 'Settings#getSettingsAdmin', 'url' => '/admin/settings', 'verb' => 'GET'],
-		['name' => 'Settings#setSettingsAdmin', 'url' => '/admin/settings', 'verb' => 'POST'],
-		['name' => 'Api#search', 'url' => '/v1/search/{providerId}/', 'verb' => 'GET'],
-		['name' => 'Api#searchFromRemote', 'url' => '/v1/remote/{providerId}/', 'verb' => 'GET']
-	]
-];
+namespace OCA\FullNextSearch\Settings;
 
+use OCA\FullNextSearch\AppInfo\Application;
+use OCP\IL10N;
+use OCP\IURLGenerator;
+use OCP\Settings\IIconSection;
 
+class AdminSection implements IIconSection {
+
+	/** @var IL10N */
+	private $l10n;
+
+	/** @var IURLGenerator */
+	private $urlGenerator;
+
+	/**
+	 * @param IL10N $l10n
+	 * @param IURLGenerator $urlGenerator
+	 */
+	public function __construct(IL10N $l10n, IURLGenerator $urlGenerator) {
+		$this->l10n = $l10n;
+		$this->urlGenerator = $urlGenerator;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getID() {
+		return Application::APP_NAME;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getName() {
+		return $this->l10n->t('Full Next Search');
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getPriority() {
+		return 55;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getIcon() {
+		return $this->urlGenerator->imagePath(Application::APP_NAME, 'fullnextsearch_black.svg');
+	}
+}

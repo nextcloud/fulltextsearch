@@ -92,6 +92,29 @@ class PlatformService {
 
 
 	/**
+	 * @return INextSearchPlatform[]
+	 * @throws Exception
+	 */
+	public function getPlatforms() {
+		$this->loadPlatforms();
+
+		$platforms = [];
+		foreach ($this->platforms as $class) {
+			try {
+				$platform = \OC::$server->query((string)$class);
+				if ($platform instanceof INextSearchPlatform) {
+					$platforms[$class] = $platform;
+				}
+			} catch (QueryException $e) {
+			}
+
+		}
+
+		return $platforms;
+	}
+
+
+	/**
 	 * @throws Exception
 	 */
 	private function loadPlatforms() {

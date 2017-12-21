@@ -1,0 +1,39 @@
+
+.hidden {
+	display: none;
+}
+
+EM {
+	font-size: 12px;
+}
+
+.div-table {
+	display: table;
+	width: auto;
+	border-spacing: 5px;
+}
+
+.div-table-row {
+	display: table-row;
+	width: auto;
+	height: 65px;
+	clear: both;
+}
+
+.div-table-col {
+	float: left;
+	display: table-column;
+	width: 300px;
+}
+
+.div-table-col-left {
+	width: 500px;
+}
+
+SELECT, INPUT {
+	width: 350px;
+}
+
+INPUT.small {
+	width: 150px;
+}

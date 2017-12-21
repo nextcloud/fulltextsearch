@@ -73,6 +73,35 @@ class ConfigService {
 
 
 	/**
+	 * @return array
+	 */
+	public function getConfig() {
+		$keys = array_keys($this->defaults);
+		$data = [];
+
+		foreach ($keys as $k) {
+			$data[$k] = $this->getAppValue($k);
+		}
+
+		return $data;
+	}
+
+
+	/**
+	 * @param array $save
+	 */
+	public function setConfig($save) {
+		$keys = array_keys($this->defaults);
+
+		foreach ($keys as $k) {
+			if (array_key_exists($k, $save)) {
+				$this->setAppValue($k, $save[$k]);
+			}
+		}
+	}
+
+
+	/**
 	 * Get a value by key
 	 *
 	 * @param string $key

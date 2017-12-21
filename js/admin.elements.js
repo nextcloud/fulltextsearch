@@ -1,5 +1,4 @@
-<?php
-/**
+/*
  * FullNextSearch - Full Text Search your Nextcloud.
  *
  * This file is licensed under the Affero General Public License version 3 or
@@ -25,14 +24,27 @@
  *
  */
 
-return [
-	'routes' => [
-		['name' => 'Navigation#navigate', 'url' => '/', 'verb' => 'GET'],
-		['name' => 'Settings#getSettingsAdmin', 'url' => '/admin/settings', 'verb' => 'GET'],
-		['name' => 'Settings#setSettingsAdmin', 'url' => '/admin/settings', 'verb' => 'POST'],
-		['name' => 'Api#search', 'url' => '/v1/search/{providerId}/', 'verb' => 'GET'],
-		['name' => 'Api#searchFromRemote', 'url' => '/v1/remote/{providerId}/', 'verb' => 'GET']
-	]
-];
+/** global: OCA */
+/** global: admin_settings */
+
+
+
+var admin_elements = {
+	fns_platforms: null,
+	fns_chunkSize: null,
+	fns_providers: null,
+
+	init: function () {
+		admin_elements.fns_platforms = $('#fns_platforms');
+		admin_elements.fns_chunkSize = $('#fns_chunk_size');
+
+		admin_elements.fns_platforms.on('change', function () {
+			admin_settings.saveSettings();
+		});
+		admin_elements.fns_chunkSize.blur(function () {
+			admin_settings.saveSettings();
+		});
+	}
+};
 
 

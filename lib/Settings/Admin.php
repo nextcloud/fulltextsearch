@@ -25,73 +25,75 @@
  *
  */
 
-namespace OCA\FullNextSearch\Controller;
+namespace OCA\FullNextSearch\Settings;
 
 use Exception;
 use OCA\FullNextSearch\AppInfo\Application;
 use OCA\FullNextSearch\Service\ConfigService;
 use OCA\FullNextSearch\Service\MiscService;
-use OCA\FullNextSearch\Service\SettingsService;
-use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http;
-use OCP\AppFramework\Http\DataResponse;
-use OCP\IRequest;
+use OCP\AppFramework\Http\TemplateResponse;
+use OCP\IL10N;
+use OCP\IURLGenerator;
+use OCP\Settings\ISettings;
 
-class SettingsController extends Controller {
+class Admin implements ISettings {
+
+	/** @var IL10N */
+	private $l10n;
+
+	/** @var IURLGenerator */
+	private $urlGenerator;
 
 	/** @var ConfigService */
 	private $configService;
-
-	/** @var SettingsService */
-	private $settingsService;
 
 	/** @var MiscService */
 	private $miscService;
 
 
 	/**
-	 * NavigationController constructor.
-	 *
-	 * @param IRequest $request
+	 * @param IL10N $l10n
+	 * @param IURLGenerator $urlGenerator
 	 * @param ConfigService $configService
-	 * @param SettingsService $settingsService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IRequest $request, ConfigService $configService, SettingsService $settingsService,
-		MiscService $miscService
+		IL10N $l10n, IURLGenerator $urlGenerator, ConfigService $configService, MiscService $miscService
 	) {
-		parent::__construct(Application::APP_NAME, $request);
+		$this->l10n = $l10n;
+		$this->urlGenerator = $urlGenerator;
 		$this->configService = $configService;
-		$this->settingsService = $settingsService;
 		$this->miscService = $miscService;
 	}
 
 
 	/**
-	 * @return DataResponse
+	 * @return TemplateResponse
 	 * @throws Exception
 	 */
-	public function getSettingsAdmin() {
-		$data = $this->configService->getConfig();
-		$this->settingsService->completeSettings($data);
-
-		return new DataResponse($data, Http::STATUS_OK);
+	public function getForm() {
+		return new TemplateResponse(Application::APP_NAME, 'settings.admin', []);
 	}
+
 
 	/**
-	 * @param $data
-	 *
-	 * @return DataResponse
-	 * @throws Exception
+	 * @return string the section ID, e.g. 'sharing'
 	 */
-	public function setSettingsAdmin($data) {
-
-		if ($this->settingsService->checkConfig($data)) {
-			$this->configService->setConfig($data);
-		}
-
-		return $this->getSettingsAdmin();
+	public function getSection() {
+		return Application::APP_NAME;
 	}
+
+
+	/**
+	 * @return int whether the form should be rather on the top or bottom of
+	 * the admin section. The forms are arranged in ascending order of the
+	 * priority values. It is required to return a value between 0 and 100.
+	 *
+	 * keep the server setting at the top, right after "server settings"
+	 */
+	public function getPriority() {
+		return 0;
+	}
+
 
 }
