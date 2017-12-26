@@ -5,8 +5,8 @@ use OCA\FullNextSearch\Api\v1\NextSearch;
 use OCP\Util;
 
 NextSearch::addJavascriptAPI();
-Util::addScript(NextSearch::appName(), 'navigate');
-Util::addStyle(NextSearch::appName(), 'navigate');
+Util::addScript(NextSearch::appName(), 'fullnextsearch');
+Util::addStyle(NextSearch::appName(), 'fullnextsearch');
 
 ?>
 
