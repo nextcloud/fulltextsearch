@@ -25,29 +25,29 @@
  */
 
 /** global: OCA */
-/** global: admin_settings */
+/** global: fns_admin_settings */
 
 
 
-var admin_elements = {
+var fns_admin_elements = {
 	fns_div: null,
 	fns_platforms: null,
 	fns_chunkSize: null,
 	fns_providers: null,
 
 	init: function () {
-		admin_elements.fns_div = $('#fns');
-		admin_elements.fns_platforms = $('#fns_platforms');
-		admin_elements.fns_chunkSize = $('#fns_chunk_size');
+		fns_admin_elements.fns_div = $('#fns');
+		fns_admin_elements.fns_platforms = $('#fns_platforms');
+		fns_admin_elements.fns_chunkSize = $('#fns_chunk_size');
 
-		admin_elements.fns_platforms.on('change', function () {
-			admin_settings.tagSettingsAsNotSaved($(this));
-			admin_settings.saveSettings();
+		fns_admin_elements.fns_platforms.on('change', function () {
+			fns_admin_settings.tagSettingsAsNotSaved($(this));
+			fns_admin_settings.saveSettings();
 		});
-		admin_elements.fns_chunkSize.on('input', function () {
-			admin_settings.tagSettingsAsNotSaved($(this));
+		fns_admin_elements.fns_chunkSize.on('input', function () {
+			fns_admin_settings.tagSettingsAsNotSaved($(this));
 		}).blur(function () {
-			admin_settings.saveSettings();
+			fns_admin_settings.saveSettings();
 		});
 	}
 };

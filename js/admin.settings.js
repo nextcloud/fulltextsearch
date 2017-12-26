@@ -25,7 +25,7 @@
  */
 
 /** global: OCA */
-/** global: admin_elements */
+/** global: fns_admin_elements */
 
 /** @namespace result.index_chunk */
 /** @namespace result.platforms_all */
@@ -35,7 +35,7 @@
 
 
 
-var admin_settings = {
+var fns_admin_settings = {
 
 	config: null,
 
@@ -45,7 +45,7 @@ var admin_settings = {
 			method: 'GET',
 			url: OC.generateUrl('/apps/fullnextsearch/admin/settings')
 		}).done(function (res) {
-			admin_settings.updateSettingPage(res);
+			fns_admin_settings.updateSettingPage(res);
 		});
 
 	},
@@ -53,19 +53,19 @@ var admin_settings = {
 
 	updateSettingPage: function (result) {
 
-		admin_settings.updateSettingPagePlatforms(result);
-		admin_settings.updateSettingPageChunkSize(result);
+		fns_admin_settings.updateSettingPagePlatforms(result);
+		fns_admin_settings.updateSettingPageChunkSize(result);
 
-		admin_settings.updateCurrentPlatform(result);
-		admin_settings.updateEnabledProviders(result);
+		fns_admin_settings.updateCurrentPlatform(result);
+		fns_admin_settings.updateEnabledProviders(result);
 
-		admin_settings.tagSettingsAsSaved(admin_elements.fns_div);
+		fns_admin_settings.tagSettingsAsSaved(fns_admin_elements.fns_div);
 	},
 
 
 	updateSettingPagePlatforms: function (result) {
-		admin_elements.fns_platforms.empty();
-		admin_elements.fns_platforms.append($('<option>', {
+		fns_admin_elements.fns_platforms.empty();
+		fns_admin_elements.fns_platforms.append($('<option>', {
 			value: '',
 			text: ''
 		}));
@@ -74,7 +74,7 @@ var admin_settings = {
 		var classes = Object.keys(platforms);
 		for (var i = 0; i < classes.length; i++) {
 			var platformClass = classes[i];
-			admin_elements.fns_platforms.append($('<option>', {
+			fns_admin_elements.fns_platforms.append($('<option>', {
 				value: platformClass,
 				selected: (result.search_platform === platformClass),
 				text: platforms[platformClass].name
@@ -84,13 +84,13 @@ var admin_settings = {
 			});
 		}
 
-		admin_elements.fns_platforms.fadeTo(300, 1);
+		fns_admin_elements.fns_platforms.fadeTo(300, 1);
 	},
 
 
 	updateSettingPageChunkSize: function (result) {
-		admin_elements.fns_chunkSize.val(result.index_chunk);
-		admin_elements.fns_chunkSize.fadeTo(300, 1);
+		fns_admin_elements.fns_chunkSize.val(result.index_chunk);
+		fns_admin_elements.fns_chunkSize.fadeTo(300, 1);
 	},
 
 
@@ -139,8 +139,8 @@ var admin_settings = {
 	saveSettings: function () {
 
 		var data = {
-			search_platform: admin_elements.fns_platforms.val(),
-			index_chunk: admin_elements.fns_chunkSize.val()
+			search_platform: fns_admin_elements.fns_platforms.val(),
+			index_chunk: fns_admin_elements.fns_chunkSize.val()
 		};
 
 		$.ajax({
@@ -150,7 +150,7 @@ var admin_settings = {
 				data: data
 			}
 		}).done(function (res) {
-			admin_settings.updateSettingPage(res);
+			fns_admin_settings.updateSettingPage(res);
 		});
 
 	}
