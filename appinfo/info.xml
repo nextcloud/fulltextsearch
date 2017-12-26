@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>fullnextsearch</id>
+	<name>Full Next Search (ALPHA)</name>
+	<summary>Core App of a Modular Content Indexer.</summary>
+	<description><![CDATA[
+
+	ALPHA - DO NOT INSTALL ON PRODUCTION NEXTCLOUD
+
+]]>
+	</description>
+	<version>0.1.9</version>
+	<licence>agpl</licence>
+	<author>Maxence Lange</author>
+	<namespace>FullNextSearch</namespace>
+	<documentation>
+		<admin>https://github.com/nextcloud/nextant/blob/fullnextsearch/INSTALL.md</admin>
+	</documentation>
+	<category>tools</category>
+	<website>https://github.com/nextcloud/nextant</website>
+	<bugs>https://github.com/nextcloud/nextant/issues</bugs>
+	<repository>https://github.com/nextcloud/nextant.git</repository>
+	<!--<screenshot>-->
+	<!--</screenshot>-->
+	<dependencies>
+		<nextcloud min-version="12" max-version="14"/>
+	</dependencies>
+
+	<background-jobs>
+		<job>OCA\FullNextSearch\Cron\Index</job>
+	</background-jobs>
+
+	<commands>
+		<command>OCA\FullNextSearch\Command\Stop</command>
+		<command>OCA\FullNextSearch\Command\Index</command>
+		<command>OCA\FullNextSearch\Command\Live</command>
+		<command>OCA\FullNextSearch\Command\Reset</command>
+		<command>OCA\FullNextSearch\Command\Search</command>
+	</commands>
+
+	<settings>
+		<admin>OCA\FullNextSearch\Settings\Admin</admin>
+		<admin-section>OCA\FullNextSearch\Settings\AdminSection</admin-section>
+	</settings>
+
+</info>
