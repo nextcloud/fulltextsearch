@@ -11,7 +11,7 @@ Util::addStyle(Application::APP_NAME, 'admin');
 
 ?>
 
-<div class="section">
+<div id="fns" class="section">
 	<h2><?php p($l->t('Full Next Search')) ?></h2>
 
 	<div class="div-table">

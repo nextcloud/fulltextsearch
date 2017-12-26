@@ -58,7 +58,8 @@ var admin_settings = {
 
 		admin_settings.updateCurrentPlatform(result);
 		admin_settings.updateEnabledProviders(result);
-		console.log(JSON.stringify(result));
+
+		admin_settings.tagSettingsAsSaved(admin_elements.fns_div);
 	},
 
 
@@ -122,6 +123,19 @@ var admin_settings = {
 	},
 
 
+	tagSettingsAsNotSaved: function (div) {
+		div.animate({
+			'backgroundColor': 'rgba(255, 180, 0, 0.18)'
+		}, 300);
+	},
+
+
+	tagSettingsAsSaved: function (div) {
+		div.find('INPUT').animate({'backgroundColor': 'rgba(255, 255, 255, 0.18)'}, 300);
+		div.find('SELECT').animate({'backgroundColor': '#fff'}, 300);
+	},
+
+
 	saveSettings: function () {
 
 		var data = {
@@ -139,8 +153,6 @@ var admin_settings = {
 			admin_settings.updateSettingPage(res);
 		});
 
-
-		console.log(JSON.stringify(data));
 	}
 
 
