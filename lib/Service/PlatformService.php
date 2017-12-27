@@ -76,14 +76,18 @@ class PlatformService {
 
 
 	/**
+	 * @param bool $silent
+	 *
 	 * @return INextSearchPlatform
 	 * @throws Exception
 	 */
-	public function getPlatform() {
+	public function getPlatform($silent = false) {
 		try {
 			$this->loadPlatform();
 		} catch (Exception $e) {
-			$this->miscService->log($e->getMessage());
+			if (!$silent) {
+				$this->miscService->log($e->getMessage());
+			}
 			throw $e;
 		}
 
