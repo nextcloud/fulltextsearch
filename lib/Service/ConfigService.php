@@ -42,7 +42,7 @@ class ConfigService {
 
 	private $defaults = [
 		self::SEARCH_PLATFORM  => '',
-		self::CHUNK_INDEX      => '50',
+		self::CHUNK_INDEX      => '20',
 		self::APP_NAVIGATION   => '0',
 		self::PROVIDER_INDEXED => ''
 	];
