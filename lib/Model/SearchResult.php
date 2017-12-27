@@ -110,7 +110,7 @@ class SearchResult implements \JsonSerializable {
 
 
 	/**
-	 * @return array
+	 * @return array<string,array<string,string>|IndexDocument[]|integer>
 	 */
 	public function jsonSerialize() {
 

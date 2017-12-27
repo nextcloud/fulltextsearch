@@ -116,7 +116,7 @@ class ApiController extends Controller {
 	/**
 	 * @param SearchResult[] $result
 	 *
-	 * @return array
+	 * @return array<string,integer>
 	 */
 	private function generateMeta($result) {
 

@@ -76,7 +76,7 @@ interface INextSearchPlatform {
 	/**
 	 * Reset the indexes
 	 *
-	 * @param INextSearchProvider $provider
+	 * @param INextSearchProvider|null $provider
 	 */
 	public function removeIndex($provider);
 

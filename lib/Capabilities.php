@@ -42,7 +42,7 @@ class Capabilities implements ICapability {
 	 * If a provider is not listed, no search will be available on it; so replace the 'files' search
 	 * only if the 'files' provider is in the list
 	 *
-	 * @return array
+	 * @return array<string,array<string,boolean|array>>
 	 * @throws Exception
 	 */
 	public function getCapabilities() {

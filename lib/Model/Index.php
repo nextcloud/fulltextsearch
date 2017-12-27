@@ -55,8 +55,8 @@ class Index implements \JsonSerializable {
 	/** @var int */
 	private $err = 0;
 
-	/** @var string */
-	private $lastIndex = '0';
+	/** @var int */
+	private $lastIndex = 0;
 
 
 	public function __construct($providerId, $documentId) {
@@ -133,7 +133,7 @@ class Index implements \JsonSerializable {
 
 
 	/**
-	 * @param string $err
+	 * @param int $err
 	 *
 	 * @return $this
 	 */
@@ -152,12 +152,12 @@ class Index implements \JsonSerializable {
 
 
 	/**
-	 * @param string $lastIndex
+	 * @param int $lastIndex
 	 *
 	 * @return $this
 	 */
-	public function setLastIndex($lastIndex = '') {
-		if ($lastIndex === '') {
+	public function setLastIndex($lastIndex = -1) {
+		if ($lastIndex === -1) {
 			$lastIndex = time();
 		}
 
@@ -167,7 +167,7 @@ class Index implements \JsonSerializable {
 	}
 
 	/**
-	 * @return string
+	 * @return int
 	 */
 	public function getLastIndex() {
 		return $this->lastIndex;

@@ -110,6 +110,7 @@ class PlatformService {
 					$platforms[$class] = $platform;
 				}
 			} catch (QueryException $e) {
+				/** we cycle */
 			}
 
 		}

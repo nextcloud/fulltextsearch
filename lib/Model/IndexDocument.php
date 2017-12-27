@@ -81,7 +81,7 @@ class IndexDocument implements \JsonSerializable {
 
 
 	/**
-	 * @param string $id
+	 * @param string|integer $id
 	 *
 	 * @return $this
 	 */
@@ -92,7 +92,7 @@ class IndexDocument implements \JsonSerializable {
 	}
 
 	/**
-	 * @return string
+	 * @return string|integer
 	 */
 	public function getId() {
 		return $this->id;
@@ -402,7 +402,7 @@ class IndexDocument implements \JsonSerializable {
 	}
 
 	/**
-	 * @return array
+	 * @return array<string,string|integer|DocumentAccess|array>
 	 */
 	public function jsonSerialize() {
 		return [
