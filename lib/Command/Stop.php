@@ -28,7 +28,6 @@
 namespace OCA\FullNextSearch\Command;
 
 use OCA\FullNextSearch\Model\ExtendedBase;
-use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\MiscService;
 use OCA\FullNextSearch\Service\RunningService;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,7 +36,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Stop extends ExtendedBase {
 
-	/** @var IndexService */
+	/** @var RunningService */
 	private $runningService;
 
 	/** @var MiscService */

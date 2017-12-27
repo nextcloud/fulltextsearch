@@ -24,7 +24,7 @@
  *
  */
 
-/** global: search */
+/** global: searchbar */
 /** global: api */
 
 var next_settings = {

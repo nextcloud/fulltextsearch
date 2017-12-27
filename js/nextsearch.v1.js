@@ -26,6 +26,7 @@
 
 /** global: OCA */
 /** global: next_settings */
+/** global: searchbar */
 /** global: result */
 /** global: nav */
 /** global: api */

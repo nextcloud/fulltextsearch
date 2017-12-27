@@ -53,7 +53,8 @@ class ApiController extends Controller {
 	 * @param SearchService $searchService
 	 * @param MiscService $miscService
 	 */
-	public function __construct(IRequest $request, SearchService $searchService, MiscService $miscService
+	public function __construct(
+		IRequest $request, SearchService $searchService, MiscService $miscService
 	) {
 		parent::__construct(Application::APP_NAME, $request);
 		$this->searchService = $searchService;

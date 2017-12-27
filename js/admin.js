@@ -25,6 +25,9 @@
  */
 
 /** global: OCA */
+/** global: fns_admin_settings */
+/** global: fns_admin_elements */
+
 
 (function () {
 
@@ -37,7 +40,7 @@
 		$.extend(NextSearchAdmin.prototype, fns_admin_settings);
 
 		fns_admin_elements.init();
-		fns_admin_settings.refreshSettingPage();
+			fns_admin_settings.refreshSettingPage();
 	};
 
 	OCA.NextSearchAdmin = NextSearchAdmin;

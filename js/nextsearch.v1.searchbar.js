@@ -25,9 +25,12 @@
  */
 
 /** global: OCA */
+/** global: nav */
+/** global: _ */
 /** global: api */
 /** global: search */
 /** global: result */
+/** global: nextSearch */
 /** global: next_settings */
 
 

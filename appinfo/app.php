@@ -36,4 +36,5 @@ try {
 	$app->registerSettingsAdmin();
 	$app->registerSettingsPersonal();
 } catch (QueryException $e) {
+	/** we do nothing */
 }
