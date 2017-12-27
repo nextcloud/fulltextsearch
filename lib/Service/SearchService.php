@@ -27,6 +27,7 @@
 
 namespace OCA\FullNextSearch\Service;
 
+use Exception;
 use OC\App\AppManager;
 use OCA\Circles\Api\v1\Circles;
 use OCA\FullNextSearch\Exceptions\EmptySearchException;
@@ -102,7 +103,7 @@ class SearchService {
 	 *
 	 * @return SearchResult[]
 	 * @throws EmptySearchException
-	 * @throws \Exception
+	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
 	public function search($providerId, $userId, $search) {
@@ -177,7 +178,7 @@ class SearchService {
 		if ($this->appManager->isEnabledForUser('circles', $user)) {
 			try {
 				$rights->setCircles(Circles::joinedCircleIds($user->getUID()));
-			} catch (\Exception $e) {
+			} catch (Exception $e) {
 				$this->miscService->log('Circles is set as enabled but: ' . $e->getMessage());
 			}
 		}

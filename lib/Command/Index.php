@@ -142,11 +142,6 @@ class Index extends ExtendedBase {
 		$users = $this->userManager->search('');
 
 		foreach ($users as $user) {
-
-			if ($user->getUID() === 'test1') {
-				continue;
-			}
-
 			$this->runner->output(' USER: ' . $user->getUID());
 			$this->indexService->indexProviderContentFromUser(
 				$platform, $provider, $user->getUID()
