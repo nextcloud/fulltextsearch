@@ -2,25 +2,25 @@
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>fullnextsearch</id>
-	<name>Full Next Search (ALPHA)</name>
-	<summary>Core App of a Modular Content Indexer.</summary>
+	<name>Full Next Search (BETA)</name>
+	<summary>Core App of the modular content indexer.</summary>
 	<description><![CDATA[
 
-	ALPHA - DO NOT INSTALL ON PRODUCTION NEXTCLOUD
+FullNextSearch is the core App of a full-text search framework for your Nextcloud.
 
 ]]>
 	</description>
-	<version>0.1.9</version>
+	<version>0.3.0</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullNextSearch</namespace>
 	<documentation>
-		<admin>https://github.com/nextcloud/nextant/blob/fullnextsearch/INSTALL.md</admin>
+		<admin>https://github.com/nextcloud/fullnextsearch/wiki</admin>
 	</documentation>
 	<category>tools</category>
-	<website>https://github.com/nextcloud/nextant</website>
-	<bugs>https://github.com/nextcloud/nextant/issues</bugs>
-	<repository>https://github.com/nextcloud/nextant.git</repository>
+	<website>https://github.com/nextcloud/fullnextsearch</website>
+	<bugs>https://github.com/nextcloud/fullnextsearch/issues</bugs>
+	<repository>https://github.com/nextcloud/fullnextsearch.git</repository>
 	<!--<screenshot>-->
 	<!--</screenshot>-->
 	<dependencies>
