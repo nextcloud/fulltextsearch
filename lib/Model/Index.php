@@ -175,7 +175,7 @@ class Index implements \JsonSerializable {
 
 
 	/**
-	 * @return array
+	 * @return array<string,string|integer>
 	 */
 	public function jsonSerialize() {
 		return [
