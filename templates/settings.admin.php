@@ -11,9 +11,17 @@ Util::addStyle(Application::APP_NAME, 'admin');
 
 ?>
 
-<div id="fns" class="section">
-	<h2><?php p($l->t('Full Next Search')) ?></h2>
 
+<div id="fns" class="section">
+	<span>
+		<a href="https://github.com/nextcloud/fullnextsearch/wiki" target="_blank">
+			Please check the wiki</a>
+		for documentation related to the installation and the configuration of the Full Text Search within your Nextcloud
+
+	</span>
+	&nbsp;<br/>
+	&nbsp;<br/>
+	<h2><?php p($l->t('Full Next Search')) ?></h2>
 	<div class="div-table">
 
 		<div class="div-table-row">
