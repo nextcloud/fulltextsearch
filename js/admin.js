@@ -29,21 +29,22 @@
 /** global: fns_admin_elements */
 
 
-(function () {
+
+$(document).ready(function () {
 
 
 	/**
-	 * @constructs NextSearch
+	 * @constructs NextSearchAdmin
 	 */
 	var NextSearchAdmin = function () {
 		$.extend(NextSearchAdmin.prototype, fns_admin_elements);
 		$.extend(NextSearchAdmin.prototype, fns_admin_settings);
 
 		fns_admin_elements.init();
-			fns_admin_settings.refreshSettingPage();
+		fns_admin_settings.refreshSettingPage();
 	};
 
 	OCA.NextSearchAdmin = NextSearchAdmin;
 	OCA.NextSearchAdmin.settings = new NextSearchAdmin();
 
-})();
+});
