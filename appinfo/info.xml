@@ -21,8 +21,7 @@ FullNextSearch is the core App of a full-text search framework for your Nextclou
 	<website>https://github.com/nextcloud/fullnextsearch</website>
 	<bugs>https://github.com/nextcloud/fullnextsearch/issues</bugs>
 	<repository>https://github.com/nextcloud/fullnextsearch.git</repository>
-	<!--<screenshot>-->
-	<!--</screenshot>-->
+	<screenshot>https://raw.githubusercontent.com/nextcloud/fullnextsearch/master/screenshots/0.3.0.png</screenshot>
 	<dependencies>
 		<nextcloud min-version="12" max-version="14"/>
 	</dependencies>
