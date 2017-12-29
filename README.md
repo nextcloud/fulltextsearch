@@ -1,6 +1,6 @@
 # FullNextSearch
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nextcloud/fullnextsearch/badges/quality-score.png?b=fullnextsearch)](https://scrutinizer-ci.com/g/nextcloud/fullnextsearch/?b=fullnextsearch)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nextcloud/fullnextsearch/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nextcloud/fullnextsearch/?b=master)
 
 **BETA VERSION**  
 
