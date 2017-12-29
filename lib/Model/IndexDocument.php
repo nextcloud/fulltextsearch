@@ -302,6 +302,8 @@ class IndexDocument implements \JsonSerializable {
 	 * @return $this
 	 */
 	public function setExcerpts($excerpts) {
+		$excerpts = array_map([$this, 'cleanExcerpt'], $excerpts);
+
 		$this->excerpts = $excerpts;
 
 		return $this;
@@ -318,9 +320,24 @@ class IndexDocument implements \JsonSerializable {
 	 * @param string $excerpt
 	 */
 	public function addExcerpt($excerpt) {
+		$excerpt = $this->cleanExcerpt($excerpt);
+
 		$this->excerpts[] = $excerpt;
 	}
 
+	/**
+	 * @param $excerpt
+	 *
+	 * @return mixed
+	 */
+	public function cleanExcerpt($excerpt) {
+		$excerpt = str_replace("\\n", ' ', $excerpt);
+		$excerpt = str_replace("\\r", ' ', $excerpt);
+		$excerpt = str_replace("\n", ' ', $excerpt);
+		$excerpt = str_replace("\r", ' ', $excerpt);
+
+		return $excerpt;
+	}
 
 	/**
 	 * @param string $score
