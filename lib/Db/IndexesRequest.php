@@ -49,6 +49,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 			$qb->setValue('owner_id', $qb->createNamedParameter($index->getOwnerId()))
 			   ->setValue('provider_id', $qb->createNamedParameter($index->getProviderId()))
 			   ->setValue('document_id', $qb->createNamedParameter($index->getDocumentId()))
+			   ->setValue('err', $qb->createNamedParameter($index->getError()))
 			   ->setValue('status', $qb->createNamedParameter($index->getStatus()))
 			   ->setValue('indexed', $qb->createNamedParameter($index->getLastIndex()));
 
