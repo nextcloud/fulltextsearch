@@ -33,7 +33,7 @@
 
 var curr = {
 	providerResult: [],
-
+	page: 0,
 
 	setProviderResult: function (id, value) {
 		curr.providerResult[id] = value;

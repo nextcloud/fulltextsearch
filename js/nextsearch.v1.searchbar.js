@@ -125,8 +125,8 @@ var searchbar = {
 
 		var request = {
 			search: search,
-			page: 1,
-			count: 20
+			page: curr.page,
+			size: 20
 		};
 
 		nextSearch.search(next_settings.searchProviderId, request, searchbar.searchResult);

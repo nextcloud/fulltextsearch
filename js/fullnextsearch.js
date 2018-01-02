@@ -82,7 +82,7 @@ Navigate.prototype = {
 		}
 		var request = {
 			search: search,
-			page: 1
+			page: curr.page
 		};
 
 		nextSearch.search('_all', request, this.searchResult);
