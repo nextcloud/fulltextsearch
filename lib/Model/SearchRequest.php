@@ -37,7 +37,7 @@ class SearchRequest implements \JsonSerializable {
 	private $page = 0;
 
 	/** @var int */
-	private $count = 10;
+	private $size = 10;
 
 
 	/**
@@ -65,6 +65,7 @@ class SearchRequest implements \JsonSerializable {
 		$this->search = trim(str_replace('  ', ' ', $this->search));
 	}
 
+
 	/**
 	 * @return int
 	 */
@@ -83,15 +84,15 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return int
 	 */
-	public function getCount() {
-		return $this->count;
+	public function getSize() {
+		return $this->size;
 	}
 
 	/**
-	 * @param int $count
+	 * @param int $size
 	 */
-	public function setCount($count) {
-		$this->count = $count;
+	public function setSize($size) {
+		$this->size = $size;
 	}
 
 
@@ -99,11 +100,10 @@ class SearchRequest implements \JsonSerializable {
 	 * @return array
 	 */
 	public function jsonSerialize() {
-
 		return [
 			'search' => $this->getSearch(),
 			'page'   => $this->getPage(),
-			'count'  => $this->getCount()
+			'size'  => $this->getSize()
 		];
 	}
 
@@ -126,8 +126,7 @@ class SearchRequest implements \JsonSerializable {
 		$request = new SearchRequest();
 		$request->setSearch(MiscService::get($arr, 'search', ''));
 		$request->setPage(MiscService::get($arr, 'page', 0));
-		$request->setCount(MiscService::get($arr, 'count', 10));
-
+		$request->setSize(MiscService::get($arr, 'size', 10));
 
 		return $request;
 	}
