@@ -34,7 +34,6 @@ try {
 	$app = new Application();
 	$app->registerNavigation();
 	$app->registerSettingsAdmin();
-	$app->registerSettingsPersonal();
 } catch (QueryException $e) {
 	/** we do nothing */
 }
