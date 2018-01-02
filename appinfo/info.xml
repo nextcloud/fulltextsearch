@@ -10,7 +10,7 @@ FullNextSearch is the core App of a full-text search framework for your Nextclou
 
 ]]>
 	</description>
-	<version>0.3.1</version>
+	<version>0.3.2</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullNextSearch</namespace>
