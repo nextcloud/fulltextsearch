@@ -80,8 +80,12 @@ Navigate.prototype = {
 		if (!force && search.length < 3) {
 			return false;
 		}
+		var request = {
+			search: search,
+			page: 1
+		};
 
-		nextSearch.search('_all', search, this.searchResult);
+		nextSearch.search('_all', request, this.searchResult);
 
 		return true;
 	},

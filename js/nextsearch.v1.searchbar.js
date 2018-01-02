@@ -115,6 +115,7 @@ var searchbar = {
 	},
 
 
+	// TODO: do we really need this initSearch, or should we use the one from fullnextsearch.js !?
 	initSearch: function (force) {
 		var search = searchbox.search_input.val();
 
@@ -122,7 +123,13 @@ var searchbar = {
 			return false;
 		}
 
-		nextSearch.search(next_settings.searchProviderId, search, searchbar.searchResult);
+		var request = {
+			search: search,
+			page: 1,
+			count: 20
+		};
+
+		nextSearch.search(next_settings.searchProviderId, request, searchbar.searchResult);
 
 		return true;
 	}

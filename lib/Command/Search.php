@@ -30,6 +30,7 @@ namespace OCA\FullNextSearch\Command;
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullNextSearch\Model\IndexDocument;
+use OCA\FullNextSearch\Model\SearchRequest;
 use OCA\FullNextSearch\Model\SearchResult;
 use OCA\FullNextSearch\Service\MiscService;
 use OCA\FullNextSearch\Service\SearchService;
@@ -83,10 +84,10 @@ class Search extends Base {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$output->writeln('search');
 
+		$request = SearchRequest::fromArray(['search' => $input->getArgument('string')]);
+
 		try {
-			$result = $this->searchService->search(
-				'files', $input->getArgument('user'), $input->getArgument('string')
-			);
+			$result = $this->searchService->search('files', $input->getArgument('user'), $request);
 
 			foreach ($result as $searchResult) {
 				$this->displaySearchResult($searchResult);

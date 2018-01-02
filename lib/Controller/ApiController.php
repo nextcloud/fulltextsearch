@@ -29,6 +29,7 @@ namespace OCA\FullNextSearch\Controller;
 
 use Exception;
 use OCA\FullNextSearch\AppInfo\Application;
+use OCA\FullNextSearch\Model\SearchRequest;
 use OCA\FullNextSearch\Model\SearchResult;
 use OCA\FullNextSearch\Service\MiscService;
 use OCA\FullNextSearch\Service\SearchService;
@@ -67,12 +68,12 @@ class ApiController extends Controller {
 	 * @NoSubAdminRequired
 	 *
 	 * @param string $providerId
-	 * @param string $search
+	 * @param string $request
 	 *
 	 * @return DataResponse
 	 */
-	public function search($providerId, $search) {
-		return $this->searchDocuments($providerId, $search);
+	public function search($providerId, $request) {
+		return $this->searchDocuments($providerId, SearchRequest::fromJSON($request));
 	}
 
 
@@ -82,32 +83,32 @@ class ApiController extends Controller {
 	 * @NoCSRFRequired
 	 *
 	 * @param string $providerId
-	 * @param string $search
+	 * @param string $request
 	 *
 	 * @return DataResponse
 	 */
-	public function searchFromRemote($providerId, $search) {
-		return $this->searchDocuments($providerId, $search);
+	public function searchFromRemote($providerId, $request) {
+		return $this->searchDocuments($providerId, SearchRequest::fromJSON($request));
 	}
 
 
 	/**
 	 * @param string $providerId
-	 * @param string $search
+	 * @param SearchRequest $request
 	 *
 	 * @return DataResponse
 	 */
-	private function searchDocuments($providerId, $search) {
+	private function searchDocuments($providerId, SearchRequest $request) {
 		try {
-			$result = $this->searchService->search($providerId, null, $search);
+			$result = $this->searchService->search($providerId, null, $request);
 			$meta = $this->generateMeta($result);
 
 			return $this->success(
-				['search' => $search, 'provider' => $providerId, 'result' => $result, 'meta' => $meta]
+				['request' => $request, 'provider' => $providerId, 'result' => $result, 'meta' => $meta]
 			);
 		} catch (Exception $e) {
 			return $this->fail(
-				['search' => $search, 'provider' => $providerId, 'error' => $e->getMessage()]
+				['request' => $request, 'provider' => $providerId, 'error' => $e->getMessage()]
 			);
 		}
 	}
