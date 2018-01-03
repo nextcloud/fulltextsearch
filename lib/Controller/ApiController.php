@@ -101,10 +101,10 @@ class ApiController extends Controller {
 	private function searchDocuments($providerId, SearchRequest $request) {
 		try {
 			$result = $this->searchService->search($providerId, null, $request);
-			$meta = $this->generateMeta($result);
+//			$meta = $this->generateMeta($result);
 
 			return $this->success(
-				['request' => $request, 'provider' => $providerId, 'result' => $result, 'meta' => $meta]
+				['request' => $request, 'provider' => $providerId, 'result' => $result]
 			);
 		} catch (Exception $e) {
 			return $this->fail(
@@ -112,26 +112,36 @@ class ApiController extends Controller {
 			);
 		}
 	}
-
-
-	/**
-	 * @param SearchResult[] $result
-	 *
-	 * @return array<string,integer>
-	 */
-	private function generateMeta($result) {
-
-		$meta = [
-			'size' => 0
-		];
-
-		foreach ($result as $searchResult) {
-			$meta['size'] += $searchResult->getSize();
-		}
-
-		return $meta;
-	}
-
+//
+//
+//	/**
+//	 * @param SearchResult[] $result
+//	 *
+//	 * @return array<string,integer>
+//	 */
+//	private function generateMeta($result) {
+//
+//		$meta = [
+//			'size'     => 0,
+//			'time'     => 0,
+//			'total'    => 0,
+//			'maxScore' => 0,
+//			'timedOut' => false
+//		];
+//
+//		foreach ($result as $searchResult) {
+//			$meta['size'] += $searchResult->getSize();
+//			$meta['time'] += $searchResult->getTime();
+//			$meta['total'] += $searchResult->getTotal();
+//			$meta['maxScore'] += $searchResult->getMaxScore();
+//			if ($searchResult->isTimedOut()) {
+//				$meta['timedOut'] = true;
+//			}
+//		}
+//
+//		return $meta;
+//	}
+//
 
 	/**
 	 * @param $data
