@@ -46,6 +46,7 @@ var api = {
 			}
 		}).done(function (res) {
 			result.displayResult(res);
+			nav.onResultDisplayed(res);
 			api.onCallback(callback, res);
 		}).fail(function () {
 			nav.failedToAjax();

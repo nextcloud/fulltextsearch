@@ -34,6 +34,7 @@
 var curr = {
 	providerResult: [],
 	page: 0,
+	lastRequest: '',
 
 	setProviderResult: function (id, value) {
 		curr.providerResult[id] = value;

@@ -123,6 +123,11 @@ var searchbar = {
 			return false;
 		}
 
+		if (curr.lastRequest === search) {
+			return true;
+		}
+		curr.lastRequest = search;
+
 		var request = {
 			search: search,
 			page: curr.page,

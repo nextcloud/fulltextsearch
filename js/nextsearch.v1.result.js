@@ -39,8 +39,6 @@ var result = {
 			return;
 		}
 
-		nav.onResultDisplayed();
-
 		var searchResult = res.result;
 		if (searchResult.length === 0) {
 			result.displayNoResult();
