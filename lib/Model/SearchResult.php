@@ -40,6 +40,19 @@ class SearchResult implements \JsonSerializable {
 	/** @var INextSearchProvider */
 	private $provider;
 
+	/** @var int */
+	private $total;
+
+	/** @var int */
+	private $maxScore;
+
+	/** @var int */
+	private $time;
+
+	/** @var boolean */
+	private $timedOut;
+
+
 	public function __construct() {
 	}
 
@@ -73,6 +86,13 @@ class SearchResult implements \JsonSerializable {
 		return $this;
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getSize() {
+		return count($this->documents);
+	}
+
 
 	/**
 	 * @param string $result
@@ -104,8 +124,63 @@ class SearchResult implements \JsonSerializable {
 	}
 
 
-	public function getSize() {
-		return count($this->documents);
+	/**
+	 * @return int
+	 */
+	public function getTotal() {
+		return $this->total;
+	}
+
+	/**
+	 * @param int $total
+	 */
+	public function setTotal($total) {
+		$this->total = $total;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getMaxScore() {
+		return $this->maxScore;
+	}
+
+	/**
+	 * @param int $maxScore
+	 */
+	public function setMaxScore($maxScore) {
+		$this->maxScore = $maxScore;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getTime() {
+		return $this->time;
+	}
+
+	/**
+	 * @param int $time
+	 */
+	public function setTime($time) {
+		$this->time = $time;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isTimedOut() {
+		return $this->timedOut;
+	}
+
+	/**
+	 * @param bool $timedOut
+	 */
+	public function setTimedOut($timedOut) {
+		$this->timedOut = $timedOut;
 	}
 
 
@@ -122,7 +197,14 @@ class SearchResult implements \JsonSerializable {
 				'name' => $provider->getName()
 			],
 			'documents' => $this->getDocuments(),
-			'size'      => $this->getSize()
+			'meta'      =>
+				[
+					'timedOut' => $this->isTimedOut(),
+					'time'     => $this->getTime(),
+					'size'     => $this->getSize(),
+					'total'    => $this->getTotal(),
+					'maxScore' => $this->getMaxScore()
+				]
 		];
 	}
 }
