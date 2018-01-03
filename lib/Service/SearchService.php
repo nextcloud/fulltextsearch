@@ -145,7 +145,7 @@ class SearchService {
 	 * @param DocumentAccess $access
 	 * @param SearchRequest $request
 	 *
-	 * @return array
+	 * @return SearchResult[]
 	 */
 	private function searchFromProviders(
 		INextSearchPlatform $platform, array $providers, DocumentAccess $access, SearchRequest $request
