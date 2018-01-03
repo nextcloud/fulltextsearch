@@ -123,6 +123,10 @@ class SearchService {
 		$access = $this->getDocumentAccessFromUser($user);
 		$result = $this->searchFromProviders($platform, $providers, $access, $request);
 
+		foreach ($result as $searchResult) {
+			$searchResult->setRequest($request);
+		}
+
 		return $result;
 	}
 

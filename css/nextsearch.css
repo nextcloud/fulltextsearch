@@ -3,6 +3,30 @@
 	font-style: italic;
 }
 
+.provider_navigation {
+	position: relative;
+}
+
+.provider_navigation_right {
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 15px;
+	margin: auto 20px auto 0px;
+	bottom: 0;
+}
+
+.provider_navigation_prev, .provider_navigation_curr, .provider_navigation_next {
+	float: left;
+}
+
+.provider_navigation_curr {
+	font-weight: normal;
+	font-size: 15px;
+	letter-spacing: 6px;
+	margin: -3px 0 0 11px;
+}
+
 .result_entry_default {
 	height: 50px;
 	width: 100%;
@@ -46,14 +70,47 @@
 
 .next_search_div {
 	position: relative;
-	width: 250px;
+	width: 286px;
 	height: 36px;
 	margin-right: 20px;
+}
+
+.provider_navigation {
+	font-size: 15px;
+	font-weight: bold;
+	color: #444;
+	background: #ddd;
+	margin-bottom: 16px;
+	padding-top: 10px;
+	padding-left: 20px;
+	padding-bottom: 10px;
+}
+
+.icon-page-prev {
+	background-image: url('/apps/fullnextsearch/img/page-prev.svg');
+}
+
+.icon-page-next {
+	background-image: url('/apps/fullnextsearch/img/page-next.svg');
+}
+
+.icon-page-next, .icon-page-prev {
+	background-repeat: no-repeat;
+	background-position: center;
+	width: 16px;
+	height: 16px;
 }
 
 .icon-fullnextsearch, .icon-close-fullnextsearch {
 	position: absolute;
 	right: 10px;
+	top: 10px;
+	cursor: pointer;
+}
+
+.icon-more-fullnextsearch {
+	position: absolute;
+	right: 40px;
 	top: 10px;
 	cursor: pointer;
 }

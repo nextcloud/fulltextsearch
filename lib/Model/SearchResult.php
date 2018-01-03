@@ -52,6 +52,9 @@ class SearchResult implements \JsonSerializable {
 	/** @var boolean */
 	private $timedOut;
 
+	/** @var SearchRequest */
+	private $request;
+
 
 	public function __construct() {
 	}
@@ -185,6 +188,21 @@ class SearchResult implements \JsonSerializable {
 
 
 	/**
+	 * @return SearchRequest
+	 */
+	public function getRequest() {
+		return $this->request;
+	}
+
+	/**
+	 * @param SearchRequest $request
+	 */
+	public function setRequest($request) {
+		$this->request = $request;
+	}
+
+
+	/**
 	 * @return array<string,array<string,string>|IndexDocument[]|integer>
 	 */
 	public function jsonSerialize() {
@@ -201,9 +219,11 @@ class SearchResult implements \JsonSerializable {
 				[
 					'timedOut' => $this->isTimedOut(),
 					'time'     => $this->getTime(),
+					'maxPage'  => ceil($this->getTotal() / $this->getSize()),
 					'size'     => $this->getSize(),
 					'total'    => $this->getTotal(),
-					'maxScore' => $this->getMaxScore()
+					'maxScore' => $this->getMaxScore(),
+					'request'  => $this->getRequest()
 				]
 		];
 	}

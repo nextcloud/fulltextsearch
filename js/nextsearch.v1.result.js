@@ -66,7 +66,8 @@ var result = {
 		var current = curr.getProviderResult(result.provider.id);
 		var divProvider = nav.getDivProvider(result.provider.id, result.provider.name);
 
-		nav.managerDivProviderResult(divProvider.children('.provider_result'), result.documents,
+		nav.manageDivProviderNavigation(divProvider.children('.provider_navigation'), result.meta);
+		nav.manageDivProviderResult(divProvider.children('.provider_result'), result.documents,
 			current.documents);
 
 		divProvider.slideDown(next_settings.delay_provider, function () {

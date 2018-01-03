@@ -34,7 +34,7 @@ class SearchRequest implements \JsonSerializable {
 	private $search;
 
 	/** @var int */
-	private $page = 0;
+	private $page = 1;
 
 	/** @var int */
 	private $size = 10;
@@ -77,6 +77,10 @@ class SearchRequest implements \JsonSerializable {
 	 * @param int $page
 	 */
 	public function setPage($page) {
+		if ($page < 1) {
+			$page = 1;
+		}
+
 		$this->page = $page;
 	}
 
@@ -103,7 +107,7 @@ class SearchRequest implements \JsonSerializable {
 		return [
 			'search' => $this->getSearch(),
 			'page'   => $this->getPage(),
-			'size'  => $this->getSize()
+			'size'   => $this->getSize()
 		];
 	}
 
