@@ -31,6 +31,7 @@ use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Model\IndexDocument;
 use OCA\FullNextSearch\Model\Runner;
 use OCA\FullNextSearch\Model\SearchResult;
+use OCP\AppFramework\Http\TemplateResponse;
 
 interface INextSearchProvider {
 
@@ -44,11 +45,26 @@ interface INextSearchProvider {
 
 
 	/**
+	 * return a appId of the Provider
+	 *
+	 * @return string
+	 */
+	public function getAppId();
+
+
+
+	/**
 	 * return a display name of the Provider
 	 *
 	 * @return string
 	 */
 	public function getName();
+
+
+	/**
+	 * @return string
+	 */
+	public function getOptionsTemplate();
 
 
 	/**

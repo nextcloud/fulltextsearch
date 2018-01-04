@@ -59,7 +59,6 @@ var searchbar = {
 		searchbox.search_icon.fadeTo(0, 0.7);
 		searchbox.search_div.append(searchbox.search_icon);
 
-
 		searchbox.search_form = $('<div>');
 		searchbox.search_form.fadeTo(0, 0);
 
@@ -134,6 +133,13 @@ var searchbar = {
 				}, 2000);
 			}
 		});
+
+		nextSearch.options(next_settings.searchProviderId);
+	},
+
+
+	onOptionsLoaded: function (result) {
+		searchbox.search_more.html(result[next_settings.searchProviderId]);
 	},
 
 
@@ -148,6 +154,7 @@ var searchbar = {
 		if (curr.lastRequest === search) {
 			return true;
 		}
+
 		curr.lastRequest = search;
 
 		nextSearch.search({

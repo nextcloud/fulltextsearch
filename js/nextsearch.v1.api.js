@@ -55,6 +55,22 @@ var api = {
 	},
 
 
+	options: function (providerId, callback) {
+		var res = {status: -1};
+
+		$.ajax({
+			method: 'GET',
+			url: OC.generateUrl('/apps/fullnextsearch/options/' + providerId)
+		}).done(function (res) {
+			searchbar.onOptionsLoaded(res);
+			api.onCallback(callback, res);
+		}).fail(function () {
+			nav.failedToAjax();
+			api.onCallback(callback, res);
+		});
+	},
+
+
 	onCallback: function (callback, result) {
 		if (callback && (typeof callback === 'function')) {
 			if (typeof result === 'object') {

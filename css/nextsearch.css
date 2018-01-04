@@ -90,8 +90,8 @@
 
 .search_more {
 	background: #fbfbfb;
-	height: 140px;
 	width: 400px;
+	padding: 15px;
 	right: 30px;
 	position: absolute;
 	top: 41px;
@@ -136,3 +136,25 @@
 }
 
 
+.div-table {
+	display: table;
+	width: auto;
+	border-spacing: 5px;
+}
+
+.div-table-row {
+	display: table-row;
+	width: auto;
+	clear: both;
+}
+
+.div-table-col {
+	float: left;
+	display: table-column;
+}
+
+
+.div-table-col-left {
+	width: 140px;
+	margin-top: 8px;
+}
