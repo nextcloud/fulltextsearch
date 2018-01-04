@@ -138,14 +138,12 @@ var searchbar = {
 		}
 		curr.lastRequest = search;
 
-		var request = {
+		nextSearch.search({
 			providers: next_settings.searchProviderId,
 			search: search,
 			page: curr.page,
 			size: 20
-		};
-
-		nextSearch.search(request, searchbar.searchResult);
+		});
 
 		return true;
 	}

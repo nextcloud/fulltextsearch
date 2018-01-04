@@ -92,7 +92,7 @@ class SearchResult implements \JsonSerializable {
 	/**
 	 * @return int
 	 */
-	public function getSize() {
+	public function getCount() {
 		return count($this->documents);
 	}
 
@@ -219,8 +219,7 @@ class SearchResult implements \JsonSerializable {
 				[
 					'timedOut' => $this->isTimedOut(),
 					'time'     => $this->getTime(),
-					'maxPage'  => ceil($this->getTotal() / $this->getSize()),
-					'size'     => $this->getSize(),
+					'count'    => $this->getCount(),
 					'total'    => $this->getTotal(),
 					'maxScore' => $this->getMaxScore(),
 					'request'  => $this->getRequest()
