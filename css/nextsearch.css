@@ -12,7 +12,7 @@
 	right: 0;
 	top: 0;
 	height: 15px;
-	margin: auto 20px auto 0px;
+	margin: auto 20px auto 0;
 	bottom: 0;
 }
 
@@ -25,6 +25,10 @@
 	font-size: 15px;
 	letter-spacing: 6px;
 	margin: -3px 0 0 11px;
+}
+
+.provider_navigation_prev, .provider_navigation_next {
+	cursor: pointer;
 }
 
 .result_entry_default {

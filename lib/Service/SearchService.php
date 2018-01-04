@@ -98,7 +98,6 @@ class SearchService {
 
 
 	/**
-	 * @param string $providerId
 	 * @param string $userId
 	 * @param SearchRequest $request
 	 *
@@ -107,7 +106,7 @@ class SearchService {
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function search($providerId, $userId, SearchRequest $request) {
+	public function search($userId, SearchRequest $request) {
 
 		$this->searchCannotBeEmpty($request);
 
@@ -116,7 +115,8 @@ class SearchService {
 		}
 
 		$request->cleanSearch();
-		$providers = $this->providerService->getFilteredProviders($providerId);
+
+		$providers = $this->providerService->getFilteredProviders($request->getProviders());
 		$platform = $this->platformService->getPlatform();
 
 		$user = $this->userManager->get($userId);
@@ -145,8 +145,8 @@ class SearchService {
 
 	/**
 	 * @param INextSearchPlatform $platform
-	 * @param INextSearchProvider[] $providers
 	 * @param DocumentAccess $access
+	 * @param INextSearchProvider[] $providers
 	 * @param SearchRequest $request
 	 *
 	 * @return SearchResult[]
