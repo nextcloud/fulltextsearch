@@ -139,12 +139,13 @@ var searchbar = {
 		curr.lastRequest = search;
 
 		var request = {
+			providers: next_settings.searchProviderId,
 			search: search,
 			page: curr.page,
 			size: 20
 		};
 
-		nextSearch.search(next_settings.searchProviderId, request, searchbar.searchResult);
+		nextSearch.search(request, searchbar.searchResult);
 
 		return true;
 	}

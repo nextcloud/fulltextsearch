@@ -147,25 +147,28 @@ class ProviderService {
 
 
 	/**
-	 * @param string $providerId
+	 * @param array $providerList
 	 *
 	 * @return INextSearchProvider[]
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function getFilteredProviders($providerId) {
+	public function getFilteredProviders($providerList) {
 		$this->loadProviders();
 
 		$providers = $this->getConfiguredProviders();
-		if ($providerId === '_all') {
+		if (in_array('all', $providerList)) {
 			return $providers;
 		}
 
-		if (!$this->isProviderIndexed($providerId)) {
-			return [];
+		$ret = [];
+		foreach ($providerList as $providerId) {
+			if ($this->isProviderIndexed($providerId)) {
+				$ret[] = $this->getProvider($providerId);
+			}
 		}
 
-		return [$this->getProvider($providerId)];
+		return $ret;
 	}
 
 

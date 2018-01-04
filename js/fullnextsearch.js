@@ -81,11 +81,12 @@ Navigate.prototype = {
 			return false;
 		}
 		var request = {
+			providers: 'all',
 			search: search,
 			page: curr.page
 		};
 
-		nextSearch.search('_all', request, this.searchResult);
+		nextSearch.search(request, this.searchResult);
 
 		return true;
 	},

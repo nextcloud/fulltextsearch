@@ -35,12 +35,12 @@
 var api = {
 
 
-	search: function (type, request, callback) {
+	search: function (request, callback) {
 		var res = {status: -1};
 
 		$.ajax({
 			method: 'GET',
-			url: OC.generateUrl('/apps/fullnextsearch/v1/search/' + type),
+			url: OC.generateUrl('/apps/fullnextsearch/v1/search'),
 			data: {
 				request: JSON.stringify(request)
 			}

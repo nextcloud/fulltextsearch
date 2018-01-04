@@ -67,13 +67,12 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 * @NoSubAdminRequired
 	 *
-	 * @param string $providerId
 	 * @param string $request
 	 *
 	 * @return DataResponse
 	 */
-	public function search($providerId, $request) {
-		return $this->searchDocuments($providerId, SearchRequest::fromJSON($request));
+	public function search($request) {
+		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
 
@@ -82,33 +81,32 @@ class ApiController extends Controller {
 	 * @NoSubAdminRequired
 	 * @NoCSRFRequired
 	 *
-	 * @param string $providerId
 	 * @param string $request
 	 *
 	 * @return DataResponse
 	 */
-	public function searchFromRemote($providerId, $request) {
-		return $this->searchDocuments($providerId, SearchRequest::fromJSON($request));
+	public function searchFromRemote($request) {
+		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
 
 	/**
-	 * @param string $providerId
 	 * @param SearchRequest $request
 	 *
 	 * @return DataResponse
 	 */
-	private function searchDocuments($providerId, SearchRequest $request) {
+	private function searchDocuments(SearchRequest $request) {
 		try {
-			$result = $this->searchService->search($providerId, null, $request);
+			$result = $this->searchService->search(null, $request);
+
 //			$meta = $this->generateMeta($result);
 
 			return $this->success(
-				['request' => $request, 'provider' => $providerId, 'result' => $result]
+				['request' => $request, 'result' => $result]
 			);
 		} catch (Exception $e) {
 			return $this->fail(
-				['request' => $request, 'provider' => $providerId, 'error' => $e->getMessage()]
+				['request' => $request, 'error' => $e->getMessage()]
 			);
 		}
 	}

@@ -30,6 +30,9 @@ use OCA\FullNextSearch\Service\MiscService;
 
 class SearchRequest implements \JsonSerializable {
 
+	/** @var array */
+	private $providers;
+
 	/** @var string */
 	private $search;
 
@@ -44,6 +47,25 @@ class SearchRequest implements \JsonSerializable {
 	 * SearchRequest constructor.
 	 */
 	public function __construct() {
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function getProviders() {
+		return $this->providers;
+	}
+
+	/**
+	 * @param string|array $providers
+	 */
+	public function setProviders($providers) {
+		if (!is_array($providers)) {
+			$providers = [$providers];
+		}
+
+		$this->providers = $providers;
 	}
 
 
@@ -105,9 +127,10 @@ class SearchRequest implements \JsonSerializable {
 	 */
 	public function jsonSerialize() {
 		return [
-			'search' => $this->getSearch(),
-			'page'   => $this->getPage(),
-			'size'   => $this->getSize()
+			'providers' => $this->getProviders(),
+			'search'    => $this->getSearch(),
+			'page'      => $this->getPage(),
+			'size'      => $this->getSize()
 		];
 	}
 
@@ -128,6 +151,7 @@ class SearchRequest implements \JsonSerializable {
 	 */
 	public static function fromArray($arr) {
 		$request = new SearchRequest();
+		$request->setProviders($arr['providers']);
 		$request->setSearch(MiscService::get($arr, 'search', ''));
 		$request->setPage(MiscService::get($arr, 'page', 0));
 		$request->setSize(MiscService::get($arr, 'size', 10));
