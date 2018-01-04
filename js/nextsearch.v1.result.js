@@ -29,14 +29,15 @@
 /** global: curr */
 /** global: nav */
 
+/** @namespace result.provider */
+/** @namespace result.documents */
+
 var result = {
 
 	displayResult: function (res) {
 		if (next_settings.resultContainer === null) {
 			return;
 		}
-
-		nav.onResultDisplayed();
 
 		var searchResult = res.result;
 		if (searchResult.length === 0) {
@@ -58,8 +59,6 @@ var result = {
 	},
 
 
-	/** @namespace result.provider */
-	/** @namespace result.documents */
 	displayProviderResult: function (result) {
 
 		next_settings.divNoResult.fadeTo(next_settings.delay_result, 0);
@@ -67,7 +66,8 @@ var result = {
 		var current = curr.getProviderResult(result.provider.id);
 		var divProvider = nav.getDivProvider(result.provider.id, result.provider.name);
 
-		nav.managerDivProviderResult(divProvider.children('.provider_result'), result.documents,
+		nav.manageDivProviderNavigation(divProvider.children('.provider_navigation'), result.meta);
+		nav.manageDivProviderResult(divProvider.children('.provider_result'), result.documents,
 			current.documents);
 
 		divProvider.slideDown(next_settings.delay_provider, function () {

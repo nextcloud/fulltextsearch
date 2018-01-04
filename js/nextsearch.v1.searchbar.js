@@ -36,6 +36,7 @@
 
 var searchbox = {
 	searchTimeout: null,
+	search_icon_more: null,
 	search_icon_close: null,
 	search_icon: null,
 	search_input: null,
@@ -67,10 +68,18 @@ var searchbar = {
 		});
 		searchbox.search_form.append(searchbox.search_input);
 
+		searchbox.search_icon_more = $('<div>', {class: 'icon-more-white icon-more-fullnextsearch'});
+		searchbox.search_icon_more.fadeTo(0, 0);
+		searchbox.search_icon_more.on('click', function () {
+			console.log('MORE !');
+		});
+		searchbox.search_form.append(searchbox.search_icon_more);
+
 		searchbox.search_icon_close = $('<div>', {class: 'icon-close-white icon-close-fullnextsearch'});
 		searchbox.search_icon_close.fadeTo(0, 0);
 		searchbox.search_icon_close.on('click', function () {
 			next_settings.lockSearchbox = false;
+			searchbox.search_icon_more.stop().fadeTo(100, 0);
 			searchbox.search_icon_close.stop().fadeTo(100, 0);
 			searchbox.search_input.val('');
 			nav.onSearchReset();
@@ -91,6 +100,7 @@ var searchbar = {
 
 		searchbox.search_input.on('focus', function () {
 			next_settings.lockSearchbox = true;
+			searchbox.search_icon_more.stop().fadeTo(200, 1);
 			searchbox.search_icon_close.stop().fadeTo(200, 1);
 		});
 
@@ -115,6 +125,7 @@ var searchbar = {
 	},
 
 
+	// TODO: do we really need this initSearch, or should we use the one from fullnextsearch.js !?
 	initSearch: function (force) {
 		var search = searchbox.search_input.val();
 
@@ -122,7 +133,17 @@ var searchbar = {
 			return false;
 		}
 
-		nextSearch.search(next_settings.searchProviderId, search, searchbar.searchResult);
+		if (curr.lastRequest === search) {
+			return true;
+		}
+		curr.lastRequest = search;
+
+		nextSearch.search({
+			providers: next_settings.searchProviderId,
+			search: search,
+			page: curr.page,
+			size: 20
+		});
 
 		return true;
 	}

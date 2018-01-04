@@ -32,7 +32,6 @@ use Exception;
 use OC\BackgroundJob\TimedJob;
 use OCA\FullNextSearch\AppInfo\Application;
 use OCA\FullNextSearch\Exceptions\InterruptException;
-use OCA\FullNextSearch\Exceptions\PlatformNotSelectedException;
 use OCA\FullNextSearch\Model\Runner;
 use OCA\FullNextSearch\Service\IndexService;
 use OCA\FullNextSearch\Service\MiscService;
@@ -70,8 +69,6 @@ class Index extends TimedJob {
 	/**
 	 * @param $argument
 	 *
-	 * @throws Exception
-	 * @throws InterruptException
 	 * @throws QueryException
 	 */
 	protected function run($argument) {
@@ -86,7 +83,6 @@ class Index extends TimedJob {
 		$this->platformService = $c->query(PlatformService::class);
 		$this->providerService = $c->query(ProviderService::class);
 		$this->miscService = $c->query(MiscService::class);
-
 
 		try {
 			$this->runner->start();

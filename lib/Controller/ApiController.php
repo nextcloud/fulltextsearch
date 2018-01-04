@@ -29,6 +29,7 @@ namespace OCA\FullNextSearch\Controller;
 
 use Exception;
 use OCA\FullNextSearch\AppInfo\Application;
+use OCA\FullNextSearch\Model\SearchRequest;
 use OCA\FullNextSearch\Model\SearchResult;
 use OCA\FullNextSearch\Service\MiscService;
 use OCA\FullNextSearch\Service\SearchService;
@@ -66,13 +67,12 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 * @NoSubAdminRequired
 	 *
-	 * @param string $providerId
-	 * @param string $search
+	 * @param string $request
 	 *
 	 * @return DataResponse
 	 */
-	public function search($providerId, $search) {
-		return $this->searchDocuments($providerId, $search);
+	public function search($request) {
+		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
 
@@ -81,56 +81,65 @@ class ApiController extends Controller {
 	 * @NoSubAdminRequired
 	 * @NoCSRFRequired
 	 *
-	 * @param string $providerId
-	 * @param string $search
+	 * @param string $request
 	 *
 	 * @return DataResponse
 	 */
-	public function searchFromRemote($providerId, $search) {
-		return $this->searchDocuments($providerId, $search);
+	public function searchFromRemote($request) {
+		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
 
 	/**
-	 * @param string $providerId
-	 * @param string $search
+	 * @param SearchRequest $request
 	 *
 	 * @return DataResponse
 	 */
-	private function searchDocuments($providerId, $search) {
+	private function searchDocuments(SearchRequest $request) {
 		try {
-			$result = $this->searchService->search($providerId, null, $search);
-			$meta = $this->generateMeta($result);
+			$result = $this->searchService->search(null, $request);
+
+//			$meta = $this->generateMeta($result);
 
 			return $this->success(
-				['search' => $search, 'provider' => $providerId, 'result' => $result, 'meta' => $meta]
+				['request' => $request, 'result' => $result]
 			);
 		} catch (Exception $e) {
 			return $this->fail(
-				['search' => $search, 'provider' => $providerId, 'error' => $e->getMessage()]
+				['request' => $request, 'error' => $e->getMessage()]
 			);
 		}
 	}
-
-
-	/**
-	 * @param SearchResult[] $result
-	 *
-	 * @return array<string,integer>
-	 */
-	private function generateMeta($result) {
-
-		$meta = [
-			'size' => 0
-		];
-
-		foreach ($result as $searchResult) {
-			$meta['size'] += $searchResult->getSize();
-		}
-
-		return $meta;
-	}
-
+//
+//
+//	/**
+//	 * @param SearchResult[] $result
+//	 *
+//	 * @return array<string,integer>
+//	 */
+//	private function generateMeta($result) {
+//
+//		$meta = [
+//			'size'     => 0,
+//			'time'     => 0,
+//			'total'    => 0,
+//			'maxScore' => 0,
+//			'timedOut' => false
+//		];
+//
+//		foreach ($result as $searchResult) {
+//			$meta['size'] += $searchResult->getSize();
+//			$meta['time'] += $searchResult->getTime();
+//			$meta['total'] += $searchResult->getTotal();
+//			$meta['maxScore'] += $searchResult->getMaxScore();
+//			if ($searchResult->isTimedOut()) {
+//				$meta['timedOut'] = true;
+//			}
+//		}
+//
+//		return $meta;
+//	}
+//
 
 	/**
 	 * @param $data

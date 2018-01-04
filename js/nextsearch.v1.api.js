@@ -35,16 +35,18 @@
 var api = {
 
 
-	search: function (type, search, callback) {
+	search: function (request, callback) {
 		var res = {status: -1};
+
 		$.ajax({
 			method: 'GET',
-			url: OC.generateUrl('/apps/fullnextsearch/v1/search/' + type),
+			url: OC.generateUrl('/apps/fullnextsearch/v1/search'),
 			data: {
-				search: search
+				request: JSON.stringify(request)
 			}
 		}).done(function (res) {
 			result.displayResult(res);
+			nav.onResultDisplayed(res);
 			api.onCallback(callback, res);
 		}).fail(function () {
 			nav.failedToAjax();

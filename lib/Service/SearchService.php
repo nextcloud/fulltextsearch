@@ -35,6 +35,7 @@ use OCA\FullNextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullNextSearch\INextSearchPlatform;
 use OCA\FullNextSearch\INextSearchProvider;
 use OCA\FullNextSearch\Model\DocumentAccess;
+use OCA\FullNextSearch\Model\SearchRequest;
 use OCA\FullNextSearch\Model\SearchResult;
 use OCP\IGroupManager;
 use OCP\IUser;
@@ -97,30 +98,34 @@ class SearchService {
 
 
 	/**
-	 * @param string $providerId
 	 * @param string $userId
-	 * @param string $search
+	 * @param SearchRequest $request
 	 *
 	 * @return SearchResult[]
 	 * @throws EmptySearchException
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function search($providerId, $userId, $search) {
+	public function search($userId, SearchRequest $request) {
 
-		$this->searchCannotBeEmpty($search);
+		$this->searchCannotBeEmpty($request);
 
 		if ($userId === null) {
 			$userId = $this->userId;
 		}
 
-		$search = trim(str_replace('  ', ' ', $search));
-		$providers = $this->providerService->getFilteredProviders($providerId);
+		$request->cleanSearch();
+
+		$providers = $this->providerService->getFilteredProviders($request->getProviders());
 		$platform = $this->platformService->getPlatform();
 
 		$user = $this->userManager->get($userId);
 		$access = $this->getDocumentAccessFromUser($user);
-		$result = $this->searchFromProviders($platform, $providers, $access, $search);
+		$result = $this->searchFromProviders($platform, $providers, $access, $request);
+
+		foreach ($result as $searchResult) {
+			$searchResult->setRequest($request);
+		}
 
 		return $result;
 	}
@@ -140,19 +145,18 @@ class SearchService {
 
 	/**
 	 * @param INextSearchPlatform $platform
-	 * @param INextSearchProvider[] $providers
 	 * @param DocumentAccess $access
-	 * @param string $search
+	 * @param INextSearchProvider[] $providers
+	 * @param SearchRequest $request
 	 *
-	 * @return array
+	 * @return SearchResult[]
 	 */
 	private function searchFromProviders(
-		INextSearchPlatform $platform, array $providers, DocumentAccess $access, $search
+		INextSearchPlatform $platform, array $providers, DocumentAccess $access, SearchRequest $request
 	) {
-
 		$result = [];
 		foreach ($providers AS $provider) {
-			$searchResult = $platform->searchDocuments($provider, $access, $search);
+			$searchResult = $platform->searchDocuments($provider, $access, $request);
 
 			$provider->improveSearchResult($searchResult);
 			if (sizeof($searchResult->getDocuments()) > 0) {

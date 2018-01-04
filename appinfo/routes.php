@@ -30,8 +30,8 @@ return [
 		['name' => 'Navigation#navigate', 'url' => '/', 'verb' => 'GET'],
 		['name' => 'Settings#getSettingsAdmin', 'url' => '/admin/settings', 'verb' => 'GET'],
 		['name' => 'Settings#setSettingsAdmin', 'url' => '/admin/settings', 'verb' => 'POST'],
-		['name' => 'Api#search', 'url' => '/v1/search/{providerId}/', 'verb' => 'GET'],
-		['name' => 'Api#searchFromRemote', 'url' => '/v1/remote/{providerId}/', 'verb' => 'GET']
+		['name' => 'Api#search', 'url' => '/v1/search', 'verb' => 'GET'],
+		['name' => 'Api#searchFromRemote', 'url' => '/v1/remote', 'verb' => 'GET']
 	]
 ];
 

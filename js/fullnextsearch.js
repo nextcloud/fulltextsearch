@@ -80,8 +80,13 @@ Navigate.prototype = {
 		if (!force && search.length < 3) {
 			return false;
 		}
+		var request = {
+			providers: 'all',
+			search: search,
+			page: curr.page
+		};
 
-		nextSearch.search('_all', search, this.searchResult);
+		nextSearch.search(request, this.searchResult);
 
 		return true;
 	},

@@ -31,9 +31,11 @@
 /** global: next_settings */
 
 
+
 var curr = {
 	providerResult: [],
-
+	page: 1,
+	lastRequest: '',
 
 	setProviderResult: function (id, value) {
 		curr.providerResult[id] = value;
@@ -62,12 +64,39 @@ var nav = {
 		},
 
 
-		managerDivProviderResult: function (divProvider, newResult, oldResult) {
+		manageDivProviderNavigation: function (divProviderNavigation, meta) {
+
+			var maxPage = Math.ceil(meta.total / meta.request.size);
+
+			divProviderNavigation.attr('data-time', meta.time);
+			divProviderNavigation.attr('data-page', meta.request.page);
+			divProviderNavigation.attr('data-search', meta.request.search);
+			divProviderNavigation.attr('data-max-page', maxPage);
+			divProviderNavigation.attr('data-size', meta.request.size);
+			divProviderNavigation.attr('data-total', meta.total);
+
+			var providerName = divProviderNavigation.attr('data-provider-name');
+
+			var left = "Searching " + providerName + " for '" + meta.request.search + "' returns " +
+				meta.total + " results";
+			divProviderNavigation.find('.provider_navigation_left').text(left);
+
+			divProviderNavigation.find('.provider_navigation_curr').text(meta.request.page + ' / ' +
+				maxPage);
+
+			divProviderNavigation.find('.provider_navigation_prev').stop().fadeTo(200,
+				(meta.request.page > 1) ? 1 : 0);
+			divProviderNavigation.find('.provider_navigation_next').stop().fadeTo(200,
+				(meta.request.page < maxPage) ? 1 : 0);
+		},
+
+
+		manageDivProviderResult: function (divProviderResult, newResult, oldResult) {
 			//replaceWith();
-			nav.divProviderResultAddItems(divProvider, newResult, oldResult);
+			nav.divProviderResultAddItems(divProviderResult, newResult, oldResult);
 			if (oldResult) {
-				nav.divProviderResultRemoveItems(divProvider, newResult, oldResult);
-				nav.divProviderResultMoveItems(divProvider, newResult, oldResult);
+				nav.divProviderResultRemoveItems(divProviderResult, newResult, oldResult);
+				nav.divProviderResultMoveItems(divProviderResult, newResult, oldResult);
 			}
 		},
 
@@ -281,14 +310,45 @@ var nav = {
 
 
 		generateDivProvider: function (providerId, providerName) {
-			var divProviderName = $('<div>', {class: 'provider_name'});
-			divProviderName.text(providerName);
+
+
+			var divProviderNavigation = $('<div>', {class: 'provider_navigation'});
+			divProviderNavigation.attr('data-provider-name', providerName);
+			divProviderNavigation.append($('<div>', {class: 'provider_navigation_left'}));
+
+			var divProviderPagination = $('<div>', {class: 'provider_navigation_right'});
+			var divProviderPaginationPrev = $('<div>', {class: 'icon-page-prev provider_navigation_prev'});
+			divProviderPaginationPrev.on('click', function () {
+				nextSearch.search({
+					providers: providerId,
+					search: divProviderNavigation.attr('data-search'),
+					page: Number(divProviderNavigation.attr('data-page')) - 1,
+					size: divProviderNavigation.attr('data-size')
+				});
+			});
+			divProviderPagination.append(divProviderPaginationPrev);
+
+			divProviderPagination.append($('<div>', {class: 'provider_navigation_curr'}));
+
+			var divProviderPaginationNext = $('<div>', {class: 'icon-page-next provider_navigation_next'});
+			divProviderPaginationNext.on('click', function () {
+				nextSearch.search({
+					providers: providerId,
+					search: divProviderNavigation.attr('data-search'),
+					page: Number(divProviderNavigation.attr('data-page')) + 1,
+					size: divProviderNavigation.attr('data-size')
+				});
+			});
+			divProviderPagination.append(divProviderPaginationNext);
+
+			divProviderNavigation.append(divProviderPagination);
 
 			var divProviderResult = $('<div>', {class: 'provider_result'});
+
 			var divProvider = $('<div>', {class: 'provider_header'});
 			divProvider.hide();
 			divProvider.attr('data-id', providerId);
-			divProvider.append(divProviderName);
+			divProvider.append(divProviderNavigation);
 			divProvider.append(divProviderResult);
 
 			return divProvider;

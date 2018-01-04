@@ -32,6 +32,7 @@ use OCA\FullNextSearch\Model\DocumentAccess;
 use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Model\IndexDocument;
 use OCA\FullNextSearch\Model\Runner;
+use OCA\FullNextSearch\Model\SearchRequest;
 use OCA\FullNextSearch\Model\SearchResult;
 
 interface INextSearchPlatform {
@@ -105,10 +106,10 @@ interface INextSearchPlatform {
 	/**
 	 * @param INextSearchProvider $provider
 	 * @param DocumentAccess $access
-	 * @param string $string
+	 * @param SearchRequest $request
 	 *
 	 * @return SearchResult
 	 */
-	public function searchDocuments(INextSearchProvider $provider, DocumentAccess $access, $string);
+	public function searchDocuments(INextSearchProvider $provider, DocumentAccess $access, $request);
 
 }

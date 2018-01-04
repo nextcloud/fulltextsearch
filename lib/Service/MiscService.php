@@ -57,6 +57,10 @@ class MiscService {
 	 * @return array|string|integer
 	 */
 	public static function get($arr, $k, $default = '') {
+		if ($arr === null) {
+			return $default;
+		}
+
 		if (!key_exists($k, $arr)) {
 			return $default;
 		}
