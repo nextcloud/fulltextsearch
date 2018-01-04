@@ -36,6 +36,7 @@
 
 var searchbox = {
 	searchTimeout: null,
+	search_more: null,
 	search_icon_more: null,
 	search_icon_close: null,
 	search_icon: null,
@@ -68,10 +69,19 @@ var searchbar = {
 		});
 		searchbox.search_form.append(searchbox.search_input);
 
+		searchbox.search_more = $('<div>', {class: 'search_more'});
+		searchbox.search_more.fadeTo(0, 0);
+
 		searchbox.search_icon_more = $('<div>', {class: 'icon-more-white icon-more-fullnextsearch'});
 		searchbox.search_icon_more.fadeTo(0, 0);
 		searchbox.search_icon_more.on('click', function () {
-			console.log('MORE !');
+			if (curr.moreDisplayed) {
+				searchbox.search_more.stop().fadeTo(100, 0);
+				curr.moreDisplayed = false;
+			} else {
+				searchbox.search_more.stop().fadeTo(100, 1);
+				curr.moreDisplayed = true;
+			}
 		});
 		searchbox.search_form.append(searchbox.search_icon_more);
 
@@ -81,13 +91,14 @@ var searchbar = {
 			next_settings.lockSearchbox = false;
 			searchbox.search_icon_more.stop().fadeTo(100, 0);
 			searchbox.search_icon_close.stop().fadeTo(100, 0);
+			searchbox.search_more.stop().fadeTo(100, 0);
+			curr.moreDisplayed = false;
 			searchbox.search_input.val('');
 			nav.onSearchReset();
 		});
 		searchbox.search_form.append(searchbox.search_icon_close);
 
-		searchbox.search_div.append(searchbox.search_form);
-		searchbox.search_div.hover(function () {
+		searchbox.search_form.hover(function () {
 			searchbox.search_icon.stop().fadeTo(100, 0);
 			searchbox.search_form.stop().fadeTo(100, 0.8);
 		}, function () {
@@ -97,6 +108,8 @@ var searchbar = {
 			searchbox.search_form.stop().fadeTo(500, 0);
 			searchbox.search_icon.stop().fadeTo(800, 0.7);
 		});
+		searchbox.search_div.append(searchbox.search_form);
+		searchbox.search_div.append(searchbox.search_more);
 
 		searchbox.search_input.on('focus', function () {
 			next_settings.lockSearchbox = true;
@@ -105,7 +118,6 @@ var searchbar = {
 		});
 
 		searchbox.search_input.on('input', function () {
-
 
 			if ($(this).val() === '') {
 				nav.onSearchReset();

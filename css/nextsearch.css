@@ -3,10 +3,6 @@
 	font-style: italic;
 }
 
-.provider_navigation {
-	position: relative;
-}
-
 .provider_navigation_right {
 	position: absolute;
 	right: 0;
@@ -80,6 +76,7 @@
 }
 
 .provider_navigation {
+	position: relative;
 	font-size: 15px;
 	font-weight: bold;
 	color: #444;
@@ -88,6 +85,18 @@
 	padding-top: 10px;
 	padding-left: 20px;
 	padding-bottom: 10px;
+	margin-top: 40px;
+}
+
+.search_more {
+	background: #fbfbfb;
+	height: 140px;
+	width: 400px;
+	right: 30px;
+	position: absolute;
+	top: 41px;
+	border-radius: 3px;
+	border: solid #cecece 1px;
 }
 
 .icon-page-prev {
