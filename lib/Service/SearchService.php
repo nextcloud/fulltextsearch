@@ -114,12 +114,13 @@ class SearchService {
 			$userId = $this->userId;
 		}
 
+		$user = $this->userManager->get($userId);
+		$request->setAuthor($user->getUID());
 		$request->cleanSearch();
 
 		$providers = $this->providerService->getFilteredProviders($request->getProviders());
 		$platform = $this->platformService->getPlatform();
 
-		$user = $this->userManager->get($userId);
 		$access = $this->getDocumentAccessFromUser($user);
 		$result = $this->searchFromProviders($platform, $providers, $access, $request);
 

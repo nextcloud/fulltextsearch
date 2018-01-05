@@ -42,6 +42,8 @@ class SearchRequest implements \JsonSerializable {
 	/** @var int */
 	private $size = 10;
 
+	/** @var string */
+	private $author;
 
 	/**
 	 * SearchRequest constructor.
@@ -66,6 +68,21 @@ class SearchRequest implements \JsonSerializable {
 		}
 
 		$this->providers = $providers;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getAuthor() {
+		return $this->author;
+	}
+
+	/**
+	 * @param string $author
+	 */
+	public function setAuthor($author) {
+		$this->author = $author;
 	}
 
 
@@ -128,6 +145,7 @@ class SearchRequest implements \JsonSerializable {
 	public function jsonSerialize() {
 		return [
 			'providers' => $this->getProviders(),
+			'author'    => $this->getAuthor(),
 			'search'    => $this->getSearch(),
 			'page'      => $this->getPage(),
 			'size'      => $this->getSize()
@@ -152,6 +170,7 @@ class SearchRequest implements \JsonSerializable {
 	public static function fromArray($arr) {
 		$request = new SearchRequest();
 		$request->setProviders($arr['providers']);
+		$request->setAuthor($arr['author']);
 		$request->setSearch(MiscService::get($arr, 'search', ''));
 		$request->setPage(MiscService::get($arr, 'page', 0));
 		$request->setSize(MiscService::get($arr, 'size', 10));
