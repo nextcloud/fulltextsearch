@@ -39,6 +39,7 @@ var next_settings = {
 	entryTemplateDefault: null,
 	divNoResult: null,
 
+
 	generateDefaultTemplate: function () {
 
 		var divLeft = $('<div>', {class: 'result_entry_left'});
