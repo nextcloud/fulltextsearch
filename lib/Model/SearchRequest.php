@@ -45,6 +45,13 @@ class SearchRequest implements \JsonSerializable {
 	/** @var string */
 	private $author;
 
+	/** @var array */
+	private $tags;
+
+	/** @var array */
+	private $options;
+
+
 	/**
 	 * SearchRequest constructor.
 	 */
@@ -142,13 +149,65 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
+	public function getOptions() {
+		return $this->options;
+	}
+
+	/**
+	 * @param array $options
+	 */
+	public function setOptions($options) {
+		$this->options = $options;
+	}
+
+	/**
+	 * @param string $option
+	 *
+	 * @return mixed|string
+	 */
+	public function getOption($option) {
+		if (array_key_exists($option, $this->options)) {
+			return $this->options[$option];
+		}
+
+		return '';
+	}
+
+
+	/**
+	 * @param string $tag
+	 */
+	public function addTag($tag) {
+		$this->tags[] = $tag;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getTags() {
+		return $this->tags;
+	}
+
+	/**
+	 * @param array $tags
+	 */
+	public function setTags($tags) {
+		$this->tags = $tags;
+	}
+
+
+	/**
+	 * @return array
+	 */
 	public function jsonSerialize() {
 		return [
 			'providers' => $this->getProviders(),
 			'author'    => $this->getAuthor(),
 			'search'    => $this->getSearch(),
 			'page'      => $this->getPage(),
-			'size'      => $this->getSize()
+			'size'      => $this->getSize(),
+			'options'   => $this->getOptions(),
+			'tags'      => $this->getTags()
 		];
 	}
 
@@ -170,10 +229,12 @@ class SearchRequest implements \JsonSerializable {
 	public static function fromArray($arr) {
 		$request = new SearchRequest();
 		$request->setProviders($arr['providers']);
-		$request->setAuthor($arr['author']);
+		$request->setAuthor(MiscService::get($arr, 'author', ''));
 		$request->setSearch(MiscService::get($arr, 'search', ''));
 		$request->setPage(MiscService::get($arr, 'page', 0));
 		$request->setSize(MiscService::get($arr, 'size', 10));
+		$request->setOptions(MiscService::get($arr, 'options', []));
+		$request->setTags(MiscService::get($arr, 'tags', []));
 
 		return $request;
 	}

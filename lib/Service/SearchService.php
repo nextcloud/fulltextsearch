@@ -157,6 +157,7 @@ class SearchService {
 	) {
 		$result = [];
 		foreach ($providers AS $provider) {
+			$provider->improveSearchRequest($request);
 			$searchResult = $platform->searchDocuments($provider, $access, $request);
 
 			$provider->improveSearchResult($searchResult);

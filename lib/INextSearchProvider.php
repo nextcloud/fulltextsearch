@@ -140,11 +140,17 @@ interface INextSearchProvider {
 
 
 	/**
+	 * before a search, improve the request
+	 *
+	 * @param SearchRequest $searchRequest
+	 */
+	public function improveSearchRequest(SearchRequest $searchRequest);
+
+
+	/**
 	 * after a search, improve the result
 	 *
 	 * @param SearchResult $searchResult
-	 *
-	 * @return mixed
 	 */
 	public function improveSearchResult(SearchResult $searchResult);
 

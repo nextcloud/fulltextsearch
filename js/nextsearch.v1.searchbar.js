@@ -147,7 +147,7 @@ var searchbar = {
 					providers: next_settings.searchProviderId,
 					search: search,
 					page: curr.page,
-					more: searchbar.getSearchOptions(),
+					options: searchbar.getSearchOptions(),
 					size: 20
 				});
 			});
@@ -189,7 +189,7 @@ var searchbar = {
 			providers: next_settings.searchProviderId,
 			search: search,
 			page: curr.page,
-			more: searchbar.getSearchOptions(),
+			options: searchbar.getSearchOptions(),
 			size: 20
 		});
 
