@@ -30,6 +30,7 @@ namespace OCA\FullNextSearch;
 use OCA\FullNextSearch\Model\Index;
 use OCA\FullNextSearch\Model\IndexDocument;
 use OCA\FullNextSearch\Model\Runner;
+use OCA\FullNextSearch\Model\SearchRequest;
 use OCA\FullNextSearch\Model\SearchResult;
 use OCP\AppFramework\Http\TemplateResponse;
 
@@ -50,7 +51,6 @@ interface INextSearchProvider {
 	 * @return string
 	 */
 	public function getAppId();
-
 
 
 	/**
@@ -131,11 +131,12 @@ interface INextSearchProvider {
 
 	/**
 	 * @param INextSearchPlatform $platform
+	 * @param SearchRequest $request
 	 * @param array $arr
 	 *
 	 * @return array
 	 */
-	public function onSearchingQuery(INextSearchPlatform $platform, &$arr);
+	public function onSearchingQuery(INextSearchPlatform $platform, SearchRequest $request, &$arr);
 
 
 	/**
