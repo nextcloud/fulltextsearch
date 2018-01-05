@@ -30,7 +30,6 @@ namespace OCA\FullNextSearch\Controller;
 use Exception;
 use OCA\FullNextSearch\AppInfo\Application;
 use OCA\FullNextSearch\Model\SearchRequest;
-use OCA\FullNextSearch\Model\SearchResult;
 use OCA\FullNextSearch\Service\MiscService;
 use OCA\FullNextSearch\Service\SearchService;
 use OCP\AppFramework\Controller;
@@ -99,8 +98,6 @@ class ApiController extends Controller {
 		try {
 			$result = $this->searchService->search(null, $request);
 
-//			$meta = $this->generateMeta($result);
-
 			return $this->success(
 				['request' => $request, 'result' => $result]
 			);
@@ -110,36 +107,7 @@ class ApiController extends Controller {
 			);
 		}
 	}
-//
-//
-//	/**
-//	 * @param SearchResult[] $result
-//	 *
-//	 * @return array<string,integer>
-//	 */
-//	private function generateMeta($result) {
-//
-//		$meta = [
-//			'size'     => 0,
-//			'time'     => 0,
-//			'total'    => 0,
-//			'maxScore' => 0,
-//			'timedOut' => false
-//		];
-//
-//		foreach ($result as $searchResult) {
-//			$meta['size'] += $searchResult->getSize();
-//			$meta['time'] += $searchResult->getTime();
-//			$meta['total'] += $searchResult->getTotal();
-//			$meta['maxScore'] += $searchResult->getMaxScore();
-//			if ($searchResult->isTimedOut()) {
-//				$meta['timedOut'] = true;
-//			}
-//		}
-//
-//		return $meta;
-//	}
-//
+
 
 	/**
 	 * @param $data
