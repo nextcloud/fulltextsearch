@@ -140,6 +140,34 @@ var searchbar = {
 
 	onOptionsLoaded: function (result) {
 		searchbox.search_more.html(result[next_settings.searchProviderId]);
+		searchbox.search_more.find('INPUT').each(function () {
+			$(this).on('change', function () {
+				var search = searchbox.search_input.val();
+				nextSearch.search({
+					providers: next_settings.searchProviderId,
+					search: search,
+					page: curr.page,
+					more: searchbar.getSearchOptions(),
+					size: 20
+				});
+			});
+		})
+	},
+
+
+	getSearchOptions: function () {
+		var options = {};
+		searchbox.search_more.find('INPUT').each(function () {
+			var value = $(this).val();
+
+			if ($(this).attr('type') === 'checkbox' && !$(this).is(':checked')) {
+				value = '';
+			}
+
+			options[$(this).attr('id')] = value;
+		});
+
+		return options;
 	},
 
 
@@ -161,6 +189,7 @@ var searchbar = {
 			providers: next_settings.searchProviderId,
 			search: search,
 			page: curr.page,
+			more: searchbar.getSearchOptions(),
 			size: 20
 		});
 
