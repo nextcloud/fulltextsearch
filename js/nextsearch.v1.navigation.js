@@ -79,7 +79,7 @@ var nav = {
 			var providerName = divProviderNavigation.attr('data-provider-name');
 
 			var left = "Searching " + providerName + " for '" + meta.request.search + "' returns " +
-				meta.total + " results";
+				meta.total + " results in " + meta.time + "ms";
 			divProviderNavigation.find('.provider_navigation_left').text(left);
 
 			divProviderNavigation.find('.provider_navigation_curr').text(meta.request.page + ' / ' +
