@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,19 +22,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
-namespace OCA\FullNextSearch\Service;
+namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OC\App\AppManager;
 use OC_App;
-use OCA\FullNextSearch\Exceptions\ProviderDoesNotExistException;
-use OCA\FullNextSearch\Exceptions\ProviderIsNotCompatibleException;
-use OCA\FullNextSearch\Exceptions\ProviderIsNotUniqueException;
-use OCA\FullNextSearch\Exceptions\ProviderOptionsDoesNotExistException;
-use OCA\FullNextSearch\INextSearchProvider;
+use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
+use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
+use OCA\FullTextSearch\Exceptions\ProviderIsNotUniqueException;
+use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
+use OCA\FullTextSearch\INextSearchProvider;
 use OCP\AppFramework\QueryException;
 
 class ProviderService {
@@ -236,12 +235,12 @@ class ProviderService {
 	 */
 	private function loadProvidersFromApp($appId) {
 		$appInfo = OC_App::getAppInfo($appId);
-		if (!is_array($appInfo) || !key_exists('fullnextsearch', $appInfo)
-			|| !key_exists('provider', $appInfo['fullnextsearch'])) {
+		if (!is_array($appInfo) || !key_exists('fulltextsearch', $appInfo)
+			|| !key_exists('provider', $appInfo['fulltextsearch'])) {
 			return;
 		}
 
-		$providers = $appInfo['fullnextsearch']['provider'];
+		$providers = $appInfo['fulltextsearch']['provider'];
 		$this->loadProvidersFromList($providers);
 	}
 

@@ -1,5 +1,5 @@
 /*
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search your Nextcloud.
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
@@ -53,9 +53,9 @@ var searchbar = {
 		searchbox.search_div = $('<div>', {class: 'next_search_div'});
 		divHeaderRight.prepend(searchbox.search_div);
 
-		searchbox.search_icon = $('<div>', {class: 'icon-fullnextsearch'});
+		searchbox.search_icon = $('<div>', {class: 'icon-fulltextsearch'});
 		searchbox.search_icon.css('background-image',
-			"url('/apps/fullnextsearch/img/fullnextsearch.svg')");
+			"url('/apps/fulltextsearch/img/fulltextsearch.svg')");
 		searchbox.search_icon.fadeTo(0, 0.7);
 		searchbox.search_div.append(searchbox.search_icon);
 
@@ -71,7 +71,7 @@ var searchbar = {
 		searchbox.search_more = $('<div>', {class: 'search_more'});
 		searchbox.search_more.fadeTo(0, 0);
 
-		searchbox.search_icon_more = $('<div>', {class: 'icon-more-white icon-more-fullnextsearch'});
+		searchbox.search_icon_more = $('<div>', {class: 'icon-more-white icon-more-fulltextsearch'});
 		searchbox.search_icon_more.fadeTo(0, 0);
 		searchbox.search_icon_more.on('click', function () {
 			if (curr.moreDisplayed) {
@@ -84,7 +84,7 @@ var searchbar = {
 		});
 		searchbox.search_form.append(searchbox.search_icon_more);
 
-		searchbox.search_icon_close = $('<div>', {class: 'icon-close-white icon-close-fullnextsearch'});
+		searchbox.search_icon_close = $('<div>', {class: 'icon-close-white icon-close-fulltextsearch'});
 		searchbox.search_icon_close.fadeTo(0, 0);
 		searchbox.search_icon_close.on('click', function () {
 			next_settings.lockSearchbox = false;
@@ -171,7 +171,7 @@ var searchbar = {
 	},
 
 
-	// TODO: do we really need this initSearch, or should we use the one from fullnextsearch.js !?
+	// TODO: do we really need this initSearch, or should we use the one from fulltextsearch.js !?
 	initSearch: function (force) {
 		var search = searchbox.search_input.val();
 

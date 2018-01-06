@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,26 +21,25 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
+ *  
  */
 
-namespace OCA\FullNextSearch\Service;
+namespace OCA\FullTextSearch\Service;
 
 use Exception;
-use OCA\FullNextSearch\Db\IndexesRequest;
-use OCA\FullNextSearch\Exceptions\DatabaseException;
-use OCA\FullNextSearch\Exceptions\IndexDoesNotExistException;
-use OCA\FullNextSearch\Exceptions\InterruptException;
-use OCA\FullNextSearch\Exceptions\NoResultException;
-use OCA\FullNextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullNextSearch\INextSearchPlatform;
-use OCA\FullNextSearch\INextSearchProvider;
-use OCA\FullNextSearch\Model\ExtendedIndex;
-use OCA\FullNextSearch\Model\Index;
-use OCA\FullNextSearch\Model\IndexDocument;
-use OCA\FullNextSearch\Model\ProviderIndexes;
-use OCA\FullNextSearch\Model\Runner;
+use OCA\FullTextSearch\Db\IndexesRequest;
+use OCA\FullTextSearch\Exceptions\DatabaseException;
+use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
+use OCA\FullTextSearch\Exceptions\InterruptException;
+use OCA\FullTextSearch\Exceptions\NoResultException;
+use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
+use OCA\FullTextSearch\INextSearchPlatform;
+use OCA\FullTextSearch\INextSearchProvider;
+use OCA\FullTextSearch\Model\ExtendedIndex;
+use OCA\FullTextSearch\Model\Index;
+use OCA\FullTextSearch\Model\IndexDocument;
+use OCA\FullTextSearch\Model\ProviderIndexes;
+use OCA\FullTextSearch\Model\Runner;
 
 class IndexService {
 

@@ -1,5 +1,5 @@
 /*
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search your Nextcloud.
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
@@ -40,7 +40,7 @@ var api = {
 
 		$.ajax({
 			method: 'GET',
-			url: OC.generateUrl('/apps/fullnextsearch/v1/search'),
+			url: OC.generateUrl('/apps/fulltextsearch/v1/search'),
 			data: {
 				request: JSON.stringify(request)
 			}
@@ -60,7 +60,7 @@ var api = {
 
 		$.ajax({
 			method: 'GET',
-			url: OC.generateUrl('/apps/fullnextsearch/options/' + providerId)
+			url: OC.generateUrl('/apps/fulltextsearch/options/' + providerId)
 		}).done(function (res) {
 			searchbar.onOptionsLoaded(res);
 			api.onCallback(callback, res);

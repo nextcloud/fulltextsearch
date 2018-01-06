@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,18 +22,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
-namespace OCA\FullNextSearch;
+namespace OCA\FullTextSearch;
 
 
-use OCA\FullNextSearch\Model\DocumentAccess;
-use OCA\FullNextSearch\Model\Index;
-use OCA\FullNextSearch\Model\IndexDocument;
-use OCA\FullNextSearch\Model\Runner;
-use OCA\FullNextSearch\Model\SearchRequest;
-use OCA\FullNextSearch\Model\SearchResult;
+use OCA\FullTextSearch\Model\DocumentAccess;
+use OCA\FullTextSearch\Model\Index;
+use OCA\FullTextSearch\Model\IndexDocument;
+use OCA\FullTextSearch\Model\Runner;
+use OCA\FullTextSearch\Model\SearchRequest;
+use OCA\FullTextSearch\Model\SearchResult;
 
 interface INextSearchPlatform {
 
