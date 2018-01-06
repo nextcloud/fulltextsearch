@@ -27,7 +27,7 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OCA\FullTextSearch\INextSearchProvider;
+use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\ExtendedBase;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\IndexService;
@@ -129,11 +129,11 @@ class Index extends ExtendedBase {
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @throws Exception
 	 */
-	private function indexProvider(INextSearchProvider $provider) {
+	private function indexProvider(IFullTextSearchProvider $provider) {
 		$platform = $this->platformService->getPlatform();
 		$platform->initializeIndex($provider);
 		$platform->setRunner($this->runner);

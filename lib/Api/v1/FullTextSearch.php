@@ -73,13 +73,13 @@ class FullTextSearch {
 	 *
 	 */
 	public static function addJavascriptAPI() {
-		Util::addStyle(Application::APP_NAME, 'nextsearch');
-		Util::addScript(Application::APP_NAME, 'nextsearch.v1.api');
-		Util::addScript(Application::APP_NAME, 'nextsearch.v1.settings');
-		Util::addScript(Application::APP_NAME, 'nextsearch.v1.searchbar');
-		Util::addScript(Application::APP_NAME, 'nextsearch.v1.result');
-		Util::addScript(Application::APP_NAME, 'nextsearch.v1.navigation');
-		Util::addScript(Application::APP_NAME, 'nextsearch.v1');
+		Util::addStyle(Application::APP_NAME, 'fulltextsearch');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.api');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.settings');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.searchbar');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.result');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.navigation');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1');
 	}
 
 

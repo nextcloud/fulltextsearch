@@ -34,7 +34,7 @@ use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
 
-interface INextSearchPlatform {
+interface IFullTextSearchPlatform {
 
 	/**
 	 * must returns a unique Id
@@ -68,15 +68,15 @@ interface INextSearchPlatform {
 	/**
 	 * Init an index regarding a provider
 	 *
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 */
-	public function initializeIndex(INextSearchProvider $provider);
+	public function initializeIndex(IFullTextSearchProvider $provider);
 
 
 	/**
 	 * Reset the indexes
 	 *
-	 * @param INextSearchProvider|null $provider
+	 * @param IFullTextSearchProvider|null $provider
 	 */
 	public function removeIndex($provider);
 
@@ -85,30 +85,30 @@ interface INextSearchPlatform {
 	 * $command can be null. instanceof ExtendedBase if the method is called from CLI.
 	 * Use it to echo whatever and intercept ^C
 	 *
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 * @param IndexDocument[] $documents
 	 *
 	 * @return Index[]
 	 */
-	public function indexDocuments(INextSearchProvider $provider, $documents);
+	public function indexDocuments(IFullTextSearchProvider $provider, $documents);
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 * @param IndexDocument $document
 	 *
 	 * @return Index
 	 */
-	public function indexDocument(INextSearchProvider $provider, IndexDocument $document);
+	public function indexDocument(IFullTextSearchProvider $provider, IndexDocument $document);
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 * @param DocumentAccess $access
 	 * @param SearchRequest $request
 	 *
 	 * @return SearchResult
 	 */
-	public function searchDocuments(INextSearchProvider $provider, DocumentAccess $access, $request);
+	public function searchDocuments(IFullTextSearchProvider $provider, DocumentAccess $access, $request);
 
 }

@@ -1,11 +1,11 @@
 /*
- * FullTextSearch - Full text search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,12 +21,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 /** global: OCA */
-/** global: fns_admin_settings */
-/** global: fns_admin_elements */
+/** global: fts_admin_settings */
+/** global: fts_admin_elements */
 
 
 
@@ -34,17 +33,17 @@ $(document).ready(function () {
 
 
 	/**
-	 * @constructs NextSearchAdmin
+	 * @constructs FullTextSearchAdmin
 	 */
-	var NextSearchAdmin = function () {
-		$.extend(NextSearchAdmin.prototype, fns_admin_elements);
-		$.extend(NextSearchAdmin.prototype, fns_admin_settings);
+	var FullTextSearchAdmin = function () {
+		$.extend(FullTextSearchAdmin.prototype, fts_admin_elements);
+		$.extend(FullTextSearchAdmin.prototype, fts_admin_settings);
 
-		fns_admin_elements.init();
-		fns_admin_settings.refreshSettingPage();
+		fts_admin_elements.init();
+		fts_admin_settings.refreshSettingPage();
 	};
 
-	OCA.NextSearchAdmin = NextSearchAdmin;
-	OCA.NextSearchAdmin.settings = new NextSearchAdmin();
+	OCA.FullTextSearchAdmin = FullTextSearchAdmin;
+	OCA.FullTextSearchAdmin.settings = new FullTextSearchAdmin();
 
 });

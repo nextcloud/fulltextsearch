@@ -26,7 +26,7 @@
 
 namespace OCA\FullTextSearch\Model;
 
-use OCA\FullTextSearch\INextSearchProvider;
+use OCA\FullTextSearch\IFullTextSearchProvider;
 
 class SearchResult implements \JsonSerializable {
 
@@ -36,7 +36,7 @@ class SearchResult implements \JsonSerializable {
 	/** @var string */
 	private $rawResult;
 
-	/** @var INextSearchProvider */
+	/** @var IFullTextSearchProvider */
 	private $provider;
 
 	/** @var int */
@@ -112,14 +112,14 @@ class SearchResult implements \JsonSerializable {
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 */
-	public function setProvider(INextSearchProvider $provider) {
+	public function setProvider(IFullTextSearchProvider $provider) {
 		$this->provider = $provider;
 	}
 
 	/**
-	 * @return INextSearchProvider
+	 * @return IFullTextSearchProvider
 	 */
 	public function getProvider() {
 		return $this->provider;

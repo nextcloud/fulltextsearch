@@ -33,8 +33,8 @@ use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\NoResultException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullTextSearch\INextSearchPlatform;
-use OCA\FullTextSearch\INextSearchProvider;
+use OCA\FullTextSearch\IFullTextSearchPlatform;
+use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\ExtendedIndex;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Model\IndexDocument;
@@ -107,14 +107,14 @@ class IndexService {
 
 
 	/**
-	 * @param INextSearchPlatform $platform
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchPlatform $platform
+	 * @param IFullTextSearchProvider $provider
 	 * @param string $userId
 	 *
 	 * @throws Exception
 	 */
 	public function indexProviderContentFromUser(
-		INextSearchPlatform $platform, INextSearchProvider $provider, $userId
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $userId
 	) {
 		$this->updateRunner('generateIndex' . $provider->getName());
 		$documents = $provider->generateIndexableDocuments($userId);
@@ -127,14 +127,14 @@ class IndexService {
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 * @param IndexDocument[] $items
 	 *
 	 * @return IndexDocument[]
 	 * @throws InterruptException
 	 * @throws TickDoesNotExistException
 	 */
-	private function updateDocumentsWithCurrentIndex(INextSearchProvider $provider, array $items) {
+	private function updateDocumentsWithCurrentIndex(IFullTextSearchProvider $provider, array $items) {
 
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
@@ -151,11 +151,11 @@ class IndexService {
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @return ProviderIndexes
 	 */
-	private function getProviderIndexFromProvider(INextSearchProvider $provider) {
+	private function getProviderIndexFromProvider(IFullTextSearchProvider $provider) {
 		$indexes = $this->indexesRequest->getIndexesFromProvider($provider);
 
 		return new ProviderIndexes($indexes);
@@ -163,13 +163,13 @@ class IndexService {
 
 
 	/**
-	 * @param INextSearchPlatform $platform
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchPlatform $platform
+	 * @param IFullTextSearchProvider $provider
 	 * @param IndexDocument[] $documents
 	 *
 	 * @throws Exception
 	 */
-	private function indexChunks(INextSearchPlatform $platform, INextSearchProvider $provider, $documents
+	private function indexChunks(IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $documents
 	) {
 		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
 
@@ -195,14 +195,14 @@ class IndexService {
 
 
 	/**
-	 * @param INextSearchPlatform $platform
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchPlatform $platform
+	 * @param IFullTextSearchProvider $provider
 	 * @param IndexDocument[] $chunk
 	 *
 	 * @throws NoResultException
 	 * @throws DatabaseException
 	 */
-	private function indexChunk(INextSearchPlatform $platform, INextSearchProvider $provider, $chunk) {
+	private function indexChunk(IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $chunk) {
 		if (sizeof($chunk) === 0) {
 			throw new NoResultException();
 		}
@@ -235,15 +235,15 @@ class IndexService {
 
 
 	/**
-	 * @param INextSearchPlatform $platform
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchPlatform $platform
+	 * @param IFullTextSearchProvider $provider
 	 * @param Index $index
 	 *
 	 * @internal param int|string $documentId
 	 * @throws Exception
 	 */
 	public function updateDocument(
-		INextSearchPlatform $platform, INextSearchProvider $provider, Index $index
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, Index $index
 	) {
 		$document = $provider->updateDocument($index);
 		if ($document === null) {

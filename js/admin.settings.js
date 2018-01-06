@@ -1,11 +1,11 @@
 /*
- * FullTextSearch - Full text search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@
  */
 
 /** global: OC */
-/** global: fns_admin_elements */
+/** global: fts_admin_elements */
 
 /** @namespace result.index_chunk */
 /** @namespace result.platforms_all */
@@ -34,7 +34,7 @@
 
 
 
-var fns_admin_settings = {
+var fts_admin_settings = {
 
 	config: null,
 
@@ -44,7 +44,7 @@ var fns_admin_settings = {
 			method: 'GET',
 			url: OC.generateUrl('/apps/fulltextsearch/admin/settings')
 		}).done(function (res) {
-			fns_admin_settings.updateSettingPage(res);
+			fts_admin_settings.updateSettingPage(res);
 		});
 
 	},
@@ -52,19 +52,19 @@ var fns_admin_settings = {
 
 	updateSettingPage: function (result) {
 
-		fns_admin_settings.updateSettingPagePlatforms(result);
-		fns_admin_settings.updateSettingPageChunkSize(result);
+		fts_admin_settings.updateSettingPagePlatforms(result);
+		fts_admin_settings.updateSettingPageChunkSize(result);
 
-		fns_admin_settings.updateCurrentPlatform(result);
-		fns_admin_settings.updateEnabledProviders(result);
+		fts_admin_settings.updateCurrentPlatform(result);
+		fts_admin_settings.updateEnabledProviders(result);
 
-		fns_admin_settings.tagSettingsAsSaved(fns_admin_elements.fns_div);
+		fts_admin_settings.tagSettingsAsSaved(fts_admin_elements.fts_div);
 	},
 
 
 	updateSettingPagePlatforms: function (result) {
-		fns_admin_elements.fns_platforms.empty();
-		fns_admin_elements.fns_platforms.append($('<option>', {
+		fts_admin_elements.fts_platforms.empty();
+		fts_admin_elements.fts_platforms.append($('<option>', {
 			value: '',
 			text: ''
 		}));
@@ -73,7 +73,7 @@ var fns_admin_settings = {
 		var classes = Object.keys(platforms);
 		for (var i = 0; i < classes.length; i++) {
 			var platformClass = classes[i];
-			fns_admin_elements.fns_platforms.append($('<option>', {
+			fts_admin_elements.fts_platforms.append($('<option>', {
 				value: platformClass,
 				selected: (result.search_platform === platformClass),
 				text: platforms[platformClass].name
@@ -83,13 +83,13 @@ var fns_admin_settings = {
 			});
 		}
 
-		fns_admin_elements.fns_platforms.fadeTo(300, 1);
+		fts_admin_elements.fts_platforms.fadeTo(300, 1);
 	},
 
 
 	updateSettingPageChunkSize: function (result) {
-		fns_admin_elements.fns_chunkSize.val(result.index_chunk);
-		fns_admin_elements.fns_chunkSize.fadeTo(300, 1);
+		fts_admin_elements.fts_chunkSize.val(result.index_chunk);
+		fts_admin_elements.fts_chunkSize.fadeTo(300, 1);
 	},
 
 
@@ -138,8 +138,8 @@ var fns_admin_settings = {
 	saveSettings: function () {
 
 		var data = {
-			search_platform: fns_admin_elements.fns_platforms.val(),
-			index_chunk: fns_admin_elements.fns_chunkSize.val()
+			search_platform: fts_admin_elements.fts_platforms.val(),
+			index_chunk: fts_admin_elements.fts_chunkSize.val()
 		};
 
 		$.ajax({
@@ -149,7 +149,7 @@ var fns_admin_settings = {
 				data: data
 			}
 		}).done(function (res) {
-			fns_admin_settings.updateSettingPage(res);
+			fts_admin_settings.updateSettingPage(res);
 		});
 
 	}

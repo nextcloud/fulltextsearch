@@ -83,7 +83,12 @@ class Search extends Base {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$output->writeln('search');
 
-		$request = SearchRequest::fromArray(['search' => $input->getArgument('string')]);
+		$request = SearchRequest::fromArray(
+			[
+				'providers' => 'all',
+				'search'    => $input->getArgument('string')
+			]
+		);
 
 		try {
 			$result = $this->searchService->search($input->getArgument('user'), $request);

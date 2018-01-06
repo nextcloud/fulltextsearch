@@ -32,7 +32,7 @@ use OC_App;
 use OCA\FullTextSearch\Exceptions\PlatformDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\PlatformIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\PlatformNotSelectedException;
-use OCA\FullTextSearch\INextSearchPlatform;
+use OCA\FullTextSearch\IFullTextSearchPlatform;
 use OCP\AppFramework\QueryException;
 
 class PlatformService {
@@ -49,7 +49,7 @@ class PlatformService {
 	/** @var array */
 	private $platforms = [];
 
-	/** @var INextSearchPlatform */
+	/** @var IFullTextSearchPlatform */
 	private $platform;
 
 	/** @var bool */
@@ -77,7 +77,7 @@ class PlatformService {
 	/**
 	 * @param bool $silent
 	 *
-	 * @return INextSearchPlatform
+	 * @return IFullTextSearchPlatform
 	 * @throws Exception
 	 */
 	public function getPlatform($silent = false) {
@@ -95,7 +95,7 @@ class PlatformService {
 
 
 	/**
-	 * @return INextSearchPlatform[]
+	 * @return IFullTextSearchPlatform[]
 	 * @throws Exception
 	 */
 	public function getPlatforms() {
@@ -105,7 +105,7 @@ class PlatformService {
 		foreach ($this->platforms as $class) {
 			try {
 				$platform = \OC::$server->query((string)$class);
-				if ($platform instanceof INextSearchPlatform) {
+				if ($platform instanceof IFullTextSearchPlatform) {
 					$platforms[$class] = $platform;
 				}
 			} catch (QueryException $e) {
@@ -157,9 +157,9 @@ class PlatformService {
 
 		$selected = $this->getSelectedPlatform();
 		$platform = \OC::$server->query((string)$selected);
-		if (!($platform instanceof INextSearchPlatform)) {
+		if (!($platform instanceof IFullTextSearchPlatform)) {
 			throw new PlatformIsNotCompatibleException(
-				$selected . ' is not a compatible NextSearchPlatform'
+				$selected . ' is not a compatible FullTextSearchPlatform'
 			);
 		}
 
@@ -177,12 +177,12 @@ class PlatformService {
 		$selected = $this->configService->getAppValue(ConfigService::SEARCH_PLATFORM);
 
 		if ($selected === '') {
-			throw new PlatformNotSelectedException('Admin have not selected any NextSearchPlatform');
+			throw new PlatformNotSelectedException('Admin have not selected any FullTextSearchPlatform');
 		}
 
 		if (!in_array($selected, $this->platforms)) {
 			throw new PlatformDoesNotExistException(
-				'NextSearchPlatform ' . $selected . ' is not available'
+				'FullTextSearchPlatform ' . $selected . ' is not available'
 			);
 		}
 

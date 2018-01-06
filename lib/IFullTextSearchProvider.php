@@ -33,7 +33,7 @@ use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
 use OCP\AppFramework\Http\TemplateResponse;
 
-interface INextSearchProvider {
+interface IFullTextSearchProvider {
 
 
 	/**
@@ -110,32 +110,32 @@ interface INextSearchProvider {
 
 
 	/**
-	 * @param INextSearchPlatform $platform
+	 * @param IFullTextSearchPlatform $platform
 	 */
-	public function onInitializingIndex(INextSearchPlatform $platform);
+	public function onInitializingIndex(IFullTextSearchPlatform $platform);
 
 
 	/**
-	 * @param INextSearchPlatform $platform
+	 * @param IFullTextSearchPlatform $platform
 	 * @param array $arr
 	 */
-	public function onIndexingDocument(INextSearchPlatform $platform, &$arr);
+	public function onIndexingDocument(IFullTextSearchPlatform $platform, &$arr);
 
 
 	/**
-	 * @param INextSearchPlatform $platform
+	 * @param IFullTextSearchPlatform $platform
 	 */
-	public function onRemovingIndex(INextSearchPlatform $platform);
+	public function onRemovingIndex(IFullTextSearchPlatform $platform);
 
 
 	/**
-	 * @param INextSearchPlatform $platform
+	 * @param IFullTextSearchPlatform $platform
 	 * @param SearchRequest $request
 	 * @param array $arr
 	 *
 	 * @return array
 	 */
-	public function onSearchingQuery(INextSearchPlatform $platform, SearchRequest $request, &$arr);
+	public function onSearchingQuery(IFullTextSearchPlatform $platform, SearchRequest $request, &$arr);
 
 
 	/**

@@ -1,11 +1,11 @@
 /*
- * FullTextSearch - Full text search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,14 +21,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 
 /** global: OCA */
 /** global: _ */
 
-const nextSearch = OCA.NextSearch.api;
+const fullTextSearch = OCA.FullTextSearch.api;
 
 
 var elements = {
@@ -48,8 +47,8 @@ Navigate.prototype = {
 	init: function () {
 		var self = this;
 
-		nextSearch.setEntryTemplateId($('#template_entry'), self);
-		nextSearch.setResultContainerId($('#search_result'));
+		fullTextSearch.setEntryTemplateId($('#template_entry'), self);
+		fullTextSearch.setResultContainerId($('#search_result'));
 
 		elements.search_input = $('#search_input');
 		elements.search_submit = $('#search_submit');
@@ -86,7 +85,7 @@ Navigate.prototype = {
 			page: curr.page
 		};
 
-		nextSearch.search(request, this.searchResult);
+		fullTextSearch.search(request, this.searchResult);
 
 		return true;
 	},
@@ -126,11 +125,11 @@ Navigate.prototype = {
 	}
 };
 
-OCA.NextSearch.Example = Navigate;
+OCA.FullTextSearch.Example = Navigate;
 
 
 $(document).ready(function () {
-	OCA.NextSearch.example = new Navigate();
+	OCA.FullTextSearch.example = new Navigate();
 });
 
 

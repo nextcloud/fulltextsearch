@@ -28,7 +28,7 @@ namespace OCA\FullTextSearch\Db;
 
 
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
-use OCA\FullTextSearch\INextSearchProvider;
+use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\ExtendedIndex;
 use OCA\FullTextSearch\Model\Index;
 
@@ -174,11 +174,11 @@ class IndexesRequest extends IndexesRequestBuilder {
 	/**
 	 * return list of last indexes from a providerId.
 	 *
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @return Index[]
 	 */
-	public function getIndexesFromProvider(INextSearchProvider $provider) {
+	public function getIndexesFromProvider(IFullTextSearchProvider $provider) {
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToProviderId($qb, $provider->getId());
 

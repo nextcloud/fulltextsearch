@@ -31,8 +31,8 @@ use OC\App\AppManager;
 use OCA\Circles\Api\v1\Circles;
 use OCA\FullTextSearch\Exceptions\EmptySearchException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
-use OCA\FullTextSearch\INextSearchPlatform;
-use OCA\FullTextSearch\INextSearchProvider;
+use OCA\FullTextSearch\IFullTextSearchPlatform;
+use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\DocumentAccess;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
@@ -144,15 +144,15 @@ class SearchService {
 
 
 	/**
-	 * @param INextSearchPlatform $platform
+	 * @param IFullTextSearchPlatform $platform
 	 * @param DocumentAccess $access
-	 * @param INextSearchProvider[] $providers
+	 * @param IFullTextSearchProvider[] $providers
 	 * @param SearchRequest $request
 	 *
 	 * @return SearchResult[]
 	 */
 	private function searchFromProviders(
-		INextSearchPlatform $platform, array $providers, DocumentAccess $access, SearchRequest $request
+		IFullTextSearchPlatform $platform, array $providers, DocumentAccess $access, SearchRequest $request
 	) {
 		$result = [];
 		foreach ($providers AS $provider) {

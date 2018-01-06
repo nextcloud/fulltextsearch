@@ -25,11 +25,12 @@
  */
 
 use OCA\FullTextSearch\Api\v1\FullTextSearch;
+use OCA\FullTextSearch\AppInfo\Application;
 use OCP\Util;
 
 FullTextSearch::addJavascriptAPI();
-Util::addScript(FullTextSearch::appName(), 'fulltextsearch');
-Util::addStyle(FullTextSearch::appName(), 'fulltextsearch');
+Util::addScript(Application::APP_NAME, 'navigate');
+Util::addStyle(Application::APP_NAME, 'navigate');
 
 ?>
 

@@ -55,7 +55,7 @@ Util::addStyle(Application::APP_NAME, 'admin');
 				<em>Select the app that will be used to index content and answer search queries.</em>
 			</div>
 			<div class="div-table-col">
-				<select id="fns_platforms">
+				<select id="fts_platforms">
 					<option></option>
 				</select>
 			</div>
@@ -68,7 +68,7 @@ Util::addStyle(Application::APP_NAME, 'admin');
 				<em>Lower the value if the server is short on memory.</em>
 			</div>
 			<div class="div-table-col">
-				<input type="text" class="small" id="fns_chunk_size"/>
+				<input type="text" class="small" id="fts_chunk_size"/>
 			</div>
 		</div>
 
