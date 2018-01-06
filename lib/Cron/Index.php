@@ -1,13 +1,13 @@
 <?php
 
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,23 +23,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
-namespace OCA\FullNextSearch\Cron;
+namespace OCA\FullTextSearch\Cron;
 
 use Exception;
 use OC\BackgroundJob\TimedJob;
-use OCA\FullNextSearch\AppInfo\Application;
-use OCA\FullNextSearch\Exceptions\InterruptException;
-use OCA\FullNextSearch\Model\Runner;
-use OCA\FullNextSearch\Service\IndexService;
-use OCA\FullNextSearch\Service\MiscService;
-use OCA\FullNextSearch\Service\PlatformService;
-use OCA\FullNextSearch\Service\ProviderService;
-use OCA\FullNextSearch\Service\RunningService;
+use OCA\FullTextSearch\AppInfo\Application;
+use OCA\FullTextSearch\Exceptions\InterruptException;
+use OCA\FullTextSearch\Model\Runner;
+use OCA\FullTextSearch\Service\IndexService;
+use OCA\FullTextSearch\Service\MiscService;
+use OCA\FullTextSearch\Service\PlatformService;
+use OCA\FullTextSearch\Service\ProviderService;
+use OCA\FullTextSearch\Service\RunningService;
 use OCP\AppFramework\QueryException;
 use OCP\IUserManager;
+
 
 class Index extends TimedJob {
 

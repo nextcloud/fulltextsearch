@@ -100,11 +100,11 @@
 }
 
 .icon-page-prev {
-	background-image: url('/apps/fullnextsearch/img/page-prev.svg');
+	background-image: url('/apps/fulltextsearch/img/page-prev.svg');
 }
 
 .icon-page-next {
-	background-image: url('/apps/fullnextsearch/img/page-next.svg');
+	background-image: url('/apps/fulltextsearch/img/page-next.svg');
 }
 
 .icon-page-next, .icon-page-prev {
@@ -114,14 +114,14 @@
 	height: 16px;
 }
 
-.icon-fullnextsearch, .icon-close-fullnextsearch {
+.icon-fulltextsearch, .icon-close-fulltextsearch {
 	position: absolute;
 	right: 10px;
 	top: 10px;
 	cursor: pointer;
 }
 
-.icon-more-fullnextsearch {
+.icon-more-fulltextsearch {
 	position: absolute;
 	right: 40px;
 	top: 10px;

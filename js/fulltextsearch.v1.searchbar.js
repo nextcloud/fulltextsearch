@@ -1,11 +1,11 @@
 /*
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 /** global: OCA */
@@ -30,8 +29,8 @@
 /** global: api */
 /** global: search */
 /** global: result */
-/** global: nextSearch */
-/** global: next_settings */
+/** global: fullTextSearch */
+/** global: settings */
 
 
 var searchbox = {
@@ -53,9 +52,9 @@ var searchbar = {
 		searchbox.search_div = $('<div>', {class: 'next_search_div'});
 		divHeaderRight.prepend(searchbox.search_div);
 
-		searchbox.search_icon = $('<div>', {class: 'icon-fullnextsearch'});
+		searchbox.search_icon = $('<div>', {class: 'icon-fulltextsearch'});
 		searchbox.search_icon.css('background-image',
-			"url('/apps/fullnextsearch/img/fullnextsearch.svg')");
+			"url('/apps/fulltextsearch/img/fulltextsearch.svg')");
 		searchbox.search_icon.fadeTo(0, 0.7);
 		searchbox.search_div.append(searchbox.search_icon);
 
@@ -71,7 +70,7 @@ var searchbar = {
 		searchbox.search_more = $('<div>', {class: 'search_more'});
 		searchbox.search_more.fadeTo(0, 0);
 
-		searchbox.search_icon_more = $('<div>', {class: 'icon-more-white icon-more-fullnextsearch'});
+		searchbox.search_icon_more = $('<div>', {class: 'icon-more-white icon-more-fulltextsearch'});
 		searchbox.search_icon_more.fadeTo(0, 0);
 		searchbox.search_icon_more.on('click', function () {
 			if (curr.moreDisplayed) {
@@ -84,10 +83,10 @@ var searchbar = {
 		});
 		searchbox.search_form.append(searchbox.search_icon_more);
 
-		searchbox.search_icon_close = $('<div>', {class: 'icon-close-white icon-close-fullnextsearch'});
+		searchbox.search_icon_close = $('<div>', {class: 'icon-close-white icon-close-fulltextsearch'});
 		searchbox.search_icon_close.fadeTo(0, 0);
 		searchbox.search_icon_close.on('click', function () {
-			next_settings.lockSearchbox = false;
+			settings.lockSearchbox = false;
 			searchbox.search_icon_more.stop().fadeTo(100, 0);
 			searchbox.search_icon_close.stop().fadeTo(100, 0);
 			searchbox.search_more.stop().fadeTo(100, 0);
@@ -101,7 +100,7 @@ var searchbar = {
 			searchbox.search_icon.stop().fadeTo(100, 0);
 			searchbox.search_form.stop().fadeTo(100, 0.8);
 		}, function () {
-			if (next_settings.lockSearchbox === true) {
+			if (settings.lockSearchbox === true) {
 				return;
 			}
 			searchbox.search_form.stop().fadeTo(500, 0);
@@ -111,7 +110,7 @@ var searchbar = {
 		searchbox.search_div.append(searchbox.search_more);
 
 		searchbox.search_input.on('focus', function () {
-			next_settings.lockSearchbox = true;
+			settings.lockSearchbox = true;
 			searchbox.search_icon_more.stop().fadeTo(200, 1);
 			searchbox.search_icon_close.stop().fadeTo(200, 1);
 		});
@@ -122,8 +121,8 @@ var searchbar = {
 				nav.onSearchReset();
 			}
 
-			if (next_settings.parentHasMethod('onEntryGenerated')) {
-				next_settings.parent.onEntryGenerated();
+			if (settings.parentHasMethod('onEntryGenerated')) {
+				settings.parent.onEntryGenerated();
 			}
 
 			if (searchbox.searchTimeout === null && searchbar.initSearch(false)) {
@@ -134,17 +133,17 @@ var searchbar = {
 			}
 		});
 
-		nextSearch.options(next_settings.searchProviderId);
+		fullTextSearch.options(settings.searchProviderId);
 	},
 
 
 	onOptionsLoaded: function (result) {
-		searchbox.search_more.html(result[next_settings.searchProviderId]);
+		searchbox.search_more.html(result[settings.searchProviderId]);
 		searchbox.search_more.find('INPUT').each(function () {
 			$(this).on('change', function () {
 				var search = searchbox.search_input.val();
-				nextSearch.search({
-					providers: next_settings.searchProviderId,
+				fullTextSearch.search({
+					providers: settings.searchProviderId,
 					search: search,
 					page: curr.page,
 					options: searchbar.getSearchOptions(),
@@ -171,7 +170,7 @@ var searchbar = {
 	},
 
 
-	// TODO: do we really need this initSearch, or should we use the one from fullnextsearch.js !?
+	// TODO: do we really need this initSearch, or should we use the one from fulltextsearch.js !?
 	initSearch: function (force) {
 		var search = searchbox.search_input.val();
 
@@ -185,8 +184,8 @@ var searchbar = {
 
 		curr.lastRequest = search;
 
-		nextSearch.search({
-			providers: next_settings.searchProviderId,
+		fullTextSearch.search({
+			providers: settings.searchProviderId,
 			search: search,
 			page: curr.page,
 			options: searchbar.getSearchOptions(),

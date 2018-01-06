@@ -1,11 +1,11 @@
 /*
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,12 +21,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 
 /** global: OC */
-/** global: next_settings */
+/** global: settings */
 /** global: result */
 /** global: search */
 /** global: nav */
@@ -40,7 +39,7 @@ var api = {
 
 		$.ajax({
 			method: 'GET',
-			url: OC.generateUrl('/apps/fullnextsearch/v1/search'),
+			url: OC.generateUrl('/apps/fulltextsearch/v1/search'),
 			data: {
 				request: JSON.stringify(request)
 			}
@@ -60,7 +59,7 @@ var api = {
 
 		$.ajax({
 			method: 'GET',
-			url: OC.generateUrl('/apps/fullnextsearch/options/' + providerId)
+			url: OC.generateUrl('/apps/fulltextsearch/options/' + providerId)
 		}).done(function (res) {
 			searchbar.onOptionsLoaded(res);
 			api.onCallback(callback, res);

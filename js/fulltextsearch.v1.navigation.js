@@ -1,11 +1,11 @@
 /*
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,14 +21,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 /** global: OCA */
 /** global: api */
 /** global: search */
 /** global: result */
-/** global: next_settings */
+/** global: settings */
 
 
 
@@ -119,8 +118,8 @@ var nav = {
 					precItem.after(divResult);
 				}
 
-				divResult.slideDown(next_settings.delay_result, function () {
-					$(this).children('.result_template').fadeTo(next_settings.delay_result, 1);
+				divResult.slideDown(settings.delay_result, function () {
+					$(this).children('.result_template').fadeTo(settings.delay_result, 1);
 				});
 
 				precItem = divResult;
@@ -134,8 +133,8 @@ var nav = {
 				var entry = oldResult[i];
 				if (result.getResultIndex(entry.id, newResult) === -1) {
 					var divResult = nav.getDivResult(entry.id, divProviderResult);
-					divResult.fadeTo(next_settings.delay_result, 0, function () {
-						$(this).slideUp(next_settings.delay_result, function () {
+					divResult.fadeTo(settings.delay_result, 0, function () {
+						$(this).slideUp(settings.delay_result, function () {
 							$(this).remove();
 						});
 					});
@@ -168,12 +167,12 @@ var nav = {
 			var divResult = nav.getDivResult(entryId, divProviderResult);
 
 			if (precId === '') {
-				divResult.fadeTo(next_settings.delay_result, 0.35, function () {
+				divResult.fadeTo(settings.delay_result, 0.35, function () {
 					$(this).prependTo(divProviderResult).fadeTo(100, 1);
 				});
 			} else {
 				var precItem = nav.getDivResult(precId, divProviderResult);
-				divResult.fadeTo(next_settings.delay_result, 0.35, function () {
+				divResult.fadeTo(settings.delay_result, 0.35, function () {
 					$(this).insertAfter(precItem).fadeTo(100, 1);
 				});
 			}
@@ -183,7 +182,7 @@ var nav = {
 
 		getDivProvider: function (providerId, providerName) {
 			var ret = null;
-			next_settings.resultContainer.children('.provider_header').each(function () {
+			settings.resultContainer.children('.provider_header').each(function () {
 				if ($(this).attr('data-id') === providerId) {
 					ret = $(this);
 				}
@@ -191,7 +190,7 @@ var nav = {
 
 			if (ret === null) {
 				ret = nav.generateDivProvider(providerId, providerName);
-				next_settings.resultContainer.append(ret);
+				settings.resultContainer.append(ret);
 			}
 
 			return ret;
@@ -250,20 +249,20 @@ var nav = {
 			nav.deleteEmptyDiv(divResult, '#line1');
 			nav.deleteEmptyDiv(divResult, '#line2');
 
-			if (next_settings.parentHasMethod('onEntryGenerated')) {
-				next_settings.parent.onEntryGenerated(divResult);
+			if (settings.parentHasMethod('onEntryGenerated')) {
+				settings.parent.onEntryGenerated(divResult);
 			}
 		},
 
 		onSearchReset: function () {
-			if (next_settings.parentHasMethod('onSearchReset')) {
-				next_settings.parent.onSearchReset();
+			if (settings.parentHasMethod('onSearchReset')) {
+				settings.parent.onSearchReset();
 			}
 		},
 
 		onResultDisplayed: function () {
-			if (next_settings.parentHasMethod('onResultDisplayed')) {
-				next_settings.parent.onResultDisplayed();
+			if (settings.parentHasMethod('onResultDisplayed')) {
+				settings.parent.onResultDisplayed();
 			}
 		},
 
@@ -276,13 +275,13 @@ var nav = {
 
 
 		generateTemplateEntry: function (document) {
-			var divTemplate = next_settings.entryTemplate;
+			var divTemplate = settings.entryTemplate;
 			if (divTemplate === null) {
-				divTemplate = next_settings.entryTemplateDefault;
+				divTemplate = settings.entryTemplateDefault;
 			}
 
 			if (!divTemplate.length) {
-				console.log('FullNextSearch Error: template_entry is not defined');
+				console.log('FullTextSearch Error: template_entry is not defined');
 				return;
 			}
 
@@ -320,7 +319,7 @@ var nav = {
 			var divProviderPagination = $('<div>', {class: 'provider_navigation_right'});
 			var divProviderPaginationPrev = $('<div>', {class: 'icon-page-prev provider_navigation_prev'});
 			divProviderPaginationPrev.on('click', function () {
-				nextSearch.search({
+				fullTextSearch.search({
 					providers: providerId,
 					search: divProviderNavigation.attr('data-search'),
 					page: Number(divProviderNavigation.attr('data-page')) - 1,
@@ -333,7 +332,7 @@ var nav = {
 
 			var divProviderPaginationNext = $('<div>', {class: 'icon-page-next provider_navigation_next'});
 			divProviderPaginationNext.on('click', function () {
-				nextSearch.search({
+				fullTextSearch.search({
 					providers: providerId,
 					search: divProviderNavigation.attr('data-search'),
 					page: Number(divProviderNavigation.attr('data-page')) + 1,

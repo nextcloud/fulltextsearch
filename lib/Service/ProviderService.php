@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,19 +22,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
-namespace OCA\FullNextSearch\Service;
+namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OC\App\AppManager;
 use OC_App;
-use OCA\FullNextSearch\Exceptions\ProviderDoesNotExistException;
-use OCA\FullNextSearch\Exceptions\ProviderIsNotCompatibleException;
-use OCA\FullNextSearch\Exceptions\ProviderIsNotUniqueException;
-use OCA\FullNextSearch\Exceptions\ProviderOptionsDoesNotExistException;
-use OCA\FullNextSearch\INextSearchProvider;
+use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
+use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
+use OCA\FullTextSearch\Exceptions\ProviderIsNotUniqueException;
+use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
+use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCP\AppFramework\QueryException;
 
 class ProviderService {
@@ -48,7 +47,7 @@ class ProviderService {
 	/** @var MiscService */
 	private $miscService;
 
-	/** @var INextSearchProvider[] */
+	/** @var IFullTextSearchProvider[] */
 	private $providers = [];
 
 	/** @var bool */
@@ -73,7 +72,7 @@ class ProviderService {
 
 
 	/**
-	 * Load all NextSearchProviders set in any info.xml file
+	 * Load all FullTextSearchProviders set in any info.xml file
 	 *
 	 * @throws Exception
 	 */
@@ -105,9 +104,9 @@ class ProviderService {
 	public function loadProvider($providerId) {
 
 		$provider = \OC::$server->query((string)$providerId);
-		if (!($provider instanceof INextSearchProvider)) {
+		if (!($provider instanceof IFullTextSearchProvider)) {
 			throw new ProviderIsNotCompatibleException(
-				$providerId . ' is not a compatible NextSearchProvider'
+				$providerId . ' is not a compatible FullTextSearchProvider'
 			);
 		}
 
@@ -119,7 +118,7 @@ class ProviderService {
 
 
 	/**
-	 * @return INextSearchProvider[]
+	 * @return IFullTextSearchProvider[]
 	 * @throws Exception
 	 */
 	public function getProviders() {
@@ -129,7 +128,7 @@ class ProviderService {
 	}
 
 	/**
-	 * @return INextSearchProvider[]
+	 * @return IFullTextSearchProvider[]
 	 * @throws Exception
 	 */
 	public function getConfiguredProviders() {
@@ -149,7 +148,7 @@ class ProviderService {
 	/**
 	 * @param array $providerList
 	 *
-	 * @return INextSearchProvider[]
+	 * @return IFullTextSearchProvider[]
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
@@ -175,7 +174,7 @@ class ProviderService {
 	/**
 	 * @param string $providerId
 	 *
-	 * @return INextSearchProvider
+	 * @return IFullTextSearchProvider
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
@@ -215,7 +214,7 @@ class ProviderService {
 	}
 
 
-	public function setProviderAsIndexed(INextSearchProvider $provider, $boolean) {
+	public function setProviderAsIndexed(IFullTextSearchProvider $provider, $boolean) {
 		$this->configService->setProviderOptions(
 			$provider->getId(), ConfigService::PROVIDER_INDEXED, (($boolean) ? '1' : '0')
 		);
@@ -236,12 +235,12 @@ class ProviderService {
 	 */
 	private function loadProvidersFromApp($appId) {
 		$appInfo = OC_App::getAppInfo($appId);
-		if (!is_array($appInfo) || !key_exists('fullnextsearch', $appInfo)
-			|| !key_exists('provider', $appInfo['fullnextsearch'])) {
+		if (!is_array($appInfo) || !key_exists('fulltextsearch', $appInfo)
+			|| !key_exists('provider', $appInfo['fulltextsearch'])) {
 			return;
 		}
 
-		$providers = $appInfo['fullnextsearch']['provider'];
+		$providers = $appInfo['fulltextsearch']['provider'];
 		$this->loadProvidersFromList($providers);
 	}
 
@@ -265,15 +264,15 @@ class ProviderService {
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @throws ProviderIsNotUniqueException
 	 */
-	private function providerIdMustBeUnique(INextSearchProvider $provider) {
+	private function providerIdMustBeUnique(IFullTextSearchProvider $provider) {
 		foreach ($this->providers AS $knownProvider) {
 			if ($knownProvider->getId() === $provider->getId()) {
 				throw new ProviderIsNotUniqueException(
-					'NextSearchProvider ' . $provider->getId() . ' already exist'
+					'FullTextSearchProvider ' . $provider->getId() . ' already exist'
 				);
 			}
 		}
@@ -281,7 +280,7 @@ class ProviderService {
 
 
 	/**
-	 * @param INextSearchProvider[] $providers
+	 * @param IFullTextSearchProvider[] $providers
 	 *
 	 * @return array
 	 */

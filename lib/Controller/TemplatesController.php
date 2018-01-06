@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,15 +24,15 @@
  *
  */
 
-namespace OCA\FullNextSearch\Controller;
+namespace OCA\FullTextSearch\Controller;
 
 use Exception;
 use OC\AppFramework\Http;
-use OCA\FullNextSearch\AppInfo\Application;
-use OCA\FullNextSearch\Exceptions\ProviderDoesNotExistException;
-use OCA\FullNextSearch\Service\ConfigService;
-use OCA\FullNextSearch\Service\MiscService;
-use OCA\FullNextSearch\Service\ProviderService;
+use OCA\FullTextSearch\AppInfo\Application;
+use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
+use OCA\FullTextSearch\Service\ConfigService;
+use OCA\FullTextSearch\Service\MiscService;
+use OCA\FullTextSearch\Service\ProviderService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
