@@ -1,0 +1,160 @@
+
+.provider_result {
+	font-style: italic;
+}
+
+.provider_navigation_right {
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 15px;
+	margin: auto 20px auto 0;
+	bottom: 0;
+}
+
+.provider_navigation_prev, .provider_navigation_curr, .provider_navigation_next {
+	float: left;
+}
+
+.provider_navigation_curr {
+	font-weight: normal;
+	font-size: 15px;
+	letter-spacing: 6px;
+	margin: -3px 0 0 11px;
+}
+
+.provider_navigation_prev, .provider_navigation_next {
+	cursor: pointer;
+}
+
+.result_entry_default {
+	height: 50px;
+	width: 100%;
+	display: inline-block;
+	background: #eeeeee;
+	padding-bottom: 2px;
+}
+
+.result_entry_left {
+	float: left;
+	position: relative;
+	top: 50%;
+	margin-left: 10px;
+	transform: perspective(1px) translateY(-50%);
+}
+
+.result_entry_right {
+	float: right;
+	margin-right: 10px;
+	position: relative;
+	top: 50%;
+	transform: perspective(1px) translateY(-50%);
+}
+
+.result_entry_default #title {
+	font-weight: bold;
+	height: 14px;
+}
+
+.result_entry_default #line1, .result_entry_default #line2 {
+	color: #333333;
+	font-size: 11px;
+	height: 12px;
+	font-style: italic;
+}
+
+.result_entry_default #score {
+	font-weight: bold;
+	font-style: italic;
+}
+
+.next_search_div {
+	position: relative;
+	width: 286px;
+	height: 36px;
+	margin-right: 20px;
+}
+
+.provider_navigation {
+	position: relative;
+	font-size: 15px;
+	font-weight: bold;
+	color: #444;
+	background: #ddd;
+	margin-bottom: 16px;
+	padding-top: 10px;
+	padding-left: 20px;
+	padding-bottom: 10px;
+	margin-top: 40px;
+}
+
+.search_more {
+	background: #fbfbfb;
+	width: 400px;
+	padding: 15px;
+	right: 30px;
+	position: absolute;
+	top: 41px;
+	border-radius: 3px;
+	border: solid #cecece 1px;
+}
+
+.icon-page-prev {
+	background-image: url('/apps/fulltextsearch/img/page-prev.svg');
+}
+
+.icon-page-next {
+	background-image: url('/apps/fulltextsearch/img/page-next.svg');
+}
+
+.icon-page-next, .icon-page-prev {
+	background-repeat: no-repeat;
+	background-position: center;
+	width: 16px;
+	height: 16px;
+}
+
+.icon-fulltextsearch, .icon-close-fulltextsearch {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	cursor: pointer;
+}
+
+.icon-more-fulltextsearch {
+	position: absolute;
+	right: 40px;
+	top: 10px;
+	cursor: pointer;
+}
+
+#next_search_input {
+	background: #fffc;
+	width: 212px;
+	height: 30px;
+	margin: 2px !important;
+}
+
+
+.div-table {
+	display: table;
+	width: auto;
+	border-spacing: 5px;
+}
+
+.div-table-row {
+	display: table-row;
+	width: auto;
+	clear: both;
+}
+
+.div-table-col {
+	float: left;
+	display: table-column;
+}
+
+
+.div-table-col-left {
+	width: 220px;
+	margin-top: 8px;
+}

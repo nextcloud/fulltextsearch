@@ -24,74 +24,76 @@
  *
  */
 
-namespace OCA\FullTextSearch\Settings;
+namespace OCA\FullTextSearch\Controller;
 
 use Exception;
+use OC\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
+use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
+use OCA\FullTextSearch\Service\ProviderService;
+use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\IL10N;
-use OCP\IURLGenerator;
-use OCP\Settings\ISettings;
+use OCP\IConfig;
+use OCP\IRequest;
 
-class Admin implements ISettings {
+class TemplatesController extends Controller {
 
-	/** @var IL10N */
-	private $l10n;
-
-	/** @var IURLGenerator */
-	private $urlGenerator;
+	/** @var IConfig */
+	private $config;
 
 	/** @var ConfigService */
 	private $configService;
+
+	/** @var ProviderService */
+	private $providerService;
 
 	/** @var MiscService */
 	private $miscService;
 
 
 	/**
-	 * @param IL10N $l10n
-	 * @param IURLGenerator $urlGenerator
+	 * TemplatesController constructor.
+	 *
+	 * @param IRequest $request
+	 * @param IConfig $config
 	 * @param ConfigService $configService
+	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IL10N $l10n, IURLGenerator $urlGenerator, ConfigService $configService, MiscService $miscService
+		IRequest $request, IConfig $config, ConfigService $configService,
+		ProviderService $providerService, MiscService $miscService
 	) {
-		$this->l10n = $l10n;
-		$this->urlGenerator = $urlGenerator;
+		parent::__construct(Application::APP_NAME, $request);
+		$this->config = $config;
 		$this->configService = $configService;
+		$this->providerService = $providerService;
 		$this->miscService = $miscService;
 	}
 
 
 	/**
-	 * @return TemplateResponse
-	 * @throws Exception
-	 */
-	public function getForm() {
-		return new TemplateResponse(Application::APP_NAME, 'settings.admin', []);
-	}
-
-
-	/**
-	 * @return string the section ID, e.g. 'sharing'
-	 */
-	public function getSection() {
-		return Application::APP_NAME;
-	}
-
-
-	/**
-	 * @return int whether the form should be rather on the top or bottom of
-	 * the admin section. The forms are arranged in ascending order of the
-	 * priority values. It is required to return a value between 0 and 100.
+	 * @NoAdminRequired
+	 * @NoSubAdminRequired
 	 *
-	 * keep the server setting at the top, right after "server settings"
+	 * @param $providerId
+	 *
+	 * @return DataResponse
+	 * @throws Exception
+	 * @throws ProviderDoesNotExistException
 	 */
-	public function getPriority() {
-		return 0;
+	public function getOptionsPanel($providerId) {
+		$provider = $this->providerService->getProvider($providerId);
+
+		$ret = [];
+		$tmpl =
+			new TemplateResponse($provider->getAppId(), $provider->getOptionsTemplate(), [], 'blank');
+		$ret[$providerId] = $tmpl->render();
+
+		return new DataResponse($ret, Http::STATUS_OK);
 	}
 
 

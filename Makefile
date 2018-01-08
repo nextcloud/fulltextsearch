@@ -1,4 +1,4 @@
-app_name=fullnextsearch
+app_name=fulltextsearch
 
 project_dir=$(CURDIR)/../$(app_name)
 build_dir=$(CURDIR)/build/artifacts
@@ -8,7 +8,7 @@ sign_dir=$(build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 codecov_token_dir=$(HOME)/.nextcloud/codecov_token
-version+=0.3.2
+version+=0.4.0
 
 all: appstore
 

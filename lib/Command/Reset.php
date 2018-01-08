@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,17 +22,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
-namespace OCA\FullNextSearch\Command;
+namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OCA\FullNextSearch\Model\ExtendedBase;
-use OCA\FullNextSearch\Model\Runner;
-use OCA\FullNextSearch\Service\IndexService;
-use OCA\FullNextSearch\Service\MiscService;
-use OCA\FullNextSearch\Service\RunningService;
+use OCA\FullTextSearch\Model\ExtendedBase;
+use OCA\FullTextSearch\Model\Runner;
+use OCA\FullTextSearch\Service\IndexService;
+use OCA\FullTextSearch\Service\MiscService;
+use OCA\FullTextSearch\Service\RunningService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -70,7 +69,7 @@ class Reset extends ExtendedBase {
 
 	protected function configure() {
 		parent::configure();
-		$this->setName('fullnextsearch:reset')
+		$this->setName('fulltextsearch:reset')
 			 ->setDescription('reset index')
 			 ->addArgument('provider', InputArgument::OPTIONAL, 'provider');
 	}
@@ -84,7 +83,6 @@ class Reset extends ExtendedBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-
 
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);

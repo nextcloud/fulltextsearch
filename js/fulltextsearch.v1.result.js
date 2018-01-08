@@ -1,11 +1,11 @@
 /*
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,22 +21,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 /** global: OCA */
-/** global: next_settings */
+/** global: settings */
 /** global: curr */
 /** global: nav */
+
+/** @namespace result.provider */
+/** @namespace result.documents */
 
 var result = {
 
 	displayResult: function (res) {
-		if (next_settings.resultContainer === null) {
+		if (settings.resultContainer === null) {
 			return;
 		}
-
-		nav.onResultDisplayed();
 
 		var searchResult = res.result;
 		if (searchResult.length === 0) {
@@ -51,27 +51,26 @@ var result = {
 
 
 	displayNoResult: function () {
-		next_settings.divNoResult.fadeTo(next_settings.delay_result, 1);
-		next_settings.resultContainer.find('.provider_header').each(function () {
-			$(this).fadeTo(next_settings.delay_result, 0);
+		settings.divNoResult.fadeTo(settings.delay_result, 1);
+		settings.resultContainer.find('.provider_header').each(function () {
+			$(this).fadeTo(settings.delay_result, 0);
 		});
 	},
 
 
-	/** @namespace result.provider */
-	/** @namespace result.documents */
 	displayProviderResult: function (result) {
 
-		next_settings.divNoResult.fadeTo(next_settings.delay_result, 0);
+		settings.divNoResult.fadeTo(settings.delay_result, 0);
 
 		var current = curr.getProviderResult(result.provider.id);
 		var divProvider = nav.getDivProvider(result.provider.id, result.provider.name);
 
-		nav.managerDivProviderResult(divProvider.children('.provider_result'), result.documents,
+		nav.manageDivProviderNavigation(divProvider.children('.provider_navigation'), result.meta);
+		nav.manageDivProviderResult(divProvider.children('.provider_result'), result.documents,
 			current.documents);
 
-		divProvider.slideDown(next_settings.delay_provider, function () {
-			$(this).fadeTo(next_settings.delay_provider, 1);
+		divProvider.slideDown(settings.delay_provider, function () {
+			$(this).fadeTo(settings.delay_provider, 1);
 		});
 
 		curr.setProviderResult(result.provider.id, result);

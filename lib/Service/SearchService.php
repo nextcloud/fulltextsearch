@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,21 +21,21 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
+ *  
  */
 
-namespace OCA\FullNextSearch\Service;
+namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OC\App\AppManager;
 use OCA\Circles\Api\v1\Circles;
-use OCA\FullNextSearch\Exceptions\EmptySearchException;
-use OCA\FullNextSearch\Exceptions\ProviderDoesNotExistException;
-use OCA\FullNextSearch\INextSearchPlatform;
-use OCA\FullNextSearch\INextSearchProvider;
-use OCA\FullNextSearch\Model\DocumentAccess;
-use OCA\FullNextSearch\Model\SearchResult;
+use OCA\FullTextSearch\Exceptions\EmptySearchException;
+use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
+use OCA\FullTextSearch\IFullTextSearchPlatform;
+use OCA\FullTextSearch\IFullTextSearchProvider;
+use OCA\FullTextSearch\Model\DocumentAccess;
+use OCA\FullTextSearch\Model\SearchRequest;
+use OCA\FullTextSearch\Model\SearchResult;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
@@ -97,30 +97,35 @@ class SearchService {
 
 
 	/**
-	 * @param string $providerId
 	 * @param string $userId
-	 * @param string $search
+	 * @param SearchRequest $request
 	 *
 	 * @return SearchResult[]
 	 * @throws EmptySearchException
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function search($providerId, $userId, $search) {
+	public function search($userId, SearchRequest $request) {
 
-		$this->searchCannotBeEmpty($search);
+		$this->searchCannotBeEmpty($request);
 
 		if ($userId === null) {
 			$userId = $this->userId;
 		}
 
-		$search = trim(str_replace('  ', ' ', $search));
-		$providers = $this->providerService->getFilteredProviders($providerId);
+		$user = $this->userManager->get($userId);
+		$request->setAuthor($user->getUID());
+		$request->cleanSearch();
+
+		$providers = $this->providerService->getFilteredProviders($request->getProviders());
 		$platform = $this->platformService->getPlatform();
 
-		$user = $this->userManager->get($userId);
 		$access = $this->getDocumentAccessFromUser($user);
-		$result = $this->searchFromProviders($platform, $providers, $access, $search);
+		$result = $this->searchFromProviders($platform, $providers, $access, $request);
+
+		foreach ($result as $searchResult) {
+			$searchResult->setRequest($request);
+		}
 
 		return $result;
 	}
@@ -139,20 +144,20 @@ class SearchService {
 
 
 	/**
-	 * @param INextSearchPlatform $platform
-	 * @param INextSearchProvider[] $providers
+	 * @param IFullTextSearchPlatform $platform
 	 * @param DocumentAccess $access
-	 * @param string $search
+	 * @param IFullTextSearchProvider[] $providers
+	 * @param SearchRequest $request
 	 *
-	 * @return array
+	 * @return SearchResult[]
 	 */
 	private function searchFromProviders(
-		INextSearchPlatform $platform, array $providers, DocumentAccess $access, $search
+		IFullTextSearchPlatform $platform, array $providers, DocumentAccess $access, SearchRequest $request
 	) {
-
 		$result = [];
 		foreach ($providers AS $provider) {
-			$searchResult = $platform->searchDocuments($provider, $access, $search);
+			$provider->improveSearchRequest($request);
+			$searchResult = $platform->searchDocuments($provider, $access, $request);
 
 			$provider->improveSearchResult($searchResult);
 			if (sizeof($searchResult->getDocuments()) > 0) {

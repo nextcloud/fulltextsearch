@@ -1,11 +1,11 @@
 /*
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,13 +21,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 /** global: searchbar */
 /** global: api */
 
-var next_settings = {
+var settings = {
 
 	parent: null,
 	delay_provider: 300,
@@ -38,6 +37,7 @@ var next_settings = {
 	lockSearchbox: false,
 	entryTemplateDefault: null,
 	divNoResult: null,
+
 
 	generateDefaultTemplate: function () {
 
@@ -53,7 +53,7 @@ var next_settings = {
 		div.append(divLeft);
 		div.append(divRight);
 
-		next_settings.entryTemplateDefault = $('<div>').append(div);
+		settings.entryTemplateDefault = $('<div>').append(div);
 	},
 
 
@@ -61,29 +61,29 @@ var next_settings = {
 		var div = $('<div>', {id: 'noresult'});
 		div.html('no result');
 		div.hide();
-		next_settings.divNoResult = div;
+		settings.divNoResult = div;
 	},
 
 
 	setEntryTemplateId: function (template, parent) {
-		next_settings.entryTemplate = template;
-		next_settings.parent = parent;
+		settings.entryTemplate = template;
+		settings.parent = parent;
 	},
 
 	setResultContainerId: function (container) {
-		next_settings.resultContainer = container;
-		next_settings.resultContainer.prepend(next_settings.divNoResult);
+		settings.resultContainer = container;
+		settings.resultContainer.prepend(settings.divNoResult);
 	},
 
 	addSearchBar: function (providerId) {
-		next_settings.searchProviderId = providerId;
+		settings.searchProviderId = providerId;
 		searchbar.init();
 	},
 
 	parentHasMethod: function (method) {
-		if (next_settings.parent === null) {
+		if (settings.parent === null) {
 			return false;
 		}
-		return (typeof eval('next_settings.parent. ' + method) === "function");
+		return (typeof eval('settings.parent. ' + method) === "function");
 	}
 };
