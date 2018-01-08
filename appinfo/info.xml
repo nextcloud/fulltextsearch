@@ -1,46 +1,46 @@
 <?xml version="1.0"?>
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-	<id>fullnextsearch</id>
-	<name>Full Next Search (BETA)</name>
-	<summary>Core App of the modular content indexer.</summary>
+	<id>fulltextsearch</id>
+	<name>Full text search (BETA)</name>
+	<summary>Core of the full-text search framework for Nextcloud</summary>
 	<description><![CDATA[
 
-FullNextSearch is the core App of a full-text search framework for your Nextcloud.
+Core App of the full-text search framework for your Nextcloud.
 
 ]]>
 	</description>
-	<version>0.3.2</version>
+	<version>0.4.0</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
-	<namespace>FullNextSearch</namespace>
+	<namespace>FullTextSearch</namespace>
 	<documentation>
-		<admin>https://github.com/nextcloud/fullnextsearch/wiki</admin>
+		<admin>https://github.com/nextcloud/fulltextsearch/wiki</admin>
 	</documentation>
 	<category>tools</category>
-	<website>https://github.com/nextcloud/fullnextsearch</website>
-	<bugs>https://github.com/nextcloud/fullnextsearch/issues</bugs>
-	<repository>https://github.com/nextcloud/fullnextsearch.git</repository>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/fullnextsearch/master/screenshots/0.3.0.png</screenshot>
+	<website>https://github.com/nextcloud/fulltextsearch</website>
+	<bugs>https://github.com/nextcloud/fulltextsearch/issues</bugs>
+	<repository>https://github.com/nextcloud/fulltextsearch.git</repository>
+	<screenshot>https://raw.githubusercontent.com/nextcloud/fulltextsearch/master/screenshots/0.3.0.png</screenshot>
 	<dependencies>
 		<nextcloud min-version="12" max-version="14"/>
 	</dependencies>
 
 	<background-jobs>
-		<job>OCA\FullNextSearch\Cron\Index</job>
+		<job>OCA\FullTextSearch\Cron\Index</job>
 	</background-jobs>
 
 	<commands>
-		<command>OCA\FullNextSearch\Command\Stop</command>
-		<command>OCA\FullNextSearch\Command\Index</command>
-		<command>OCA\FullNextSearch\Command\Live</command>
-		<command>OCA\FullNextSearch\Command\Reset</command>
-		<command>OCA\FullNextSearch\Command\Search</command>
+		<command>OCA\FullTextSearch\Command\Stop</command>
+		<command>OCA\FullTextSearch\Command\Index</command>
+		<command>OCA\FullTextSearch\Command\Live</command>
+		<command>OCA\FullTextSearch\Command\Reset</command>
+		<command>OCA\FullTextSearch\Command\Search</command>
 	</commands>
 
 	<settings>
-		<admin>OCA\FullNextSearch\Settings\Admin</admin>
-		<admin-section>OCA\FullNextSearch\Settings\AdminSection</admin-section>
+		<admin>OCA\FullTextSearch\Settings\Admin</admin>
+		<admin-section>OCA\FullTextSearch\Settings\AdminSection</admin-section>
 	</settings>
 
 </info>

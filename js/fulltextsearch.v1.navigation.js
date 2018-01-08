@@ -1,11 +1,11 @@
 /*
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,19 +21,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 /** global: OCA */
 /** global: api */
 /** global: search */
 /** global: result */
-/** global: next_settings */
+/** global: settings */
+
 
 
 var curr = {
 	providerResult: [],
-
+	page: 1,
+	lastRequest: '',
+	moreDisplayed: false,
 
 	setProviderResult: function (id, value) {
 		curr.providerResult[id] = value;
@@ -62,12 +64,39 @@ var nav = {
 		},
 
 
-		managerDivProviderResult: function (divProvider, newResult, oldResult) {
+		manageDivProviderNavigation: function (divProviderNavigation, meta) {
+
+			var maxPage = Math.ceil(meta.total / meta.request.size);
+
+			divProviderNavigation.attr('data-time', meta.time);
+			divProviderNavigation.attr('data-page', meta.request.page);
+			divProviderNavigation.attr('data-search', meta.request.search);
+			divProviderNavigation.attr('data-max-page', maxPage);
+			divProviderNavigation.attr('data-size', meta.request.size);
+			divProviderNavigation.attr('data-total', meta.total);
+
+			var providerName = divProviderNavigation.attr('data-provider-name');
+
+			var left = "Searching " + providerName + " for '" + meta.request.search + "' returns " +
+				meta.total + " results in " + meta.time + "ms";
+			divProviderNavigation.find('.provider_navigation_left').text(left);
+
+			divProviderNavigation.find('.provider_navigation_curr').text(meta.request.page + ' / ' +
+				maxPage);
+
+			divProviderNavigation.find('.provider_navigation_prev').stop().fadeTo(200,
+				(meta.request.page > 1) ? 1 : 0);
+			divProviderNavigation.find('.provider_navigation_next').stop().fadeTo(200,
+				(meta.request.page < maxPage) ? 1 : 0);
+		},
+
+
+		manageDivProviderResult: function (divProviderResult, newResult, oldResult) {
 			//replaceWith();
-			nav.divProviderResultAddItems(divProvider, newResult, oldResult);
+			nav.divProviderResultAddItems(divProviderResult, newResult, oldResult);
 			if (oldResult) {
-				nav.divProviderResultRemoveItems(divProvider, newResult, oldResult);
-				nav.divProviderResultMoveItems(divProvider, newResult, oldResult);
+				nav.divProviderResultRemoveItems(divProviderResult, newResult, oldResult);
+				nav.divProviderResultMoveItems(divProviderResult, newResult, oldResult);
 			}
 		},
 
@@ -89,8 +118,8 @@ var nav = {
 					precItem.after(divResult);
 				}
 
-				divResult.slideDown(next_settings.delay_result, function () {
-					$(this).children('.result_template').fadeTo(next_settings.delay_result, 1);
+				divResult.slideDown(settings.delay_result, function () {
+					$(this).children('.result_template').fadeTo(settings.delay_result, 1);
 				});
 
 				precItem = divResult;
@@ -104,8 +133,8 @@ var nav = {
 				var entry = oldResult[i];
 				if (result.getResultIndex(entry.id, newResult) === -1) {
 					var divResult = nav.getDivResult(entry.id, divProviderResult);
-					divResult.fadeTo(next_settings.delay_result, 0, function () {
-						$(this).slideUp(next_settings.delay_result, function () {
+					divResult.fadeTo(settings.delay_result, 0, function () {
+						$(this).slideUp(settings.delay_result, function () {
 							$(this).remove();
 						});
 					});
@@ -138,12 +167,12 @@ var nav = {
 			var divResult = nav.getDivResult(entryId, divProviderResult);
 
 			if (precId === '') {
-				divResult.fadeTo(next_settings.delay_result, 0.35, function () {
+				divResult.fadeTo(settings.delay_result, 0.35, function () {
 					$(this).prependTo(divProviderResult).fadeTo(100, 1);
 				});
 			} else {
 				var precItem = nav.getDivResult(precId, divProviderResult);
-				divResult.fadeTo(next_settings.delay_result, 0.35, function () {
+				divResult.fadeTo(settings.delay_result, 0.35, function () {
 					$(this).insertAfter(precItem).fadeTo(100, 1);
 				});
 			}
@@ -153,7 +182,7 @@ var nav = {
 
 		getDivProvider: function (providerId, providerName) {
 			var ret = null;
-			next_settings.resultContainer.children('.provider_header').each(function () {
+			settings.resultContainer.children('.provider_header').each(function () {
 				if ($(this).attr('data-id') === providerId) {
 					ret = $(this);
 				}
@@ -161,7 +190,7 @@ var nav = {
 
 			if (ret === null) {
 				ret = nav.generateDivProvider(providerId, providerName);
-				next_settings.resultContainer.append(ret);
+				settings.resultContainer.append(ret);
 			}
 
 			return ret;
@@ -220,20 +249,20 @@ var nav = {
 			nav.deleteEmptyDiv(divResult, '#line1');
 			nav.deleteEmptyDiv(divResult, '#line2');
 
-			if (next_settings.parentHasMethod('onEntryGenerated')) {
-				next_settings.parent.onEntryGenerated(divResult);
+			if (settings.parentHasMethod('onEntryGenerated')) {
+				settings.parent.onEntryGenerated(divResult);
 			}
 		},
 
 		onSearchReset: function () {
-			if (next_settings.parentHasMethod('onSearchReset')) {
-				next_settings.parent.onSearchReset();
+			if (settings.parentHasMethod('onSearchReset')) {
+				settings.parent.onSearchReset();
 			}
 		},
 
 		onResultDisplayed: function () {
-			if (next_settings.parentHasMethod('onResultDisplayed')) {
-				next_settings.parent.onResultDisplayed();
+			if (settings.parentHasMethod('onResultDisplayed')) {
+				settings.parent.onResultDisplayed();
 			}
 		},
 
@@ -246,13 +275,13 @@ var nav = {
 
 
 		generateTemplateEntry: function (document) {
-			var divTemplate = next_settings.entryTemplate;
+			var divTemplate = settings.entryTemplate;
 			if (divTemplate === null) {
-				divTemplate = next_settings.entryTemplateDefault;
+				divTemplate = settings.entryTemplateDefault;
 			}
 
 			if (!divTemplate.length) {
-				console.log('FullNextSearch Error: template_entry is not defined');
+				console.log('FullTextSearch Error: template_entry is not defined');
 				return;
 			}
 
@@ -281,14 +310,45 @@ var nav = {
 
 
 		generateDivProvider: function (providerId, providerName) {
-			var divProviderName = $('<div>', {class: 'provider_name'});
-			divProviderName.text(providerName);
+
+
+			var divProviderNavigation = $('<div>', {class: 'provider_navigation'});
+			divProviderNavigation.attr('data-provider-name', providerName);
+			divProviderNavigation.append($('<div>', {class: 'provider_navigation_left'}));
+
+			var divProviderPagination = $('<div>', {class: 'provider_navigation_right'});
+			var divProviderPaginationPrev = $('<div>', {class: 'icon-page-prev provider_navigation_prev'});
+			divProviderPaginationPrev.on('click', function () {
+				fullTextSearch.search({
+					providers: providerId,
+					search: divProviderNavigation.attr('data-search'),
+					page: Number(divProviderNavigation.attr('data-page')) - 1,
+					size: divProviderNavigation.attr('data-size')
+				});
+			});
+			divProviderPagination.append(divProviderPaginationPrev);
+
+			divProviderPagination.append($('<div>', {class: 'provider_navigation_curr'}));
+
+			var divProviderPaginationNext = $('<div>', {class: 'icon-page-next provider_navigation_next'});
+			divProviderPaginationNext.on('click', function () {
+				fullTextSearch.search({
+					providers: providerId,
+					search: divProviderNavigation.attr('data-search'),
+					page: Number(divProviderNavigation.attr('data-page')) + 1,
+					size: divProviderNavigation.attr('data-size')
+				});
+			});
+			divProviderPagination.append(divProviderPaginationNext);
+
+			divProviderNavigation.append(divProviderPagination);
 
 			var divProviderResult = $('<div>', {class: 'provider_result'});
+
 			var divProvider = $('<div>', {class: 'provider_header'});
 			divProvider.hide();
 			divProvider.attr('data-id', providerId);
-			divProvider.append(divProviderName);
+			divProvider.append(divProviderNavigation);
 			divProvider.append(divProviderResult);
 
 			return divProvider;

@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,20 +22,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
-namespace OCA\FullNextSearch\Command;
+namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OCA\FullNextSearch\INextSearchProvider;
-use OCA\FullNextSearch\Model\ExtendedBase;
-use OCA\FullNextSearch\Model\Runner;
-use OCA\FullNextSearch\Service\IndexService;
-use OCA\FullNextSearch\Service\MiscService;
-use OCA\FullNextSearch\Service\PlatformService;
-use OCA\FullNextSearch\Service\ProviderService;
-use OCA\FullNextSearch\Service\RunningService;
+use OCA\FullTextSearch\IFullTextSearchProvider;
+use OCA\FullTextSearch\Model\ExtendedBase;
+use OCA\FullTextSearch\Model\Runner;
+use OCA\FullTextSearch\Service\IndexService;
+use OCA\FullTextSearch\Service\MiscService;
+use OCA\FullTextSearch\Service\PlatformService;
+use OCA\FullTextSearch\Service\ProviderService;
+use OCA\FullTextSearch\Service\RunningService;
 use OCP\IUserManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -95,7 +94,7 @@ class Index extends ExtendedBase {
 	 */
 	protected function configure() {
 		parent::configure();
-		$this->setName('fullnextsearch:index')
+		$this->setName('fulltextsearch:index')
 			 ->setDescription('Index files');
 	}
 
@@ -130,11 +129,11 @@ class Index extends ExtendedBase {
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @throws Exception
 	 */
-	private function indexProvider(INextSearchProvider $provider) {
+	private function indexProvider(IFullTextSearchProvider $provider) {
 		$platform = $this->platformService->getPlatform();
 		$platform->initializeIndex($provider);
 		$platform->setRunner($this->runner);

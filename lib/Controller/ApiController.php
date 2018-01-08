@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,16 +22,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
-namespace OCA\FullNextSearch\Controller;
+namespace OCA\FullTextSearch\Controller;
 
 use Exception;
-use OCA\FullNextSearch\AppInfo\Application;
-use OCA\FullNextSearch\Model\SearchResult;
-use OCA\FullNextSearch\Service\MiscService;
-use OCA\FullNextSearch\Service\SearchService;
+use OCA\FullTextSearch\AppInfo\Application;
+use OCA\FullTextSearch\Model\SearchRequest;
+use OCA\FullTextSearch\Service\MiscService;
+use OCA\FullTextSearch\Service\SearchService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
@@ -66,13 +65,12 @@ class ApiController extends Controller {
 	 * @NoAdminRequired
 	 * @NoSubAdminRequired
 	 *
-	 * @param string $providerId
-	 * @param string $search
+	 * @param string $request
 	 *
 	 * @return DataResponse
 	 */
-	public function search($providerId, $search) {
-		return $this->searchDocuments($providerId, $search);
+	public function search($request) {
+		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
 
@@ -81,54 +79,32 @@ class ApiController extends Controller {
 	 * @NoSubAdminRequired
 	 * @NoCSRFRequired
 	 *
-	 * @param string $providerId
-	 * @param string $search
+	 * @param string $request
 	 *
 	 * @return DataResponse
 	 */
-	public function searchFromRemote($providerId, $search) {
-		return $this->searchDocuments($providerId, $search);
+	public function searchFromRemote($request) {
+		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
 
 	/**
-	 * @param string $providerId
-	 * @param string $search
+	 * @param SearchRequest $request
 	 *
 	 * @return DataResponse
 	 */
-	private function searchDocuments($providerId, $search) {
+	private function searchDocuments(SearchRequest $request) {
 		try {
-			$result = $this->searchService->search($providerId, null, $search);
-			$meta = $this->generateMeta($result);
+			$result = $this->searchService->search(null, $request);
 
 			return $this->success(
-				['search' => $search, 'provider' => $providerId, 'result' => $result, 'meta' => $meta]
+				['request' => $request, 'result' => $result]
 			);
 		} catch (Exception $e) {
 			return $this->fail(
-				['search' => $search, 'provider' => $providerId, 'error' => $e->getMessage()]
+				['request' => $request, 'error' => $e->getMessage()]
 			);
 		}
-	}
-
-
-	/**
-	 * @param SearchResult[] $result
-	 *
-	 * @return array<string,integer>
-	 */
-	private function generateMeta($result) {
-
-		$meta = [
-			'size' => 0
-		];
-
-		foreach ($result as $searchResult) {
-			$meta['size'] += $searchResult->getSize();
-		}
-
-		return $meta;
 	}
 
 

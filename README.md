@@ -1,10 +1,10 @@
-# FullNextSearch
+# FullTextSearch
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nextcloud/fullnextsearch/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nextcloud/fullnextsearch/?b=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nextcloud/fulltextsearch/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nextcloud/fulltextsearch/?b=master)
 
 **BETA VERSION**  
 
-_FullNextSearch_ is the core App of a full-text search framework for your Nextcloud. 
+_FullTextSearch_ is the core App of a full-text search framework for your Nextcloud. 
 To have it operate, and get content indexed, some other Apps are needed: 
 
 - Some **Providers Apps** to extract content from your Nextcloud. 
@@ -15,5 +15,5 @@ _Note: There is no limit to the number of Platform-App to be installed, however 
 
 ### Documentation
 
-[Can be found on the Wiki](https://github.com/nextcloud/fullnextsearch/wiki)
+[Can be found on the Wiki](https://github.com/nextcloud/fulltextsearch/wiki)
 

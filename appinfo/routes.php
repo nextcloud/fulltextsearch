@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 return [
@@ -30,8 +29,9 @@ return [
 		['name' => 'Navigation#navigate', 'url' => '/', 'verb' => 'GET'],
 		['name' => 'Settings#getSettingsAdmin', 'url' => '/admin/settings', 'verb' => 'GET'],
 		['name' => 'Settings#setSettingsAdmin', 'url' => '/admin/settings', 'verb' => 'POST'],
-		['name' => 'Api#search', 'url' => '/v1/search/{providerId}/', 'verb' => 'GET'],
-		['name' => 'Api#searchFromRemote', 'url' => '/v1/remote/{providerId}/', 'verb' => 'GET']
+		['name' => 'Api#search', 'url' => '/v1/search', 'verb' => 'GET'],
+		['name' => 'Api#searchFromRemote', 'url' => '/v1/remote', 'verb' => 'GET'],
+		['name' => 'Templates#getOptionsPanel', 'url' => '/options/{providerId}/', 'verb' => 'GET'],
 	]
 ];
 

@@ -1,11 +1,11 @@
 /*
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,33 +21,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
 /** global: OCA */
-/** global: fns_admin_settings */
+/** global: fts_admin_settings */
 
 
 
-var fns_admin_elements = {
-	fns_div: null,
-	fns_platforms: null,
-	fns_chunkSize: null,
-	fns_providers: null,
+var fts_admin_elements = {
+	fts_div: null,
+	fts_platforms: null,
+	fts_chunkSize: null,
+	fts_providers: null,
 
 	init: function () {
-		fns_admin_elements.fns_div = $('#fns');
-		fns_admin_elements.fns_platforms = $('#fns_platforms');
-		fns_admin_elements.fns_chunkSize = $('#fns_chunk_size');
+		fts_admin_elements.fts_div = $('#fns');
+		fts_admin_elements.fts_platforms = $('#fts_platforms');
+		fts_admin_elements.fts_chunkSize = $('#fts_chunk_size');
 
-		fns_admin_elements.fns_platforms.on('change', function () {
-			fns_admin_settings.tagSettingsAsNotSaved($(this));
-			fns_admin_settings.saveSettings();
+		fts_admin_elements.fts_platforms.on('change', function () {
+			fts_admin_settings.tagSettingsAsNotSaved($(this));
+			fts_admin_settings.saveSettings();
 		});
-		fns_admin_elements.fns_chunkSize.on('input', function () {
-			fns_admin_settings.tagSettingsAsNotSaved($(this));
+		fts_admin_elements.fts_chunkSize.on('input', function () {
+			fts_admin_settings.tagSettingsAsNotSaved($(this));
 		}).blur(function () {
-			fns_admin_settings.saveSettings();
+			fts_admin_settings.saveSettings();
 		});
 	}
 };

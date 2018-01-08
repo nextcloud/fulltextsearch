@@ -1,12 +1,12 @@
 <?php
 /**
- * FullNextSearch - Full Text Search your Nextcloud.
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
  * @author Maxence Lange <maxence@artificial-owl.com>
- * @copyright 2017
+ * @copyright 2018
  * @license GNU AGPL version 3 or any later version
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,12 +22,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
  */
 
-namespace OCA\FullNextSearch\Model;
+namespace OCA\FullTextSearch\Model;
 
-use OCA\FullNextSearch\INextSearchProvider;
+use OCA\FullTextSearch\IFullTextSearchProvider;
 
 class SearchResult implements \JsonSerializable {
 
@@ -37,8 +36,24 @@ class SearchResult implements \JsonSerializable {
 	/** @var string */
 	private $rawResult;
 
-	/** @var INextSearchProvider */
+	/** @var IFullTextSearchProvider */
 	private $provider;
+
+	/** @var int */
+	private $total;
+
+	/** @var int */
+	private $maxScore;
+
+	/** @var int */
+	private $time;
+
+	/** @var boolean */
+	private $timedOut;
+
+	/** @var SearchRequest */
+	private $request;
+
 
 	public function __construct() {
 	}
@@ -73,6 +88,13 @@ class SearchResult implements \JsonSerializable {
 		return $this;
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getCount() {
+		return count($this->documents);
+	}
+
 
 	/**
 	 * @param string $result
@@ -90,22 +112,92 @@ class SearchResult implements \JsonSerializable {
 
 
 	/**
-	 * @param INextSearchProvider $provider
+	 * @param IFullTextSearchProvider $provider
 	 */
-	public function setProvider(INextSearchProvider $provider) {
+	public function setProvider(IFullTextSearchProvider $provider) {
 		$this->provider = $provider;
 	}
 
 	/**
-	 * @return INextSearchProvider
+	 * @return IFullTextSearchProvider
 	 */
 	public function getProvider() {
 		return $this->provider;
 	}
 
 
-	public function getSize() {
-		return count($this->documents);
+	/**
+	 * @return int
+	 */
+	public function getTotal() {
+		return $this->total;
+	}
+
+	/**
+	 * @param int $total
+	 */
+	public function setTotal($total) {
+		$this->total = $total;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getMaxScore() {
+		return $this->maxScore;
+	}
+
+	/**
+	 * @param int $maxScore
+	 */
+	public function setMaxScore($maxScore) {
+		$this->maxScore = $maxScore;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getTime() {
+		return $this->time;
+	}
+
+	/**
+	 * @param int $time
+	 */
+	public function setTime($time) {
+		$this->time = $time;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isTimedOut() {
+		return $this->timedOut;
+	}
+
+	/**
+	 * @param bool $timedOut
+	 */
+	public function setTimedOut($timedOut) {
+		$this->timedOut = $timedOut;
+	}
+
+
+	/**
+	 * @return SearchRequest
+	 */
+	public function getRequest() {
+		return $this->request;
+	}
+
+	/**
+	 * @param SearchRequest $request
+	 */
+	public function setRequest($request) {
+		$this->request = $request;
 	}
 
 
@@ -122,7 +214,15 @@ class SearchResult implements \JsonSerializable {
 				'name' => $provider->getName()
 			],
 			'documents' => $this->getDocuments(),
-			'size'      => $this->getSize()
+			'meta'      =>
+				[
+					'timedOut' => $this->isTimedOut(),
+					'time'     => $this->getTime(),
+					'count'    => $this->getCount(),
+					'total'    => $this->getTotal(),
+					'maxScore' => $this->getMaxScore(),
+					'request'  => $this->getRequest()
+				]
 		];
 	}
 }
