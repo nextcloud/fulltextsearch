@@ -1,10 +1,10 @@
-# FullTextSearch
+# Full text search
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nextcloud/fulltextsearch/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nextcloud/fulltextsearch/?b=master)
 
 **BETA VERSION**  
 
-_FullTextSearch_ is the core App of a full-text search framework for your Nextcloud. 
+_Full text search_ is the core App of a full-text search framework for your Nextcloud. 
 To have it operate, and get content indexed, some other Apps are needed: 
 
 - Some **Providers Apps** to extract content from your Nextcloud. 

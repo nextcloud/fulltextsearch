@@ -106,7 +106,7 @@ class ProviderService {
 		$provider = \OC::$server->query((string)$providerId);
 		if (!($provider instanceof IFullTextSearchProvider)) {
 			throw new ProviderIsNotCompatibleException(
-				$providerId . ' is not a compatible FullTextSearchProvider'
+				$providerId . ' is not a compatible IFullTextSearchProvider'
 			);
 		}
 

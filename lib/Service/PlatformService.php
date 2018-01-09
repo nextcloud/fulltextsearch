@@ -177,7 +177,7 @@ class PlatformService {
 		$selected = $this->configService->getAppValue(ConfigService::SEARCH_PLATFORM);
 
 		if ($selected === '') {
-			throw new PlatformNotSelectedException('Admin have not selected any FullTextSearchPlatform');
+			throw new PlatformNotSelectedException('Admin have not selected any IFullTextSearchPlatform');
 		}
 
 		if (!in_array($selected, $this->platforms)) {
