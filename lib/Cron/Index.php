@@ -109,6 +109,10 @@ class Index extends TimedJob {
 
 			try {
 				$provider = $this->providerService->getProvider($index->getProviderId());
+				if (!$this->providerService->isProviderIndexed($provider->getId())) {
+					continue;
+				}
+
 				$this->indexService->updateDocument($platform, $provider, $index);
 			} catch (Exception $e) {
 				$this->runner->exception($e->getMessage(), false);

@@ -21,7 +21,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  */
 
 namespace OCA\FullTextSearch\Model;
@@ -53,7 +53,7 @@ class IndexDocument implements \JsonSerializable {
 	private $title;
 
 	/** @var string */
-	private $content;
+	private $content = null;
 
 	/** @var string */
 	private $link = '';

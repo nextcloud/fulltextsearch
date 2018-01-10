@@ -117,15 +117,16 @@ class FullTextSearch {
 	 * @param string $providerId
 	 * @param string|int $documentId
 	 * @param int $status
+	 * @param bool $reset
 	 *
 	 * @return mixed
 	 * @throws QueryException
 	 */
-	public static function updateIndexStatus($providerId, $documentId, $status) {
+	public static function updateIndexStatus($providerId, $documentId, $status, $reset = false) {
 		$c = self::getContainer();
 
 		return $c->query(IndexService::class)
-				 ->updateIndexStatus($providerId, $documentId, $status);
+				 ->updateIndexStatus($providerId, $documentId, $status, $reset);
 	}
 
 
