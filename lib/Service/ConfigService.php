@@ -55,6 +55,7 @@ class ConfigService {
 	/** @var MiscService */
 	private $miscService;
 
+
 	/**
 	 * ConfigService constructor.
 	 *

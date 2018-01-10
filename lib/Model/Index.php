@@ -32,7 +32,7 @@ class Index implements \JsonSerializable {
 	const INDEX_IGNORE = 2;
 	const INDEX_META = 4;
 	const INDEX_CONTENT = 8;
-	const INDEX_ALL = 12;
+	const INDEX_FULL = 12;
 	const INDEX_REMOVE = 16;
 	const INDEX_FAILED = 32;
 

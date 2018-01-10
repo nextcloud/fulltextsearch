@@ -307,15 +307,16 @@ class IndexService {
 	 * @param string $providerId
 	 * @param string|int $documentId
 	 * @param int $status
+	 * @param bool $reset
 	 *
 	 * @throws DatabaseException
 	 */
-	public function updateIndexStatus($providerId, $documentId, $status) {
+	public function updateIndexStatus($providerId, $documentId, $status, $reset = false) {
 		try {
 			$curr = $this->getIndex($providerId, $documentId);
 		} catch (IndexDoesNotExistException $e) {
 			$curr = new Index($providerId, $documentId);
-			$curr->setStatus(Index::INDEX_ALL);
+			$curr->setStatus(Index::INDEX_FULL);
 		}
 
 		$curr->setStatus($status);

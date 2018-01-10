@@ -66,7 +66,7 @@ class ProviderIndexes {
 		$index = $this->getIndex($document->getId());
 		if ($index === null) {
 			$index = new Index($document->getProviderId(), $document->getId());
-			$index->setStatus(Index::INDEX_ALL);
+			$index->setStatus(Index::INDEX_FULL);
 			$index->setLastIndex();
 		}
 
