@@ -158,7 +158,7 @@ class CoreRequestBuilder {
 	protected function limitToQueuedIndexes(IQueryBuilder &$qb) {
 		$expr = $qb->expr();
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
-		$qb->andWhere($expr->neq($pf . 'status', $qb->createNamedParameter(Index::STATUS_INDEX_DONE)));
+		$qb->andWhere($expr->neq($pf . 'status', $qb->createNamedParameter(Index::INDEX_OK)));
 	}
 
 }

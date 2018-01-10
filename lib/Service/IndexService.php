@@ -21,7 +21,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  */
 
 namespace OCA\FullTextSearch\Service;
@@ -169,7 +169,8 @@ class IndexService {
 	 *
 	 * @throws Exception
 	 */
-	private function indexChunks(IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $documents
+	private function indexChunks(
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $documents
 	) {
 		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
 
@@ -202,7 +203,9 @@ class IndexService {
 	 * @throws NoResultException
 	 * @throws DatabaseException
 	 */
-	private function indexChunk(IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $chunk) {
+	private function indexChunk(
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $chunk
+	) {
 		if (sizeof($chunk) === 0) {
 			throw new NoResultException();
 		}
@@ -225,7 +228,7 @@ class IndexService {
 			// TODO - rework the index/not_index
 //			echo '==st==' . $document->getIndex()->getStatus() . "\n";
 			if (!$document->getIndex()
-						  ->isStatus(Index::STATUS_INDEX_IGNORE)) {
+						  ->isStatus(Index::INDEX_IGNORE)) {
 				$toIndex[] = $document;
 			}
 		}
@@ -281,10 +284,20 @@ class IndexService {
 	 */
 	private function updateIndex(Index $index) {
 
-		if ($index->isStatus(Index::STATUS_DOCUMENT_REMOVED)) {
-			$this->indexesRequest->deleteIndex($index);
+		if ($index->isStatus(Index::INDEX_REMOVE)) {
 
-		} else if (!$this->indexesRequest->update($index)) {
+			if ($index->isStatus(Index::INDEX_OK)) {
+				$this->indexesRequest->deleteIndex($index);
+
+				return;
+			}
+			$index->setStatus(Index::INDEX_FAILED);
+			$this->indexesRequest->update($index);
+
+			return;
+		}
+
+		if (!$this->indexesRequest->update($index)) {
 			$this->indexesRequest->create($index);
 		}
 	}
@@ -302,7 +315,7 @@ class IndexService {
 			$curr = $this->getIndex($providerId, $documentId);
 		} catch (IndexDoesNotExistException $e) {
 			$curr = new Index($providerId, $documentId);
-			$curr->setStatus(Index::STATUS_INDEX_THIS);
+			$curr->setStatus(Index::INDEX_ALL);
 		}
 
 		$curr->setStatus($status);

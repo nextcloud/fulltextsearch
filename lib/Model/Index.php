@@ -28,12 +28,13 @@ namespace OCA\FullTextSearch\Model;
 
 class Index implements \JsonSerializable {
 
-	const STATUS_INDEX_IGNORE = 16;
-	const STATUS_INDEX_FAILED = 32;
-	const STATUS_INDEX_THIS = 1;
-	const STATUS_INDEX_DONE = 2;
-	const STATUS_REMOVE_DOCUMENT = 4;
-	const STATUS_DOCUMENT_REMOVED = 8;
+	const INDEX_OK = 1;
+	const INDEX_IGNORE = 2;
+	const INDEX_META = 4;
+	const INDEX_CONTENT = 8;
+	const INDEX_ALL = 12;
+	const INDEX_REMOVE = 16;
+	const INDEX_FAILED = 32;
 
 	const ERROR_FAILED = 1;
 	const ERROR_FAILED2 = 2;
