@@ -99,11 +99,10 @@ class Reset extends ExtendedBase {
 			$this->indexService->resetIndex($this->getProviderIdFromArgument($input));
 
 		} catch (Exception $e) {
-			$this->runner->stop();
 			throw $e;
+		} finally {
+			$this->runner->stop();
 		}
-
-		$this->runner->stop();
 	}
 
 
