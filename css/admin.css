@@ -27,7 +27,13 @@ EM {
 }
 
 .div-table-col-left {
-	width: 500px;
+	width: 350px;
+	margin-right: 35px;
+	text-align: right;
+}
+
+.hsub {
+	margin-left: 20px;
 }
 
 SELECT, INPUT {

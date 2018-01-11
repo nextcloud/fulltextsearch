@@ -52,7 +52,7 @@ Util::addStyle(Application::APP_NAME, 'admin');
 			<div class="div-table-col div-table-col-left">
 				<span class="leftcol">Search Platform :</span>
 				<br/>
-				<em>Select the app that will be used to index content and answer search queries.</em>
+				<em>Select the app to index content and answer search queries.</em>
 			</div>
 			<div class="div-table-col">
 				<select id="fts_platforms">
