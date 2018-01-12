@@ -68,16 +68,18 @@ var searchbar = {
 		searchbox.search_form.append(searchbox.search_input);
 
 		searchbox.search_more = $('<div>', {class: 'search_more'});
-		searchbox.search_more.fadeTo(0, 0);
+		searchbox.search_more.fadeTo(0, 0).hide();
 
 		searchbox.search_icon_more = $('<div>', {class: 'icon-more-white icon-more-fulltextsearch'});
 		searchbox.search_icon_more.fadeTo(0, 0);
 		searchbox.search_icon_more.on('click', function () {
 			if (curr.moreDisplayed) {
-				searchbox.search_more.stop().fadeTo(100, 0);
+				searchbox.search_more.stop().fadeTo(100, 0, function () {
+					$(this).hide();
+				});
 				curr.moreDisplayed = false;
 			} else {
-				searchbox.search_more.stop().fadeTo(100, 1);
+				searchbox.search_more.stop().show().fadeTo(100, 1);
 				curr.moreDisplayed = true;
 			}
 		});
@@ -89,7 +91,9 @@ var searchbar = {
 			settings.lockSearchbox = false;
 			searchbox.search_icon_more.stop().fadeTo(100, 0);
 			searchbox.search_icon_close.stop().fadeTo(100, 0);
-			searchbox.search_more.stop().fadeTo(100, 0);
+			searchbox.search_more.stop().fadeTo(100, 0, function () {
+				$(this).hide();
+			});
 			curr.moreDisplayed = false;
 			searchbox.search_input.val('');
 			nav.onSearchReset();
