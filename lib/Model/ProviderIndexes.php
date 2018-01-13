@@ -62,22 +62,4 @@ class ProviderIndexes {
 	}
 
 
-	public function isDocumentIndexUpToDate(IndexDocument $document) {
-		$index = $this->getIndex($document->getId());
-		if ($index === null) {
-			$index = new Index($document->getProviderId(), $document->getId());
-			$index->setStatus(Index::INDEX_FULL);
-			$index->setLastIndex();
-		}
-
-		$document->setIndex($index);
-
-		if ($index->getStatus() !== Index::INDEX_OK) {
-			return false;
-		}
-
-		return ($index->getLastIndex() >= $document->getModifiedTime());
-	}
-
-
 }

@@ -121,32 +121,62 @@ class IndexService {
 
 		//$maxSize = sizeof($documents);
 
-		$toIndex = $this->updateDocumentsWithCurrentIndex($provider, $documents);
+		$toIndex = $this->updateDocumentsWithCurrIndex($provider, $documents);
 		$this->indexChunks($platform, $provider, $toIndex);
 	}
 
 
 	/**
 	 * @param IFullTextSearchProvider $provider
-	 * @param IndexDocument[] $items
+	 * @param IndexDocument[] $documents
 	 *
 	 * @return IndexDocument[]
 	 * @throws InterruptException
 	 * @throws TickDoesNotExistException
 	 */
-	private function updateDocumentsWithCurrentIndex(IFullTextSearchProvider $provider, array $items) {
+	private function updateDocumentsWithCurrIndex(IFullTextSearchProvider $provider, array $documents) {
 
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
-		foreach ($items as $item) {
+		foreach ($documents as $document) {
 			$this->updateRunner('compareWithCurrentIndex');
-			if (!$currIndex->isDocumentIndexUpToDate($item)) {
-				$result[] = $item;
+
+			$index = $currIndex->getIndex($document->getId());
+			if ($index === null) {
+				$index = new Index($document->getProviderId(), $document->getId());
+				$index->setStatus(Index::INDEX_FULL);
+				$index->setLastIndex();
+			}
+
+			$document->setIndex($index);
+			if (!$this->isDocumentUpToDate($provider, $document)) {
+				$result[] = $document;
 			}
 
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * @param IFullTextSearchProvider $provider
+	 * @param IndexDocument $document
+	 *
+	 * @return bool
+	 */
+	private function isDocumentUpToDate(IFullTextSearchProvider $provider, IndexDocument $document) {
+		$index = $document->getIndex();
+
+		if (!$index->isStatus(Index::INDEX_OK)) {
+			return false;
+		}
+
+		if ($index->isStatus(Index::INDEX_META) || $index->isStatus(Index::INDEX_CONTENT)) {
+			return false;
+		}
+
+		return $provider->isDocumentUpToDate($document);
 	}
 
 

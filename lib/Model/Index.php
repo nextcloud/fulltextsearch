@@ -30,11 +30,14 @@ class Index implements \JsonSerializable {
 
 	const INDEX_OK = 1;
 	const INDEX_IGNORE = 2;
+
 	const INDEX_META = 4;
 	const INDEX_CONTENT = 8;
 	const INDEX_FULL = 12;
 	const INDEX_REMOVE = 16;
-	const INDEX_FAILED = 32;
+
+	const INDEX_DONE = 32;
+	const INDEX_FAILED = 64;
 
 	const ERROR_FAILED = 1;
 	const ERROR_FAILED2 = 2;
@@ -126,12 +129,22 @@ class Index implements \JsonSerializable {
 	/**
 	 * @param int $status
 	 *
-	 * @return int
+	 * @return bool
 	 */
 	public function isStatus($status) {
 		return ((int)$status & $this->getStatus());
 	}
 
+	/**
+	 * @param int $status
+	 */
+	public function unsetStatus($status) {
+		if (!$this->isStatus($status)) {
+			return;
+		}
+
+		$this->status -= $status;
+	}
 
 	/**
 	 * @param int $err

@@ -97,6 +97,7 @@ class FullTextSearch {
 				 ->getIndex($providerId, $documentId);
 	}
 
+
 	/**
 	 * @param $providerId
 	 * @param $documentId
