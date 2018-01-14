@@ -72,6 +72,13 @@
 			</field>
 
 			<field>
+				<name>message</name>
+				<type>text</type>
+				<length>3000</length>
+				<notnull>false</notnull>
+			</field>
+
+			<field>
 				<name>indexed</name>
 				<type>integer</type>
 				<length>6</length>

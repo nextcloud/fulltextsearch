@@ -59,6 +59,9 @@ class Index implements \JsonSerializable {
 	/** @var int */
 	private $err = 0;
 
+	/** @var string */
+	private $message;
+
 	/** @var int */
 	private $lastIndex = 0;
 
@@ -146,6 +149,7 @@ class Index implements \JsonSerializable {
 		$this->status -= $status;
 	}
 
+
 	/**
 	 * @param int $err
 	 *
@@ -162,6 +166,34 @@ class Index implements \JsonSerializable {
 	 */
 	public function getError() {
 		return $this->err;
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function incrementError() {
+		$this->err++;
+
+		return $this;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getMessage() {
+		return $this->message;
+	}
+
+	/**
+	 * @param string $message
+	 *
+	 * @return Index
+	 */
+	public function setMessage($message) {
+		$this->message = $message;
+
+		return $this;
 	}
 
 

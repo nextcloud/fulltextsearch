@@ -49,6 +49,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 			   ->setValue('provider_id', $qb->createNamedParameter($index->getProviderId()))
 			   ->setValue('document_id', $qb->createNamedParameter($index->getDocumentId()))
 			   ->setValue('err', $qb->createNamedParameter($index->getError()))
+			   ->setValue('message', $qb->createNamedParameter($index->getMessage()))
 			   ->setValue('status', $qb->createNamedParameter($index->getStatus()))
 			   ->setValue('indexed', $qb->createNamedParameter($index->getLastIndex()));
 
@@ -84,6 +85,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 		if ($index->getLastIndex() > 0) {
 			$qb->set('indexed', $qb->createNamedParameter($index->getLastIndex()));
 		}
+
+		$qb->set('message', $qb->createNamedParameter($index->getMessage()));
 
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
