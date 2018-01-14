@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.5.0
+
+- managing errors from platform
+- issues with JS
+
+
 
 ### v0.4.0
 

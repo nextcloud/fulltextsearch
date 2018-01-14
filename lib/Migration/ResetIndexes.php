@@ -72,7 +72,17 @@ class ResetIndexes implements IRepairStep {
 	 * @param IOutput $output
 	 */
 	public function run(IOutput $output) {
-		$this->resetIndexes($output);
+
+		$oldVersion = explode(
+			'.', \OC::$server->getConfig()
+							 ->getAppValue('fulltextsearch', 'installed_version', '')
+		);
+
+		if ((int)$oldVersion[0] === 0
+			&& (int)$oldVersion[1] < 5) {
+			$this->resetIndexes($output);
+		}
+
 	}
 
 
