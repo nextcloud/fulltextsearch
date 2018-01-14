@@ -327,6 +327,10 @@ class IndexService {
 			return;
 		}
 
+		if ($index->isStatus(Index::INDEX_DONE)) {
+			$index->setStatus(Index::INDEX_OK, true);
+		}
+
 		if (!$this->indexesRequest->update($index)) {
 			$this->indexesRequest->create($index);
 		}
