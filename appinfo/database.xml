@@ -74,7 +74,7 @@
 			<field>
 				<name>message</name>
 				<type>text</type>
-				<length>3000</length>
+				<length>4000</length>
 				<notnull>false</notnull>
 			</field>
 
@@ -123,7 +123,7 @@
 			<field>
 				<name>data</name>
 				<type>text</type>
-				<length>3000</length>
+				<length>6000</length>
 			</field>
 
 			<field>

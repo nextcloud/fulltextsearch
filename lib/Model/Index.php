@@ -191,7 +191,7 @@ class Index implements \JsonSerializable {
 	 * @return Index
 	 */
 	public function setMessage($message) {
-		$this->message = $message;
+		$this->message = substr($message, 0, 3800);
 
 		return $this;
 	}
