@@ -27,6 +27,7 @@
 namespace OCA\FullTextSearch\Service;
 
 use Exception;
+use OC\User\NoUserException;
 use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
@@ -278,7 +279,13 @@ class IndexService {
 	public function updateDocument(
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, Index $index
 	) {
-		$document = $provider->updateDocument($index);
+		$document = null;
+		try {
+			$document = $provider->updateDocument($index);
+		} catch (NoUserException $e) {
+			/** we do nothing, we'll delete the index anyway. */
+		}
+
 		if ($document === null) {
 			$this->indexesRequest->deleteIndex($index);
 

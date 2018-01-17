@@ -26,6 +26,7 @@
 
 namespace OCA\FullTextSearch;
 
+use OC\User\NoUserException;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Model\Runner;
@@ -113,6 +114,7 @@ interface IFullTextSearchProvider {
 	 * @param Index $index
 	 *
 	 * @return IndexDocument
+	 * @throws NoUserException
 	 */
 	public function updateDocument(Index $index);
 
