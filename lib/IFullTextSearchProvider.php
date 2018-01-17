@@ -135,7 +135,7 @@ interface IFullTextSearchProvider {
 	/**
 	 * @param IFullTextSearchPlatform $platform
 	 */
-	public function onRemovingIndex(IFullTextSearchPlatform $platform);
+	public function onResettingIndex(IFullTextSearchPlatform $platform);
 
 
 	/**
