@@ -283,7 +283,7 @@ class IndexService {
 		try {
 			$document = $provider->updateDocument($index);
 		} catch (NoUserException $e) {
-			/** we do nothing, we'll delete the index anyway. */
+			$platform->deleteIndexes([$index]);
 		}
 
 		if ($document === null) {
