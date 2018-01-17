@@ -64,29 +64,29 @@ var nav = {
 		},
 
 
-		manageDivProviderNavigation: function (divProviderNavigation, meta) {
+		manageDivProviderNavigation: function (divProviderNavigation, request, meta) {
 
-			var maxPage = Math.ceil(meta.total / meta.request.size);
+			var maxPage = Math.ceil(meta.total / request.size);
 
 			divProviderNavigation.attr('data-time', meta.time);
-			divProviderNavigation.attr('data-page', meta.request.page);
-			divProviderNavigation.attr('data-search', meta.request.search);
+			divProviderNavigation.attr('data-page', request.page);
+			divProviderNavigation.attr('data-search', request.search);
 			divProviderNavigation.attr('data-max-page', maxPage);
-			divProviderNavigation.attr('data-size', meta.request.size);
+			divProviderNavigation.attr('data-size', request.size);
 			divProviderNavigation.attr('data-total', meta.total);
 
 			var providerName = divProviderNavigation.attr('data-provider-name');
-			var left = "Search " + providerName + " for '" + meta.request.search + "' returned " +
+			var left = "Search " + providerName + " for '" + request.search + "' returned " +
 				meta.total + " results in " + meta.time + "ms";
 			divProviderNavigation.find('.provider_navigation_left').text(left);
 
-			divProviderNavigation.find('.provider_navigation_curr').text(meta.request.page + ' / ' +
+			divProviderNavigation.find('.provider_navigation_curr').text(request.page + ' / ' +
 				maxPage);
 
 			divProviderNavigation.find('.provider_navigation_prev').stop().fadeTo(200,
-				(meta.request.page > 1) ? 1 : 0);
+				(request.page > 1) ? 1 : 0);
 			divProviderNavigation.find('.provider_navigation_next').stop().fadeTo(200,
-				(meta.request.page < maxPage) ? 1 : 0);
+				(request.page < maxPage) ? 1 : 0);
 		},
 
 

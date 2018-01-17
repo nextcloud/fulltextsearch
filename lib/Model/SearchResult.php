@@ -220,8 +220,7 @@ class SearchResult implements \JsonSerializable {
 					'time'     => $this->getTime(),
 					'count'    => $this->getCount(),
 					'total'    => $this->getTotal(),
-					'maxScore' => $this->getMaxScore(),
-					'request'  => $this->getRequest()
+					'maxScore' => $this->getMaxScore()
 				]
 		];
 	}

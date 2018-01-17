@@ -45,7 +45,7 @@ var result = {
 		}
 
 		for (var i = 0; i < searchResult.length; i++) {
-			result.displayProviderResult(searchResult[i]);
+			result.displayProviderResult(res.request, searchResult[i]);
 		}
 	},
 
@@ -58,14 +58,14 @@ var result = {
 	},
 
 
-	displayProviderResult: function (result) {
+	displayProviderResult: function (request, result) {
 
 		settings.divNoResult.fadeTo(settings.delay_result, 0);
 
 		var current = curr.getProviderResult(result.provider.id);
 		var divProvider = nav.getDivProvider(result.provider.id, result.provider.name);
 
-		nav.manageDivProviderNavigation(divProvider.children('.provider_navigation'), result.meta);
+		nav.manageDivProviderNavigation(divProvider.children('.provider_navigation'), request, result.meta);
 		nav.manageDivProviderResult(divProvider.children('.provider_result'), result.documents,
 			current.documents);
 
