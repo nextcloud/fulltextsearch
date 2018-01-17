@@ -78,7 +78,15 @@ interface IFullTextSearchPlatform {
 	 *
 	 * @param IFullTextSearchProvider|null $provider
 	 */
-	public function removeIndex($provider);
+	public function resetIndex($provider);
+
+
+	/**
+	 * Reset indexes
+	 *
+	 * @param Index[] $indexes
+	 */
+	public function deleteIndexes($indexes);
 
 
 	/**
