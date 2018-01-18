@@ -394,7 +394,7 @@ class IndexService {
 		$platform = $this->platformService->getPlatform();
 
 		if ($providerId === '') {
-			$platform->removeIndex(null);
+			$platform->resetIndex(null);
 			$this->providerService->setProvidersAsNotIndexed();
 			$this->indexesRequest->reset();
 
@@ -404,7 +404,7 @@ class IndexService {
 		}
 
 		foreach ($providers AS $provider) {
-			$platform->removeIndex($provider);
+			$platform->resetIndex($provider);
 			$this->providerService->setProviderAsIndexed($provider, false);
 			$this->indexesRequest->deleteFromProviderId($provider->getId());
 		}
