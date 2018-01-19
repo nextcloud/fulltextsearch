@@ -124,6 +124,7 @@ class SearchService {
 		$result = $this->searchFromProviders($platform, $providers, $access, $request);
 
 		foreach ($result as $searchResult) {
+			$searchResult->setPlatform($platform);
 			$searchResult->setRequest($request);
 		}
 

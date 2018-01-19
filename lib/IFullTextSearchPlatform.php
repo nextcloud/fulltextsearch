@@ -44,16 +44,23 @@ interface IFullTextSearchPlatform {
 	public function getId();
 
 
+	/**
+	 * @return string
+	 */
 	public function getName();
 
 
-	public function getClient();
+	/**
+	 * @return string
+	 */
+	public function getVersion();
 
 
 	/**
 	 * @param Runner $runner
 	 */
 	public function setRunner(Runner $runner);
+
 
 	/**
 	 * Load the search platform

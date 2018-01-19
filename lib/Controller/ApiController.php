@@ -29,6 +29,7 @@ namespace OCA\FullTextSearch\Controller;
 use Exception;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Model\SearchRequest;
+use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCP\AppFramework\Controller;
@@ -41,6 +42,9 @@ class ApiController extends Controller {
 	/** @var SearchService */
 	private $searchService;
 
+	/** @var ConfigService */
+	private $configService;
+
 	/** @var MiscService */
 	private $miscService;
 
@@ -49,14 +53,17 @@ class ApiController extends Controller {
 	 * NavigationController constructor.
 	 *
 	 * @param IRequest $request
+	 * @param ConfigService $configService
 	 * @param SearchService $searchService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IRequest $request, SearchService $searchService, MiscService $miscService
+		IRequest $request, ConfigService $configService, SearchService $searchService,
+		MiscService $miscService
 	) {
 		parent::__construct(Application::APP_NAME, $request);
 		$this->searchService = $searchService;
+		$this->configService = $configService;
 		$this->miscService = $miscService;
 	}
 
@@ -98,11 +105,19 @@ class ApiController extends Controller {
 			$result = $this->searchService->search(null, $request);
 
 			return $this->success(
-				['request' => $request, 'result' => $result]
+				[
+					'request' => $request,
+					'result'  => $result,
+					'version' => $this->configService->getAppValue('installed_version')
+				]
 			);
 		} catch (Exception $e) {
 			return $this->fail(
-				['request' => $request, 'error' => $e->getMessage()]
+				[
+					'request' => $request,
+					'error'   => $e->getMessage(),
+					'version' => $this->configService->getAppValue('installed_version')
+				]
 			);
 		}
 	}

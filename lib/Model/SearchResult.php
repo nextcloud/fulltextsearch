@@ -26,6 +26,7 @@
 
 namespace OCA\FullTextSearch\Model;
 
+use OCA\FullTextSearch\IFullTextSearchPlatform;
 use OCA\FullTextSearch\IFullTextSearchProvider;
 
 class SearchResult implements \JsonSerializable {
@@ -38,6 +39,9 @@ class SearchResult implements \JsonSerializable {
 
 	/** @var IFullTextSearchProvider */
 	private $provider;
+
+	/** @var IFullTextSearchPlatform */
+	private $platform;
 
 	/** @var int */
 	private $total;
@@ -127,6 +131,21 @@ class SearchResult implements \JsonSerializable {
 
 
 	/**
+	 * @return IFullTextSearchPlatform
+	 */
+	public function getPlatform() {
+		return $this->platform;
+	}
+
+	/**
+	 * @param IFullTextSearchPlatform $platform
+	 */
+	public function setPlatform($platform) {
+		$this->platform = $platform;
+	}
+
+
+	/**
 	 * @return int
 	 */
 	public function getTotal() {
@@ -207,11 +226,18 @@ class SearchResult implements \JsonSerializable {
 	public function jsonSerialize() {
 
 		$provider = $this->getProvider();
+		$platform = $this->getPlatform();
 
 		return [
 			'provider'  => [
-				'id'   => $provider->getId(),
-				'name' => $provider->getName()
+				'id'      => $provider->getId(),
+				'name'    => $provider->getName(),
+				'version' => $provider->getVersion()
+			],
+			'platform'  => [
+				'id'      => $platform->getId(),
+				'name'    => $platform->getName(),
+				'version' => $platform->getVersion()
 			],
 			'documents' => $this->getDocuments(),
 			'meta'      =>

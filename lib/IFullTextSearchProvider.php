@@ -62,6 +62,14 @@ interface IFullTextSearchProvider {
 
 
 	/**
+	 * return a display version of the Provider
+	 *
+	 * @return string
+	 */
+	public function getVersion();
+
+
+	/**
 	 * @return string
 	 */
 	public function getOptionsTemplate();
