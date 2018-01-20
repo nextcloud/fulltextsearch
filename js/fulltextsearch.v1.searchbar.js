@@ -114,9 +114,7 @@ var searchbar = {
 		searchbox.search_div.append(searchbox.search_more);
 
 		searchbox.search_input.on('focus', function () {
-			settings.lockSearchbox = true;
-			searchbox.search_icon_more.stop().fadeTo(200, 1);
-			searchbox.search_icon_close.stop().fadeTo(200, 1);
+			searchbar.searching();
 		});
 
 		searchbox.search_input.on('input', function () {
@@ -138,6 +136,28 @@ var searchbar = {
 		});
 
 		fullTextSearch.options(settings.searchProviderId);
+
+		$(window).bind('keydown', function (event) {
+			if (event.ctrlKey || event.metaKey) {
+				if (String.fromCharCode(event.which).toLowerCase() === 'f') {
+					event.preventDefault();
+					searchbar.searching();
+				}
+			}
+		});
+	},
+
+
+	searching: function () {
+		if (settings.lockSearchbox === true) {
+			return;
+		}
+		settings.lockSearchbox = true;
+		searchbox.search_icon.stop().fadeTo(100, 0);
+		searchbox.search_form.stop().fadeTo(100, 0.8);
+		searchbox.search_input.focus();
+		searchbox.search_icon_more.stop().fadeTo(200, 1);
+		searchbox.search_icon_close.stop().fadeTo(200, 1);
 	},
 
 
