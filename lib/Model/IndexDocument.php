@@ -50,6 +50,9 @@ class IndexDocument implements \JsonSerializable {
 	private $tags = [];
 
 	/** @var string */
+	private $source;
+
+	/** @var string */
 	private $title;
 
 	/** @var string */
@@ -204,6 +207,24 @@ class IndexDocument implements \JsonSerializable {
 	 */
 	public function addTag($tag) {
 		$this->tags[] = $tag;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSource() {
+		return $this->source;
+	}
+
+	/**
+	 * @param string $source
+	 *
+	 * @return $this
+	 */
+	public function setSource($source) {
+		$this->source = $source;
 
 		return $this;
 	}
