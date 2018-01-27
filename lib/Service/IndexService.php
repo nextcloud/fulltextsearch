@@ -244,6 +244,7 @@ class IndexService {
 		$documents = $provider->fillIndexDocuments($chunk);
 		$toIndex = $this->filterDocumentsToIndex($documents);
 		$indexes = $platform->indexDocuments($provider, $toIndex);
+
 		$this->updateIndexes($indexes);
 	}
 
@@ -257,9 +258,11 @@ class IndexService {
 		$toIndex = [];
 		foreach ($documents as $document) {
 			// TODO - rework the index/not_index
-//			echo '==st==' . $document->getIndex()->getStatus() . "\n";
-			if (!$document->getIndex()
-						  ->isStatus(Index::INDEX_IGNORE)) {
+			$index = $document->getIndex();
+			$access = $document->getAccess();
+
+			$index->setOwnerId($access->getOwnerId());
+			if (!$index->isStatus(Index::INDEX_IGNORE)) {
 				$toIndex[] = $document;
 			}
 		}
