@@ -111,10 +111,10 @@ class Index extends ExtendedBase {
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);
 			$this->runner->start();
-			$this->runner->output('indexing.');
 
 			$providers = $this->providerService->getProviders();
 			foreach ($providers as $provider) {
+				$this->runner->output('indexing ' . $provider->getName() . '.');
 				$provider->setRunner($this->runner);
 				$this->indexProvider($provider);
 			}

@@ -353,8 +353,10 @@ class IndexDocument implements \JsonSerializable {
 	public function cleanExcerpt($excerpt) {
 		$excerpt = str_replace("\\n", ' ', $excerpt);
 		$excerpt = str_replace("\\r", ' ', $excerpt);
+		$excerpt = str_replace("\\t", ' ', $excerpt);
 		$excerpt = str_replace("\n", ' ', $excerpt);
 		$excerpt = str_replace("\r", ' ', $excerpt);
+		$excerpt = str_replace("\t", ' ', $excerpt);
 
 		return $excerpt;
 	}
@@ -431,6 +433,7 @@ class IndexDocument implements \JsonSerializable {
 		unset($this->title);
 		unset($this->content);
 		unset($this->link);
+		unset($this->tags);
 		unset($this->more);
 		unset($this->excerpts);
 		unset($this->score);
@@ -448,6 +451,7 @@ class IndexDocument implements \JsonSerializable {
 			'access'       => $this->getAccess(),
 			'modifiedTime' => $this->getModifiedTime(),
 			'title'        => $this->getTitle(),
+			'tags'         => $this->getTags(),
 			'link'         => $this->getLink(),
 			'more'         => $this->getMore(),
 			'excerpts'     => $this->getExcerpts(),
