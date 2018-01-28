@@ -89,9 +89,12 @@ class TemplatesController extends Controller {
 		$provider = $this->providerService->getProvider($providerId);
 
 		$ret = [];
-		$tmpl =
-			new TemplateResponse($provider->getAppId(), $provider->getOptionsTemplate(), [], 'blank');
-		$ret[$providerId] = $tmpl->render();
+		$tmplFile = $provider->getOptionsTemplate();
+		if ($tmplFile !== '') {
+			$tmpl =
+				new TemplateResponse($provider->getAppId(), $tmplFile, [], 'blank');
+			$ret[$providerId] = $tmpl->render();
+		}
 
 		return new DataResponse($ret, Http::STATUS_OK);
 	}
