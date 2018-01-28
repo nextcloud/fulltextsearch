@@ -283,13 +283,17 @@ class IndexService {
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, Index $index
 	) {
 		$document = null;
-		try {
-			$document = $provider->updateDocument($index);
-		} catch (NoUserException $e) {
-			$platform->deleteIndexes([$index]);
+
+		if (!$index->isStatus(Index::INDEX_REMOVE)) {
+			try {
+				$document = $provider->updateDocument($index);
+			} catch (Exception $e) {
+				/** we do nothing, because we're not sure provider manage the right MissingDocumentException */
+			}
 		}
 
 		if ($document === null) {
+			$platform->deleteIndexes([$index]);
 			$this->indexesRequest->deleteIndex($index);
 
 			return;
@@ -326,12 +330,12 @@ class IndexService {
 
 		if ($index->isStatus(Index::INDEX_REMOVE)) {
 
-			if ($index->isStatus(Index::INDEX_OK)) {
+			if ($index->isStatus(Index::INDEX_DONE)) {
 				$this->indexesRequest->deleteIndex($index);
 
 				return;
 			}
-			$index->setStatus(Index::INDEX_FAILED);
+
 			$this->indexesRequest->update($index);
 
 			return;
