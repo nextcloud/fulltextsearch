@@ -123,9 +123,9 @@ var searchbar = {
 				nav.onSearchReset();
 			}
 
-			if (settings.parentHasMethod('onEntryGenerated')) {
-				settings.parent.onEntryGenerated();
-			}
+			// if (settings.parentHasMethod('onEntryGenerated')) {
+			// 	settings.parent.onEntryGenerated();
+			// }
 
 			if (searchbox.searchTimeout === null && searchbar.initSearch(false)) {
 				searchbox.searchTimeout = _.delay(function () {
@@ -156,12 +156,20 @@ var searchbar = {
 		searchbox.search_icon.stop().fadeTo(100, 0);
 		searchbox.search_form.stop().fadeTo(100, 0.8);
 		searchbox.search_input.focus();
-		searchbox.search_icon_more.stop().fadeTo(200, 1);
 		searchbox.search_icon_close.stop().fadeTo(200, 1);
+		if (settings.noMoreOptions) {
+			searchbox.search_icon_more.stop().fadeTo(200, 1);
+		}
 	},
 
 
 	onOptionsLoaded: function (result) {
+		if (!result[settings.searchProviderId]) {
+			searchbox.search_icon_more.off('click').hide();
+			searchbox.search_input.css('width', '245px');
+			return;
+		}
+		settings.noMoreOptions = true;
 		searchbox.search_more.html(result[settings.searchProviderId]);
 		searchbox.search_more.find('INPUT').each(function () {
 			$(this).on('change', function () {

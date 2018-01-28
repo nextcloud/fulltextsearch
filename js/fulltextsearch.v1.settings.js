@@ -35,6 +35,7 @@ var settings = {
 	entryTemplate: null,
 	searchProviderId: '',
 	lockSearchbox: false,
+	noMoreOptions: false,
 	entryTemplateDefault: null,
 	divNoResult: null,
 

@@ -298,6 +298,7 @@ var nav = {
 			var divResult = $('<div>', {class: 'result_entry'});
 			divResult.hide();
 			divResult.attr('data-id', entry.id);
+			divResult.attr('data-link', entry.link);
 			divResult.attr('data-result', JSON.stringify(entry));
 			divResult.append(divResultContent);
 
