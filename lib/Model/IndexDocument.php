@@ -433,6 +433,7 @@ class IndexDocument implements \JsonSerializable {
 		unset($this->title);
 		unset($this->content);
 		unset($this->link);
+		unset($this->source);
 		unset($this->tags);
 		unset($this->more);
 		unset($this->excerpts);
@@ -451,8 +452,9 @@ class IndexDocument implements \JsonSerializable {
 			'access'       => $this->getAccess(),
 			'modifiedTime' => $this->getModifiedTime(),
 			'title'        => $this->getTitle(),
-			'tags'         => $this->getTags(),
 			'link'         => $this->getLink(),
+			'source'       => $this->getSource(),
+			'tags'         => $this->getTags(),
 			'more'         => $this->getMore(),
 			'excerpts'     => $this->getExcerpts(),
 			'score'        => $this->getScore()
