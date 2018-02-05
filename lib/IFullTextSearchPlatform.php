@@ -57,6 +57,12 @@ interface IFullTextSearchPlatform {
 
 
 	/**
+	 * @return array
+	 */
+	public function getConfiguration();
+
+
+	/**
 	 * @param Runner $runner
 	 */
 	public function setRunner(Runner $runner);

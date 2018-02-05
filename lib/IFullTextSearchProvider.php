@@ -70,6 +70,12 @@ interface IFullTextSearchProvider {
 
 
 	/**
+	 * @return array
+	 */
+	public function getConfiguration();
+
+
+	/**
 	 * @return string
 	 */
 	public function getOptionsTemplate();
@@ -153,7 +159,9 @@ interface IFullTextSearchProvider {
 	 *
 	 * @return array
 	 */
-	public function onSearchingQuery(IFullTextSearchPlatform $platform, SearchRequest $request, &$arr);
+	public function onSearchingQuery(
+		IFullTextSearchPlatform $platform, SearchRequest $request, &$arr
+	);
 
 
 	/**
