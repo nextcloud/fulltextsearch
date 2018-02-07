@@ -76,7 +76,7 @@ interface IFullTextSearchProvider {
 
 
 	/**
-	 * @return string
+	 * @return array|string
 	 */
 	public function getOptionsTemplate();
 
