@@ -52,6 +52,8 @@ var fts_admin_settings = {
 
 	updateSettingPage: function (result) {
 
+		fts_admin_elements.fts_navigation.prop('checked', (result.app_navigation === '1'));
+
 		fts_admin_settings.updateSettingPagePlatforms(result);
 		fts_admin_settings.updateSettingPageChunkSize(result);
 
@@ -138,6 +140,7 @@ var fts_admin_settings = {
 	saveSettings: function () {
 
 		var data = {
+			app_navigation: (fts_admin_elements.fts_navigation.is(':checked')) ? 1 : 0,
 			search_platform: fts_admin_elements.fts_platforms.val(),
 			index_chunk: fts_admin_elements.fts_chunkSize.val()
 		};

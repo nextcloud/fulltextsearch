@@ -30,15 +30,18 @@
 
 var fts_admin_elements = {
 	fts_div: null,
+	fts_navigation: null,
 	fts_platforms: null,
 	fts_chunkSize: null,
 	fts_providers: null,
 
 	init: function () {
 		fts_admin_elements.fts_div = $('#fns');
+		fts_admin_elements.fts_navigation = $('#fts_navigation');
 		fts_admin_elements.fts_platforms = $('#fts_platforms');
 		fts_admin_elements.fts_chunkSize = $('#fts_chunk_size');
 
+		fts_admin_elements.fts_navigation.on('change', fts_admin_settings.saveSettings);
 		fts_admin_elements.fts_platforms.on('change', function () {
 			fts_admin_settings.tagSettingsAsNotSaved($(this));
 			fts_admin_settings.saveSettings();

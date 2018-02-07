@@ -30,6 +30,7 @@ use Exception;
 use OC\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
+use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\ProviderService;
@@ -38,6 +39,7 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\IRequest;
+use OCP\Util;
 
 class TemplatesController extends Controller {
 
@@ -89,14 +91,65 @@ class TemplatesController extends Controller {
 		$provider = $this->providerService->getProvider($providerId);
 
 		$ret = [];
-		$tmplFile = $provider->getOptionsTemplate();
-		if ($tmplFile !== '') {
-			$tmpl =
-				new TemplateResponse($provider->getAppId(), $tmplFile, [], 'blank');
+		$options = $provider->getOptionsTemplate();
+		if (is_array($options) && array_key_exists('panel', $options)) {
+			$tmpl = $this->getTemplate($provider, $options['panel']);
 			$ret[$providerId] = $tmpl->render();
 		}
 
 		return new DataResponse($ret, Http::STATUS_OK);
+	}
+
+
+	/**
+	 * @NoAdminRequired
+	 * @NoSubAdminRequired
+	 *
+	 * @return DataResponse
+	 * @throws Exception
+	 */
+	public function getNavigationPanels() {
+		$providers = $this->providerService->getProviders();
+
+		$ret = [];
+		foreach ($providers as $provider) {
+			$providerId = $provider->getId();
+
+			$options = $provider->getOptionsTemplate();
+			$nav = [];
+			if (is_array($options) && array_key_exists('navigation', $options)) {
+				$nav = $options['navigation'];
+			}
+
+			if (array_key_exists('css', $nav)) {
+				Util::addStyle($provider->getAppId(), $nav['css']);
+			}
+
+			$ret[$providerId] =
+				[
+					'title'      => $provider->getName(),
+					'navigation' => $nav
+				];
+		}
+
+		return new DataResponse($ret, Http::STATUS_OK);
+	}
+
+
+	/**
+	 * @param IFullTextSearchProvider $provider
+	 * @param array $panel
+	 *
+	 * @return TemplateResponse
+	 * @throws Exception
+	 */
+	private function getTemplate(IFullTextSearchProvider $provider, $panel) {
+
+		if (!is_array($panel) || !array_key_exists('template', $panel)) {
+			throw new Exception('malformed option panel');
+		}
+
+		return new TemplateResponse($provider->getAppId(), $panel['template'], [], 'blank');
 	}
 
 

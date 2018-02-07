@@ -50,6 +50,17 @@ Util::addStyle(Application::APP_NAME, 'admin');
 
 		<div class="div-table-row">
 			<div class="div-table-col div-table-col-left">
+				<span class="leftcol">Enable App Navigation:</span>
+				<br/>
+				<em>Add a global search within all your content provider.</em>
+			</div>
+			<div class="div-table-col">
+				<input type="checkbox" id="fts_navigation" value="1"/>
+			</div>
+		</div>
+
+		<div class="div-table-row">
+			<div class="div-table-col div-table-col-left">
 				<span class="leftcol">Search Platform :</span>
 				<br/>
 				<em>Select the app to index content and answer search queries.</em>

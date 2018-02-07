@@ -32,6 +32,7 @@ return [
 		['name' => 'Api#search', 'url' => '/v1/search', 'verb' => 'GET'],
 		['name' => 'Api#searchFromRemote', 'url' => '/v1/remote', 'verb' => 'GET'],
 		['name' => 'Templates#getOptionsPanel', 'url' => '/options/{providerId}/', 'verb' => 'GET'],
+		['name' => 'Templates#getNavigationPanels', 'url' => '/navigation/panels', 'verb' => 'GET']
 	]
 ];
 

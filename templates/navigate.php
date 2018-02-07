@@ -34,12 +34,27 @@ Util::addStyle(Application::APP_NAME, 'navigate');
 
 ?>
 
-<div id="search_header">
-	<input id="search_input" placeholder="<?php p($l->t('Search on %s', [$_['themingName']])); ?>">
+<div id="app-navigation">
+	<ul id="search_navigation">
+		<li>
+			<div id="app-navigation" style="position: relative;">
+				<div id="search_header">
+					<div>
+						<input id="search_input"
+							   placeholder="<?php p(
+								   $l->t('Search on %s', [$_['themingName']])
+							   ); ?>">
+					</div>
+				</div>
+			</div>
+		</li>
+	</ul>
 </div>
 
-
-<div id="search_result"></div>
+<div id="app-content">
+	<div>asdsdasad</div>
+	<div id="search_result"></div>
+</div>
 
 <!-- <div id="search_json"></div> -->
 

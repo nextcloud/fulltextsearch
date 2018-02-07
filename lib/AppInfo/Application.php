@@ -29,11 +29,15 @@ namespace OCA\FullTextSearch\AppInfo;
 use OCA\FullTextSearch\Capabilities;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCP\AppFramework\App;
+use OCP\AppFramework\IAppContainer;
 use OCP\AppFramework\QueryException;
 
 class Application extends App {
 
 	const APP_NAME = 'fulltextsearch';
+
+	/** @var IAppContainer */
+	private $container;
 
 	/**
 	 * @param array $params
@@ -41,8 +45,8 @@ class Application extends App {
 	public function __construct(array $params = array()) {
 		parent::__construct(self::APP_NAME, $params);
 
-		$container = $this->getContainer();
-		$container->registerCapability(Capabilities::class);
+		$this->container = $this->getContainer();
+		$this->container->registerCapability(Capabilities::class);
 
 		$this->registerHooks();
 	}
@@ -63,19 +67,18 @@ class Application extends App {
 	public function registerNavigation() {
 
 		/** @var ConfigService $configService */
-		$configService = \OC::$server->query(ConfigService::class);
+		$configService = $this->container->query(ConfigService::class);
 		if ($configService->getAppValue(ConfigService::APP_NAVIGATION) !== '1') {
 			return;
 		}
 
-		$this->getContainer()
-			 ->getServer()
-			 ->getNavigationManager()
-			 ->add($this->fullTextSearchNavigation());
+		$this->container->getServer()
+						->getNavigationManager()
+						->add($this->fullTextSearchNavigation());
 	}
 
 
-	public function fullTextSearchNavigation() {
+	private function fullTextSearchNavigation() {
 		$urlGen = \OC::$server->getURLGenerator();
 		$navName = \OC::$server->getL10N(self::APP_NAME)
 							   ->t('Full text search');

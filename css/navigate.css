@@ -1,18 +1,36 @@
 #search_header {
-	height: 200px;
 	width: 100%;
-	text-align: center;
-	background-color: #f6f6f6;
-	border-bottom: solid #d7d7d7 1px;
+	position: absolute;
+}
+
+#search_header div {
+	left: 0;
+	right: 0;
+	top: 0;
+	margin: 5px;
 }
 
 #search_input {
-	width: 400px;
-	position: relative;
-	top: 50%;
-	transform: perspective(1px) translateY(-50%);
+	width: 100%;
 }
 
+.search_checkbox {
+	margin-right: 10px !important;
+	opacity: 0.8;
+}
+
+.search_checkbox_sub {
+	margin-right: 10px !important;
+	opacity: 0.65;
+}
+
+.search_icon {
+	background-image: url('/apps/fulltextsearch/img/fulltextsearch_black.svg');
+}
+
+/**
+
+*/
 #search_result {
 	margin: 50px 80px 0 50px;
 }

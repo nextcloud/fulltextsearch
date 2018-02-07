@@ -34,8 +34,7 @@ var elements = {
 	searchTimeout: null,
 	search_input: null,
 	search_submit: null,
-	search_json: null,
-	divHeader: null
+	search_json: null
 };
 
 const Navigate = function () {
@@ -52,7 +51,8 @@ Navigate.prototype = {
 
 		elements.search_input = $('#search_input');
 		elements.search_submit = $('#search_submit');
-		elements.search_json = $('#search_json');
+		elements.search_panels = $('#search_navigation');
+//		elements.search_json = $('#search_json');
 		elements.divHeader = $('#search_header');
 
 		elements.search_input.on('input', function () {
@@ -65,11 +65,81 @@ Navigate.prototype = {
 			}
 		});
 
-		$(document).keypress(function (e) {
-			if (e.which === 13) {
-				self.initSearch(true);
-			}
+		//
+		// $(document).keypress(function (e) {
+		// 	if (e.which === 13) {
+		// 		self.initSearch(true);
+		// 	}
+		// });
+
+		self.initPanels();
+	},
+
+
+	initPanels: function () {
+		var res = {status: -1};
+		var self = this;
+
+		$.ajax({
+			method: 'GET',
+			url: OC.generateUrl('/apps/fulltextsearch//navigation/panels')
+		}).done(function (res) {
+			self.displayPanels(res);
 		});
+	},
+
+
+	displayPanels: function (data) {
+
+		var ak = Object.keys(data);
+		for (var i = 0; i < ak.length; i++) {
+			var title = data[ak[i]]['title'];
+			var nav = data[ak[i]]['navigation'];
+
+			var li = $('<li>', {class: (nav.options !== undefined) ? 'collapsible open' : ''});
+			var aIcon = $('<a>', {
+				href: '#',
+				class: 'search_icon'
+			});
+			aIcon.text(title);
+
+			var ul = $('<ul>');
+
+
+			if (nav.options !== undefined) {
+				// var button = $('<button>', {class: 'collapse'});
+				// li.append(button);
+
+				for (var j = 0; j < nav.options.length; j++) {
+					var sub = nav.options[j];
+
+					console.log('sub: ' + JSON.stringify(sub));
+					var subA = $('<a>', {
+						href: '#',
+						text: sub.title
+					});
+
+					if (sub.type === 'checkbox') {
+						ul.append($('<li>').append(subA).append($('<input>', {
+							class: 'search_checkbox_sub',
+							type: 'checkbox'
+						})));
+					}
+				}
+			}
+
+			li.append(aIcon);
+			li.append($('<input>', {
+				class: 'search_checkbox',
+				type: 'checkbox'
+			}));
+			li.append(ul);
+
+			elements.search_panels.append(li);
+
+
+		}
+
 	},
 
 
