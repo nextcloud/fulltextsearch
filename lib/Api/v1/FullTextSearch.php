@@ -76,7 +76,7 @@ class FullTextSearch {
 		Util::addStyle(Application::APP_NAME, 'fulltextsearch');
 		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.api');
 		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.settings');
-		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.searchbar');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.searchbox');
 		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.result');
 		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.navigation');
 		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1');

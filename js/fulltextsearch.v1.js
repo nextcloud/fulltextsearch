@@ -39,7 +39,7 @@
 	var FullTextSearch = function () {
 		$.extend(FullTextSearch.prototype, settings);
 		$.extend(FullTextSearch.prototype, result);
-		$.extend(FullTextSearch.prototype, searchbar);
+		$.extend(FullTextSearch.prototype, searchbox);
 		$.extend(FullTextSearch.prototype, nav);
 		$.extend(FullTextSearch.prototype, api);
 

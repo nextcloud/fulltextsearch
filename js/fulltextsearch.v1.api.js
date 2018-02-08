@@ -54,14 +54,14 @@ var api = {
 	},
 
 
-	options: function (providerId, callback) {
+	retreiveOptions: function (providerId, callback) {
 		var res = {status: -1};
 
 		$.ajax({
 			method: 'GET',
 			url: OC.generateUrl('/apps/fulltextsearch/options/' + providerId)
 		}).done(function (res) {
-			searchbar.onOptionsLoaded(res);
+			searchbox.onOptionsLoaded(res);
 			api.onCallback(callback, res);
 		}).fail(function () {
 			nav.failedToAjax();

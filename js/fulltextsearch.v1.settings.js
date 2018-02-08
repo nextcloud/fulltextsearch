@@ -28,18 +28,21 @@
 
 var settings = {
 
-	parent: null,
 	delay_provider: 300,
 	delay_result: 150,
 	resultContainer: null,
 	entryTemplate: null,
-	searchProviderId: '',
-	lockSearchbox: false,
-	noMoreOptions: false,
 	entryTemplateDefault: null,
 	divNoResult: null,
 
+	// 0.6.0
+	parent: null,
+	searchProviderId: '',
 
+
+	/**
+	 * generate the default template to dsplay search result entries
+	 */
 	generateDefaultTemplate: function () {
 
 		var divLeft = $('<div>', {class: 'result_entry_left'});
@@ -58,6 +61,9 @@ var settings = {
 	},
 
 
+	/**
+	 * generate a no result display
+	 */
 	generateNoResultDiv: function () {
 		var div = $('<div>', {id: 'noresult'});
 		div.html('no result');
@@ -66,21 +72,45 @@ var settings = {
 	},
 
 
-	setEntryTemplateId: function (template, parent) {
+	/**
+	 * used to set the template to display search result entries
+	 *
+	 * @param template
+	 */
+	setEntryTemplate: function (template) {
 		settings.entryTemplate = template;
-		settings.parent = parent;
 	},
 
-	setResultContainerId: function (container) {
+	/**
+	 * used to set the container for the search result entries
+	 *
+	 * @param container
+	 */
+	setResultContainer: function (container) {
 		settings.resultContainer = container;
 		settings.resultContainer.prepend(settings.divNoResult);
 	},
 
-	addSearchBar: function (providerId) {
+
+	/**
+	 *  initialize the full text search and assign a providerId
+	 *
+	 * @param providerId
+	 * @param parent
+	 */
+	initFullTextSearch: function (providerId, parent) {
 		settings.searchProviderId = providerId;
-		searchbar.init();
+		settings.parent = parent;
+		searchbox.init();
 	},
 
+
+	/**
+	 * check that the app that call the lib contains a specific method
+	 *
+	 * @param method
+	 * @returns {boolean}
+	 */
 	parentHasMethod: function (method) {
 		if (settings.parent === null) {
 			return false;

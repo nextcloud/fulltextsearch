@@ -46,8 +46,8 @@ Navigate.prototype = {
 	init: function () {
 		var self = this;
 
-		fullTextSearch.setEntryTemplateId($('#template_entry'), self);
-		fullTextSearch.setResultContainerId($('#search_result'));
+		fullTextSearch.setEntryTemplate($('#template_entry'), self);
+		fullTextSearch.setResultContainer($('#search_result'));
 
 		elements.search_input = $('#search_input');
 		elements.search_submit = $('#search_submit');
@@ -82,7 +82,7 @@ Navigate.prototype = {
 
 		$.ajax({
 			method: 'GET',
-			url: OC.generateUrl('/apps/fulltextsearch//navigation/panels')
+			url: OC.generateUrl('/apps/fulltextsearch/navigation/panels')
 		}).done(function (res) {
 			self.displayPanels(res);
 		});
@@ -136,8 +136,6 @@ Navigate.prototype = {
 			li.append(ul);
 
 			elements.search_panels.append(li);
-
-
 		}
 
 	},

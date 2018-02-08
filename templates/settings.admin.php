@@ -48,16 +48,16 @@ Util::addStyle(Application::APP_NAME, 'admin');
 	<h2><?php p($l->t('Full text search')) ?></h2>
 	<div class="div-table">
 
-		<div class="div-table-row">
-			<div class="div-table-col div-table-col-left">
-				<span class="leftcol">Enable App Navigation:</span>
-				<br/>
-				<em>Add a global search within all your content provider.</em>
-			</div>
-			<div class="div-table-col">
-				<input type="checkbox" id="fts_navigation" value="1"/>
-			</div>
-		</div>
+<!--		<div class="div-table-row">-->
+<!--			<div class="div-table-col div-table-col-left">-->
+<!--				<span class="leftcol">Enable App Navigation:</span>-->
+<!--				<br/>-->
+<!--				<em>Add a global search within all your content provider.</em>-->
+<!--			</div>-->
+<!--			<div class="div-table-col">-->
+<!--				<input type="checkbox" id="fts_navigation" value="1"/>-->
+<!--			</div>-->
+<!--		</div>-->
 
 		<div class="div-table-row">
 			<div class="div-table-col div-table-col-left">
