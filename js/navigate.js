@@ -27,8 +27,7 @@
 /** global: OCA */
 /** global: _ */
 
-const \
-fullTextSearch = OCA.FullTextSearch.api;
+const fullTextSearch = OCA.FullTextSearch.api;
 
 
 var elements = {
@@ -78,7 +77,6 @@ Navigate.prototype = {
 
 
 	initPanels: function () {
-		var res = {status: -1};
 		var self = this;
 
 		$.ajax({
