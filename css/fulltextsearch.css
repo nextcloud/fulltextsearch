@@ -14,8 +14,9 @@ div.icon-fulltextsearch {
 }
 
 #fts-popup {
-	width: 400px;
+	width: 340px;
 	right: 100px;
+	max-width: 90%;
 }
 
 #fts-popup::after {
@@ -36,6 +37,7 @@ div.icon-fulltextsearch {
 #fts-input {
 	width: 100%;
 }
+
 
 /**
 
@@ -184,6 +186,10 @@ div.icon-fulltextsearch {
 }
 
 .div-table-col-left {
-	width: 220px;
+	width: 170px;
 	margin-top: 8px;
+	color: #707070;
+	margin-right: 15px;
+	text-align: right;
+
 }
