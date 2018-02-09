@@ -34,19 +34,8 @@
 
 
 var box_elements = {
-	searchTimeout: null,
-
-	searchBoxInitialized: false,
-	search_form: null,
-	moreDisplayed: false,
-	iconSearchOptions: 'options.svg',
-	iconSearch: 'fulltextsearch.svg',
-	currentBackgroundImage: '',
-
-	// v0.6.0
 	searchInput: null,
 	searchMore: null,
-	delayAnimation: 500,
 	divFullTextSearchIcon: null,
 	divFullTextSearchPopup: null
 };
@@ -77,7 +66,7 @@ var searchbox = {
 		OC.registerMenu(box_elements.divFullTextSearchIcon, box_elements.divFullTextSearchPopup,
 			searchbox.displayedSearchPopup);
 
-		fullTextSearch.retrieveOptions(settings.searchProviderId);
+		api.retrieveOptions(settings.searchProviderId);
 
 		$(window).bind('keydown', function (event) {
 			if (event.ctrlKey || event.metaKey) {
@@ -160,14 +149,17 @@ var searchbox = {
 			force = false;
 		}
 
-		if (!force && search.length < 3) {
+		if (search.length < 3) {
 			return;
 		}
 
-		if (search === '' || (!force && curr.lastRequest === search)) {
+		if (!force && curr.lastRequest === search) {
 			return;
 		}
 		curr.lastRequest = search;
+		if (!searchbox.timingRequest(force)) {
+			return;
+		}
 
 		api.search({
 			providers: settings.searchProviderId,
@@ -176,19 +168,25 @@ var searchbox = {
 			options: searchbox.getSearchOptions(),
 			size: 20
 		});
+	},
 
-//		return;
-		// if (settings.lockSearchbox === true) {
-		// 	return;
-		// }
-		// settings.lockSearchbox = true;
-		// searchbox.search_icon.stop().fadeTo(100, 0);
-		// searchbox.search_form.stop().fadeTo(100, 0.8);
-		// searchbox.search_input.focus();
-		// searchbox.search_icon_close.stop().fadeTo(200, 1);
-		// if (settings.noMoreOptions) {
-		// 	searchbox.search_icon_more.stop().fadeTo(200, 1);
-		// }
+
+	timingRequest: function (force) {
+		if (curr.lastRequestTimer === null) {
+			curr.lastRequestTimer = window.setTimeout(function () {
+				curr.lastRequestTimer = null;
+				if (curr.lastRequestTimerQueued) {
+					curr.lastRequestTimerQueued = false;
+					searchbox.searching(curr.lastRequestTimerForcing);
+				}
+			}, settings.searchTimer);
+		} else {
+			curr.lastRequestTimerQueued = true;
+			curr.lastRequestTimerForcing = force;
+			return false;
+		}
+
+		return true;
 	},
 
 
@@ -199,7 +197,7 @@ var searchbox = {
 
 		box_elements.searchMore.html(result[settings.searchProviderId]);
 		box_elements.searchMore.find('INPUT').each(function () {
-			$(this).on('change', function () {
+			$(this).on('change keyup', function () {
 				searchbox.searching(true);
 			});
 		})

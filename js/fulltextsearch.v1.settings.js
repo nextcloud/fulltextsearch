@@ -32,6 +32,7 @@ var settings = {
 	delay_result: 150,
 
 	// 0.6.0
+	searchTimer: 1000,
 	parent: null,
 	searchProviderId: '',
 	searchProviderName: '',

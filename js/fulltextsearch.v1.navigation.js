@@ -35,6 +35,9 @@ var curr = {
 	providerResult: [],
 	page: 1,
 	lastRequest: '',
+	lastRequestTimer: null,
+	lastRequestTimerQueued: false,
+	lastRequestTimerForcing: false,
 
 	setProviderResult: function (id, value) {
 		curr.providerResult[id] = value;
