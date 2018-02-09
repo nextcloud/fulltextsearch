@@ -54,7 +54,7 @@ var api = {
 	},
 
 
-	retreiveOptions: function (providerId, callback) {
+	retrieveOptions: function (providerId, callback) {
 		var res = {status: -1};
 
 		$.ajax({

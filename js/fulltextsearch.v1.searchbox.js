@@ -77,7 +77,7 @@ var searchbox = {
 		OC.registerMenu(box_elements.divFullTextSearchIcon, box_elements.divFullTextSearchPopup,
 			searchbox.displayedSearchPopup);
 
-		fullTextSearch.retreiveOptions(settings.searchProviderId);
+		fullTextSearch.retrieveOptions(settings.searchProviderId);
 
 		$(window).bind('keydown', function (event) {
 			if (event.ctrlKey || event.metaKey) {
