@@ -30,15 +30,15 @@ var settings = {
 
 	delay_provider: 300,
 	delay_result: 150,
-	resultContainer: null,
-	entryTemplate: null,
-	entryTemplateDefault: null,
-	divNoResult: null,
 
 	// 0.6.0
 	parent: null,
 	searchProviderId: '',
-
+	searchProviderName: '',
+	resultContainer: null,
+	entryTemplate: null,
+	entryTemplateDefault: null,
+	divNoResult: null,
 
 	/**
 	 * generate the default template to dsplay search result entries
@@ -57,7 +57,7 @@ var settings = {
 		div.append(divLeft);
 		div.append(divRight);
 
-		settings.entryTemplateDefault = $('<div>').append(div);
+		return $('<div>').append(div);
 	},
 
 
@@ -96,10 +96,12 @@ var settings = {
 	 *  initialize the full text search and assign a providerId
 	 *
 	 * @param providerId
+	 * @param providerName
 	 * @param parent
 	 */
-	initFullTextSearch: function (providerId, parent) {
+	initFullTextSearch: function (providerId, providerName, parent) {
 		settings.searchProviderId = providerId;
+		settings.searchProviderName = providerName;
 		settings.parent = parent;
 		searchbox.init();
 	},

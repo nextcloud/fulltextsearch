@@ -43,7 +43,6 @@
 		$.extend(FullTextSearch.prototype, nav);
 		$.extend(FullTextSearch.prototype, api);
 
-		settings.generateDefaultTemplate();
 		settings.generateNoResultDiv();
 	};
 

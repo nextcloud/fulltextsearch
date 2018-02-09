@@ -35,7 +35,6 @@ var curr = {
 	providerResult: [],
 	page: 1,
 	lastRequest: '',
-	moreDisplayed: false,
 
 	setProviderResult: function (id, value) {
 		curr.providerResult[id] = value;
@@ -276,7 +275,7 @@ var nav = {
 		generateTemplateEntry: function (document) {
 			var divTemplate = settings.entryTemplate;
 			if (divTemplate === null) {
-				divTemplate = settings.entryTemplateDefault;
+				divTemplate = settings.generateDefaultTemplate();
 			}
 
 			if (!divTemplate.length) {

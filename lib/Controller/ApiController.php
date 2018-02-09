@@ -77,6 +77,7 @@ class ApiController extends Controller {
 	 * @return DataResponse
 	 */
 	public function search($request) {
+		$this->miscService->log('____' . json_encode($request));
 		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 

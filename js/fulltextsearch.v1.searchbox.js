@@ -36,17 +36,19 @@
 var box_elements = {
 	searchTimeout: null,
 
-	// v0.6.0
-
 	searchBoxInitialized: false,
 	search_form: null,
-	search_input: null,
-	moreOptions: false,
 	moreDisplayed: false,
-	search_more: null,
 	iconSearchOptions: 'options.svg',
 	iconSearch: 'fulltextsearch.svg',
-	currentBackgroundImage: ''
+	currentBackgroundImage: '',
+
+	// v0.6.0
+	searchInput: null,
+	searchMore: null,
+	delayAnimation: 500,
+	divFullTextSearchIcon: null,
+	divFullTextSearchPopup: null
 };
 
 
@@ -55,134 +57,127 @@ var searchbox = {
 	init: function () {
 
 		var self = this;
-		box_elements.search_form = $('FORM.searchbox');
-		box_elements.search_input = $('INPUT#searchbox');
 
-
-		// on focus of the searchbox, we remove all keyup event
-		box_elements.search_input.bind('keydown', function () {
-			self.initFullTextSearchBox();
-		});
-
-		// options
-		if (OCA.Theming.inverted) {
-			box_elements.iconSearchOptions = 'options_black.svg';
-			box_elements.iconSearch = 'fulltextsearch_black.svg';
+		// we remove old search
+		var search_form = $('FORM.searchbox');
+		if (search_form.length > 0) {
+			search_form.remove();
 		}
 
-		box_elements.currentBackgroundImage = box_elements.iconSearch;
-		box_elements.search_input.css({
-			'background-image': 'url(/apps/fulltextsearch/img/' + box_elements.iconSearch + ')'
-		});
 
-		box_elements.search_input.click(function (e) {
-			var elm = $(this);
-			var xPos = e.pageX - elm.offset().left;
-			if (xPos < 26) {
-				self.switchSearchOptions();
-			}
-		});
+		var divHeaderRight = $('DIV.header-right');
+		var divFullTextSearch = $('<div>', {id: 'fulltextsearch'});
+		divHeaderRight.prepend(divFullTextSearch);
+
+		box_elements.divFullTextSearchIcon = searchbox.generateFullTextSearchIcon();
+		box_elements.divFullTextSearchPopup = searchbox.generateFullTextSearchPopup();
+		divFullTextSearch.append(box_elements.divFullTextSearchIcon);
+		divFullTextSearch.append(box_elements.divFullTextSearchPopup);
+
+		OC.registerMenu(box_elements.divFullTextSearchIcon, box_elements.divFullTextSearchPopup,
+			searchbox.displayedSearchPopup);
 
 		fullTextSearch.retreiveOptions(settings.searchProviderId);
 
-		box_elements.search_more =
-			$('<div>', {class: 'search_more'}).css({'border-color': OCA.Theming.color});
+		$(window).bind('keydown', function (event) {
+			if (event.ctrlKey || event.metaKey) {
+				if (String.fromCharCode(event.which).toLowerCase() === 'f') {
+					event.preventDefault();
+					searchbox.displaySearchPopup(true);
+				}
 
-		box_elements.search_form.append(box_elements.search_more);
-		box_elements.search_more.fadeTo(0, 0).hide();
-	},
-
-
-	initFullTextSearchBox: function () {
-		if (box_elements.searchBoxInitialized) {
-			return;
-		}
-		var self = this;
-
-		box_elements.search_input.unbind('keyup');
-		box_elements.search_input.bind('keyup blur change', function () {
-			if ($(this).val() === '') {
-				self.displaySearchOptionsIcon(false);
-			} else {
-				self.displaySearchOptionsIcon(true);
-			}
-
-			self.searching();
-		});
-
-		box_elements.searchBoxInitialized = true;
-	},
-
-
-	switchSearchOptions: function () {
-		this.displaySearchOptions(!box_elements.moreDisplayed);
-	},
-
-	displaySearchOptions: function (display) {
-		if (!box_elements.moreOptions) {
-			return;
-		}
-
-		if (display) {
-			box_elements.search_more.stop().show().fadeTo(100, 1);
-		} else {
-			box_elements.search_more.stop().fadeTo(100, 0, function () {
-				$(this).hide();
-			});
-		}
-		box_elements.moreDisplayed = display;
-	},
-
-
-	displaySearchOptionsIcon: function (display) {
-
-		if (!box_elements.moreOptions) {
-			return;
-		}
-
-		if (display) {
-			this.switchInputBackgroundImage(box_elements.iconSearchOptions);
-		} else {
-			if (box_elements.search_input.val() !== '') {
 				return;
 			}
 
-			this.displaySearchOptions(false);
-			this.switchInputBackgroundImage(box_elements.iconSearch);
+			if (event.which === 27) {
+				searchbox.displaySearchPopup(false);
+			}
+		});
+
+
+	},
+
+
+	generateFullTextSearchIcon: function () {
+		var className = 'icon-fulltextsearch';
+		if (!OCA.Theming.inverted) {
+			className = 'icon-fulltextsearch-white';
+		}
+
+		var icon = $('<div>', {
+			id: 'fts-icon',
+			tabindex: 0,
+			role: 'link',
+			class: className + ' menutoggle'
+		});
+
+		icon.fadeTo(0, 0.6);
+
+		return icon;
+	},
+
+
+	generateFullTextSearchPopup: function () {
+		var popup = $('<div>', {
+			id: 'fts-popup'
+		});
+
+		var self = this;
+		box_elements.searchInput = $('<input>', {
+			id: 'fts-input',
+			placeholder: 'Search ' + settings.searchProviderName
+		}).on('keyup', self.searching);
+		box_elements.searchMore = $('<div>', {id: 'fts-more'});
+
+		var divHeader = $('<div>', {id: 'fts-header'});
+		divHeader.append($('<div>').append(box_elements.searchInput));
+
+		popup.append(divHeader);
+		popup.append(box_elements.searchMore);
+
+		return popup;
+	},
+
+
+	displaySearchPopup: function (display) {
+		if (display) {
+			OC.showMenu(box_elements.divFullTextSearchIcon, box_elements.divFullTextSearchPopup,
+				searchbox.displayedSearchPopup);
+		} else {
+			OC.hideMenus(null);
 		}
 	},
 
 
-	switchInputBackgroundImage: function (image) {
+	displayedSearchPopup: function () {
+		box_elements.searchInput.focus();
+	},
 
-		if (image === box_elements.currentBackgroundImage) {
+
+	searching: function (force) {
+		var search = box_elements.searchInput.val();
+		if (force === undefined) {
+			force = false;
+		}
+
+		if (!force && search.length < 3) {
 			return;
 		}
-		box_elements.currentBackgroundImage = image;
 
-		box_elements.search_input.stop().animate({'background-position-x': '-70px'}, 150,
-			function () {
-				$(this).css({
-					'background-image': 'url(/apps/fulltextsearch/img/' + image + ')'
-				}).animate({'background-position-x': '6px'}, 150);
-			});
-	},
+		if (search === '' || (!force && curr.lastRequest === search)) {
+			return;
+		}
+		curr.lastRequest = search;
 
+		api.search({
+			providers: settings.searchProviderId,
+			search: search,
+			page: curr.page,
+			options: searchbox.getSearchOptions(),
+			size: 20
+		});
 
-	searching: function () {
-
-		var search = box_elements.search_input.val();
-		console.log('searching ' + search);
-
-		// 	fullTextSearch.search({
-		// 		providers: settings.searchProviderId,
-		// 		search: search,
-		// 		page: curr.page,
-		// 		options: searchbox.getSearchOptions(),
-		// 		size: 20
-		// 	});
-		// });
-
+//		return;
 		// if (settings.lockSearchbox === true) {
 		// 	return;
 		// }
@@ -199,32 +194,64 @@ var searchbox = {
 
 	onOptionsLoaded: function (result) {
 		if (!result[settings.searchProviderId]) {
-			box_elements.moreOptions = false;
 			return;
 		}
 
-		box_elements.moreOptions = true;
-		box_elements.search_input.find('background-image').on('click', function () {
-			console.log('___');
-		});
-		box_elements.search_more.html(result[settings.searchProviderId]);
-		box_elements.search_more.find('INPUT').each(function () {
-			$(this).on('change', searchbox.searching);
+		box_elements.searchMore.html(result[settings.searchProviderId]);
+		box_elements.searchMore.find('INPUT').each(function () {
+			$(this).on('change', function () {
+				searchbox.searching(true);
+			});
 		})
 	},
 
 
+	/**
+	 *
+	 * 0.6.0
+	 *
+	 *
+	 */
+	//
+	//
+	// initFullTextSearchBox: function () {
+	// 	if (box_elements.searchBoxInitialized) {
+	// 		return;
+	// 	}
+	// 	var self = this;
+	//
+	// 	box_elements.search_input.unbind('keyup');
+	// 	box_elements.search_input.bind('keyup blur change', function () {
+	// 		if ($(this).val() === '') {
+	// 			self.displaySearchOptionsIcon(false);
+	// 		} else {
+	// 			self.displaySearchOptionsIcon(true);
+	// 		}
+	//
+	// 		self.searching();
+	// 	});
+	//
+	// 	box_elements.searchBoxInitialized = true;
+	// },
+	//
+
+
 	getSearchOptions: function () {
 		var options = {};
-		// searchbox.search_more.find('INPUT').each(function () {
-		// 	var value = $(this).val();
-		//
-		// 	if ($(this).attr('type') === 'checkbox' && !$(this).is(':checked')) {
-		// 		value = '';
-		// 	}
-		//
-		// 	options[$(this).attr('id')] = value;
-		// });
+
+		if (box_elements.searchMore === null) {
+			return options;
+		}
+
+		box_elements.searchMore.find('INPUT').each(function () {
+			var value = $(this).val();
+
+			if ($(this).attr('type') === 'checkbox' && !$(this).is(':checked')) {
+				value = '';
+			}
+
+			options[$(this).attr('id')] = value;
+		});
 
 		return options;
 	},

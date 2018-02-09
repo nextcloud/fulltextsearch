@@ -1,17 +1,40 @@
 
-INPUT#searchbox {
-	background-size: 16px !important;
+#fts-icon {
+	background-size: 16px 16px;
+	padding: 14px;
+	cursor: pointer;
 }
 
-.search_more {
+div.icon-fulltextsearch-white {
+	background-image: url('../img/fulltextsearch.svg');
+}
+
+div.icon-fulltextsearch {
+	background-image: url('../img/fulltextsearch_black.svg');
+}
+
+#fts-popup {
 	width: 400px;
-	padding: 15px;
-	right: 0px;
-	position: absolute;
-	top: 44px;
-	border-radius: 3px;
-	border: 1px solid;
-	background: #ffffff;
+	right: 100px;
+}
+
+#fts-popup::after {
+	right: 20px;
+}
+
+#fts-header {
+	width: 100%;
+}
+
+#fts-header div {
+	left: 0;
+	right: 0;
+	top: 0;
+	margin: 7px;
+}
+
+#fts-input {
+	width: 100%;
 }
 
 /**
@@ -108,11 +131,11 @@ INPUT#searchbox {
 }
 
 .icon-page-prev {
-	background-image: url('/apps/fulltextsearch/img/page-prev.svg');
+	background-image: url('../img/page-prev.svg');
 }
 
 .icon-page-next {
-	background-image: url('/apps/fulltextsearch/img/page-next.svg');
+	background-image: url('/../img/page-next.svg');
 }
 
 .icon-page-next, .icon-page-prev {
@@ -122,12 +145,12 @@ INPUT#searchbox {
 	height: 16px;
 }
 
-.icon-fulltextsearch, .icon-close-fulltextsearch {
-	position: absolute;
-	right: 10px;
-	top: 10px;
-	cursor: pointer;
-}
+/*.icon-fulltextsearch, .icon-close-fulltextsearch {*/
+/*position: absolute;*/
+/*right: 10px;*/
+/*top: 10px;*/
+/*cursor: pointer;*/
+/*}*/
 
 .icon-more-fulltextsearch {
 	position: absolute;

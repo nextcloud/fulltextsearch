@@ -27,7 +27,8 @@
 /** global: OCA */
 /** global: _ */
 
-const fullTextSearch = OCA.FullTextSearch.api;
+const \
+fullTextSearch = OCA.FullTextSearch.api;
 
 
 var elements = {
