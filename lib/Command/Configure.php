@@ -115,18 +115,11 @@ class Check extends ExtendedBase {
 	private function displayAsJson() {
 
 		try {
-			$platforms = $this->platformService->getPlatforms();
-			$ak = array_keys($platforms);
-			foreach ($ak as $k) {
-				$platform = $platforms[$k];
-				$platform->loadPlatform();
-				$resultPlatform[$platform->getId()] = [
-					'class'   => $k,
-					'version' => $platform->getVersion(),
-					'config'  => $platform->getConfiguration()
-				];
-			}
-
+			$platform = $this->platformService->getPlatform();
+			$resultPlatform = [
+				'version' => $platform->getVersion(),
+				'config'  => $platform->getConfiguration()
+			];
 		} catch (Exception $e) {
 			$resultPlatform = ['error' => $e->getMessage()];
 		}
@@ -143,7 +136,6 @@ class Check extends ExtendedBase {
 		} catch (Exception $e) {
 			$resultProviders[] = ['error' => $e->getMessage()];
 		}
-
 		return [
 			'fulltextsearch' => [
 				'version' => $this->configService->getAppValue('installed_version'),
