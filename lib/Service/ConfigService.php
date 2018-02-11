@@ -39,7 +39,8 @@ class ConfigService {
 	const CHUNK_INDEX = 'index_chunk';
 	const PROVIDER_INDEXED = 'provider_indexed';
 
-	private $defaults = [
+	/** @var array */
+	public $defaults = [
 		self::SEARCH_PLATFORM  => '',
 		self::CHUNK_INDEX      => '20',
 		self::APP_NAVIGATION   => '0',

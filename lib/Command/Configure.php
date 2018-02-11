@@ -32,12 +32,13 @@ use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Check extends ExtendedBase {
+class Configure extends ExtendedBase {
 
 	const CYCLE_DELAY = 10;
 
@@ -81,9 +82,9 @@ class Check extends ExtendedBase {
 	 */
 	protected function configure() {
 		parent::configure();
-		$this->setName('fulltextsearch:check')
-			 ->addOption('json', 'j', InputOption::VALUE_NONE, 'return result as JSON')
-			 ->setDescription('Check the installation');
+		$this->setName('fulltextsearch:configure')
+			 ->addArgument('json', InputArgument::REQUIRED, 'set config')
+			 ->setDescription('Configure the installation');
 	}
 
 
@@ -95,107 +96,24 @@ class Check extends ExtendedBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
+		$json = $input->getArgument('json');
 
-		if ($input->getOption('json') === true) {
-			$output->writeln(json_encode($this->displayAsJson(), JSON_PRETTY_PRINT));
+		$config = json_decode($json, true);
+
+		if ($config === null) {
+			$output->writeln('Invalid JSON');
 
 			return;
 		}
 
-		$output->writeln(
-			'Full text search ' . $this->configService->getAppValue('installed_version')
-		);
-		$output->writeln(' ');
-
-		$this->displayPlatform($output);
-		$this->displayProviders($output);
-	}
-
-
-	private function displayAsJson() {
-
-		try {
-			$platform = $this->platformService->getPlatform();
-			$resultPlatform = [
-				'version' => $platform->getVersion(),
-				'config'  => $platform->getConfiguration()
-			];
-		} catch (Exception $e) {
-			$resultPlatform = ['error' => $e->getMessage()];
-		}
-
-		$resultProviders = [];
-		try {
-			$providers = $this->providerService->getProviders();
-			foreach ($providers as $provider) {
-				$resultProviders[$provider->getId()] = [
-					'version' => $provider->getVersion(),
-					'config'  => $provider->getConfiguration()
-				];
+		$ak = array_keys($config);
+		foreach ($ak as $k) {
+			if (array_key_exists($k, $this->configService->defaults)) {
+				$this->configService->setAppValue($k, $config[$k]);
 			}
-		} catch (Exception $e) {
-			$resultProviders[] = ['error' => $e->getMessage()];
-		}
-		return [
-			'fulltextsearch' => [
-				'version' => $this->configService->getAppValue('installed_version'),
-				'config'  => $this->configService->getConfig()
-			],
-
-			'platform'  => $resultPlatform,
-			'providers' => $resultProviders
-		];
-
-	}
-
-
-	/**
-	 * @param OutputInterface $output
-	 *
-	 * @throws Exception
-	 */
-	private function displayPlatform(OutputInterface $output) {
-		try {
-			$platform = $this->platformService->getPlatform();
-		} catch (Exception $e) {
-			$output->writeln('No search platform available');
-
-			return;
 		}
 
-		$output->writeln('- Search Platform:');
-
-		$output->writeln($platform->getName() . ' ' . $platform->getVersion());
-		echo json_encode($platform->getConfiguration(), JSON_PRETTY_PRINT);
-
-		$output->writeln(' ');
-		$output->writeln(' ');
-	}
-
-
-	/**
-	 * @param OutputInterface $output
-	 *
-	 * @throws Exception
-	 */
-	private function displayProviders(OutputInterface $output) {
-		$providers = $this->providerService->getProviders();
-
-		if (sizeof($providers) === 0) {
-			$output->writeln('No Content Provider available');
-
-			return;
-		}
-
-		$output->writeln('- Content Providers:');
-
-		foreach ($providers as $provider) {
-			$output->writeln($provider->getName() . ' ' . $provider->getVersion());
-			echo json_encode($provider->getConfiguration(), JSON_PRETTY_PRINT);
-			$output->writeln('');
-		}
-
-
+		$output->writeln(json_encode($this->configService->getConfig(), JSON_PRETTY_PRINT));
 	}
 
 

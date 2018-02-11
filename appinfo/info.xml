@@ -37,6 +37,7 @@ Core App of the full-text search framework for your Nextcloud.
 	</repair-steps>
 
 	<commands>
+		<command>OCA\FullTextSearch\Command\Configure</command>
 		<command>OCA\FullTextSearch\Command\Check</command>
 		<command>OCA\FullTextSearch\Command\Stop</command>
 		<command>OCA\FullTextSearch\Command\Index</command>
