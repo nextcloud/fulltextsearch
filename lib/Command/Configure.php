@@ -40,17 +40,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Configure extends ExtendedBase {
 
-	const CYCLE_DELAY = 10;
-
-
 	/** @var ConfigService */
 	private $configService;
-
-	/** @var PlatformService */
-	private $platformService;
-
-	/** @var ProviderService */
-	private $providerService;
 
 	/** @var MiscService */
 	private $miscService;
@@ -60,19 +51,12 @@ class Configure extends ExtendedBase {
 	 * Index constructor.
 	 *
 	 * @param ConfigService $configService
-	 * @param PlatformService $platformService
-	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
 	 */
-	public function __construct(
-		ConfigService $configService, PlatformService $platformService,
-		ProviderService $providerService, MiscService $miscService
-	) {
+	public function __construct(ConfigService $configService, MiscService $miscService) {
 		parent::__construct();
 
 		$this->configService = $configService;
-		$this->platformService = $platformService;
-		$this->providerService = $providerService;
 		$this->miscService = $miscService;
 	}
 

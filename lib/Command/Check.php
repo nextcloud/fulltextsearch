@@ -39,9 +39,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Check extends ExtendedBase {
 
-	const CYCLE_DELAY = 10;
-
-
 	/** @var ConfigService */
 	private $configService;
 
