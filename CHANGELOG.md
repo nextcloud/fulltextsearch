@@ -1,6 +1,13 @@
 # Changelog
 
 
+### 0.6.0
+
+- Nextcloud integration
+- Options panel
+- bugfixes
+ 
+
 ### 0.5.1
 
 - bugfixes
