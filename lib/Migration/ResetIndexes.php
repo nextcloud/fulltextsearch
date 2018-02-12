@@ -79,7 +79,7 @@ class ResetIndexes implements IRepairStep {
 		);
 
 		if ((int)$oldVersion[0] === 0
-			&& (int)$oldVersion[1] < 5) {
+			&& (int)$oldVersion[1] < 6) {
 			$this->resetIndexes($output);
 		}
 
