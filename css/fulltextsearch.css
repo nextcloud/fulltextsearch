@@ -15,12 +15,12 @@ div.icon-fulltextsearch {
 
 #fts-popup {
 	width: 340px;
-	right: 100px;
-	max-width: 90%;
+	right: 42px;
+	max-width: 85%;
 }
 
 #fts-popup::after {
-	right: 20px;
+	right: 78px;
 }
 
 #fts-header {
@@ -36,6 +36,10 @@ div.icon-fulltextsearch {
 
 #fts-input {
 	width: 100%;
+}
+
+input.options_small {
+	width: 60px;
 }
 
 
