@@ -73,7 +73,8 @@ class IndexService {
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IndexesRequest $indexesRequest, ConfigService $configService, ProviderService $providerService,
+		IndexesRequest $indexesRequest, ConfigService $configService,
+		ProviderService $providerService,
 		PlatformService $platformService, MiscService $miscService
 	) {
 		$this->indexesRequest = $indexesRequest;
@@ -135,7 +136,9 @@ class IndexService {
 	 * @throws InterruptException
 	 * @throws TickDoesNotExistException
 	 */
-	private function updateDocumentsWithCurrIndex(IFullTextSearchProvider $provider, array $documents) {
+	private function updateDocumentsWithCurrIndex(
+		IFullTextSearchProvider $provider, array $documents
+	) {
 
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
@@ -166,7 +169,8 @@ class IndexService {
 	 *
 	 * @return bool
 	 */
-	private function isDocumentUpToDate(IFullTextSearchProvider $provider, IndexDocument $document) {
+	private function isDocumentUpToDate(IFullTextSearchProvider $provider, IndexDocument $document
+	) {
 		$index = $document->getIndex();
 
 		if (!$index->isStatus(Index::INDEX_OK)) {
@@ -363,8 +367,9 @@ class IndexService {
 		try {
 			$curr = $this->getIndex($providerId, $documentId);
 		} catch (IndexDoesNotExistException $e) {
-			$curr = new Index($providerId, $documentId);
-			$curr->setStatus(Index::INDEX_FULL);
+			return;
+//			$curr = new Index($providerId, $documentId);
+//			$curr->setStatus(Index::INDEX_FULL);
 		}
 
 		$curr->setStatus($status);
