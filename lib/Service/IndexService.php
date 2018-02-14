@@ -265,8 +265,8 @@ class IndexService {
 			$index = $document->getIndex();
 			$access = $document->getAccess();
 
-			$index->setOwnerId($access->getOwnerId());
-			if (!$index->isStatus(Index::INDEX_IGNORE)) {
+			if ($access !== null && $index !== null && !$index->isStatus(Index::INDEX_IGNORE)) {
+				$index->setOwnerId($access->getOwnerId());
 				$toIndex[] = $document;
 			}
 		}
