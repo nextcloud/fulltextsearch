@@ -1,0 +1,6 @@
+{ "translations": {
+    "Full text search" : "Gueta de testos completos",
+    "Index not found" : "Nun s'alcontró l'índiz",
+    "Search on %s" : "Guetar en %s"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
