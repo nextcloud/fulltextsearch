@@ -1,6 +1,13 @@
 # Changelog
 
 
+### 0.6.1
+
+- bugfix: removing reset of the index on migration
+- bugfix: do not retrieve access on ignored document
+
+
+
 ### 0.6.0
 
 - Nextcloud integration
