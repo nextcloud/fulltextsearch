@@ -92,8 +92,8 @@ class ResetIndexes implements IRepairStep {
 	public function resetIndexes(IOutput $output) {
 		$output->info('Reset database');
 
-		$this->indexRequest->reset();
-		$this->providerService->setProvidersAsNotIndexed();
+//		$this->indexRequest->reset();
+//		$this->providerService->setProvidersAsNotIndexed();
 
 
 		$output->finishProgress();

@@ -30,12 +30,6 @@ Core App of the full-text search framework for your Nextcloud.
 		<job>OCA\FullTextSearch\Cron\Index</job>
 	</background-jobs>
 
-	<repair-steps>
-		<post-migration>
-			<step>OCA\FullTextSearch\Migration\ResetIndexes</step>
-		</post-migration>
-	</repair-steps>
-
 	<commands>
 		<command>OCA\FullTextSearch\Command\Configure</command>
 		<command>OCA\FullTextSearch\Command\Check</command>
