@@ -89,7 +89,7 @@ var searchbox = {
 
 	generateFullTextSearchIcon: function () {
 		var className = 'icon-fulltextsearch';
-		if (!OCA.Theming.inverted) {
+		if (OCA.Theming === undefined || !OCA.Theming.inverted) {
 			className = 'icon-fulltextsearch-white';
 		}
 
