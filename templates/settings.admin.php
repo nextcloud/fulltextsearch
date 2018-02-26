@@ -395,7 +395,7 @@ style('nextant', 'admin');
 					</div>
 
 					<div class="solr_filters_item_large solr_filters_title"
-						style="margin-top: 15px;"><?php p($l->t('Extensions you wish to ignore (.java .xml)')); ?></div>
+						style="margin-top: 15px;"><?php p($l->t('File extensions you wish to ignore (.java .xml)')); ?></div>
 					<div class="solr_filters_item_large">
 						<textarea name="" style="width: 435px; height: 75px;"
 							id="solr_filters_extensions"></textarea>
