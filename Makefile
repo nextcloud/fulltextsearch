@@ -35,7 +35,7 @@ appstore: clean
 	rsync -a \
 	--exclude=/build \
 	--exclude=/docs \
-	--exclude=/l10n/templates \
+	--exclude=/translationfiles \
 	--exclude=/.tx \
 	--exclude=/tests \
 	--exclude=/.git \
