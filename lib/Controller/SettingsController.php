@@ -321,7 +321,7 @@ class SettingsController extends Controller
         $asource = $this->indexService->getDocuments(ItemDocument::TYPE_TEST, '_nextant_test', 1, $ierror);
         
         if ($asource === false || sizeof($asource) != 1 || (! key_exists('test_1', $asource))) {
-            $message = $this->l10n->t('Error updating field - Can\'t find original document - (Error #%1$s)', array(
+            $message = $this->l10n->t('Error updating field. Can\'t find original document (Error #%1$s)', array(
                 $ierror->getCode()
             ));
             return false;
