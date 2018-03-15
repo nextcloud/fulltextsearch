@@ -94,7 +94,7 @@ class Application extends App {
 
 
 	public function registerSettingsAdmin() {
-		\OCP\App::registerAdmin(self::APP_NAME, 'lib/admin');
+		// \OCP\App::registerAdmin(self::APP_NAME, 'lib/admin');
 	}
 
 }
