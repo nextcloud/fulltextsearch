@@ -255,6 +255,12 @@ var nav = {
 			}
 		},
 
+		onSearchRequest: function (data) {
+			if (settings.parentHasMethod('onSearchRequest')) {
+				settings.parent.onSearchRequest(data);
+			}
+		},
+
 		onSearchReset: function () {
 			if (settings.parentHasMethod('onSearchReset')) {
 				settings.parent.onSearchReset();

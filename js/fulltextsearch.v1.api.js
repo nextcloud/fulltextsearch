@@ -37,6 +37,8 @@ var api = {
 	search: function (request, callback) {
 		var res = {status: -1};
 
+		nav.onSearchRequest(request);
+
 		$.ajax({
 			method: 'GET',
 			url: OC.generateUrl('/apps/fulltextsearch/v1/search'),
