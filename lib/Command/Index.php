@@ -135,7 +135,9 @@ class Index extends ExtendedBase {
 	 */
 	private function indexProvider(IFullTextSearchProvider $provider) {
 		$platform = $this->platformService->getPlatform();
-		$platform->initializeIndex($provider);
+		$platform->initializeIndex();
+		$provider->onInitializingIndex($platform);
+
 		$platform->setRunner($this->runner);
 
 		$users = $this->userManager->search('');

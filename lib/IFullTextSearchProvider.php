@@ -32,7 +32,6 @@ use OCA\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
-use OCP\AppFramework\Http\TemplateResponse;
 
 interface IFullTextSearchProvider {
 
@@ -141,27 +140,8 @@ interface IFullTextSearchProvider {
 
 	/**
 	 * @param IFullTextSearchPlatform $platform
-	 * @param array $arr
-	 */
-	public function onIndexingDocument(IFullTextSearchPlatform $platform, &$arr);
-
-
-	/**
-	 * @param IFullTextSearchPlatform $platform
 	 */
 	public function onResettingIndex(IFullTextSearchPlatform $platform);
-
-
-	/**
-	 * @param IFullTextSearchPlatform $platform
-	 * @param SearchRequest $request
-	 * @param array $arr
-	 *
-	 * @return array
-	 */
-	public function onSearchingQuery(
-		IFullTextSearchPlatform $platform, SearchRequest $request, &$arr
-	);
 
 
 	/**

@@ -32,49 +32,51 @@ class IndexDocument implements \JsonSerializable {
 	const ENCODED_BASE64 = 1;
 
 	/** @var string|int */
-	private $id;
+	public $id;
 
 	/** @var string */
-	private $providerId;
+	public $providerId;
 
 	/** @var DocumentAccess */
-	private $access;
+	public $access;
 
 	/** @var Index */
-	private $index;
+	public $index;
 
 	/** @var int */
-	private $modifiedTime = 0;
+	public $modifiedTime = 0;
 
 	/** @var array */
-	private $tags = [];
+	public $tags = [];
+
+	// TODO: do we really need it in the base class ?
+	/** @var string */
+	public $source = '';
 
 	/** @var string */
-	private $source;
+	public $title = '';
 
 	/** @var string */
-	private $title;
+	public $content = null;
 
 	/** @var string */
-	private $content = null;
-
-	/** @var string */
-	private $link = '';
+	public $link = '';
 
 	/** @var array */
-	private $more = [];
+	public $more = [];
 
 	/** @var array */
-	private $excerpts = [];
+	public $excerpts = [];
 
 	/** @var string */
-	private $score;
+	public $score;
 
 	/** @var array */
-	private $info = [];
+	public $info = [];
 
 	/** @var int */
-	private $contentEncoded;
+	public $contentEncoded;
+
 
 	public function __construct($providerId, $id) {
 		$this->providerId = $providerId;

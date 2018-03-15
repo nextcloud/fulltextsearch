@@ -21,7 +21,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  */
 
 namespace OCA\FullTextSearch\Model;
@@ -51,6 +51,11 @@ class SearchRequest implements \JsonSerializable {
 	/** @var array */
 	private $options;
 
+	/** @var array */
+	private $wildcardQueries = [];
+
+	/** @var array */
+	private $wildcardFilters = [];
 
 	/**
 	 * SearchRequest constructor.
@@ -196,6 +201,71 @@ class SearchRequest implements \JsonSerializable {
 	}
 
 
+	/**
+	 * @param array $query
+	 *
+	 * @return $this
+	 */
+	public function addWildcardQuery($query) {
+		$this->addWildcardQueries([$query]);
+
+		return $this;
+	}
+
+	/**
+	 * @param array $query
+	 *
+	 * @return $this
+	 */
+	public function addWildcardQueries($query) {
+		array_push($this->wildcardQueries, $query);
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getWildcardQueries() {
+		return $this->wildcardQueries;
+	}
+
+
+
+
+	/**
+	 * @param array $filter
+	 *
+	 * @return $this
+	 */
+	public function addWildcardFilter($filter) {
+		$this->addWildcardfilters([$filter]);
+
+		return $this;
+	}
+
+	/**
+	 * @param array $filters
+	 *
+	 * @return $this
+	 */
+	public function addWildcardFilters($filters) {
+		array_push($this->wildcardFilters, $filters);
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getWildcardFilters() {
+		return $this->wildcardFilters;
+	}
+
+
+	
+	
+	
 	/**
 	 * @return array
 	 */

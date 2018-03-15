@@ -159,6 +159,8 @@ class SearchService {
 		foreach ($providers AS $provider) {
 			$provider->improveSearchRequest($request);
 			$searchResult = $platform->searchDocuments($provider, $access, $request);
+			$searchResult->setProvider($provider);
+			$searchResult->setPlatform($platform);
 
 			$provider->improveSearchResult($searchResult);
 			if (sizeof($searchResult->getDocuments()) > 0) {

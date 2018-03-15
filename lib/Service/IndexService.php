@@ -406,7 +406,7 @@ class IndexService {
 		$platform = $this->platformService->getPlatform();
 
 		if ($providerId === '') {
-			$platform->resetIndex(null);
+			$platform->resetIndex();
 			$this->providerService->setProvidersAsNotIndexed();
 			$this->indexesRequest->reset();
 
@@ -416,7 +416,11 @@ class IndexService {
 		}
 
 		foreach ($providers AS $provider) {
-			$platform->resetIndex($provider);
+			// TODO: need to specify the map to remove
+			// TODO: need to remove entries with type=providerId
+			$provider->onResettingIndex($this);
+
+			$platform->resetIndex();
 			$this->providerService->setProviderAsIndexed($provider, false);
 			$this->indexesRequest->deleteFromProviderId($provider->getId());
 		}

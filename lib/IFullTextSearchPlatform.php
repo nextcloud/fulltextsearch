@@ -80,18 +80,14 @@ interface IFullTextSearchPlatform {
 
 	/**
 	 * Init an index regarding a provider
-	 *
-	 * @param IFullTextSearchProvider $provider
 	 */
-	public function initializeIndex(IFullTextSearchProvider $provider);
+	public function initializeIndex();
 
 
 	/**
 	 * Reset the indexes
-	 *
-	 * @param IFullTextSearchProvider|null $provider
 	 */
-	public function resetIndex($provider);
+	public function resetIndex();
 
 
 	/**
@@ -130,6 +126,8 @@ interface IFullTextSearchPlatform {
 	 *
 	 * @return SearchResult
 	 */
-	public function searchDocuments(IFullTextSearchProvider $provider, DocumentAccess $access, $request);
+	public function searchDocuments(
+		IFullTextSearchProvider $provider, DocumentAccess $access, SearchRequest $request
+	);
 
 }
