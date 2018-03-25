@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Full text search" : "Fuld tekst søgning",
     "Index not found" : "Index ikke fundet",
+    "Tick not found" : "Kryds ikke fundet",
     "Full text search (BETA)" : "Fuld tekst søgning (BETA)",
     "Search on %s" : "Søg på %s"
 },
