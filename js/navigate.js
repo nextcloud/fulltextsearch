@@ -106,13 +106,19 @@ Navigate.prototype = {
 
 
 			if (nav.options !== undefined) {
-				// var button = $('<button>', {class: 'collapse'});
-				// li.append(button);
+
+				aIcon.on('click', function () {
+					var li = $(this).closest('li');
+					if (li.hasClass('open')) {
+						li.removeClass('open');
+					} else {
+						li.addClass('open');
+					}
+				});
 
 				for (var j = 0; j < nav.options.length; j++) {
 					var sub = nav.options[j];
 
-					console.log('sub: ' + JSON.stringify(sub));
 					var subA = $('<a>', {
 						href: '#',
 						text: sub.title
