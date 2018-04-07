@@ -122,11 +122,13 @@ Navigate.prototype = {
 
 					var subA = $('<a>', {
 						href: '#',
+						class: 'ulsub',
 						text: sub.title
 					});
 
+					var subAInput;
 					if (sub.type === 'checkbox') {
-						var subAInput = $('<input>', {
+						subAInput = $('<input>', {
 							class: 'search_checkbox_sub',
 							type: 'checkbox',
 							'data-option': sub.name
