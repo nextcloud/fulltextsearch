@@ -72,13 +72,14 @@ var nav = {
 
 			divProviderNavigation.attr('data-time', meta.time);
 			divProviderNavigation.attr('data-page', request.page);
+			divProviderNavigation.attr('data-options', JSON.stringify(request.options));
 			divProviderNavigation.attr('data-search', request.search);
 			divProviderNavigation.attr('data-max-page', maxPage);
 			divProviderNavigation.attr('data-size', request.size);
 			divProviderNavigation.attr('data-total', meta.total);
 
-			var providerName = divProviderNavigation.attr('data-provider-name');
-			var left = "Search " + providerName + " for '" + request.search + "' returned " +
+			var providerTitle = divProviderNavigation.attr('data-provider-title');
+			var left = "Search " + providerTitle + " for '" + request.search + "' returned " +
 				meta.total + " results in " + meta.time + "ms";
 			divProviderNavigation.find('.provider_navigation_left').text(left);
 
@@ -321,7 +322,8 @@ var nav = {
 
 
 			var divProviderNavigation = $('<div>', {class: 'provider_navigation'});
-			divProviderNavigation.attr('data-provider-name', providerName);
+			divProviderNavigation.attr('data-provider-id', providerId);
+			divProviderNavigation.attr('data-provider-title', providerName);
 			divProviderNavigation.append($('<div>', {class: 'provider_navigation_left'}));
 
 			var divProviderPagination = $('<div>', {class: 'provider_navigation_right'});
@@ -329,6 +331,7 @@ var nav = {
 			divProviderPaginationPrev.on('click', function () {
 				fullTextSearch.search({
 					providers: providerId,
+					options: JSON.parse(divProviderNavigation.attr('data-options')),
 					search: divProviderNavigation.attr('data-search'),
 					page: Number(divProviderNavigation.attr('data-page')) - 1,
 					size: divProviderNavigation.attr('data-size')
@@ -342,6 +345,7 @@ var nav = {
 			divProviderPaginationNext.on('click', function () {
 				fullTextSearch.search({
 					providers: providerId,
+					options: JSON.parse(divProviderNavigation.attr('data-options')),
 					search: divProviderNavigation.attr('data-search'),
 					page: Number(divProviderNavigation.attr('data-page')) + 1,
 					size: divProviderNavigation.attr('data-size')
