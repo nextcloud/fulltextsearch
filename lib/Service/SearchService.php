@@ -21,7 +21,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  */
 
 namespace OCA\FullTextSearch\Service;
@@ -82,7 +82,8 @@ class SearchService {
 	 */
 	public function __construct(
 		$userId, AppManager $appManager, IUserManager $userManager, IGroupManager $groupManager,
-		ConfigService $configService, ProviderService $providerService, PlatformService $platformService,
+		ConfigService $configService, ProviderService $providerService,
+		PlatformService $platformService,
 		MiscService $miscService
 	) {
 		$this->userId = $userId;
@@ -107,7 +108,7 @@ class SearchService {
 	 */
 	public function search($userId, SearchRequest $request) {
 
-		$this->searchCannotBeEmpty($request);
+		$this->searchRequestCannotBeEmpty($request);
 
 		if ($userId === null) {
 			$userId = $this->userId;
@@ -133,12 +134,12 @@ class SearchService {
 
 
 	/**
-	 * @param string $search
+	 * @param SearchRequest $request
 	 *
 	 * @throws EmptySearchException
 	 */
-	private function searchCannotBeEmpty($search) {
-		if ($search === null || $search === '') {
+	private function searchRequestCannotBeEmpty(SearchRequest $request) {
+		if ($request === null || strlen($request->getSearch()) < 2) {
 			throw new EmptySearchException('search cannot be empty');
 		}
 	}
@@ -153,7 +154,8 @@ class SearchService {
 	 * @return SearchResult[]
 	 */
 	private function searchFromProviders(
-		IFullTextSearchPlatform $platform, array $providers, DocumentAccess $access, SearchRequest $request
+		IFullTextSearchPlatform $platform, $providers, DocumentAccess $access,
+		SearchRequest $request
 	) {
 		$result = [];
 		foreach ($providers AS $provider) {
@@ -163,9 +165,7 @@ class SearchService {
 			$searchResult->setPlatform($platform);
 
 			$provider->improveSearchResult($searchResult);
-			if (sizeof($searchResult->getDocuments()) > 0) {
-				$result[] = $searchResult;
-			}
+			$result[] = $searchResult;
 		}
 
 		return $result;
