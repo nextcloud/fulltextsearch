@@ -136,8 +136,21 @@ Navigate.prototype = {
 						subAInput.change(function () {
 							self.initSearch();
 						});
-						ul.append($('<li>').append(subA).append(subAInput));
 					}
+
+					if (sub.type === 'input') {
+						subAInput = $('<input>', {
+							class: 'search_input_sub search_input_sub_' + sub.size,
+							type: 'text',
+							placeholder: sub.placeholder,
+							'data-option': sub.name
+						});
+						subAInput.on('input', function () {
+							self.initSearch();
+						});
+					}
+
+					ul.append($('<li>').append(subA).append(subAInput));
 				}
 			}
 
@@ -179,8 +192,13 @@ Navigate.prototype = {
 	getOptions: function () {
 		var options = {};
 		elements.search_panels.find('input').each(function () {
+
 			if ($(this).hasClass('search_checkbox_sub')) {
 				options[$(this).attr('data-option')] = (($(this).is(':checked')) ? '1' : '0');
+			}
+
+			if ($(this).hasClass('search_input_sub')) {
+				options[$(this).attr('data-option')] = $(this).val();
 			}
 		});
 
