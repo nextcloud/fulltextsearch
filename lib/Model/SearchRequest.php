@@ -57,6 +57,10 @@ class SearchRequest implements \JsonSerializable {
 	/** @var array */
 	private $wildcardFilters = [];
 
+	/** @var array */
+	private $regexFilters = [];
+
+
 	/**
 	 * SearchRequest constructor.
 	 */
@@ -231,15 +235,13 @@ class SearchRequest implements \JsonSerializable {
 	}
 
 
-
-
 	/**
 	 * @param array $filter
 	 *
 	 * @return $this
 	 */
 	public function addWildcardFilter($filter) {
-		$this->addWildcardfilters([$filter]);
+		$this->addWildcardFilters([$filter]);
 
 		return $this;
 	}
@@ -263,9 +265,36 @@ class SearchRequest implements \JsonSerializable {
 	}
 
 
-	
-	
-	
+	/**
+	 * @param array $filter
+	 *
+	 * @return $this
+	 */
+	public function addRegexFilter($filter) {
+		$this->addRegexFilters([$filter]);
+
+		return $this;
+	}
+
+	/**
+	 * @param array $filters
+	 *
+	 * @return $this
+	 */
+	public function addRegexFilters($filters) {
+		array_push($this->regexFilters, $filters);
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getRegexFilters() {
+		return $this->regexFilters;
+	}
+
+
 	/**
 	 * @return array
 	 */
