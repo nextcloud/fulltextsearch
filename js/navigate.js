@@ -34,6 +34,7 @@ var elements = {
 	searchTimeout: null,
 	search_input: null,
 	search_submit: null,
+	search_result: null,
 	search_json: null
 };
 
@@ -46,20 +47,21 @@ Navigate.prototype = {
 	init: function () {
 		var self = this;
 
-		fullTextSearch.setEntryTemplate($('#template_entry'), self);
-		fullTextSearch.setResultContainer($('#search_result'));
-
 		elements.search_input = $('#search_input');
 		elements.search_submit = $('#search_submit');
+		elements.search_result = $('#search_result');
 		elements.search_panels = $('#search_navigation');
 //		elements.search_json = $('#search_json');
 		elements.divHeader = $('#search_header');
 
+		fullTextSearch.setEntryTemplate($('#template_entry'), self);
+		fullTextSearch.setResultContainer(elements.search_result);
+
 		elements.search_input.on('input', function () {
 			self.resetSearch();
-			if (elements.searchTimeout === null && self.initSearch(false)) {
+			if (elements.searchTimeout === null && self.initSearch()) {
 				elements.searchTimeout = _.delay(function () {
-					self.initSearch(false);
+					self.initSearch();
 					elements.searchTimeout = null;
 				}, 3000);
 			}
@@ -89,6 +91,7 @@ Navigate.prototype = {
 
 
 	displayPanels: function (data) {
+		var self = this;
 
 		var ak = Object.keys(data);
 		for (var i = 0; i < ak.length; i++) {
@@ -103,8 +106,6 @@ Navigate.prototype = {
 			aIcon.text(title);
 
 			var ul = $('<ul>');
-
-
 			if (nav.options !== undefined) {
 
 				aIcon.on('click', function () {
@@ -125,19 +126,30 @@ Navigate.prototype = {
 					});
 
 					if (sub.type === 'checkbox') {
-						ul.append($('<li>').append(subA).append($('<input>', {
+						var subAInput = $('<input>', {
 							class: 'search_checkbox_sub',
-							type: 'checkbox'
-						})));
+							type: 'checkbox',
+							'data-option': sub.name
+						});
+						subAInput.change(function () {
+							self.initSearch();
+						});
+						ul.append($('<li>').append(subA).append(subAInput));
 					}
 				}
 			}
 
 			li.append(aIcon);
-			li.append($('<input>', {
+			var aInput = $('<input>', {
 				class: 'search_checkbox',
-				type: 'checkbox'
-			}));
+				type: 'checkbox',
+				'data-provider': ak[i]
+			});
+			aInput.change(function () {
+				self.initSearch();
+			});
+
+			li.append(aInput);
 			li.append(ul);
 
 			elements.search_panels.append(li);
@@ -146,21 +158,66 @@ Navigate.prototype = {
 	},
 
 
-	initSearch: function (force) {
+	getProviders: function () {
+		var providers = [];
+		elements.search_panels.find('input').each(function () {
+			if ($(this).hasClass('search_checkbox') && $(this).is(":checked")) {
+				providers.push($(this).attr('data-provider'));
+			}
+		});
+
+		if (providers.length === 0) {
+			return 'all';
+		}
+
+		return providers;
+	},
+
+
+	getOptions: function () {
+		var options = {};
+		elements.search_panels.find('input').each(function () {
+			if ($(this).hasClass('search_checkbox_sub')) {
+				options[$(this).attr('data-option')] = (($(this).is(':checked')) ? '1' : '0');
+			}
+		});
+
+		return options;
+	},
+
+
+	initSearch: function () {
 		var search = elements.search_input.val();
 
-		if (!force && search.length < 3) {
+		if (search.length < 3) {
 			return false;
 		}
+
+		var providers = this.getProviders();
+		var options = this.getOptions();
+
+		this.displayProviderResults(providers);
+
 		var request = {
-			providers: 'all',
+			providers: providers,
+			options: options,
 			search: search,
 			page: curr.page
 		};
 
 		fullTextSearch.search(request, this.searchResult);
-
 		return true;
+	},
+
+
+	displayProviderResults: function (providers) {
+		elements.search_result.children('DIV.provider_header').each(function () {
+			if (providers === 'all' || providers.indexOf($(this).attr('data-id')) > -1) {
+				$(this).stop().slideDown(100).fadeTo(settings.delay_provider, 1);
+			} else {
+				$(this).stop().fadeTo(settings.delay_provider, 0).slideUp(100);
+			}
+		});
 	},
 
 
@@ -196,6 +253,8 @@ Navigate.prototype = {
 			div.remove();
 		}
 	}
+
+
 };
 
 OCA.FullTextSearch.Example = Navigate;
