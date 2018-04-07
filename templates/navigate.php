@@ -52,7 +52,6 @@ Util::addStyle(Application::APP_NAME, 'navigate');
 </div>
 
 <div id="app-content">
-	<div>asdsdasad</div>
 	<div id="search_result"></div>
 </div>
 
