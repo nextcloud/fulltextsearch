@@ -149,7 +149,7 @@ var searchbox = {
 			force = false;
 		}
 
-		if (search.length < 3) {
+		if (search.length < 1) {
 			return;
 		}
 
