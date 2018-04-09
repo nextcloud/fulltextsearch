@@ -28,6 +28,7 @@ namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OC\App\AppManager;
+use OC\User\NoUserException;
 use OCA\Circles\Api\v1\Circles;
 use OCA\FullTextSearch\Exceptions\EmptySearchException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
@@ -115,6 +116,10 @@ class SearchService {
 		}
 
 		$user = $this->userManager->get($userId);
+		if ($user === null) {
+			throw new NoUserException('User does not exist');
+		}
+
 		$request->setAuthor($user->getUID());
 		$request->cleanSearch();
 
@@ -139,7 +144,7 @@ class SearchService {
 	 * @throws EmptySearchException
 	 */
 	private function searchRequestCannotBeEmpty(SearchRequest $request) {
-		if ($request === null || strlen($request->getSearch()) < 2) {
+		if ($request === null || strlen($request->getSearch()) < 1) {
 			throw new EmptySearchException('search cannot be empty');
 		}
 	}
