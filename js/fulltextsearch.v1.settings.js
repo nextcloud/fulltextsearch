@@ -77,9 +77,13 @@ var settings = {
 	 * used to set the template to display search result entries
 	 *
 	 * @param template
+	 * @param parent
 	 */
-	setEntryTemplate: function (template) {
+	setEntryTemplate: function (template, parent) {
 		settings.entryTemplate = template;
+		if (parent !== null) {
+			settings.parent = parent;
+		}
 	},
 
 	/**
