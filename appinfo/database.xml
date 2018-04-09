@@ -65,6 +65,13 @@
 			</field>
 
 			<field>
+				<name>options</name>
+				<type>text</type>
+				<length>511</length>
+				<notnull>false</notnull>
+			</field>
+
+			<field>
 				<name>err</name>
 				<type>integer</type>
 				<length>1</length>

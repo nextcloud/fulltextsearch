@@ -43,7 +43,8 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 * {@inheritdoc}
 	 */
 	public function __construct(
-		IL10N $l10n, IDBConnection $connection, ConfigService $configService, MiscService $miscService
+		IL10N $l10n, IDBConnection $connection, ConfigService $configService,
+		MiscService $miscService
 	) {
 		parent::__construct($l10n, $connection, $configService, $miscService);
 	}
@@ -85,8 +86,8 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
 		$qb->select(
-			'li.owner_id', 'li.provider_id', 'li.document_id', 'li.status', 'li.err', 'li.message',
-			'li.indexed'
+			'li.owner_id', 'li.provider_id', 'li.document_id', 'li.status', 'li.options', 'li.err',
+			'li.message', 'li.indexed'
 		)
 		   ->from(self::TABLE_INDEXES, 'li');
 
@@ -117,6 +118,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	protected function parseIndexesSelectSql($data) {
 		$index = new ExtendedIndex($data['provider_id'], $data['document_id']);
 		$index->setStatus($data['status'])
+			  ->setOptions(json_decode($data['options'], true))
 			  ->setError($data['err'])
 			  ->setMessage($data['message'])
 			  ->setOwnerId($data['owner_id'])

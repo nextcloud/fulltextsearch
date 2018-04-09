@@ -56,6 +56,9 @@ class Index implements \JsonSerializable {
 	/** @var int */
 	private $status = 0;
 
+	/** @var array */
+	private $options = [];
+
 	/** @var int */
 	private $err = 0;
 
@@ -147,6 +150,25 @@ class Index implements \JsonSerializable {
 		}
 
 		$this->status -= $status;
+	}
+
+
+	/**
+	 * @param array $options
+	 *
+	 * @return $this
+	 */
+	public function setOptions($options) {
+		$this->options = $options;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getOptions() {
+		return $this->options;
 	}
 
 
