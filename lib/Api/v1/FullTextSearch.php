@@ -99,16 +99,18 @@ class FullTextSearch {
 
 
 	/**
-	 * @param $providerId
-	 * @param $documentId
+	 * @param string $providerId
+	 * @param string|int $documentId
 	 * @param string $ownerId
+	 * @param int $status
 	 *
 	 * @return mixed
 	 * @throws QueryException
 	 */
-	public static function createIndex($providerId, $documentId, $ownerId = '') {
+	public static function createIndex($providerId, $documentId, $ownerId, $status = 0) {
 		$index = new Index($providerId, $documentId);
 		$index->setOwnerId($ownerId);
+		$index->setStatus($status);
 
 		return self::updateIndexes([$index]);
 	}

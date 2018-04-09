@@ -287,7 +287,6 @@ class IndexService {
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, Index $index
 	) {
 		$document = null;
-
 		if (!$index->isStatus(Index::INDEX_REMOVE)) {
 			try {
 				$document = $provider->updateDocument($index);
@@ -368,8 +367,6 @@ class IndexService {
 			$curr = $this->getIndex($providerId, $documentId);
 		} catch (IndexDoesNotExistException $e) {
 			return;
-//			$curr = new Index($providerId, $documentId);
-//			$curr->setStatus(Index::INDEX_FULL);
 		}
 
 		$curr->setStatus($status);
