@@ -50,6 +50,10 @@ var result = {
 	},
 
 
+	displayError: function (res) {
+	},
+
+
 	displayNoResult: function () {
 		settings.divNoResult.fadeTo(settings.delay_result, 1);
 		settings.resultContainer.find('.provider_header').each(function () {

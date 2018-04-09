@@ -27,7 +27,7 @@
 /** global: OCA */
 /** global: _ */
 
-const fullTextSearch = OCA.FullTextSearch.api;
+var fullTextSearch = OCA.FullTextSearch.api;
 
 
 var elements = {
@@ -38,7 +38,7 @@ var elements = {
 	search_json: null
 };
 
-const Navigate = function () {
+var Navigate = function () {
 	this.init();
 };
 
@@ -209,7 +209,7 @@ Navigate.prototype = {
 	initSearch: function () {
 		var search = elements.search_input.val();
 
-		if (search.length < 3) {
+		if (search.length < 1) {
 			return false;
 		}
 
@@ -258,6 +258,11 @@ Navigate.prototype = {
 //			OCA.notification.onFail('Search returned no result');
 //		OCA.notification.onSuccess('Search returned ' + res.meta.size + ' result(s)');
 
+	},
+
+
+	onError: function (message) {
+		console.log('!' + message);
 	},
 
 

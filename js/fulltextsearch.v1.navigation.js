@@ -268,9 +268,15 @@ var nav = {
 			}
 		},
 
-		onResultDisplayed: function () {
+		onResultDisplayed: function (data) {
 			if (settings.parentHasMethod('onResultDisplayed')) {
-				settings.parent.onResultDisplayed();
+				settings.parent.onResultDisplayed(data);
+			}
+		},
+
+		onError: function (data) {
+			if (settings.parentHasMethod('onError')) {
+				settings.parent.onError(data);
 			}
 		},
 

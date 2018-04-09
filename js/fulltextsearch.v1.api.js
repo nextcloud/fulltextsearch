@@ -34,8 +34,8 @@
 var api = {
 
 
-	search: function (request, callback) {
-		var res = {status: -1};
+	search: function (request, callback, callbackError) {
+		var res = {status: -1, error: 'failed to connect to Nextcloud'};
 
 		nav.onSearchRequest(request);
 
@@ -46,12 +46,19 @@ var api = {
 				request: JSON.stringify(request)
 			}
 		}).done(function (res) {
+			if (_.has(res, 'error')) {
+				result.displayError(res);
+				nav.onError(res.error);
+				api.onCallback(callbackError, res);
+				return;
+			}
 			result.displayResult(res);
 			nav.onResultDisplayed(res);
 			api.onCallback(callback, res);
 		}).fail(function () {
-			nav.failedToAjax();
-			api.onCallback(callback, res);
+			nav.failedToAjax(res);
+			nav.onError(res.error);
+			api.onCallback(callbackError, res);
 		});
 	},
 
