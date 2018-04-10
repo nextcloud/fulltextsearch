@@ -52,7 +52,7 @@ var settings = {
 		divLeft.append($('<div>', {id: 'line2'}));
 
 		var divRight = $('<div>', {class: 'result_entry_right'});
-		divRight.append($('<div>', {id: 'score'}));
+		divRight.append($('<div>', {class: 'score'}));
 
 		var div = $('<div>', {class: 'result_entry_default'});
 		div.append(divLeft);

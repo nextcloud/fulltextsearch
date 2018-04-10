@@ -44,16 +44,13 @@ a.ulsub {
 /**
 
 */
-#search_result {
-	margin: 50px 80px 0 50px;
-}
 
 .provider_result {
 	margin-left: 30px;
+	margin-right: 30px;
 }
 
 #noresult {
-	font-style: italic;
 	position: absolute;
 	left: 100px;
 }

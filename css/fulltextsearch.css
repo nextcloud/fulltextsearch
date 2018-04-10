@@ -42,15 +42,6 @@ input.options_small {
 	width: 60px;
 }
 
-
-/**
-
- */
-
-.provider_result {
-	font-style: italic;
-}
-
 .provider_navigation_right {
 	position: absolute;
 	right: 0;
@@ -66,7 +57,6 @@ input.options_small {
 
 .provider_navigation_curr {
 	font-weight: normal;
-	font-size: 15px;
 	letter-spacing: 6px;
 	margin: -3px 0 0 11px;
 }
@@ -79,7 +69,6 @@ input.options_small {
 	height: 50px;
 	width: 100%;
 	display: inline-block;
-	background: #eeeeee;
 	padding-bottom: 2px;
 }
 
@@ -108,12 +97,10 @@ input.options_small {
 	color: #333333;
 	font-size: 11px;
 	height: 12px;
-	font-style: italic;
 }
 
-.result_entry_default #score {
-	font-weight: bold;
-	font-style: italic;
+.result_entry_default .score {
+	color: #999;
 }
 
 .next_search_div {
@@ -125,10 +112,8 @@ input.options_small {
 
 .provider_navigation {
 	position: relative;
-	font-size: 15px;
 	font-weight: bold;
 	color: #444;
-	background: #ddd;
 	margin-bottom: 16px;
 	padding-top: 10px;
 	padding-left: 20px;

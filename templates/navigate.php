@@ -66,7 +66,7 @@ Util::addStyle(Application::APP_NAME, 'navigate');
 			<div id="line2"></div>
 		</div>
 		<div class="result_entry_right">
-			<div id="score"></div>
+			<div class="score"></div>
 		</div>
 	</div>
 
