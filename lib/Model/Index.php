@@ -154,6 +154,18 @@ class Index implements \JsonSerializable {
 
 
 	/**
+	 * @param string $option
+	 * @param string|int $value
+	 *
+	 * @return $this
+	 */
+	public function setOption($option, $value) {
+		$this->options[$option] = $value;
+
+		return $this;
+	}
+
+	/**
 	 * @param array $options
 	 *
 	 * @return $this
@@ -251,7 +263,8 @@ class Index implements \JsonSerializable {
 			'providerId' => $this->getProviderId(),
 			'documentId' => $this->getDocumentId(),
 			'lastIndex'  => $this->getLastIndex(),
-			'status'     => (int)$this->getStatus()
+			'status'     => (int)$this->getStatus(),
+			'options'    => $this->getOptions()
 		];
 	}
 
