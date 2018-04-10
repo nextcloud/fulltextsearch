@@ -369,7 +369,7 @@ class IndexService {
 			return;
 		}
 
-		$curr->setStatus($status);
+		$curr->setStatus($status, $reset);
 		$this->updateIndexes([$curr]);
 	}
 
