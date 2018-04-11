@@ -18,6 +18,7 @@ Core App of the full-text search framework for your Nextcloud.
 		<admin>https://github.com/nextcloud/fulltextsearch/wiki</admin>
 	</documentation>
 	<category>tools</category>
+	<category>search</category>
 	<website>https://github.com/nextcloud/fulltextsearch</website>
 	<bugs>https://github.com/nextcloud/fulltextsearch/issues</bugs>
 	<repository>https://github.com/nextcloud/fulltextsearch.git</repository>
