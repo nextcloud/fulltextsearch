@@ -125,7 +125,7 @@ var searchbox = {
 
 		popup.append(divHeader);
 		popup.append(box_elements.searchMore);
-		popup.append(box_elements.searchError);
+		popup.append(box_elements.searchError.hide());
 
 		return popup;
 	},
@@ -142,6 +142,7 @@ var searchbox = {
 
 
 	displayedSearchPopup: function () {
+		box_elements.searchError.hide();
 		box_elements.searchInput.focus();
 	},
 
