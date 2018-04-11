@@ -13,6 +13,12 @@ div.icon-fulltextsearch {
 	background-image: url('../img/fulltextsearch_black.svg');
 }
 
+#fts-error {
+	color: #f00;
+	text-align: center;
+	margin: 20px;
+}
+
 #fts-popup {
 	width: 340px;
 	right: 42px;

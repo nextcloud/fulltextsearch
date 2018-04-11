@@ -36,6 +36,7 @@
 var box_elements = {
 	searchInput: null,
 	searchMore: null,
+	searchError: null,
 	divFullTextSearchIcon: null,
 	divFullTextSearchPopup: null
 };
@@ -117,12 +118,14 @@ var searchbox = {
 			placeholder: 'Search ' + settings.searchProviderName
 		}).on('keyup', self.searching);
 		box_elements.searchMore = $('<div>', {id: 'fts-more'});
+		box_elements.searchError = $('<div>', {id: 'fts-error'});
 
 		var divHeader = $('<div>', {id: 'fts-header'});
 		divHeader.append($('<div>').append(box_elements.searchInput));
 
 		popup.append(divHeader);
 		popup.append(box_elements.searchMore);
+		popup.append(box_elements.searchError);
 
 		return popup;
 	},

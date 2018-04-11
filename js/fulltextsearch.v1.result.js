@@ -34,6 +34,7 @@
 var result = {
 
 	displayResult: function (res) {
+		box_elements.searchError.text('');
 		if (settings.resultContainer === null) {
 			return;
 		}
@@ -51,6 +52,8 @@ var result = {
 
 
 	displayError: function (res) {
+		console.log('searching returns an error: ' + res.error);
+		box_elements.searchError.text(res.error);
 	},
 
 
