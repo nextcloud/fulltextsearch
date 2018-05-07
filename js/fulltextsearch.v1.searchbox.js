@@ -84,7 +84,6 @@ var searchbox = {
 			}
 		});
 
-
 	},
 
 
@@ -214,30 +213,6 @@ var searchbox = {
 	 *
 	 *
 	 */
-	//
-	//
-	// initFullTextSearchBox: function () {
-	// 	if (box_elements.searchBoxInitialized) {
-	// 		return;
-	// 	}
-	// 	var self = this;
-	//
-	// 	box_elements.search_input.unbind('keyup');
-	// 	box_elements.search_input.bind('keyup blur change', function () {
-	// 		if ($(this).val() === '') {
-	// 			self.displaySearchOptionsIcon(false);
-	// 		} else {
-	// 			self.displaySearchOptionsIcon(true);
-	// 		}
-	//
-	// 		self.searching();
-	// 	});
-	//
-	// 	box_elements.searchBoxInitialized = true;
-	// },
-	//
-
-
 	getSearchOptions: function () {
 		var options = {};
 
@@ -256,32 +231,6 @@ var searchbox = {
 		});
 
 		return options;
-	},
-
-
-	// TODO: do we really need this initSearch, or should we use the one from fulltextsearch.js !?
-	initSearch: function (force) {
-		// var search = searchbox.search_input.val();
-		//
-		// if (!force && search.length < 3) {
-		// 	return false;
-		// }
-		//
-		// if (curr.lastRequest === search) {
-		// 	return true;
-		// }
-		//
-		// curr.lastRequest = search;
-		//
-		// fullTextSearch.search({
-		// 	providers: settings.searchProviderId,
-		// 	search: search,
-		// 	page: curr.page,
-		// 	options: searchbar.getSearchOptions(),
-		// 	size: 20
-		// });
-		//
-		// return true;
 	}
 
 

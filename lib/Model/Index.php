@@ -268,4 +268,16 @@ class Index implements \JsonSerializable {
 		];
 	}
 
+
+	public function __destruct() {
+		unset($this->providerId);
+		unset($this->documentId);
+		unset($this->ownerId);
+		unset($this->status);
+		unset($this->options);
+		unset($this->err);
+		unset($this->message);
+		unset($this->lastIndex);
+	}
+
 }

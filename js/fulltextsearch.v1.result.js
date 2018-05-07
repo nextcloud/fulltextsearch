@@ -52,7 +52,6 @@ var result = {
 
 
 	displayError: function (res) {
-		console.log('searching returns an error: ' + res.error);
 		box_elements.searchError.text(res.error).show();
 	},
 
@@ -72,7 +71,8 @@ var result = {
 		var current = curr.getProviderResult(result.provider.id);
 		var divProvider = nav.getDivProvider(result.provider.id, result.provider.name);
 
-		nav.manageDivProviderNavigation(divProvider.children('.provider_navigation'), request, result.meta);
+		nav.manageDivProviderNavigation(divProvider.children('.provider_navigation'), request,
+			result.meta);
 		nav.manageDivProviderResult(divProvider.children('.provider_result'), result.documents,
 			current.documents);
 
