@@ -52,6 +52,9 @@ class SearchRequest implements \JsonSerializable {
 	private $options;
 
 	/** @var array */
+	private $parts = [];
+
+	/** @var array */
 	private $wildcardQueries = [];
 
 	/** @var array */
@@ -184,6 +187,25 @@ class SearchRequest implements \JsonSerializable {
 
 
 	/**
+	 * @param array $parts
+	 *
+	 * @return $this
+	 */
+	public function setParts($parts) {
+		$this->parts = $parts;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getParts() {
+		return $this->parts;
+	}
+
+
+	/**
 	 * @param string $tag
 	 */
 	public function addTag($tag) {
@@ -305,6 +327,7 @@ class SearchRequest implements \JsonSerializable {
 			'search'    => $this->getSearch(),
 			'page'      => $this->getPage(),
 			'size'      => $this->getSize(),
+			'parts'     => $this->getParts(),
 			'options'   => $this->getOptions(),
 			'tags'      => $this->getTags()
 		];
@@ -331,6 +354,7 @@ class SearchRequest implements \JsonSerializable {
 		$request->setAuthor(MiscService::get($arr, 'author', ''));
 		$request->setSearch(MiscService::get($arr, 'search', ''));
 		$request->setPage(MiscService::get($arr, 'page', 0));
+		$request->setParts(MiscService::get($arr, 'parts', []));
 		$request->setSize(MiscService::get($arr, 'size', 10));
 		$request->setOptions(MiscService::get($arr, 'options', []));
 		$request->setTags(MiscService::get($arr, 'tags', []));

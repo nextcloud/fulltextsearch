@@ -59,6 +59,9 @@ class IndexDocument implements \JsonSerializable {
 	/** @var string */
 	public $content = null;
 
+	/** @var array */
+	public $parts = [];
+
 	/** @var string */
 	public $link = '';
 
@@ -269,6 +272,37 @@ class IndexDocument implements \JsonSerializable {
 	 */
 	public function getContent() {
 		return $this->content;
+	}
+
+
+	/**
+	 * @param string $part
+	 * @param string $content
+	 *
+	 * @return $this
+	 */
+	public function setPart($part, $content) {
+		$this->parts[$part] = $content;
+
+		return $this;
+	}
+
+	/**
+	 * @param array $parts
+	 *
+	 * @return $this
+	 */
+	public function setParts($parts) {
+		$this->parts = $parts;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getParts() {
+		return $this->parts;
 	}
 
 
