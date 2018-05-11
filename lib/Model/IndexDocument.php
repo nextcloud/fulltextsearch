@@ -281,7 +281,7 @@ class IndexDocument implements \JsonSerializable {
 	 *
 	 * @return $this
 	 */
-	public function setPart($part, $content) {
+	public function addPart($part, $content) {
 		$this->parts[$part] = $content;
 
 		return $this;
