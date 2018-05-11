@@ -151,7 +151,7 @@ input.options_small {
 }
 
 .icon-page-next {
-	background-image: url('/../img/page-next.svg');
+	background-image: url('../img/page-next.svg');
 }
 
 .icon-page-next, .icon-page-prev {
