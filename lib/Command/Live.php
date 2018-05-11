@@ -31,6 +31,7 @@ use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\ExtendedBase;
 use OCA\FullTextSearch\Model\Runner;
+use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
@@ -48,6 +49,9 @@ class Live extends ExtendedBase {
 
 	/** @var IUserManager */
 	private $userManager;
+
+	/** @var ConfigService */
+	private $configService;
 
 	/** @var IndexService */
 	private $indexService;
@@ -70,19 +74,22 @@ class Live extends ExtendedBase {
 	 *
 	 * @param IUserManager $userManager
 	 * @param RunningService $runningService
+	 * @param ConfigService $configService
 	 * @param IndexService $indexService
 	 * @param PlatformService $platformService
 	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IUserManager $userManager, RunningService $runningService, IndexService $indexService,
-		PlatformService $platformService, ProviderService $providerService, MiscService $miscService
+		IUserManager $userManager, RunningService $runningService, ConfigService $configService,
+		IndexService $indexService, PlatformService $platformService,
+		ProviderService $providerService, MiscService $miscService
 	) {
 		parent::__construct();
 		$this->userManager = $userManager;
 
 		$this->runner = new Runner($runningService, 'commandLive');
+		$this->configService = $configService;
 		$this->indexService = $indexService;
 		$this->platformService = $platformService;
 		$this->providerService = $providerService;
@@ -108,6 +115,10 @@ class Live extends ExtendedBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
+
+		if ($this->configService->getCloudVersion() < 14) {
+			throw new Exception('This feature is only available on Nextcloud 14 or newer');
+		}
 
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);
