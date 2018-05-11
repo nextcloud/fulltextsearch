@@ -274,6 +274,12 @@ var nav = {
 			}
 		},
 
+		onResultClose: function () {
+			if (settings.parentHasMethod('onResultClose')) {
+				settings.parent.onResultClose();
+			}
+		},
+
 		onError: function (data) {
 			if (settings.parentHasMethod('onError')) {
 				settings.parent.onError(data);
@@ -358,6 +364,16 @@ var nav = {
 				});
 			});
 			divProviderPagination.append(divProviderPaginationNext);
+
+			if (settings.searchProviderId !== '') {
+				var divProviderPaginationClose = $('<div>',
+					{class: 'icon-close provider_navigation_close'});
+				divProviderPaginationClose.on('click', function () {
+					nav.onResultClose();
+				});
+				divProviderPagination.append(divProviderPaginationClose);
+			}
+
 
 			divProviderNavigation.append(divProviderPagination);
 
