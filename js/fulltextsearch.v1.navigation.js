@@ -57,15 +57,6 @@ var curr = {
 
 var nav = {
 
-		failedToAjax: function () {
-			// OCA.notification.onFail(
-			// 	'Failed to connect to cloud, page will refresh within few seconds');
-			// window.setTimeout(function () {
-			// 	window.location.reload(true);
-			// }, 4000);
-		},
-
-
 		manageDivProviderNavigation: function (divProviderNavigation, request, meta) {
 
 			var maxPage = Math.ceil(meta.total / request.size);

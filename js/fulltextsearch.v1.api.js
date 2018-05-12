@@ -35,7 +35,10 @@ var api = {
 
 
 	search: function (request, callback, callbackError) {
-		var res = {status: -1, error: 'failed to connect to Nextcloud'};
+		var res = {
+			status: -1,
+			error: 'failed to connect to Nextcloud'
+		};
 
 		nav.onSearchRequest(request);
 
@@ -52,13 +55,14 @@ var api = {
 				api.onCallback(callbackError, res);
 				return;
 			}
+
 			result.displayResult(res);
 			nav.onResultDisplayed(res);
 			api.onCallback(callback, res);
 		}).fail(function () {
-			nav.failedToAjax(res);
-			nav.onError(res.error);
-			api.onCallback(callbackError, res);
+			if (!api.onCallback(callbackError, res)) {
+				nav.onError('Failed to reach server. Try reloading the page');
+			}
 		});
 	},
 
@@ -86,7 +90,11 @@ var api = {
 			} else {
 				callback({status: -1});
 			}
+
+			return true;
 		}
+
+		return false;
 	}
 
 };
