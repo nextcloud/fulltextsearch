@@ -51,6 +51,9 @@ class Index implements \JsonSerializable {
 	private $documentId;
 
 	/** @var string */
+	private $source = '';
+
+	/** @var string */
 	private $ownerId = '';
 
 	/** @var int */
@@ -87,6 +90,25 @@ class Index implements \JsonSerializable {
 	 */
 	public function getDocumentId() {
 		return $this->documentId;
+	}
+
+
+	/**
+	 * @param string $source
+	 *
+	 * @return $this
+	 */
+	public function setSource($source) {
+		$this->source = $source;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSource() {
+		return $this->source;
 	}
 
 
@@ -159,7 +181,7 @@ class Index implements \JsonSerializable {
 	 *
 	 * @return $this
 	 */
-	public function setOption($option, $value) {
+	public function addOption($option, $value) {
 		$this->options[$option] = $value;
 
 		return $this;
@@ -181,6 +203,21 @@ class Index implements \JsonSerializable {
 	 */
 	public function getOptions() {
 		return $this->options;
+	}
+
+
+	/**
+	 * @param string $option
+	 * @param string $default
+	 *
+	 * @return mixed|string
+	 */
+	public function getOption($option, $default = '') {
+		if (!array_key_exists($option, $this->options)) {
+			return $default;
+		}
+
+		return $this->options[$option];
 	}
 
 

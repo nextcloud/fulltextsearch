@@ -48,6 +48,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 			$qb->setValue('owner_id', $qb->createNamedParameter($index->getOwnerId()))
 			   ->setValue('provider_id', $qb->createNamedParameter($index->getProviderId()))
 			   ->setValue('document_id', $qb->createNamedParameter($index->getDocumentId()))
+			   ->setValue('source', $qb->createNamedParameter($index->getSource()))
 			   ->setValue('err', $qb->createNamedParameter($index->getError()))
 			   ->setValue('message', $qb->createNamedParameter($index->getMessage()))
 			   ->setValue('status', $qb->createNamedParameter($index->getStatus()))
@@ -78,6 +79,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('status', $qb->createNamedParameter($index->getStatus()));
+		$qb->set('source', $qb->createNamedParameter($index->getSource()));
 		$qb->set('options', $qb->createNamedParameter(json_encode($index->getOptions())));
 
 		if ($index->getOwnerId() !== '') {

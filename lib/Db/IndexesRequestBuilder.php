@@ -86,7 +86,8 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
 		$qb->select(
-			'li.owner_id', 'li.provider_id', 'li.document_id', 'li.status', 'li.options', 'li.err',
+			'li.owner_id', 'li.provider_id', 'li.document_id', 'li.source', 'li.status',
+			'li.options', 'li.err',
 			'li.message', 'li.indexed'
 		)
 		   ->from(self::TABLE_INDEXES, 'li');
@@ -118,6 +119,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	protected function parseIndexesSelectSql($data) {
 		$index = new ExtendedIndex($data['provider_id'], $data['document_id']);
 		$index->setStatus($data['status'])
+			  ->setSource($data['source'])
 			  ->setOptions(json_decode($data['options'], true))
 			  ->setError($data['err'])
 			  ->setMessage($data['message'])

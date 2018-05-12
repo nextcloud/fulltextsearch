@@ -51,6 +51,13 @@
 			</field>
 
 			<field>
+				<name>source</name>
+				<type>text</type>
+				<length>64</length>
+				<notnull>true</notnull>
+			</field>
+
+			<field>
 				<name>owner_id</name>
 				<type>text</type>
 				<length>64</length>
