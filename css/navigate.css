@@ -29,6 +29,12 @@
 	opacity: 0.65;
 }
 
+.search_tags_sub {
+	margin-right: 10px !important;
+	width: 200px;
+	opacity: 0.65;
+}
+
 .search_input_sub_small {
 	width: 70px;
 }

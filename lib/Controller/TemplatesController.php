@@ -113,7 +113,7 @@ class TemplatesController extends Controller {
 
 		$ret = [];
 		foreach ($providers as $provider) {
-			$providerId = $provider->getId();
+			$providerAppId = $provider->getAppId();
 
 			$options = $provider->getOptionsTemplate();
 			$nav = [];
@@ -125,8 +125,9 @@ class TemplatesController extends Controller {
 				Util::addStyle($provider->getAppId(), $nav['css']);
 			}
 
-			$ret[$providerId] =
+			$ret[$providerAppId] =
 				[
+					'provider'   => $provider->getId(),
 					'title'      => $provider->getName(),
 					'navigation' => $nav
 				];

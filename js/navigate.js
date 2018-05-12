@@ -44,6 +44,9 @@ var Navigate = function () {
 
 Navigate.prototype = {
 
+	currentTagsResult: {},
+	selectedTags: {},
+
 	init: function () {
 		var self = this;
 
@@ -53,6 +56,7 @@ Navigate.prototype = {
 		elements.search_panels = $('#search_navigation');
 //		elements.search_json = $('#search_json');
 		elements.divHeader = $('#search_header');
+		box_elements.searchError = $('#search_error');
 
 		fullTextSearch.setEntryTemplate($('#template_entry'), self);
 		fullTextSearch.setResultContainer(elements.search_result);
@@ -95,13 +99,19 @@ Navigate.prototype = {
 
 		var ak = Object.keys(data);
 		for (var i = 0; i < ak.length; i++) {
+			var providerAppId = ak[i];
 			var title = data[ak[i]]['title'];
 			var nav = data[ak[i]]['navigation'];
+			var providerId = data[ak[i]]['provider'];
+
+			if (nav.css !== undefined) {
+				OC.addStyle(providerAppId, nav.css);
+			}
 
 			var li = $('<li>', {class: (nav.options !== undefined) ? 'collapsible open' : ''});
 			var aIcon = $('<a>', {
 				href: '#',
-				class: 'search_icon'
+				class: (nav.icon !== undefined) ? nav.icon : 'search_icon'
 			});
 			aIcon.text(title);
 
@@ -119,38 +129,27 @@ Navigate.prototype = {
 
 				for (var j = 0; j < nav.options.length; j++) {
 					var sub = nav.options[j];
+					self.displayPanelCheckbox(ul, sub);
+					self.displayPanelInput(ul, sub);
+					self.displayPanelTags(ul, sub);
+					self.displayPanelSearch(providerAppId, ul, sub);
+					//
+					// <p id="tag_filter" class="open">
+					// 		<input value="" style="display: none;" type="text">
+					// 		<ul class="tagit ui-widget ui-widget-content ui-corner-all">
+					// 		<li class="tagit-new">
+					// 		<input class="ui-widget-content ui-autocomplete-input"
+					// placeholder="Filter by tag" autocomplete="off" type="text"> <span role="status"
+					// aria-live="polite" class="ui-helper-hidden-accessible"> 1 result is available,
+					// use up and down arrow keys to navigate.</span></li> <li class="tagit-choice
+					// ui-widget-content ui-state-default ui-corner-all"> <span
+					// class="tagit-label">test</span><a class="close"><span class="text-icon">×</span>
+					// <span class="ui-icon ui-icon-close"></span></a></li> <li class="tagit-choice
+					// ui-widget-content ui-state-default ui-corner-all"> <span
+					// class="tagit-label">perdu</span><a class="close"><span class="text-icon">×</span>
+					// <span class="ui-icon ui-icon-close"></span></a></li></ul> </p>
 
-					var subA = $('<a>', {
-						href: '#',
-						class: 'ulsub',
-						text: sub.title
-					});
 
-					var subAInput;
-					if (sub.type === 'checkbox') {
-						subAInput = $('<input>', {
-							class: 'search_checkbox_sub',
-							type: 'checkbox',
-							'data-option': sub.name
-						});
-						subAInput.change(function () {
-							self.initSearch();
-						});
-					}
-
-					if (sub.type === 'input') {
-						subAInput = $('<input>', {
-							class: 'search_input_sub search_input_sub_' + sub.size,
-							type: 'text',
-							placeholder: sub.placeholder,
-							'data-option': sub.name
-						});
-						subAInput.on('input', function () {
-							self.initSearch();
-						});
-					}
-
-					ul.append($('<li>').append(subA).append(subAInput));
 				}
 			}
 
@@ -158,7 +157,8 @@ Navigate.prototype = {
 			var aInput = $('<input>', {
 				class: 'search_checkbox',
 				type: 'checkbox',
-				'data-provider': ak[i]
+				'data-provider': ak[i],
+				'data-provider-id': providerId
 			});
 			aInput.change(function () {
 				self.initSearch();
@@ -173,11 +173,193 @@ Navigate.prototype = {
 	},
 
 
+	displayPanelOptionTitle (sub) {
+		return $('<a>', {
+			href: '#',
+			class: 'ulsub',
+			text: sub.title
+		});
+	},
+
+	displayPanelCheckbox: function (ul, sub) {
+
+		if (sub.type !== 'checkbox') {
+			return;
+		}
+
+		var subA = this.displayPanelOptionTitle(sub);
+		var subAInput = $('<input>', {
+			class: 'search_checkbox_sub',
+			type: 'checkbox',
+			'data-option': sub.name
+		});
+		subAInput.change(function () {
+			self.initSearch();
+		});
+
+		ul.append($('<li>').append(subA).append(subAInput));
+	},
+
+
+	displayPanelInput: function (ul, sub) {
+		if (sub.type !== 'input') {
+			return;
+		}
+
+		var subA = this.displayPanelOptionTitle(sub);
+		var subAInput = $('<input>', {
+			class: 'search_input_sub search_input_sub_' + sub.size,
+			type: 'text',
+			placeholder: sub.placeholder,
+			'data-option': sub.name
+		});
+		subAInput.on('input', function () {
+			self.initSearch();
+		});
+
+		ul.append($('<li>').append(subA).append(subAInput));
+	},
+
+
+	displayPanelTags: function (ul, sub) {
+		if (sub.type !== 'tags') {
+			return;
+		}
+
+		var subAInput = $('<input>', {
+			id: sub.name,
+			class: 'search_tags_sub',
+			type: 'text',
+			placeholder: sub.title,
+			list: sub.name + '_datalist',
+			'data-option': sub.name
+		});
+
+		var subADataList = $('<datalist>', {
+			id: sub.name + '_datalist'
+		});
+
+		sub.list.forEach(function (item) {
+			subADataList.append($('<option>', {value: item}));
+		});
+
+
+		/**
+		 * <div class="systemTagsInfoView">
+		 *       <div class="systemTagsInputFieldContainer">
+		 *           <div id="s2id_autogen15" class="select2-container select2-container-multi
+		 * systemTagsInputField systemtags-select2-container">
+		 *               <ul class="select2-choices">
+		 *                   <li class="select2-search-choice">
+		 *                       <div>
+		 *                           <span class="label">dsfsdfds</span>
+		 *                       </div>
+		 *                       <a href="#" class="select2-search-choice-close" tabindex="-1"></a>
+		 *                   </li>
+		 *               </ul>
+		 *           </div>
+		 *           <input class="systemTagsInputField select2-offscreen" name="tags"
+		 * value="5,4,3,1,2,6" tabindex="-1" type="hidden">
+		 *       </div>
+		 * </div>
+		 */
+		// subAInput.on('change', function (e) {
+		// 	var div = $(this);
+		// 	if (e.which === 13 && div.val() !== '') {
+		// 		self.selectPanelTags($(this).attr('id'));
+		// 	}
+		//
+		//
+		// 	var url = '/apps/' + div.attr('data-provider');
+		// 	var route = JSON.parse(div.attr('data-route'));
+		//
+		// 	route.url = url + route.url;
+		// 	self.quickSearch(route, div.val(), function (res) {
+		// 		self.resultTagsSearch(div, res);
+		// 	});
+		// });
+
+		ul.append($('<li>').append(subAInput).append(subADataList));
+	},
+
+	displayPanelSearch: function (appId, ul, sub) {
+		var self = this;
+
+		if (sub.type !== 'search') {
+			return;
+		}
+
+		var subAInput = $('<input>', {
+			id: sub.name,
+			class: 'search_tags_sub',
+			type: 'text',
+			placeholder: sub.title,
+			list: sub.name + '_datalist',
+			'data-option': sub.name,
+			'data-provider': appId,
+			'data-route': JSON.stringify(sub.route)
+		});
+
+		var subADataList = $('<datalist>', {
+			id: sub.name + '_datalist'
+		});
+
+
+		subAInput.on('keypress', function (e) {
+			var div = $(this);
+			if (e.which === 13 && div.val() !== '') {
+				self.selectPanelTags($(this).attr('id'));
+			}
+
+
+			var url = '/apps/' + div.attr('data-provider');
+			var route = JSON.parse(div.attr('data-route'));
+
+			route.url = url + route.url;
+			self.quickSearch(route, div.val(), function (res) {
+				self.resultTagsSearch(div, res);
+			});
+		});
+
+		ul.append($('<li>').append(subAInput).append(subADataList));
+	},
+
+
+	// selectPanelTags: function (panelId) {
+	// 	if (this.currentTagsResult === undefined) {
+	// 		return;
+	// 	}
+	//
+	// 	var tags = this.currentTagsResult[panelId];
+	// 	if (tags.length === 0) {
+	// 		return;
+	// 	}
+	//
+	// 	if (this.selectedTags[panelId] === undefined)
+	// 		this.selectedTags[panelId] = [];
+	// 	this.selectedTags[panelId].push(tags[0]);
+	//
+	// 	console.log('etntree' + JSON.stringify(this.selectedTags[panelId]));
+	// },
+	//
+	//
+	// resultTagsSearch: function (div, res) {
+	// 	this.currentTagsResult[div.attr('id')] = res;
+	// 	var datalistId = div.attr('data-option') + '_datalist';
+	// 	var datalist = $('#' + datalistId);
+	//
+	// 	datalist.empty();
+	// 	res.forEach(function (item) {
+	// 		datalist.append($('<option>', {value: item}));
+	// 	});
+	// },
+
+
 	getProviders: function () {
 		var providers = [];
 		elements.search_panels.find('input').each(function () {
 			if ($(this).hasClass('search_checkbox') && $(this).is(":checked")) {
-				providers.push($(this).attr('data-provider'));
+				providers.push($(this).attr('data-provider-id'));
 			}
 		});
 
@@ -192,7 +374,6 @@ Navigate.prototype = {
 	getOptions: function () {
 		var options = {};
 		elements.search_panels.find('input').each(function () {
-
 			if ($(this).hasClass('search_checkbox_sub')) {
 				options[$(this).attr('data-option')] = (($(this).is(':checked')) ? '1' : '0');
 			}
@@ -230,6 +411,23 @@ Navigate.prototype = {
 	},
 
 
+	quickSearch: function (route, search, callback) {
+		$.ajax({
+			method: route.verb,
+			url: OC.generateUrl(route.url),
+			data: {
+				search: search
+			}
+		}).done(function (res) {
+			if (_.has(res, 'error')) {
+				return;
+			}
+
+			callback(res);
+		});
+	},
+
+
 	displayProviderResults: function (providers) {
 		elements.search_result.children('DIV.provider_header').each(function () {
 			if (providers === 'all' || providers.indexOf($(this).attr('data-id')) > -1) {
@@ -262,7 +460,7 @@ Navigate.prototype = {
 
 
 	onError: function (message) {
-		console.log('!' + message);
+		console.log('error while searching: ' + message);
 	},
 
 
