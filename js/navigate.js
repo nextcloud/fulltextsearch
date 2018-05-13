@@ -435,7 +435,7 @@ Navigate.prototype = {
 		elements.search_result.children('DIV.provider_header').each(function () {
 			if (providers === 'all' || providers.indexOf($(this).attr('data-id')) > -1) {
 				$(this).stop().slideDown(100).fadeTo(settings.delay_provider, 1);
-			} else {
+			} else if ($(this).css('display') !== 'none') {
 				$(this).stop().fadeTo(settings.delay_provider, 0).slideUp(100);
 			}
 		});
