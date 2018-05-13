@@ -74,13 +74,19 @@ var nav = {
 				meta.total + " results in " + meta.time + "ms";
 			divProviderNavigation.find('.provider_navigation_left').text(left);
 
-			divProviderNavigation.find('.provider_navigation_curr').text(request.page + ' / ' +
-				maxPage);
+			if (maxPage > 1) {
+				divProviderNavigation.find('.provider_navigation_curr').text(request.page + ' / ' +
+					maxPage).stop().fadeTo(200, 1);
 
-			divProviderNavigation.find('.provider_navigation_prev').stop().fadeTo(200,
-				(request.page > 1) ? 1 : 0);
-			divProviderNavigation.find('.provider_navigation_next').stop().fadeTo(200,
-				(request.page < maxPage) ? 1 : 0);
+				divProviderNavigation.find('.provider_navigation_prev').stop().fadeTo(200,
+					(request.page > 1) ? 1 : 0);
+				divProviderNavigation.find('.provider_navigation_next').stop().fadeTo(200,
+					(request.page < maxPage) ? 1 : 0);
+			} else {
+				divProviderNavigation.find('.provider_navigation_prev').stop().fadeTo(200, 0);
+				divProviderNavigation.find('.provider_navigation_curr').stop().fadeTo(200, 0);
+				divProviderNavigation.find('.provider_navigation_next').stop().fadeTo(200, 0);
+			}
 		},
 
 
