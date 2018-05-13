@@ -210,7 +210,7 @@ var nav = {
 
 		fillDivResult: function (divResult, entry) {
 			divResult.find('#title').text(entry.title);
-			divResult.find('#score').text(entry.score);
+			// divResult.find('#score').text(entry.score);
 
 			nav.fillDivResultExcepts(divResult, entry);
 

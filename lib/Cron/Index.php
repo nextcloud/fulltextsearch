@@ -62,7 +62,7 @@ class Index extends TimedJob {
 	private $runner;
 
 	public function __construct() {
-		$this->setInterval(20 * 60); // 20 minutes
+		$this->setInterval(12 * 60); // 12 minutes
 	}
 
 

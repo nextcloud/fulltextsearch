@@ -1,6 +1,16 @@
 # Changelog
 
 
+### 0.7.0
+
+- navigation app to search within all content from your providers
+- better navigation
+- content (index and search) can be splited in Parts 
+- rework on the exchange between platform and providers
+- bugfixes
+
+
+
 ### 0.6.1
 
 - bugfix: removing reset of the index on migration
