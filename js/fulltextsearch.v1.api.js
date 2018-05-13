@@ -37,7 +37,7 @@ var api = {
 	search: function (request, callback, callbackError) {
 		var res = {
 			status: -1,
-			error: 'failed to connect to Nextcloud'
+			error: 'Failed to reach server. Try reloading the page'
 		};
 
 		nav.onSearchRequest(request);
@@ -61,7 +61,7 @@ var api = {
 			api.onCallback(callback, res);
 		}).fail(function () {
 			if (!api.onCallback(callbackError, res)) {
-				nav.onError('Failed to reach server. Try reloading the page');
+				nav.onError(res.error);
 			}
 		});
 	},
