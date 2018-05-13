@@ -187,6 +187,7 @@ Navigate.prototype = {
 			return;
 		}
 
+		var self = this;
 		var subA = this.displayPanelOptionTitle(sub);
 		var subAInput = $('<input>', {
 			class: 'search_checkbox_sub',
@@ -206,6 +207,7 @@ Navigate.prototype = {
 			return;
 		}
 
+		var self = this;
 		var subA = this.displayPanelOptionTitle(sub);
 		var subAInput = $('<input>', {
 			class: 'search_input_sub search_input_sub_' + sub.size,
@@ -226,6 +228,7 @@ Navigate.prototype = {
 			return;
 		}
 
+		var self = this;
 		var subAInput = $('<input>', {
 			id: sub.name,
 			class: 'search_tags_sub',
