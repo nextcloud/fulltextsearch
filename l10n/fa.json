@@ -4,5 +4,5 @@
     "Tick not found" : "تیک یافت نشد",
     "Full text search (BETA)" : "جستجوی کامل متن (آزمایشی)",
     "Search on %s" : "%s جستجو در ‍"
-},"pluralForm" :"nplurals=1; plural=0;"
+},"pluralForm" :"nplurals=2; plural=((n<=1 && n>= 0) ? 1);"
 }

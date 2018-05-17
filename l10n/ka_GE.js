@@ -7,4 +7,4 @@ OC.L10N.register(
     "Full text search (BETA)" : "სრული ტექსტის ძიება (ბეტა)",
     "Search on %s" : "ძიება %s-ზე"
 },
-"nplurals=1; plural=0;");
+"nplurals=2; plural=(n==1);");
