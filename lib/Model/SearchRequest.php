@@ -55,6 +55,9 @@ class SearchRequest implements \JsonSerializable {
 	private $parts = [];
 
 	/** @var array */
+	private $fields = [];
+
+	/** @var array */
 	private $wildcardQueries = [];
 
 	/** @var array */
@@ -202,6 +205,36 @@ class SearchRequest implements \JsonSerializable {
 	 */
 	public function getParts() {
 		return $this->parts;
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function getFields() {
+		return $this->fields;
+	}
+
+	/**
+	 * @param array $fields
+	 *
+	 * @return $this
+	 */
+	public function setFields($fields) {
+		$this->fields = $fields;
+
+		return $this;
+	}
+
+	/**
+	 * @param $field
+	 *
+	 * @return $this
+	 */
+	public function addField($field) {
+		$this->fields[] = $field;
+
+		return $this;
 	}
 
 
