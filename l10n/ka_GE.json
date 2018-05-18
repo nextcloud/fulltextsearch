@@ -4,5 +4,5 @@
     "Tick not found" : "Tick ვერ იქნა ნაპოვნი",
     "Full text search (BETA)" : "სრული ტექსტის ძიება (ბეტა)",
     "Search on %s" : "ძიება %s-ზე"
-},"pluralForm" :"nplurals=2; plural=(n==1);"
+},"pluralForm" :"nplurals=2; plural=(n!=1);"
 }
