@@ -90,12 +90,18 @@ class TemplatesController extends Controller {
 	public function getOptionsPanel($providerId) {
 		$provider = $this->providerService->getProvider($providerId);
 
-		$ret = [];
+		$panel = [];
 		$options = $provider->getOptionsTemplate();
 		if (is_array($options) && array_key_exists('panel', $options)) {
-			$tmpl = $this->getTemplate($provider, $options['panel']);
-			$ret[$providerId] = $tmpl->render();
+			$panel = $options['panel'];
 		}
+
+		if (array_key_exists('template', $panel)) {
+			$tmpl = new TemplateResponse($provider->getAppId(), $panel['template'], [], 'blank');
+			$panel['template'] = $tmpl->render();
+		}
+
+		$ret[$providerId] = $panel;
 
 		return new DataResponse($ret, Http::STATUS_OK);
 	}
@@ -134,23 +140,6 @@ class TemplatesController extends Controller {
 		}
 
 		return new DataResponse($ret, Http::STATUS_OK);
-	}
-
-
-	/**
-	 * @param IFullTextSearchProvider $provider
-	 * @param array $panel
-	 *
-	 * @return TemplateResponse
-	 * @throws Exception
-	 */
-	private function getTemplate(IFullTextSearchProvider $provider, $panel) {
-
-		if (!is_array($panel) || !array_key_exists('template', $panel)) {
-			throw new Exception('malformed option panel');
-		}
-
-		return new TemplateResponse($provider->getAppId(), $panel['template'], [], 'blank');
 	}
 
 

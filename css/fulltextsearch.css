@@ -49,6 +49,16 @@ input.options_small {
 }
 
 
+.fts_options_input {
+	margin-right: 10px !important;
+	opacity: 0.65;
+}
+
+.fts_options_input_small {
+	width: 70px;
+}
+
+
 /**
 
  */

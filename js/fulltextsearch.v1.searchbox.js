@@ -35,7 +35,8 @@
 
 var box_elements = {
 	searchInput: null,
-	searchMore: null,
+	searchOptions: null,
+	searchTemplate: null,
 	searchError: null,
 	divFullTextSearchIcon: null,
 	divFullTextSearchPopup: null
@@ -116,14 +117,16 @@ var searchbox = {
 			id: 'fts-input',
 			placeholder: 'Search ' + settings.searchProviderName
 		}).on('keyup', self.searching);
-		box_elements.searchMore = $('<div>', {id: 'fts-more'});
+		box_elements.searchOptions = $('<div>', {id: 'fts-options'});
+		box_elements.searchTemplate = $('<div>', {id: 'fts-options-template'});
 		box_elements.searchError = $('<div>', {id: 'fts-error'});
 
 		var divHeader = $('<div>', {id: 'fts-header'});
 		divHeader.append($('<div>').append(box_elements.searchInput));
 
 		popup.append(divHeader);
-		popup.append(box_elements.searchMore);
+		popup.append(box_elements.searchOptions);
+		popup.append(box_elements.searchTemplate);
 		popup.append(box_elements.searchError.hide());
 
 		return popup;
@@ -198,39 +201,121 @@ var searchbox = {
 			return;
 		}
 
-		box_elements.searchMore.html(result[settings.searchProviderId]);
-		box_elements.searchMore.find('INPUT').each(function () {
-			$(this).on('change keyup', function () {
-				searchbox.searching(true);
+		if (result[settings.searchProviderId]['options']) {
+			searchbox.generateOptionsHtml(result[settings.searchProviderId]['options']);
+			box_elements.searchOptions.find('INPUT').each(function () {
+				searchbox.eventOnOptionsLoadedInput($(this));
 			});
-		})
+		}
+
+		if (result[settings.searchProviderId]['template']) {
+			box_elements.searchTemplate.html(result[settings.searchProviderId]['template']);
+			box_elements.searchTemplate.find('INPUT').each(function () {
+				searchbox.eventOnOptionsLoadedInput($(this))
+			});
+		}
 	},
 
 
-	/**
-	 *
-	 * 0.6.0
-	 *
-	 *
-	 */
+	eventOnOptionsLoadedInput: function (div) {
+		div.on('change keyup', function () {
+			searchbox.searching(true);
+		});
+	},
+
+
+	generateOptionsHtml: function (options) {
+		var div = $('<div>', {class: 'div-table'});
+
+		for (var j = 0; j < options.length; j++) {
+			var sub = options[j];
+			searchbox.displayPanelCheckbox(div, sub);
+			searchbox.displayPanelInput(div, sub);
+		}
+
+		box_elements.searchOptions.append(div);
+	},
+
+
+	displayPanelOptionTitle (sub) {
+		var subDiv = $('<div>', {
+			class: 'div-table-row'
+		});
+
+		subDiv.append($('<div>',
+			{
+				class: 'div-table-col div-table-col-left'
+			}).append($('<span>', {
+			class: 'leftcol',
+			text: sub.title
+		})));
+
+		subDiv.append($('<div>',
+			{class: 'div-table-col div-table-col-right'}));
+
+		return subDiv;
+	},
+
+
+	displayPanelCheckbox: function (div, sub) {
+		if (sub.type !== 'checkbox') {
+			return;
+		}
+
+		var subDiv = searchbox.displayPanelOptionTitle(sub);
+		var subDivInput = $('<input>', {
+			type: 'checkbox',
+			id: sub.name,
+			value: 1
+		});
+		subDiv.find('.div-table-col-right').append(subDivInput);
+		div.append(subDiv);
+	},
+
+
+	displayPanelInput: function (div, sub) {
+		if (sub.type !== 'input') {
+			return;
+		}
+
+		var subDiv = searchbox.displayPanelOptionTitle(sub);
+		var subDivInput = $('<input>', {
+			class: 'fts_options_input fts_options_input_' + sub.size,
+			type: 'text',
+			placeholder: sub.placeholder,
+			id: sub.name
+		});
+		subDiv.find('.div-table-col-right').append(subDivInput);
+		div.append(subDiv);
+	},
+
+
 	getSearchOptions: function () {
 		var options = {};
 
-		if (box_elements.searchMore === null) {
+		if (box_elements.searchTemplate === null) {
 			return options;
 		}
 
-		box_elements.searchMore.find('INPUT').each(function () {
-			var value = $(this).val();
-
-			if ($(this).attr('type') === 'checkbox' && !$(this).is(':checked')) {
-				value = '';
-			}
-
-			options[$(this).attr('id')] = value;
+		box_elements.searchOptions.find('INPUT').each(function () {
+			searchbox.getSearchOptionsFromInput($(this), options);
+		});
+		box_elements.searchTemplate.find('INPUT').each(function () {
+			searchbox.getSearchOptionsFromInput($(this), options);
 		});
 
 		return options;
+	},
+
+
+	getSearchOptionsFromInput: function (div, options) {
+		var value = div.val();
+
+		if (div.attr('type') === 'checkbox' && !div.is(':checked')) {
+			value = '';
+		}
+
+		options[div.attr('id')] = value;
 	}
 
 
