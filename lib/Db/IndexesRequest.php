@@ -101,6 +101,17 @@ class IndexesRequest extends IndexesRequestBuilder {
 	}
 
 
+	public function updateStatus($providerId, $indexes, $status) {
+		$qb = $this->getIndexesUpdateSql();
+		$qb->set('status', $qb->createNamedParameter($status));
+
+		$this->limitToProviderId($qb, $providerId);
+		$this->limitToDocumentId($qb, $indexes);
+
+		$qb->execute();
+	}
+
+
 	/**
 	 * @param Index $index
 	 */
@@ -157,6 +168,35 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 
 		return $this->parseIndexesSelectSql($data);
+	}
+
+
+	/**
+	 * return index.
+	 *
+	 * @param string $providerId
+	 * @param array $documentIds
+	 *
+	 * @return ExtendedIndex[]
+	 * @throws IndexDoesNotExistException
+	 */
+	public function getIndexes($providerId, $documentIds) {
+		$qb = $this->getIndexesSelectSql();
+		$this->limitToProviderId($qb, $providerId);
+		$this->limitToDocumentIds($qb, $documentIds);
+
+		$indexes = [];
+		$cursor = $qb->execute();
+		while ($data = $cursor->fetch()) {
+			$indexes[] = $this->parseIndexesSelectSql($data);
+		}
+		$cursor->closeCursor();
+
+		if (sizeof($indexes) === 0) {
+			throw new IndexDoesNotExistException($this->l10n->t('Index not found'));
+		}
+
+		return $indexes;
 	}
 
 

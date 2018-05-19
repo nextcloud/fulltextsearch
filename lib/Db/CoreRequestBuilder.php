@@ -65,7 +65,8 @@ class CoreRequestBuilder {
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IL10N $l10n, IDBConnection $connection, ConfigService $configService, MiscService $miscService
+		IL10N $l10n, IDBConnection $connection, ConfigService $configService,
+		MiscService $miscService
 	) {
 		$this->l10n = $l10n;
 		$this->dbConnection = $connection;
@@ -119,6 +120,17 @@ class CoreRequestBuilder {
 
 
 	/**
+	 * Limit to documentIds
+	 *
+	 * @param IQueryBuilder $qb
+	 * @param array $documentIds
+	 */
+	protected function limitToDocumentIds(IQueryBuilder &$qb, $documentIds) {
+		$this->limitToDBField($qb, 'document_id', $documentIds);
+	}
+
+
+	/**
 	 * Limit the request to the Source
 	 *
 	 * @param IQueryBuilder $qb
@@ -143,12 +155,23 @@ class CoreRequestBuilder {
 	/**
 	 * @param IQueryBuilder $qb
 	 * @param string $field
-	 * @param string|integer $value
+	 * @param string|integer|array $values
 	 */
-	private function limitToDBField(IQueryBuilder &$qb, $field, $value) {
+	private function limitToDBField(IQueryBuilder &$qb, $field, $values) {
 		$expr = $qb->expr();
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
-		$qb->andWhere($expr->eq($pf . $field, $qb->createNamedParameter($value)));
+		$field = $pf . $field;
+
+		if (!is_array($values)) {
+			$values = [$values];
+		}
+
+		$orX = $expr->orX();
+		foreach($values as $value) {
+			$orX->add($expr->eq($field, $qb->createNamedParameter($value)));
+		}
+
+		$qb->andWhere($orX);
 	}
 
 

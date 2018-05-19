@@ -356,33 +356,42 @@ class IndexService {
 
 	/**
 	 * @param string $providerId
-	 * @param string|int $documentId
+	 * @param array $documentIds
 	 * @param int $status
 	 * @param bool $reset
 	 *
 	 * @throws DatabaseException
 	 */
-	public function updateIndexStatus($providerId, $documentId, $status, $reset = false) {
+	public function updateIndexesStatus($providerId, $documentIds, $status, $reset = false) {
+		if ($reset === true) {
+			$this->indexesRequest->updateStatus($providerId, $documentIds, $status);
+
+			return;
+		}
+
 		try {
-			$curr = $this->getIndex($providerId, $documentId);
+			$all = $this->getIndexes($providerId, $documentIds);
 		} catch (IndexDoesNotExistException $e) {
 			return;
 		}
 
-		$curr->setStatus($status, $reset);
-		$this->updateIndexes([$curr]);
+		foreach ($all as $curr) {
+			$curr->setStatus($status);
+			$this->updateIndexes([$curr]);
+		}
+
 	}
 
 
 	/**
 	 * @param string $providerId
-	 * @param string|int $documentId
+	 * @param array $documentId
 	 *
-	 * @return ExtendedIndex
+	 * @return ExtendedIndex[]
 	 * @throws IndexDoesNotExistException
 	 */
-	public function getIndex($providerId, $documentId) {
-		return $this->indexesRequest->getIndex($providerId, $documentId);
+	public function getIndexes($providerId, $documentId) {
+		return $this->indexesRequest->getIndexes($providerId, $documentId);
 	}
 
 

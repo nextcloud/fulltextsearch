@@ -27,6 +27,7 @@
 namespace OCA\FullTextSearch\Api\v1;
 
 
+use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Model\ExtendedIndex;
 use OCA\FullTextSearch\Model\Index;
@@ -62,10 +63,19 @@ class FullTextSearch {
 	 *
 	 * returns the current version of the API
 	 *
-	 * @return int[]
+	 * @return array
+	 * @throws QueryException
 	 */
 	public static function version() {
-		return self::API_VERSION;
+		$c = self::getContainer();
+
+		return [
+			[
+				'fulltextsearch' => $c->query(ConfigService::class)
+									  ->getAppValue('installed_version')
+			],
+			['api' => self::API_VERSION]
+		];
 	}
 
 
@@ -118,18 +128,22 @@ class FullTextSearch {
 
 	/**
 	 * @param string $providerId
-	 * @param string|int $documentId
+	 * @param string|int|array $documentIds
 	 * @param int $status
 	 * @param bool $reset
 	 *
 	 * @return mixed
 	 * @throws QueryException
 	 */
-	public static function updateIndexStatus($providerId, $documentId, $status, $reset = false) {
+	public static function updateIndexStatus($providerId, $documentIds, $status, $reset = false) {
 		$c = self::getContainer();
 
+		if (!is_array($documentIds)) {
+			$documentIds = [$documentIds];
+		}
+
 		return $c->query(IndexService::class)
-				 ->updateIndexStatus($providerId, $documentId, $status, $reset);
+				 ->updateIndexesStatus($providerId, $documentIds, $status, $reset);
 	}
 
 
