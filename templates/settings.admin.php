@@ -45,7 +45,7 @@ Util::addStyle(Application::APP_NAME, 'admin');
 	</span>
 	&nbsp;<br/>
 	&nbsp;<br/>
-	<h2><?php p($l->t('Full text search')) ?></h2>
+	<h2><?php p($l->t('General')) ?></h2>
 	<div class="div-table">
 
 		<div class="div-table-row">
