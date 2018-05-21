@@ -181,6 +181,7 @@ Navigate.prototype = {
 		});
 	},
 
+
 	displayPanelCheckbox: function (ul, sub) {
 
 		if (sub.type !== 'checkbox') {
