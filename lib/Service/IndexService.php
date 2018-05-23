@@ -27,7 +27,6 @@
 namespace OCA\FullTextSearch\Service;
 
 use Exception;
-use OC\User\NoUserException;
 use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
