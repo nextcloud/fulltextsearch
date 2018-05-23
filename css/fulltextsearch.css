@@ -48,7 +48,6 @@ input.options_small {
 	width: 60px;
 }
 
-
 .fts_options_input {
 	margin-right: 10px !important;
 	opacity: 0.65;
@@ -58,13 +57,12 @@ input.options_small {
 	width: 70px;
 }
 
-
 /**
 
  */
 
 .provider_result {
-	font-style: italic;
+//	font-style: italic;
 }
 
 .provider_navigation_right {
@@ -72,7 +70,7 @@ input.options_small {
 	right: 0;
 	top: 0;
 	height: 15px;
-	margin: auto 20px auto 0;
+	margin: auto 25px auto 0;
 	bottom: 0;
 }
 
@@ -91,23 +89,27 @@ input.options_small {
 	margin: -3px 0 0 11px;
 }
 
-.provider_navigation_prev, .provider_navigation_next, .provider_navigation_close {
+.provider_navigation_prev, .provider_navigation_next, .provider_navigation_close, .provider_navigation_page {
 	cursor: pointer;
 }
 
+.provider_navigation_page {
+	font-size: 11px;
+	white-space: nowrap;
+	margin: -3px 16px -3px 16px;
+}
+
 .result_entry_default {
-	height: 50px;
+	height: 55px;
 	width: 100%;
-	display: inline-block;
-	background: #eeeeee;
-	padding-bottom: 2px;
+	border-bottom: solid 1px #d1d1d1;
 }
 
 .result_entry_left {
 	float: left;
 	position: relative;
-	top: 50%;
-	margin-left: 10px;
+	top: 45%;
+	margin-left: 16px;
 	transform: perspective(1px) translateY(-50%);
 }
 
@@ -125,15 +127,17 @@ input.options_small {
 }
 
 .result_entry_default #line1, .result_entry_default #line2 {
-	color: #333333;
+	color: #717171;
 	font-size: 11px;
 	height: 12px;
-	font-style: italic;
 }
 
 .result_entry_default #score {
+	/*font-weight: bold;*/
+}
+
+.result_entry_default #info {
 	font-weight: bold;
-	font-style: italic;
 }
 
 .next_search_div {
@@ -147,28 +151,30 @@ input.options_small {
 	position: relative;
 	font-size: 15px;
 	font-weight: bold;
-	color: #444;
-	background: #ddd;
-	margin-bottom: 16px;
+	color: #898989;
 	padding-top: 10px;
 	padding-left: 20px;
 	padding-bottom: 10px;
 	margin-top: 40px;
+	border-bottom: solid 1px #a1a1a1;
 }
 
 .icon-page-prev {
 	background-image: url('../img/page-prev.svg');
+	background-position: left;
+	padding-left: 18px;
 }
 
 .icon-page-next {
 	background-image: url('../img/page-next.svg');
+	background-position: right;
+	padding-right: 18px;
 }
 
 .icon-page-next, .icon-page-prev {
 	background-repeat: no-repeat;
-	background-position: center;
-	width: 16px;
 	height: 16px;
+	font-size: 11px;
 }
 
 /*.icon-fulltextsearch, .icon-close-fulltextsearch {*/

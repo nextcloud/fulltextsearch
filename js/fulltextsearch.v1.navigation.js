@@ -70,7 +70,7 @@ var nav = {
 			divProviderNavigation.attr('data-total', meta.total);
 
 			var providerTitle = divProviderNavigation.attr('data-provider-title');
-			var left = "Search " + providerTitle + " for '" + request.search + "' returned " +
+			var left = "the search in " + providerTitle + " for '" + request.search + "' returned " +
 				meta.total + " results in " + meta.time + "ms";
 			divProviderNavigation.find('.provider_navigation_left').text(left);
 
@@ -329,20 +329,26 @@ var nav = {
 
 		generateDivProvider: function (providerId, providerName) {
 
-
 			var divProviderNavigation = $('<div>', {class: 'provider_navigation'});
 			divProviderNavigation.attr('data-provider-id', providerId);
 			divProviderNavigation.attr('data-provider-title', providerName);
 			divProviderNavigation.append($('<div>', {class: 'provider_navigation_left'}));
 
 			var divProviderPagination = $('<div>', {class: 'provider_navigation_right'});
-			var divProviderPaginationPrev = $('<div>', {class: 'icon-page-prev provider_navigation_prev'});
+			var divProviderPaginationPrev = $('<div>', {class: 'provider_navigation_prev'}).append(
+				$('<div>', {class: 'provider_navigation_page'}).text('previous page'));
+
 			divProviderPaginationPrev.on('click', function () {
+				var prevPage = Number(divProviderNavigation.attr('data-page')) - 1;
+				if (prevPage < 1) {
+					return;
+				}
+
 				fullTextSearch.search({
 					providers: providerId,
 					options: JSON.parse(divProviderNavigation.attr('data-options')),
 					search: divProviderNavigation.attr('data-search'),
-					page: Number(divProviderNavigation.attr('data-page')) - 1,
+					page: prevPage,
 					size: divProviderNavigation.attr('data-size')
 				});
 			});
@@ -350,13 +356,21 @@ var nav = {
 
 			divProviderPagination.append($('<div>', {class: 'provider_navigation_curr'}));
 
-			var divProviderPaginationNext = $('<div>', {class: 'icon-page-next provider_navigation_next'});
+			var divProviderPaginationNext = $('<div>',
+				{class: 'provider_navigation_next'}).append(
+				$('<div>', {class: 'provider_navigation_page'}).text('next page'));
+
 			divProviderPaginationNext.on('click', function () {
+				var nextPage = Number(divProviderNavigation.attr('data-page')) + 1;
+				if (nextPage > Number(divProviderNavigation.attr('data-max-page'))) {
+					return;
+				}
+
 				fullTextSearch.search({
 					providers: providerId,
 					options: JSON.parse(divProviderNavigation.attr('data-options')),
 					search: divProviderNavigation.attr('data-search'),
-					page: Number(divProviderNavigation.attr('data-page')) + 1,
+					page: nextPage,
 					size: divProviderNavigation.attr('data-size')
 				});
 			});
