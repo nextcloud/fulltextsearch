@@ -5,6 +5,7 @@ OC.L10N.register(
     "Index not found" : "No se encontró el índice",
     "Tick not found" : "Marca no encontrada",
     "Full text search (BETA)" : "Búsqueda de texto completo (BETA)",
-    "Search on %s" : "Busar en %s"
+    "Search on %s" : "Busar en %s",
+    "General" : "General"
 },
 "nplurals=2; plural=(n != 1);");
