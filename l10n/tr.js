@@ -5,6 +5,7 @@ OC.L10N.register(
     "Index not found" : "Dizin bulunamadı",
     "Tick not found" : "İşaret bulunamadı",
     "Full text search (BETA)" : "Tam metin arama (BETA)",
-    "Search on %s" : "%s üzerine arama"
+    "Search on %s" : "%s üzerine arama",
+    "General" : "Genel"
 },
 "nplurals=2; plural=(n > 1);");
