@@ -211,6 +211,9 @@ var nav = {
 		fillDivResult: function (divResult, entry) {
 			divResult.find('#title').text(entry.title);
 			// divResult.find('#score').text(entry.score);
+			if (entry.info.source !== '') {
+				divResult.find('#source').text(entry.info.source);
+			}
 
 			nav.fillDivResultExcepts(divResult, entry);
 
@@ -303,7 +306,7 @@ var nav = {
 			}
 
 			var tmpl = divTemplate.html();
-			tmpl = tmpl.replace(/%%id%%/g, escapeHTML(document.id));
+//			tmpl = tmpl.replace(/%%id%%/g, escapeHTML(document.id));
 
 			var div = $('<div>', {class: 'result_template'});
 			div.html(tmpl).fadeTo(0);
@@ -314,9 +317,13 @@ var nav = {
 
 		generateDivResult: function (entry, divResultContent) {
 			var divResult = $('<div>', {class: 'result_entry'});
+
+			console.log('!!! ' + JSON.stringify(entry.info));
 			divResult.hide();
 			divResult.attr('data-id', entry.id);
 			divResult.attr('data-link', entry.link);
+			divResult.attr('data-source', entry.source);
+			divResult.attr('data-info', JSON.stringify(entry.info));
 			divResult.attr('data-result', JSON.stringify(entry));
 			divResult.append(divResultContent);
 

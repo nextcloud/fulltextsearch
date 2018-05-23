@@ -490,6 +490,7 @@ class IndexDocument implements \JsonSerializable {
 			'title'        => $this->getTitle(),
 			'link'         => $this->getLink(),
 			'source'       => $this->getSource(),
+			'info'         => $this->getInfoAll(),
 			'tags'         => $this->getTags(),
 			'more'         => $this->getMore(),
 			'excerpts'     => $this->getExcerpts(),

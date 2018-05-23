@@ -62,12 +62,12 @@ Util::addStyle(Application::APP_NAME, 'navigate');
 <script id="template_entry" type="text/template">
 	<div class="result_entry_default">
 		<div class="result_entry_left">
-			<div id="title"></div>
-			<div id="line1"></div>
-			<div id="line2"></div>
+			<div id="title">&nbsp;</div>
+			<div id="line1">&nbsp;</div>
+			<div id="line2">&nbsp;</div>
 		</div>
 		<div class="result_entry_right">
-			<div id="info">&nbsp;</div>
+			<div id="source">&nbsp;</div>
 			<div id="score">&nbsp;</div>
 		</div>
 	</div>
