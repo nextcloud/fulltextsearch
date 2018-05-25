@@ -5,6 +5,8 @@ OC.L10N.register(
     "Index not found" : "Índice não encontrado",
     "Tick not found" : "Verificação não encontrada",
     "Full text search (BETA)" : "Pesquisa por texto completo (BETA)",
+    "Core of the full-text search framework for Nextcloud" : "Núcleo da estrutura de pesquisa de texto completo para Nextcloud",
+    "Core App of the full-text search framework for your Nextcloud." : "Aplicativo principal da estrutura de pesquisa de texto completo para Nextcloud.",
     "Search on %s" : "Pesquisar em %s",
     "General" : "Geral"
 },
