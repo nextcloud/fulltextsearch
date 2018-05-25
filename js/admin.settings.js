@@ -112,6 +112,8 @@ var fts_admin_settings = {
 			$('#' + providerIds[i]).stop().fadeTo(300, 0);
 		}
 
+		$('.subprovider').stop().fadeTo(300, 0);
+
 		// we only check that a search_platform is valid. we don't manage a list of enabled provider as
 		// of right now
 		if (result.search_platform.length === 0) {
@@ -121,6 +123,24 @@ var fts_admin_settings = {
 		for (i = 0; i < providerIds.length; i++) {
 			$('#' + providerIds[i]).stop().fadeTo(300, 1);
 		}
+	},
+
+
+	updateEnabledSubProviders: function () {
+		$('body').find('.subprovider').each(function () {
+			var top = $(this).attr('id').split('-', 2);
+
+			if (top.length < 2) {
+				return;
+			}
+
+			var topOption = top[0];
+			if ($('#' + topOption).is(':checked')) {
+				$(this).stop().fadeTo(300, 1).slideDown();
+			} else {
+				$(this).stop().fadeTo(300, 0).slideUp();
+			}
+		});
 	},
 
 
@@ -134,6 +154,8 @@ var fts_admin_settings = {
 	tagSettingsAsSaved: function (div) {
 		div.find('INPUT').animate({'backgroundColor': 'rgba(255, 255, 255, 0.18)'}, 300);
 		div.find('SELECT').animate({'backgroundColor': '#fff'}, 300);
+
+		fts_admin_settings.updateEnabledSubProviders();
 	},
 
 
