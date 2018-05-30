@@ -1,7 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "Full text search" : "Full-textové vyhledávání",
+    "Full text search" : "Plnotextové vyhledávání",
     "Index not found" : "Index nebyl nalezen",
     "Full text search (BETA)" : "Full-textové vyhledávání (BETA)",
     "Search on %s" : "Hledat v%s",
