@@ -59,6 +59,9 @@ class IndexDocument implements \JsonSerializable {
 	/** @var string */
 	public $content = null;
 
+	/** @var string */
+	public $hash = '';
+
 	/** @var array */
 	public $parts = [];
 
@@ -276,6 +279,38 @@ class IndexDocument implements \JsonSerializable {
 
 
 	/**
+	 * @return $this
+	 */
+	public function initHash() {
+		if ($this->getContent() === '' || is_null($this->getContent())) {
+			return $this;
+		}
+
+		$this->hash = hash("md5", $this->getContent());
+
+		return $this;
+	}
+
+	/**
+	 * @param $hash
+	 *
+	 * @return $this
+	 */
+	public function setHash($hash) {
+		$this->hash = $hash;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getHash() {
+		return $this->hash;
+	}
+
+
+	/**
 	 * @param string $part
 	 * @param string $content
 	 *
@@ -468,6 +503,7 @@ class IndexDocument implements \JsonSerializable {
 		unset($this->modifiedTime);
 		unset($this->title);
 		unset($this->content);
+		unset($this->hash);
 		unset($this->link);
 		unset($this->source);
 		unset($this->tags);
@@ -491,6 +527,7 @@ class IndexDocument implements \JsonSerializable {
 			'link'         => $this->getLink(),
 			'source'       => $this->getSource(),
 			'info'         => $this->getInfoAll(),
+			'hash'         => $this->getHash(),
 			'tags'         => $this->getTags(),
 			'more'         => $this->getMore(),
 			'excerpts'     => $this->getExcerpts(),

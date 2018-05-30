@@ -107,6 +107,7 @@ var nav = {
 				var entry = newResult[i];
 				if (result.getResultIndex(entry.id, oldResult) > -1) {
 					precItem = nav.getDivResult(entry.id, divProviderResult);
+					nav.fillDivResult(precItem, entry);
 					continue;
 				}
 
@@ -210,9 +211,14 @@ var nav = {
 
 		fillDivResult: function (divResult, entry) {
 			divResult.find('#title').text(entry.title);
-			// divResult.find('#score').text(entry.score);
+
+			divResult.find('#source').html('&nbsp;');
 			if (entry.info.source !== '') {
 				divResult.find('#source').text(entry.info.source);
+			}
+
+			if (settings.options.show_hash === '1') {
+				divResult.find('#source').text(entry.hash);
 			}
 
 			nav.fillDivResultExcepts(divResult, entry);
@@ -318,7 +324,6 @@ var nav = {
 		generateDivResult: function (entry, divResultContent) {
 			var divResult = $('<div>', {class: 'result_entry'});
 
-			console.log('!!! ' + JSON.stringify(entry.info));
 			divResult.hide();
 			divResult.attr('data-id', entry.id);
 			divResult.attr('data-link', entry.link);
@@ -328,7 +333,6 @@ var nav = {
 			divResult.append(divResultContent);
 
 			nav.fillDivResult(divResult, entry);
-			nav.onEntryGenerated(divResult);
 
 			return divResult;
 		},

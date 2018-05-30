@@ -122,8 +122,44 @@ class SearchRequest implements \JsonSerializable {
 		$this->search = $search;
 	}
 
+
 	public function cleanSearch() {
-		$this->search = trim(str_replace('  ', ' ', $this->search));
+		$search = trim(str_replace('  ', ' ', $this->getSearch()));
+
+		preg_match_all('/[^?]"(?:\\\\.|[^\\\\"])*"|\S+/', " $search ", $words);
+		$searchItems = [];
+		foreach ($words[0] as $word) {
+			if ($this->searchQueryOptions($word)) {
+				continue;
+			}
+
+			$searchItems[] = $word;
+		}
+
+		$this->setSearch(implode(" ", $searchItems));
+	}
+
+
+	/**
+	 * @param $word
+	 *
+	 * @return bool
+	 */
+	private function searchQueryOptions($word) {
+		if (($pos = strpos($word, ':')) === false) {
+			return false;
+		}
+
+		list($kw, $value) = explode(':', $word, 2);
+		$options = ['is', 'show'];
+
+		if (in_array($kw, $options)) {
+			$this->addOption($kw . '_' . $value, '1');
+
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -173,6 +209,18 @@ class SearchRequest implements \JsonSerializable {
 	 */
 	public function setOptions($options) {
 		$this->options = $options;
+	}
+
+	/**
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return $this
+	 */
+	public function addOption($key, $value) {
+		$this->options[$key] = $value;
+
+		return $this;
 	}
 
 	/**

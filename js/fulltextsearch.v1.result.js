@@ -45,6 +45,7 @@ var result = {
 			return;
 		}
 
+		settings.options = res.request.options;
 		for (var i = 0; i < searchResult.length; i++) {
 			result.displayProviderResult(res.request, searchResult[i]);
 		}

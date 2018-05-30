@@ -40,6 +40,7 @@ var settings = {
 	entryTemplate: null,
 	entryTemplateDefault: null,
 	divNoResult: null,
+	options: [],
 
 	/**
 	 * generate the default template to dsplay search result entries
