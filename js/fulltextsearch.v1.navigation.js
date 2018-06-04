@@ -244,10 +244,14 @@ var nav = {
 
 			if (entry.excerpts.length > 0) {
 				divResult.find('#line1').text(entry.excerpts[0]);
+			} else {
+				divResult.find('#line1').html('&nbsp;');
 			}
 
 			if (entry.excerpts.length > 1) {
 				divResult.find('#line2').text(entry.excerpts[1]);
+			} else {
+				divResult.find('#line2').html('&nbsp;');
 			}
 
 		},
