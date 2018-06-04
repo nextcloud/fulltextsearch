@@ -58,6 +58,9 @@ class SearchRequest implements \JsonSerializable {
 	private $fields = [];
 
 	/** @var array */
+	private $wildcardFields = [];
+
+	/** @var array */
 	private $wildcardQueries = [];
 
 	/** @var array */
@@ -123,6 +126,9 @@ class SearchRequest implements \JsonSerializable {
 	}
 
 
+	/**
+	 *
+	 */
 	public function cleanSearch() {
 		$search = trim(str_replace('  ', ' ', $this->getSearch()));
 
@@ -313,7 +319,26 @@ class SearchRequest implements \JsonSerializable {
 	 *
 	 * @return $this
 	 */
-	public function addWildcardQuery($query) {
+	public function addWildcardField($field) {
+		$this->wildcardFields[] = $field;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getWildcardFields() {
+		return $this->wildcardFields;
+	}
+
+
+	/**
+	 * @param array $query
+	 *
+	 * @return $this
+	 */
+	public function addWildcardQuery($field) {
 		$this->addWildcardQueries([$query]);
 
 		return $this;
