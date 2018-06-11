@@ -298,6 +298,7 @@ class Index implements \JsonSerializable {
 		return [
 			'ownerId'    => $this->getOwnerId(),
 			'providerId' => $this->getProviderId(),
+			'source'     => $this->getSource(),
 			'documentId' => $this->getDocumentId(),
 			'lastIndex'  => $this->getLastIndex(),
 			'status'     => (int)$this->getStatus(),

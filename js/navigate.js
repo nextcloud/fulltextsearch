@@ -468,10 +468,10 @@ Navigate.prototype = {
 	},
 
 
-	onEntryGenerated: function (entry) {
-		this.deleteEmptyDiv(entry, '#line1');
-		this.deleteEmptyDiv(entry, '#line2');
-	},
+	// onEntryGenerated: function (entry) {
+	// 	this.deleteEmptyDiv(entry, '#line1');
+	// 	this.deleteEmptyDiv(entry, '#line2');
+	// },
 
 
 	deleteEmptyDiv: function (entry, divId) {

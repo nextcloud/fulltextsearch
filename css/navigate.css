@@ -57,7 +57,10 @@ a.ulsub {
 
 */
 #search_result {
-	margin: 50px 30px 0 30px;
+}
+
+.provider_header {
+	margin-bottom: 35px;
 }
 
 .provider_result {

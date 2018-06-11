@@ -37,9 +37,11 @@ var settings = {
 	searchProviderId: '',
 	searchProviderName: '',
 	resultContainer: null,
+	resultHeader: null,
+	resultFooter: null,
 	entryTemplate: null,
 	entryTemplateDefault: null,
-	divNoResult: null,
+	// divNoResult: null,
 	options: [],
 
 	/**
@@ -62,15 +64,30 @@ var settings = {
 		return $('<div>').append(div);
 	},
 
+	//
+	// /**
+	//  * generate a no result display
+	//  */
+	// generateNoResultDiv: function () {
+	// 	var div = $('<div>', {id: 'noresult'});
+	// 	div.html('no result');
+	// 	div.hide();
+	// 	settings.divNoResult = div;
+	// },
+
 
 	/**
-	 * generate a no result display
+	 * @param template
 	 */
-	generateNoResultDiv: function () {
-		var div = $('<div>', {id: 'noresult'});
-		div.html('no result');
-		div.hide();
-		settings.divNoResult = div;
+	setResultHeader: function (template) {
+		settings.resultHeader = template;
+	},
+
+	/**
+	 * @param template
+	 */
+	setResultFooter: function (template) {
+		settings.resultFooter = template;
 	},
 
 
@@ -78,14 +95,11 @@ var settings = {
 	 * used to set the template to display search result entries
 	 *
 	 * @param template
-	 * @param parent
 	 */
-	setEntryTemplate: function (template, parent) {
+	setEntryTemplate: function (template) {
 		settings.entryTemplate = template;
-		if (parent !== null) {
-			settings.parent = parent;
-		}
 	},
+
 
 	/**
 	 * used to set the container for the search result entries
@@ -94,7 +108,7 @@ var settings = {
 	 */
 	setResultContainer: function (container) {
 		settings.resultContainer = container;
-		settings.resultContainer.prepend(settings.divNoResult);
+		// settings.resultContainer.prepend(settings.divNoResult);
 	},
 
 

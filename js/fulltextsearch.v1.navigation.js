@@ -56,7 +56,6 @@ var curr = {
 
 
 var nav = {
-
 		manageDivProviderNavigation: function (divProviderNavigation, request, meta) {
 
 			var maxPage = Math.ceil(meta.total / request.size);
@@ -106,12 +105,12 @@ var nav = {
 			for (var i = 0; i < newResult.length; i++) {
 				var entry = newResult[i];
 				if (result.getResultIndex(entry.id, oldResult) > -1) {
-					precItem = nav.getDivResult(entry.id, divProviderResult);
-					nav.fillDivResult(precItem, entry);
+					precItem = nav.getDivEntry(entry.id, divProviderResult);
+					nav.fillDivEntry(precItem, entry);
 					continue;
 				}
 
-				var divResult = nav.generateDivResult(entry, nav.generateTemplateEntry(entry));
+				var divResult = nav.generateDivEntry(entry, nav.generateTemplateEntry(entry));
 				if (precItem === null) {
 					divProviderResult.prepend(divResult);
 				} else {
@@ -132,7 +131,7 @@ var nav = {
 			for (var i = 0; i < oldResult.length; i++) {
 				var entry = oldResult[i];
 				if (result.getResultIndex(entry.id, newResult) === -1) {
-					var divResult = nav.getDivResult(entry.id, divProviderResult);
+					var divResult = nav.getDivEntry(entry.id, divProviderResult);
 					divResult.fadeTo(settings.delay_result, 0, function () {
 						$(this).slideUp(settings.delay_result, function () {
 							$(this).remove();
@@ -164,14 +163,14 @@ var nav = {
 
 		animateMoveDivResult: function (entryId, divProviderResult, precId) {
 
-			var divResult = nav.getDivResult(entryId, divProviderResult);
+			var divResult = nav.getDivEntry(entryId, divProviderResult);
 
 			if (precId === '') {
 				divResult.fadeTo(settings.delay_result, 0.35, function () {
 					$(this).prependTo(divProviderResult).fadeTo(100, 1);
 				});
 			} else {
-				var precItem = nav.getDivResult(precId, divProviderResult);
+				var precItem = nav.getDivEntry(precId, divProviderResult);
 				divResult.fadeTo(settings.delay_result, 0.35, function () {
 					$(this).insertAfter(precItem).fadeTo(100, 1);
 				});
@@ -197,8 +196,9 @@ var nav = {
 		},
 
 
-		getDivResult: function (resultId, divProviderResult) {
+		getDivEntry: function (resultId, divProviderResult) {
 			var ret = null;
+
 			divProviderResult.children('.result_entry').each(function () {
 				if ($(this).attr('data-id') === resultId) {
 					ret = $(this);
@@ -209,28 +209,34 @@ var nav = {
 		},
 
 
-		fillDivResult: function (divResult, entry) {
-			divResult.find('#title').text(entry.title);
+		fillDivEntry: function (divEntry, entry) {
+			divEntry.find('#title').text(entry.title);
 
-			divResult.find('#source').html('&nbsp;');
+			divEntry.find('#source').html('&nbsp;');
 			if (entry.info.source !== '') {
-				divResult.find('#source').text(entry.info.source);
+				divEntry.find('#source').text(entry.info.source);
 			}
 
 			if (settings.options.show_hash === '1') {
-				divResult.find('#source').text(entry.hash);
+				divEntry.find('#source').text(entry.hash);
 			}
 
-			nav.fillDivResultExcepts(divResult, entry);
+			nav.fillDivResultExcepts(divEntry, entry);
 
 			if (entry.link !== '') {
-				divResult.on('click', function () {
-					window.open(entry.link, '_self');
+				divEntry.off('click').on('click', function (event) {
+					if (nav.onEntrySelect($(this), event)) {
+						return;
+					}
+
+					window.open(entry.link);
 				});
-				divResult.find('div').each(function () {
+				divEntry.find('div').each(function () {
 					$(this).css('cursor', 'pointer');
 				});
 			}
+
+			nav.onEntryGenerated(divEntry, entry);
 		},
 
 
@@ -243,28 +249,25 @@ var nav = {
 			}
 
 			if (entry.excerpts.length > 0) {
-				divResult.find('#line1').text(entry.excerpts[0]);
+				divResult.find('#extract').text(entry.excerpts[0]);
 			} else {
-				divResult.find('#line1').html('&nbsp;');
+				divResult.find('#extract').text('');
 			}
-
-			if (entry.excerpts.length > 1) {
-				divResult.find('#line2').text(entry.excerpts[1]);
-			} else {
-				divResult.find('#line2').html('&nbsp;');
-			}
-
 		},
 
-		onEntryGenerated: function (divResult) {
 
-			nav.deleteEmptyDiv(divResult, '#line1');
-			nav.deleteEmptyDiv(divResult, '#line2');
-
+		onEntryGenerated: function (divEntry, entry) {
 			if (settings.parentHasMethod('onEntryGenerated')) {
-				settings.parent.onEntryGenerated(divResult);
+				settings.parent.onEntryGenerated(divEntry, entry);
 			}
 		},
+
+
+		onEntrySelect: function (divEntry, event) {
+			return !!(settings.parentHasMethod('onEntrySelect') &&
+				settings.parent.onEntrySelect(divEntry, event));
+		},
+
 
 		onSearchRequest: function (data) {
 			if (settings.parentHasMethod('onSearchRequest')) {
@@ -272,11 +275,13 @@ var nav = {
 			}
 		},
 
+
 		onSearchReset: function () {
 			if (settings.parentHasMethod('onSearchReset')) {
 				settings.parent.onSearchReset();
 			}
 		},
+
 
 		onResultDisplayed: function (data) {
 			if (settings.parentHasMethod('onResultDisplayed')) {
@@ -296,28 +301,31 @@ var nav = {
 			}
 		},
 
-		deleteEmptyDiv: function (entry, divId) {
-			var div = entry.find(divId);
-			if (div.text() === '') {
-				div.remove();
-			}
-		},
+		// deleteEmptyDiv: function (entry, divId) {
+		// 	var div = entry.find(divId);
+		// 	if (div.text() === '') {
+		// 		div.remove();
+		// 	}
+		// },
 
 
-		generateTemplateEntry: function (document) {
+		generateTemplateEntry: function () {
 			var divTemplate = settings.entryTemplate;
 			if (divTemplate === null) {
 				divTemplate = settings.generateDefaultTemplate();
 			}
 
 			if (!divTemplate.length) {
-				console.log('FullTextSearch Error: template_entry is not defined');
+				console.log('FullTextSearch Error: entryTemplate is not defined');
 				return;
 			}
 
 			var tmpl = divTemplate.html();
-//			tmpl = tmpl.replace(/%%id%%/g, escapeHTML(document.id));
-
+			// var divNavToggle = $('<div>', {
+			// 	id: 'app-navigation-toggle',
+			// 	class: 'icon-menu'
+			// });
+			//
 			var div = $('<div>', {class: 'result_template'});
 			div.html(tmpl).fadeTo(0);
 
@@ -325,20 +333,20 @@ var nav = {
 		},
 
 
-		generateDivResult: function (entry, divResultContent) {
-			var divResult = $('<div>', {class: 'result_entry'});
+		generateDivEntry: function (entry, divResultContent) {
+			var divEntry = $('<div>', {class: 'result_entry'});
 
-			divResult.hide();
-			divResult.attr('data-id', entry.id);
-			divResult.attr('data-link', entry.link);
-			divResult.attr('data-source', entry.source);
-			divResult.attr('data-info', JSON.stringify(entry.info));
-			divResult.attr('data-result', JSON.stringify(entry));
-			divResult.append(divResultContent);
+			divEntry.hide();
+			divEntry.attr('data-id', entry.id);
+			divEntry.attr('data-link', entry.link);
+			divEntry.attr('data-source', entry.source);
+			divEntry.attr('data-info', JSON.stringify(entry.info));
+			divEntry.attr('data-result', JSON.stringify(entry));
+			divEntry.append(divResultContent);
 
-			nav.fillDivResult(divResult, entry);
+			nav.fillDivEntry(divEntry, entry);
 
-			return divResult;
+			return divEntry;
 		},
 
 
@@ -347,7 +355,20 @@ var nav = {
 			var divProviderNavigation = $('<div>', {class: 'provider_navigation'});
 			divProviderNavigation.attr('data-provider-id', providerId);
 			divProviderNavigation.attr('data-provider-title', providerName);
-			divProviderNavigation.append($('<div>', {class: 'provider_navigation_left'}));
+
+			var divProviderLeftNav = $('<div>', {class: 'provider_navigation_left'});
+			if (settings.searchProviderId !== '') {
+				console.log('--- !!');
+				var divProviderPaginationClose = $('<div>',
+					{class: 'icon-close provider_navigation_close'});
+				divProviderPaginationClose.on('click', function () {
+					nav.onResultClose();
+				});
+				divProviderNavigation.append(divProviderPaginationClose);
+			}
+
+			divProviderNavigation.append(divProviderLeftNav);
+
 
 			var divProviderPagination = $('<div>', {class: 'provider_navigation_right'});
 			var divProviderPaginationPrev = $('<div>', {class: 'provider_navigation_prev'}).append(
@@ -391,16 +412,6 @@ var nav = {
 			});
 			divProviderPagination.append(divProviderPaginationNext);
 
-			if (settings.searchProviderId !== '') {
-				var divProviderPaginationClose = $('<div>',
-					{class: 'icon-close provider_navigation_close'});
-				divProviderPaginationClose.on('click', function () {
-					nav.onResultClose();
-				});
-				divProviderPagination.append(divProviderPaginationClose);
-			}
-
-
 			divProviderNavigation.append(divProviderPagination);
 
 			var divProviderResult = $('<div>', {class: 'provider_result'});
@@ -409,7 +420,16 @@ var nav = {
 			divProvider.hide();
 			divProvider.attr('data-id', providerId);
 			divProvider.append(divProviderNavigation);
+
+			if (settings.resultHeader !== null) {
+				divProvider.append(settings.resultHeader);
+			}
+
 			divProvider.append(divProviderResult);
+
+			if (settings.resultFooter !== null) {
+				divProvider.append(settings.resultFooter);
+			}
 
 			return divProvider;
 		}
