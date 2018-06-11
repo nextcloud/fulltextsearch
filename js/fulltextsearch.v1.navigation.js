@@ -211,13 +211,13 @@ var nav = {
 		fillDivEntry: function (divEntry, entry) {
 			divEntry.find('#title').text(entry.title);
 
-			divEntry.find('#source').html('&nbsp;');
-			if (entry.info.source !== '') {
-				divEntry.find('#source').text(entry.info.source);
-			}
+			divEntry.find('#info').text('');
+			// if (entry.info.source !== '') {
+			// 	divEntry.find('#source').text(entry.info.source);
+			// }
 
 			if (settings.options.show_hash === '1') {
-				divEntry.find('#source').text(entry.hash);
+				divEntry.find('#info').text(entry.hash);
 			}
 
 			nav.fillDivResultExcepts(divEntry, entry);

@@ -136,13 +136,9 @@ input.options_small {
 	/*font-weight: bold;*/
 }
 
-#source {
-	color: #a5a5a5;
-}
-
-.result_entry_default #info {
-	font-weight: bold;
-}
+/*.result_entry_default #info {*/
+	/*font-weight: bold;*/
+/*}*/
 
 .next_search_div {
 	position: relative;
