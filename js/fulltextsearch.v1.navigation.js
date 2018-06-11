@@ -212,10 +212,6 @@ var nav = {
 			divEntry.find('#title').text(entry.title);
 
 			divEntry.find('#info').text('');
-			// if (entry.info.source !== '') {
-			// 	divEntry.find('#source').text(entry.info.source);
-			// }
-
 			if (settings.options.show_hash === '1') {
 				divEntry.find('#info').text(entry.hash);
 			}
@@ -224,7 +220,7 @@ var nav = {
 
 			if (entry.link !== '') {
 				divEntry.off('click').on('click', function (event) {
-					if (nav.onEntrySelect($(this), event)) {
+					if (nav.onEntrySelected($(this), event)) {
 						return;
 					}
 
@@ -262,9 +258,9 @@ var nav = {
 		},
 
 
-		onEntrySelect: function (divEntry, event) {
-			return !!(settings.parentHasMethod('onEntrySelect') &&
-				settings.parent.onEntrySelect(divEntry, event));
+		onEntrySelected: function (divEntry, event) {
+			return !!(settings.parentHasMethod('onEntrySelected') &&
+				settings.parent.onEntrySelected(divEntry, event));
 		},
 
 

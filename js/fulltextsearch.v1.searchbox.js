@@ -55,7 +55,6 @@ var searchbox = {
 			search_form.remove();
 		}
 
-
 		var divHeaderRight = $('DIV.header-right');
 		var divFullTextSearch = $('<div>', {id: 'fulltextsearch'});
 		divHeaderRight.prepend(divFullTextSearch);
@@ -191,6 +190,7 @@ var searchbox = {
 			}, settings.searchRequestTimer);
 		}
 	},
+
 
 	onOptionsLoaded: function (result) {
 		if (!result[settings.searchProviderId]) {

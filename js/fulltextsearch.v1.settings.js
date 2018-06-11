@@ -45,24 +45,49 @@ var settings = {
 	options: [],
 
 	/**
-	 * generate the default template to dsplay search result entries
+	 * generate the default template to display search result entries
 	 */
 	generateDefaultTemplate: function () {
 
-		var divLeft = $('<div>', {class: 'result_entry_left'});
-		divLeft.append($('<div>', {id: 'title'}));
-		divLeft.append($('<div>', {id: 'line1'}));
-		divLeft.append($('<div>', {id: 'line2'}));
+			var resultContent = $('<div>', {class: 'result_content'});
+			resultContent.append($('<div>', {
+				id: 'title',
+				class: 'result_title'
+			}));
+			resultContent.append($('<div>', {
+				id: 'extract',
+				class: 'result_extract'
+			}));
 
-		var divRight = $('<div>', {class: 'result_entry_right'});
-		//divRight.append($('<div>', {id: 'score'}));
+			var resultEntry = $('<div>', {class: 'result_entry'});
+			resultEntry.append($('<div>', {class: 'result_div_checkbox'}));
 
-		var div = $('<div>', {class: 'result_entry_default'});
-		div.append(divLeft);
-		div.append(divRight);
+			resultEntry.append($('<div>', {class: 'result_div result_div_content'}).append(resultContent));
 
-		return $('<div>').append(div);
-	},
+			var resultRight = $('<div>', {class: 'result_div result_div_right'});
+			resultRight.append($('<div>', {id: 'source'}));
+			resultRight.append($('<div>', {id: 'info'}));
+			resultEntry.append(resultRight);
+
+			return $('<div>').append(resultEntry);
+		},
+
+
+
+	// 	var divLeft = $('<div>', {class: 'result_entry_left'});
+	// 	divLeft.append($('<div>', {id: 'title'}));
+	// 	divLeft.append($('<div>', {id: 'line1'}));
+	// 	divLeft.append($('<div>', {id: 'line2'}));
+	//
+	// 	var divRight = $('<div>', {class: 'result_entry_right'});
+	// 	//divRight.append($('<div>', {id: 'score'}));
+	//
+	// 	var div = $('<div>', {class: 'result_entry_default'});
+	// 	div.append(divLeft);
+	// 	div.append(divRight);
+	//
+	// 	return $('<div>').append(div);
+	// },
 
 	//
 	// /**
