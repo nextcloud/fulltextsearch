@@ -36,8 +36,7 @@ var curr = {
 	page: 1,
 	lastRequest: '',
 	lastRequestTimer: null,
-	lastRequestTimerQueued: false,
-	lastRequestTimerForcing: false,
+	lastSearchTimer: null,
 
 	setProviderResult: function (id, value) {
 		curr.providerResult[id] = value;

@@ -112,11 +112,10 @@ var searchbox = {
 			id: 'fts-popup'
 		});
 
-		var self = this;
 		box_elements.searchInput = $('<input>', {
 			id: 'fts-input',
 			placeholder: 'Search ' + settings.searchProviderName
-		}).on('keyup', self.searching);
+		}).on('keyup', searchbox.timedSearch);
 		box_elements.searchOptions = $('<div>', {id: 'fts-options'});
 		box_elements.searchTemplate = $('<div>', {id: 'fts-options-template'});
 		box_elements.searchError = $('<div>', {id: 'fts-error'});
@@ -149,24 +148,22 @@ var searchbox = {
 	},
 
 
-	searching: function (force) {
-		var search = box_elements.searchInput.val();
-		if (force === undefined) {
-			force = false;
+	searching: function () {
+		if (curr.lastRequestTimer !== null) {
+			window.clearTimeout(curr.lastRequestTimer);
+			curr.lastRequestTimer = null;
 		}
 
+		if (curr.lastSearchTimer !== null) {
+			window.clearTimeout(curr.lastSearchTimer);
+		}
+
+		var search = box_elements.searchInput.val();
 		if (search.length < 1) {
 			return;
 		}
 
-		if (!force && curr.lastRequest === search) {
-			return;
-		}
 		curr.lastRequest = search;
-		if (!searchbox.timingRequest(force)) {
-			return;
-		}
-
 		api.search({
 			providers: settings.searchProviderId,
 			search: search,
@@ -177,24 +174,23 @@ var searchbox = {
 	},
 
 
-	timingRequest: function (force) {
-		if (curr.lastRequestTimer === null) {
-			curr.lastRequestTimer = window.setTimeout(function () {
-				curr.lastRequestTimer = null;
-				if (curr.lastRequestTimerQueued) {
-					curr.lastRequestTimerQueued = false;
-					searchbox.searching(curr.lastRequestTimerForcing);
-				}
-			}, settings.searchTimer);
-		} else {
-			curr.lastRequestTimerQueued = true;
-			curr.lastRequestTimerForcing = force;
-			return false;
+	timedSearch: function () {
+
+		if (curr.lastSearchTimer !== null) {
+			window.clearTimeout(curr.lastSearchTimer);
 		}
 
-		return true;
-	},
+		curr.lastSearchTimer = window.setTimeout(function () {
+			searchbox.searching();
+		}, settings.searchEntryTimer);
 
+		if (curr.lastRequestTimer === null) {
+			curr.lastRequestTimer = window.setTimeout(function () {
+				console.log('lastRequestTimer');
+				searchbox.searching();
+			}, settings.searchRequestTimer);
+		}
+	},
 
 	onOptionsLoaded: function (result) {
 		if (!result[settings.searchProviderId]) {
@@ -219,7 +215,9 @@ var searchbox = {
 
 	eventOnOptionsLoadedInput: function (div) {
 		div.on('change keyup', function () {
-			searchbox.searching(true);
+			console.log('eventOnOptionsLoadedInput');
+
+			searchbox.searching();
 		});
 	},
 
