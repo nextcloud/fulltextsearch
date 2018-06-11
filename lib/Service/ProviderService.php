@@ -111,9 +111,11 @@ class ProviderService {
 		}
 
 		$this->providerIdMustBeUnique($provider);
-
-		$provider->loadProvider();
-		$this->providers[] = $provider;
+		try {
+			$provider->loadProvider();
+			$this->providers[] = $provider;
+		} catch (Exception $e) {
+		}
 	}
 
 
