@@ -58,18 +58,19 @@ Navigate.prototype = {
 		elements.divHeader = $('#search_header');
 		box_elements.searchError = $('#search_error');
 
-		fullTextSearch.setEntryTemplate($('#template_entry'), self);
+		//	fullTextSearch.setEntryTemplate($('#template_entry'), self);
 		fullTextSearch.setResultContainer(elements.search_result);
 
-		elements.search_input.on('input', function () {
-			self.resetSearch();
-			if (elements.searchTimeout === null && self.initSearch()) {
-				elements.searchTimeout = _.delay(function () {
-					self.initSearch();
-					elements.searchTimeout = null;
-				}, 3000);
-			}
-		});
+		elements.search_input.on('input', this.navigateTimedSearch);
+		// function () {
+		// 	self.resetSearch();
+		// 	if (elements.searchTimeout === null && self.initSearch()) {
+		// 		elements.searchTimeout = _.delay(function () {
+		// 			self.initSearch();
+		// 			elements.searchTimeout = null;
+		// 		}, 3000);
+		// 	}
+		// });
 
 		//
 		// $(document).keypress(function (e) {
@@ -79,6 +80,24 @@ Navigate.prototype = {
 		// });
 
 		self.initPanels();
+	},
+
+
+	navigateTimedSearch: function () {
+
+		if (curr.lastSearchTimer !== null) {
+			window.clearTimeout(curr.lastSearchTimer);
+		}
+
+		curr.lastSearchTimer = window.setTimeout(function () {
+			OCA.FullTextSearch.navigate.initSearch();
+		}, settings.searchEntryTimer);
+
+		if (curr.lastRequestTimer === null) {
+			curr.lastRequestTimer = window.setTimeout(function () {
+				OCA.FullTextSearch.navigate.initSearch();
+			}, settings.searchRequestTimer);
+		}
 	},
 
 
@@ -484,11 +503,11 @@ Navigate.prototype = {
 
 };
 
-OCA.FullTextSearch.Example = Navigate;
+OCA.FullTextSearch.Navigate = Navigate;
 
 
 $(document).ready(function () {
-	OCA.FullTextSearch.example = new Navigate();
+	OCA.FullTextSearch.navigate = new Navigate();
 });
 
 

@@ -185,7 +185,6 @@ var searchbox = {
 
 		if (curr.lastRequestTimer === null) {
 			curr.lastRequestTimer = window.setTimeout(function () {
-				console.log('lastRequestTimer');
 				searchbox.searching();
 			}, settings.searchRequestTimer);
 		}
@@ -215,7 +214,7 @@ var searchbox = {
 
 	eventOnOptionsLoadedInput: function (div) {
 		div.on('change keyup', function () {
-			console.log('eventOnOptionsLoadedInput');
+//			console.log('eventOnOptionsLoadedInput');
 
 			searchbox.searching();
 		});

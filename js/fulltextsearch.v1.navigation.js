@@ -353,7 +353,6 @@ var nav = {
 
 			var divProviderLeftNav = $('<div>', {class: 'provider_navigation_left'});
 			if (settings.searchProviderId !== '') {
-				console.log('--- !!');
 				var divProviderPaginationClose = $('<div>',
 					{class: 'icon-close provider_navigation_close'});
 				divProviderPaginationClose.on('click', function () {
