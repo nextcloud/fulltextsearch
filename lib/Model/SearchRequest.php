@@ -58,6 +58,9 @@ class SearchRequest implements \JsonSerializable {
 	private $fields = [];
 
 	/** @var array */
+	private $limitFields = [];
+
+	/** @var array */
 	private $wildcardFields = [];
 
 	/** @var array */
@@ -157,10 +160,17 @@ class SearchRequest implements \JsonSerializable {
 		}
 
 		list($kw, $value) = explode(':', $word, 2);
-		$options = ['is', 'show'];
 
+		$options = ['is', 'show'];
 		if (in_array($kw, $options)) {
 			$this->addOption($kw . '_' . $value, '1');
+
+			return true;
+		}
+
+		$valuedOptions = ['in'];
+		if (in_array($kw, $valuedOptions)) {
+			$this->addMultipleOption($kw, $value);
 
 			return true;
 		}
@@ -230,6 +240,22 @@ class SearchRequest implements \JsonSerializable {
 	}
 
 	/**
+	 * @param $key
+	 * @param $value
+	 *
+	 * @return $this
+	 */
+	public function addMultipleOption($key, $value) {
+		if (!array_key_exists($key, $this->options)) {
+			$this->options[$key] = [];
+		}
+
+		$this->options[$key][] = $value;
+
+		return $this;
+	}
+
+	/**
 	 * @param string $option
 	 *
 	 * @return mixed|string
@@ -279,6 +305,26 @@ class SearchRequest implements \JsonSerializable {
 
 		return $this;
 	}
+
+
+	/**
+	 * @param $field
+	 *
+	 * @return $this
+	 */
+	public function limitToField($field) {
+		array_push($this->limitFields, $field);
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getLimitFields() {
+		return $this->limitFields;
+	}
+
 
 	/**
 	 * @param $field
