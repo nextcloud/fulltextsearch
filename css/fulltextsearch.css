@@ -23,6 +23,7 @@ div.icon-fulltextsearch {
 	width: 340px;
 	right: 42px;
 	max-width: 85%;
+	max-height: 500px !important;
 }
 
 #fts-popup::after {
