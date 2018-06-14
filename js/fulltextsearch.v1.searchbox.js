@@ -234,7 +234,7 @@ var searchbox = {
 	},
 
 
-	displayPanelOptionTitle (sub) {
+	displayPanelOptionTitle: function (sub) {
 		var subDiv = $('<div>', {
 			class: 'div-table-row'
 		});
