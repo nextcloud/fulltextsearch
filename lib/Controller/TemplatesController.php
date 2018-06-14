@@ -127,10 +127,6 @@ class TemplatesController extends Controller {
 				$nav = $options['navigation'];
 			}
 
-			if (array_key_exists('css', $nav)) {
-				Util::addStyle($provider->getAppId(), $nav['css']);
-			}
-
 			$ret[$providerAppId] =
 				[
 					'provider'   => $provider->getId(),
