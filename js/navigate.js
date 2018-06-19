@@ -192,7 +192,7 @@ Navigate.prototype = {
 	},
 
 
-	displayPanelOptionTitle (sub) {
+	displayPanelOptionTitle: function (sub) {
 		return $('<a>', {
 			href: '#',
 			class: 'ulsub',
