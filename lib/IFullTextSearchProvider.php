@@ -29,6 +29,7 @@ namespace OCA\FullTextSearch;
 use OC\User\NoUserException;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Model\IndexDocument;
+use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
@@ -90,6 +91,12 @@ interface IFullTextSearchProvider {
 	 * @param Runner $runner
 	 */
 	public function setRunner(Runner $runner);
+
+
+//	/**
+//	 * @param IndexOptions $options
+//	 */
+//	public function setIndexOptions($options);
 
 
 	/**

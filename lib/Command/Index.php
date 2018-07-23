@@ -29,6 +29,7 @@ namespace OCA\FullTextSearch\Command;
 use Exception;
 use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\ExtendedBase;
+use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\MiscService;
@@ -36,6 +37,7 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\IUserManager;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -95,7 +97,8 @@ class Index extends ExtendedBase {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:index')
-			 ->setDescription('Index files');
+			 ->setDescription('Index files')
+			 ->addArgument('options', InputArgument::OPTIONAL, 'options');
 	}
 
 
@@ -107,6 +110,7 @@ class Index extends ExtendedBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
+		$options = $this->generateIndexOptions($input);
 
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);
@@ -114,9 +118,15 @@ class Index extends ExtendedBase {
 
 			$providers = $this->providerService->getProviders();
 			foreach ($providers as $provider) {
+
+				if (!$this->isIncludedProvider($options, $provider->getId())) {
+					continue;
+				}
+
 				$this->runner->output('indexing ' . $provider->getName() . '.');
 				$provider->setRunner($this->runner);
-				$this->indexProvider($provider);
+				$provider->setIndexOptions($options);
+				$this->indexProvider($provider, $options);
 			}
 
 		} catch (Exception $e) {
@@ -130,22 +140,26 @@ class Index extends ExtendedBase {
 
 	/**
 	 * @param IFullTextSearchProvider $provider
+	 * @param IndexOptions $options
 	 *
 	 * @throws Exception
 	 */
-	private function indexProvider(IFullTextSearchProvider $provider) {
+	private function indexProvider(IFullTextSearchProvider $provider, IndexOptions $options) {
 		$platform = $this->platformService->getPlatform();
 		$platform->initializeIndex();
 		$provider->onInitializingIndex($platform);
 
 		$platform->setRunner($this->runner);
 
-		$users = $this->userManager->search('');
-
+		$users = $this->generateUserList($options);
 		foreach ($users as $user) {
+			if ($user === null) {
+				continue;
+			}
+
 			$this->runner->output(' USER: ' . $user->getUID());
 			$this->indexService->indexProviderContentFromUser(
-				$platform, $provider, $user->getUID()
+				$platform, $provider, $user->getUID(), $options
 			);
 		}
 
@@ -153,6 +167,62 @@ class Index extends ExtendedBase {
 
 	}
 
+
+	/**
+	 * @param InputInterface $input
+	 *
+	 * @return IndexOptions
+	 */
+	private function generateIndexOptions(InputInterface $input) {
+		$jsonOptions = $input->getArgument('options');
+		$options = json_decode($jsonOptions, true);
+
+		if (!is_array($options)) {
+			$options = [];
+		}
+
+		return new IndexOptions($options);
+	}
+
+
+	/**
+	 * @param IndexOptions $options
+	 * @param string $providerId
+	 *
+	 * @return bool
+	 */
+	private function isIncludedProvider(IndexOptions $options, $providerId) {
+		if ($options->getOption('provider', '') !== ''
+			&& $options->getOption('provider') !== $providerId) {
+			return false;
+		}
+
+		if ($options->getOption('providers', null) !== null
+			&& is_array($options->getOption('providers'))) {
+			return (in_array($providerId, $options->getOption('providers')));
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * @param IndexOptions $options
+	 *
+	 * @return array
+	 */
+	private function generateUserList(IndexOptions $options) {
+		if ($options->getOption('user', '') !== '') {
+			return [$this->userManager->get($options->getOption('user'))];
+		}
+
+		if ($options->getOption('users', null) !== null
+			&& is_array($options->getOption('users'))) {
+			return array_map([$this->userManager, 'get'], $options->getOption('users'));
+		}
+
+		return $this->userManager->search('');
+	}
 }
 
 

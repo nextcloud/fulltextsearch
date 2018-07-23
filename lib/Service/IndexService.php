@@ -38,6 +38,7 @@ use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\ExtendedIndex;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Model\IndexDocument;
+use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\ProviderIndexes;
 use OCA\FullTextSearch\Model\Runner;
 
@@ -111,18 +112,21 @@ class IndexService {
 	 * @param IFullTextSearchPlatform $platform
 	 * @param IFullTextSearchProvider $provider
 	 * @param string $userId
+	 * @param IndexOptions $options
 	 *
+	 * @throws InterruptException
+	 * @throws TickDoesNotExistException
 	 * @throws Exception
 	 */
 	public function indexProviderContentFromUser(
-		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $userId
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $userId, $options
 	) {
 		$this->updateRunner('generateIndex' . $provider->getName());
 		$documents = $provider->generateIndexableDocuments($userId);
 
 		//$maxSize = sizeof($documents);
 
-		$toIndex = $this->updateDocumentsWithCurrIndex($provider, $documents);
+		$toIndex = $this->updateDocumentsWithCurrIndex($provider, $documents, $options);
 		$this->indexChunks($platform, $provider, $toIndex);
 	}
 
@@ -130,13 +134,14 @@ class IndexService {
 	/**
 	 * @param IFullTextSearchProvider $provider
 	 * @param IndexDocument[] $documents
+	 * @param IndexOptions $options
 	 *
 	 * @return IndexDocument[]
 	 * @throws InterruptException
 	 * @throws TickDoesNotExistException
 	 */
 	private function updateDocumentsWithCurrIndex(
-		IFullTextSearchProvider $provider, array $documents
+		IFullTextSearchProvider $provider, array $documents, $options
 	) {
 
 		$currIndex = $this->getProviderIndexFromProvider($provider);
@@ -152,7 +157,8 @@ class IndexService {
 			}
 
 			$document->setIndex($index);
-			if (!$this->isDocumentUpToDate($provider, $document)) {
+			if ($options->getOption('force', false) === true
+				|| !$this->isDocumentUpToDate($provider, $document)) {
 				$result[] = $document;
 			}
 
