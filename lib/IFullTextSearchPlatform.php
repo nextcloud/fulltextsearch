@@ -74,7 +74,9 @@ interface IFullTextSearchPlatform {
 	public function loadPlatform();
 
 
-	/** no used yet */
+	/**
+	 * test the search platform
+	 */
 	public function testPlatform();
 
 
