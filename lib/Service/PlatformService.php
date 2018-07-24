@@ -189,6 +189,7 @@ class PlatformService {
 		return $selected;
 	}
 
+
 	/**
 	 * @param string $appId
 	 */
