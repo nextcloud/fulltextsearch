@@ -47,6 +47,9 @@ class Index extends ExtendedBase {
 	/** @var IUserManager */
 	private $userManager;
 
+	/** @var RunningService */
+	private $runningService;
+
 	/** @var IndexService */
 	private $indexService;
 
@@ -81,9 +84,8 @@ class Index extends ExtendedBase {
 		parent::__construct();
 		$this->userManager = $userManager;
 
-		$this->runner = new Runner($runningService, 'commandIndex');
+		$this->runningService = $runningService;
 		$this->indexService = $indexService;
-		$this->indexService->setRunner($this->runner);
 
 		$this->platformService = $platformService;
 		$this->providerService = $providerService;
@@ -110,7 +112,12 @@ class Index extends ExtendedBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
+
 		$options = $this->generateIndexOptions($input);
+
+		$this->runner = new Runner($this->runningService, 'commandIndex');
+		$this->indexService->setRunner($this->runner);
+
 
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);
