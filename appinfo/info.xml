@@ -31,13 +31,14 @@ Core App of the full-text search framework for your Nextcloud.
 	</background-jobs>
 
 	<commands>
-		<command>OCA\FullTextSearch\Command\Configure</command>
 		<command>OCA\FullTextSearch\Command\Check</command>
-		<command>OCA\FullTextSearch\Command\Stop</command>
+		<command>OCA\FullTextSearch\Command\Configure</command>
 		<command>OCA\FullTextSearch\Command\Index</command>
 		<command>OCA\FullTextSearch\Command\Live</command>
 		<command>OCA\FullTextSearch\Command\Reset</command>
 		<command>OCA\FullTextSearch\Command\Search</command>
+		<command>OCA\FullTextSearch\Command\Stop</command>
+		<command>OCA\FullTextSearch\Command\Test</command>
 	</commands>
 
 	<settings>
