@@ -156,12 +156,15 @@ class IndexService {
 				$index->setLastIndex();
 			}
 
+			if ($options->getOption('force', false) === true) {
+				$index->setStatus(Index::INDEX_FULL);
+			}
+
 			$document->setIndex($index);
 			if ($options->getOption('force', false) === true
 				|| !$this->isDocumentUpToDate($provider, $document)) {
 				$result[] = $document;
 			}
-
 		}
 
 		return $result;
@@ -216,7 +219,6 @@ class IndexService {
 
 		$max = sizeof($documents);
 		for ($i = 0; $i < $max; $i++) {
-
 			$this->updateRunner('indexChunk');
 			try {
 				$chunk = array_splice($documents, 0, $chunkSize);
