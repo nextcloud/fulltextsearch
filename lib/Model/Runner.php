@@ -21,7 +21,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  */
 
 
@@ -48,6 +48,9 @@ class Runner {
 
 	/** @var string */
 	private $source;
+
+	/** @var bool */
+	private $strict = false;
 
 	/** @var int */
 	private $tickId;
@@ -80,10 +83,12 @@ class Runner {
 
 
 	/**
+	 * @param bool $strict
+	 *
 	 * @throws RunnerAlreadyUpException
-	 * @throws Exception
 	 */
-	public function start() {
+	public function start($strict = false) {
+		$this->strict = $strict;
 		$this->tickId = $this->runningService->start($this->source);
 	}
 
@@ -171,6 +176,10 @@ class Runner {
 		$this->commandBase = $base;
 	}
 
+
+	public function isStrict() {
+		return $this->strict;
+	}
 
 	/**
 	 * @param string $line
