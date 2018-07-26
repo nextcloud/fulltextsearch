@@ -132,4 +132,12 @@ interface IFullTextSearchPlatform {
 		IFullTextSearchProvider $provider, DocumentAccess $access, SearchRequest $request
 	);
 
+
+//	/**
+//	 * @param string $providerId
+//	 * @param string $documentId
+//	 *
+//	 * @return IndexDocument
+//	 */
+//	public function getDocument($providerId, $documentId);
 }

@@ -30,15 +30,20 @@ use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCA\FullTextSearch\Model\DocumentAccess;
 use OCA\FullTextSearch\Model\IndexDocument;
+use OCA\FullTextSearch\Provider\TestProvider;
 use OCP\IConfig;
 use OCP\PreConditionNotMetException;
 use OCP\Util;
 
 class TestService {
 
-	const DOCUMENT_TEST_INDEX1 = 1;
-	const DOCUMENT_TEST_INDEX2 = 2;
-	const DOCUMENT_TEST_INDEX3 = 3;
+	const DOCUMENT_USER = 'user';
+
+	const DOCUMENT_TEST_LICENSE = 'license';
+	const DOCUMENT_TEST_SIMPLE = 'simple';
+	const DOCUMENT_TEST_ACCESS = 'access';
+
+	const LICENSE_HASH = '108322602bb857915803a84e23a2cc2f';
 
 	/** @var MiscService */
 	private $miscService;
@@ -55,16 +60,73 @@ class TestService {
 
 
 	/**
-	 * @param int $documentType
+	 * @return IndexDocument
+	 */
+	public function generateIndexDocumentContentLicense() {
+		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TEST_LICENSE);
+
+		$content = file_get_contents(__DIR__ . '/../../LICENSE');
+		$indexDocument->setContent($content);
+
+		return $indexDocument;
+	}
+
+
+	/**
+	 * @return IndexDocument
+	 */
+	public function generateIndexDocumentSimple() {
+
+		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TEST_SIMPLE);
+		$indexDocument->setContent('This is a test');
+
+		return $indexDocument;
+	}
+
+
+	/**
+	 * @param IndexDocument $origIndex
+	 * @param IndexDocument $compareIndex
+	 *
+	 * @throws \Exception
+	 */
+	public function compareIndexDocument(IndexDocument $origIndex, IndexDocument $compareIndex) {
+		if ($origIndex->getAccess()
+					  ->getOwnerId() !== $compareIndex->getAccess()
+													  ->getOwnerId()) {
+			throw new \Exception('issue with AccessDocument');
+		}
+
+		$methods = [
+			'getId',
+			'getProviderId',
+			'getTitle',
+			'getSource'
+		];
+
+		foreach ($methods as $method) {
+			$orig = call_user_func([$origIndex, $method]);
+			$compare = call_user_func([$compareIndex, $method]);
+			if ($orig !== $compare) {
+				throw new \Exception($method . '() orig:' . $orig . ' compare:' . $compare);
+
+			};
+		}
+	}
+
+
+	/**
+	 * @param string $documentType
 	 *
 	 * @return IndexDocument
 	 */
-	public function generateIndexDocuments($documentType) {
-		$indexDocument = new IndexDocument('test', 'test_' . $documentType);
-		$indexDocument->setContent('This is the content');
+	private function generateIndexDocument($documentType) {
+		$indexDocument = new IndexDocument(TestProvider::TEST_PROVIDER_ID, $documentType);
 
-		$access = new DocumentAccess('user');
+		$access = new DocumentAccess(self::DOCUMENT_USER);
 		$indexDocument->setAccess($access);
+
 		return $indexDocument;
 	}
+
 }

@@ -27,10 +27,13 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
+use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
+use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
+use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
+use OCA\FullTextSearch\IFullTextSearchPlatform;
 use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\ExtendedBase;
-use OCA\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Provider\TestProvider;
@@ -38,6 +41,7 @@ use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\RunningService;
+use OCA\FullTextSearch\Service\TestService;
 use OCP\AppFramework\QueryException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -54,6 +58,9 @@ class Test extends ExtendedBase {
 
 	/** @var PlatformService */
 	private $platformService;
+
+	/** @var TestService */
+	private $testService;
 
 	/** @var MiscService */
 	private $miscService;
@@ -72,17 +79,19 @@ class Test extends ExtendedBase {
 	 * @param RunningService $runningService
 	 * @param IndexService $indexService
 	 * @param PlatformService $platformService
+	 * @param TestService $testService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
 		RunningService $runningService, IndexService $indexService,
-		PlatformService $platformService, MiscService $miscService
+		PlatformService $platformService, TestService $testService, MiscService $miscService
 	) {
 		parent::__construct();
 
 		$this->indexService = $indexService;
 		$this->runningService = $runningService;
 		$this->platformService = $platformService;
+		$this->testService = $testService;
 		$this->miscService = $miscService;
 	}
 
@@ -111,57 +120,27 @@ class Test extends ExtendedBase {
 		$this->output($output, '.Testing your current setup:');
 
 		try {
-			$this->output($output, 'Creating mocked content provider.');
-			$testProvider = $this->generateMockProvider();
-			$this->output($output, true);
-
-			$this->output($output, 'Testing mocked provider: get indexable documents.');
-			$indexableDocuments = $testProvider->generateIndexableDocuments('user');
-			$this->output($output, '(' . sizeof($indexableDocuments) . ' items)', false);
-			$this->output($output, true);
-
+			$testProvider = $this->testCreatingProvider($output);
+			$this->testMockedProvider($output, $testProvider);
+			$testPlatform = $this->testLoadingPlatform($output);
 		} catch (Exception $e) {
 			$this->output($output, false);
 			throw $e;
 		}
 
 		try {
-			$this->output($output, 'Loading search platform.');
-			$testPlatform = $this->platformService->getPlatform();
-			$this->output($output, '(' . $testPlatform->getName() . ')', false);
-			$this->output($output, true);
+			$this->testLockingProcess($output, $testPlatform, $testProvider);
+			$this->testIndexingDocuments($output, $testPlatform, $testProvider);
+			$this->testContentLicense($output, $testPlatform);
 
-			$this->output($output, 'Testing search platform.');
-			$testPlatform->testPlatform();
-			$this->output($output, true);
+			$this->testUnlockingProcess($output);
+		} catch (Exception $e) {
 
-			$this->output($output, 'Locking process');
-			$this->runner = new Runner($this->runningService, 'test');
-			$this->runner->start(true);
-			$this->indexService->setRunner($this->runner);
-			$testPlatform->setRunner($this->runner);
-			$testProvider->setRunner($this->runner);
-			$this->output($output, true);
-
-			$this->output($output, 'Indexing search platform.');
-			$options = new IndexOptions(
-				[
-					'provider' => TestProvider::TEST_PROVIDER_ID
-				]
-			);
-			$this->indexService->indexProviderContentFromUser(
-				$testPlatform, $testProvider, 'user', $options
-			);
-			$this->output($output, true);
-
-
-			$this->output($output, 'Unlocking process');
+			$this->output($output, false);
+			$this->output($output, 'Error detected, unlocking process');
 			$this->runner->stop();
 			$this->output($output, true);
 
-
-		} catch (Exception $e) {
-			$this->output($output, false);
 			throw $e;
 		}
 
@@ -247,6 +226,150 @@ class Test extends ExtendedBase {
 
 		return '<info>ok</info>';
 	}
+
+
+	/**
+	 * @param $output
+	 *
+	 * @return IFullTextSearchProvider
+	 * @throws ProviderIsNotCompatibleException
+	 * @throws QueryException
+	 */
+	private function testCreatingProvider($output) {
+		$this->output($output, 'Creating mocked content provider.');
+		$testProvider = $this->generateMockProvider();
+		$this->output($output, true);
+
+		return $testProvider;
+	}
+
+
+	/**
+	 * @param $output
+	 * @param IFullTextSearchProvider $testProvider
+	 */
+	private function testMockedProvider($output, IFullTextSearchProvider $testProvider) {
+		$this->output($output, 'Testing mocked provider: get indexable documents.');
+		$indexableDocuments = $testProvider->generateIndexableDocuments('user');
+		$this->output($output, '(' . sizeof($indexableDocuments) . ' items)', false);
+		$this->output($output, true);
+	}
+
+
+	/**
+	 * @param $output
+	 *
+	 * @return IFullTextSearchPlatform
+	 * @throws Exception
+	 */
+	private function testLoadingPlatform($output) {
+		$this->output($output, 'Loading search platform.');
+		$testPlatform = $this->platformService->getPlatform();
+		$this->output($output, '(' . $testPlatform->getName() . ')', false);
+		$this->output($output, true);
+
+		$this->output($output, 'Testing search platform.');
+		$testPlatform->testPlatform();
+		$this->output($output, true);
+
+		return $testPlatform;
+	}
+
+
+	/**
+	 * @param OutputInterface $output
+	 * @param IFullTextSearchPlatform $testPlatform
+	 * @param IFullTextSearchProvider $testProvider
+	 *
+	 * @throws RunnerAlreadyUpException
+	 */
+	private function testLockingProcess(
+		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IFullTextSearchProvider $testProvider
+	) {
+		$this->output($output, 'Locking process');
+		$this->runner = new Runner($this->runningService, 'test');
+		$this->runner->start(true);
+		$this->indexService->setRunner($this->runner);
+		$testPlatform->setRunner($this->runner);
+		$testProvider->setRunner($this->runner);
+		$this->output($output, true);
+	}
+
+
+	/**
+	 * @param OutputInterface $output
+	 * @param IFullTextSearchPlatform $testPlatform
+	 * @param IFullTextSearchProvider $testProvider
+	 *
+	 * @throws InterruptException
+	 * @throws TickDoesNotExistException
+	 */
+	private function testIndexingDocuments(
+		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IFullTextSearchProvider $testProvider
+	) {
+		$this->output($output, 'Indexing generated documents.');
+		$options = new IndexOptions(
+			[
+				'provider' => TestProvider::TEST_PROVIDER_ID
+			]
+		);
+		$this->indexService->indexProviderContentFromUser(
+			$testPlatform, $testProvider, 'user', $options
+		);
+		$this->output($output, true);
+	}
+
+
+	/**
+	 * @param OutputInterface $output
+	 * @param IFullTextSearchPlatform $testPlatform
+	 *
+	 * @throws Exception
+	 */
+	private function testContentLicense(
+		OutputInterface $output, IFullTextSearchPlatform $testPlatform
+	) {
+
+		try {
+			$this->output($output, 'Retreiving content from a big index (license).');
+			$indexDocument = $testPlatform->getDocument(
+				TestProvider::TEST_PROVIDER_ID, TestService::DOCUMENT_TEST_LICENSE
+			);
+
+			$this->output(
+				$output, '(size: ' . $indexDocument->getContentSize() . ')', false
+			);
+			$this->output($output, true);
+
+		} catch (Exception $e) {
+			throw new Exception(
+				"Issue while getting test document '" . TestService::DOCUMENT_TEST_LICENSE
+				. "' from search platform: " . $e->getMessage()
+			);
+		}
+
+		$this->output($output, 'Comparing document with source.');
+		$this->testService->compareIndexDocument(
+			$this->testService->generateIndexDocumentContentLicense(), $indexDocument
+		);
+		$this->output($output, true);
+	}
+
+
+	/**
+	 * @param OutputInterface $output
+	 *
+	 * @throws TickDoesNotExistException
+	 */
+	private function testUnlockingProcess(OutputInterface $output) {
+		$this->output($output, 'Unlocking process');
+		$this->runner->stop();
+		$this->output($output, true);
+	}
+
+
 
 //	/**
 //	 * @param IFullTextSearchProvider $provider

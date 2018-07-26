@@ -160,9 +160,9 @@ class TestProvider implements IFullTextSearchProvider {
 	public function generateIndexableDocuments($userId) {
 		$result = [];
 
-		$result[] = $this->testService->generateIndexDocuments(TestService::DOCUMENT_TEST_INDEX1);
-		$result[] = $this->testService->generateIndexDocuments(TestService::DOCUMENT_TEST_INDEX2);
-		$result[] = $this->testService->generateIndexDocuments(TestService::DOCUMENT_TEST_INDEX3);
+		$result[] = $this->testService->generateIndexDocumentContentLicense();
+		$result[] = $this->testService->generateIndexDocumentSimple();
+//		$result[] = $this->testService->generateIndexDocuments(TestService::DOCUMENT_TEST_INDEX3);
 
 		return $result;
 	}

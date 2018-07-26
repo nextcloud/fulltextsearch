@@ -277,6 +277,13 @@ class IndexDocument implements \JsonSerializable {
 		return $this->content;
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getContentSize() {
+		return strlen($this->getContent());
+	}
+
 
 	/**
 	 * @return $this
@@ -528,6 +535,7 @@ class IndexDocument implements \JsonSerializable {
 			'source'       => $this->getSource(),
 			'info'         => $this->getInfoAll(),
 			'hash'         => $this->getHash(),
+			'contentSize'  => $this->getContentSize(),
 			'tags'         => $this->getTags(),
 			'more'         => $this->getMore(),
 			'excerpts'     => $this->getExcerpts(),
