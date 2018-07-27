@@ -225,20 +225,29 @@ class SearchResult implements \JsonSerializable {
 	 */
 	public function jsonSerialize() {
 
-		$provider = $this->getProvider();
-		$platform = $this->getPlatform();
+		$providerObj = $this->getProvider();
+		$provider = [];
+		if ($providerObj !== null) {
+			$provider = [
+				'id'      => $providerObj->getId(),
+				'name'    => $providerObj->getName(),
+				'version' => $providerObj->getVersion()
+			];
+		}
+
+		$platformObj = $this->getPlatform();
+		$platform = [];
+		if ($platformObj !== null) {
+			$platform = [
+				'id'      => $platformObj->getId(),
+				'name'    => $platformObj->getName(),
+				'version' => $platformObj->getVersion()
+			];
+		}
 
 		return [
-			'provider'  => [
-				'id'      => $provider->getId(),
-				'name'    => $provider->getName(),
-				'version' => $provider->getVersion()
-			],
-			'platform'  => [
-				'id'      => $platform->getId(),
-				'name'    => $platform->getName(),
-				'version' => $platform->getVersion()
-			],
+			'provider'  => $provider,
+			'platform'  => $platform,
 			'documents' => $this->getDocuments(),
 			'meta'      =>
 				[

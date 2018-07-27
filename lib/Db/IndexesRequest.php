@@ -129,7 +129,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 */
 	public function deleteFromProviderId($providerId) {
 		$qb = $this->getIndexesDeleteSql();
-		$this->limitToProviderId($qb, $providerId());
+		$this->limitToProviderId($qb, $providerId);
 
 		$qb->execute();
 	}
