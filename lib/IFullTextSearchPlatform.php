@@ -88,8 +88,10 @@ interface IFullTextSearchPlatform {
 
 	/**
 	 * Reset the indexes
+	 *
+	 * @param string $providerId
 	 */
-	public function resetIndex();
+	public function resetIndex($providerId);
 
 
 	/**
