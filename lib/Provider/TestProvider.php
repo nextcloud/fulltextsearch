@@ -58,7 +58,7 @@ class TestProvider implements IFullTextSearchProvider {
 	private $runner;
 
 	/** @var IndexOptions */
-	private $indexOptions = [];
+	private $indexOptions;
 
 
 	/**
@@ -74,6 +74,8 @@ class TestProvider implements IFullTextSearchProvider {
 		$this->configService = $configService;
 		$this->testService = $testService;
 		$this->miscService = $miscService;
+
+		$this->indexOptions = new IndexOptions();
 	}
 
 
@@ -160,8 +162,8 @@ class TestProvider implements IFullTextSearchProvider {
 	public function generateIndexableDocuments($userId) {
 		$result = [];
 
-		$result[] = $this->testService->generateIndexDocumentContentLicense();
-		$result[] = $this->testService->generateIndexDocumentSimple();
+		$result[] = $this->testService->generateIndexDocumentContentLicense($this->indexOptions);
+		$result[] = $this->testService->generateIndexDocumentSimple($this->indexOptions);
 //		$result[] = $this->testService->generateIndexDocuments(TestService::DOCUMENT_TEST_INDEX3);
 
 		return $result;

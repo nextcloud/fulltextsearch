@@ -30,6 +30,7 @@ use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCA\FullTextSearch\Model\DocumentAccess;
 use OCA\FullTextSearch\Model\IndexDocument;
+use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Provider\TestProvider;
 use OCP\IConfig;
 use OCP\PreConditionNotMetException;
@@ -37,11 +38,20 @@ use OCP\Util;
 
 class TestService {
 
-	const DOCUMENT_USER = 'user';
+	const DOCUMENT_USER1 = 'user1';
+	const DOCUMENT_USER2 = 'user2';
+	const DOCUMENT_USER3 = 'user3';
+	const DOCUMENT_NOTUSER = 'notuser';
 
-	const DOCUMENT_TEST_LICENSE = 'license';
-	const DOCUMENT_TEST_SIMPLE = 'simple';
-	const DOCUMENT_TEST_ACCESS = 'access';
+	const DOCUMENT_GROUP1 = 'group_1';
+	const DOCUMENT_GROUP2 = 'group_2';
+	const DOCUMENT_NOTGROUP = 'group_3';
+
+	const DOCUMENT_TYPE_LICENSE = 'license';
+	const DOCUMENT_TYPE_SIMPLE = 'simple';
+
+	const DOCUMENT_INDEXING_OPTION = 'indexing';
+	const DOCUMENT_INDEXING_ACCESS = 'access';
 
 	const LICENSE_HASH = '108322602bb857915803a84e23a2cc2f';
 
@@ -60,24 +70,40 @@ class TestService {
 
 
 	/**
+	 * @param IndexOptions $options
+	 *
 	 * @return IndexDocument
 	 */
-	public function generateIndexDocumentContentLicense() {
-		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TEST_LICENSE);
+	public function generateIndexDocumentContentLicense(IndexOptions $options = null) {
+		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TYPE_LICENSE);
 
 		$content = file_get_contents(__DIR__ . '/../../LICENSE');
 		$indexDocument->setContent($content);
+
+		if ($options === null) {
+			return $indexDocument;
+		}
+
+		if ($options->getOption(self::DOCUMENT_INDEXING_OPTION, '')
+			=== self::DOCUMENT_INDEXING_ACCESS) {
+			$indexDocument->getAccess()
+						  ->setGroups([self::DOCUMENT_GROUP1, self::DOCUMENT_GROUP2]);
+			$indexDocument->getAccess()
+						  ->setUsers([self::DOCUMENT_USER2, self::DOCUMENT_USER3]);
+		}
 
 		return $indexDocument;
 	}
 
 
 	/**
+	 * @param IndexOptions $options
+	 *
 	 * @return IndexDocument
 	 */
-	public function generateIndexDocumentSimple() {
+	public function generateIndexDocumentSimple(IndexOptions $options) {
 
-		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TEST_SIMPLE);
+		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TYPE_SIMPLE);
 		$indexDocument->setContent('This is a test');
 
 		return $indexDocument;
@@ -123,7 +149,7 @@ class TestService {
 	private function generateIndexDocument($documentType) {
 		$indexDocument = new IndexDocument(TestProvider::TEST_PROVIDER_ID, $documentType);
 
-		$access = new DocumentAccess(self::DOCUMENT_USER);
+		$access = new DocumentAccess(self::DOCUMENT_USER1);
 		$indexDocument->setAccess($access);
 
 		return $indexDocument;
