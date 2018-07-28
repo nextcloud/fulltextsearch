@@ -361,7 +361,7 @@ class SearchRequest implements \JsonSerializable {
 
 
 	/**
-	 * @param array $query
+	 * @param string $field
 	 *
 	 * @return $this
 	 */
@@ -378,35 +378,35 @@ class SearchRequest implements \JsonSerializable {
 		return $this->wildcardFields;
 	}
 
-
-	/**
-	 * @param array $query
-	 *
-	 * @return $this
-	 */
-	public function addWildcardQuery($field) {
-		$this->addWildcardQueries([$query]);
-
-		return $this;
-	}
-
-	/**
-	 * @param array $query
-	 *
-	 * @return $this
-	 */
-	public function addWildcardQueries($query) {
-		array_push($this->wildcardQueries, $query);
-
-		return $this;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getWildcardQueries() {
-		return $this->wildcardQueries;
-	}
+//
+//	/**
+//	 * @param array $query
+//	 *
+//	 * @return $this
+//	 */
+//	public function addWildcardQuery($query) {
+//		$this->addWildcardQueries([$query]);
+//
+//		return $this;
+//	}
+//
+//	/**
+//	 * @param array $query
+//	 *
+//	 * @return $this
+//	 */
+//	public function addWildcardQueries($query) {
+//		array_push($this->wildcardQueries, $query);
+//
+//		return $this;
+//	}
+//
+//	/**
+//	 * @return array
+//	 */
+//	public function getWildcardQueries() {
+//		return $this->wildcardQueries;
+//	}
 
 
 	/**

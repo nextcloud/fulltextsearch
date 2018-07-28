@@ -26,15 +26,10 @@
 
 namespace OCA\FullTextSearch\Service;
 
-use OCA\FullTextSearch\AppInfo\Application;
-use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCA\FullTextSearch\Model\DocumentAccess;
 use OCA\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Provider\TestProvider;
-use OCP\IConfig;
-use OCP\PreConditionNotMetException;
-use OCP\Util;
 
 class TestService {
 

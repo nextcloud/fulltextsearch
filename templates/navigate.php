@@ -36,8 +36,7 @@ Util::addStyle(Application::APP_NAME, 'navigate');
 
 <div id="app-navigation">
 	<ul id="search_navigation">
-		<li>
-			<div id="app-navigation" style="position: relative;">
+		<li style="height: 50px">
 				<div id="search_header">
 					<div>
 						<input id="search_input"
@@ -46,7 +45,6 @@ Util::addStyle(Application::APP_NAME, 'navigate');
 							   ); ?>">
 					</div>
 				</div>
-			</div>
 		</li>
 	</ul>
 </div>

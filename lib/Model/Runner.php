@@ -27,7 +27,6 @@
 
 namespace OCA\FullTextSearch\Model;
 
-use Exception;
 use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;

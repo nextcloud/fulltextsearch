@@ -30,7 +30,6 @@ use Exception;
 use OC\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
-use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\ProviderService;
@@ -39,7 +38,6 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\IRequest;
-use OCP\Util;
 
 class TemplatesController extends Controller {
 

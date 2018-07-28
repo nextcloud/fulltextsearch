@@ -111,6 +111,8 @@ class Check extends ExtendedBase {
 
 	private function displayAsJson() {
 
+		$resultPlatform = [];
+
 		try {
 			$platforms = $this->platformService->getPlatforms();
 			$ak = array_keys($platforms);
