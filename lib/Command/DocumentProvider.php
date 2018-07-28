@@ -95,18 +95,25 @@ class DocumentProvider extends ExtendedBase {
 		$index->setOwnerId($userId);
 		$index->setStatus(Index::INDEX_FULL);
 		$indexDocument = $provider->updateDocument($index);
-		$result = [
-			'document' => $indexDocument
-		];
-		if ($input->getOption('content') === true) {
-			$content = $indexDocument->getContent();
-			if ($indexDocument->isContentEncoded() === IndexDocument::ENCODED_BASE64) {
-				$content = base64_decode($content);
-			}
-			$result['content'] = substr($content, 0, 200);
+		if ($indexDocument->getIndex()
+						  ->isStatus(Index::INDEX_REMOVE)) {
+			throw new Exception('Unknown document');
+		}
+		
+		$output->writeln('Document: ');
+		$output->writeln(json_encode($indexDocument, JSON_PRETTY_PRINT));
+
+		if ($input->getOption('content') !== true) {
+			return;
 		}
 
-		$output->writeln(json_encode($result, JSON_PRETTY_PRINT));
+		$output->writeln('Content: ');
+		$content = $indexDocument->getContent();
+		if ($indexDocument->isContentEncoded() === IndexDocument::ENCODED_BASE64) {
+			$content = base64_decode($content, true);
+		}
+
+		$output->writeln(substr($content, 0, 60));
 	}
 
 

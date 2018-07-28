@@ -532,6 +532,7 @@ class IndexDocument implements \JsonSerializable {
 			'modifiedTime' => $this->getModifiedTime(),
 			'title'        => $this->getTitle(),
 			'link'         => $this->getLink(),
+			'index'        => $this->getIndex(),
 			'source'       => $this->getSource(),
 			'info'         => $this->getInfoAll(),
 			'hash'         => $this->getHash(),
