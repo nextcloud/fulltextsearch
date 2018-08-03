@@ -105,7 +105,7 @@ class Index extends TimedJob {
 		$indexes = $this->indexService->getQueuedIndexes();
 
 		foreach ($indexes as $index) {
-			$this->runner->update('indexing');
+			$this->runner->updateAction('indexing');
 
 			try {
 				$provider = $this->providerService->getProvider($index->getProviderId());

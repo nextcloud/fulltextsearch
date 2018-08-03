@@ -152,7 +152,7 @@ class Live extends ExtendedBase {
 			$indexes = $this->indexService->getQueuedIndexes();
 
 			foreach ($indexes as $index) {
-				$this->runner->update('indexing');
+				$this->runner->updateAction('indexing');
 
 				try {
 					$provider = $this->providerService->getProvider($index->getProviderId());
@@ -165,7 +165,7 @@ class Live extends ExtendedBase {
 				}
 			}
 
-			$this->runner->update('waiting');
+			$this->runner->updateAction('waiting');
 
 			sleep(self::CYCLE_DELAY);
 		}

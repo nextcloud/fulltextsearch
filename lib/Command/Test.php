@@ -138,7 +138,6 @@ class Test extends ExtendedBase {
 			'platform_delay'
 		) : self::DELAY_STABILIZE_PLATFORM;
 
-		echo '$' . $input->getOption('platform_delay') . '$';
 		$this->output($output, '.Testing your current setup:');
 
 		try {
