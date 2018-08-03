@@ -156,10 +156,23 @@ class IndexService {
 
 		$documents = $provider->generateIndexableDocuments($userId);
 
+		$this->updateRunnerInfoArray(
+			[
+				'documentTotal' => sizeof($documents),
+				'documentLeft'  => ''
+			]
+		);
+
 		//$maxSize = sizeof($documents);
 
 		$toIndex = $this->updateDocumentsWithCurrIndex($provider, $documents, $options);
 		$this->indexChunks($platform, $provider, $toIndex);
+
+//		$this->updateRunnerInfoArray(
+//			[
+//				'documentLeft' => 0
+//			]
+//		);
 	}
 
 
@@ -253,14 +266,19 @@ class IndexService {
 		for ($i = 0; $i < $max; $i++) {
 			$this->updateRunnerAction('indexChunk', true);
 			try {
+
 				$chunk = array_splice($documents, 0, $chunkSize);
 				$this->indexChunk($platform, $provider, $chunk);
+
+				$this->updateRunnerInfoArray(['documentLeft' => sizeof($documents)]);
 
 				/** @var IndexDocument $doc */
 				foreach ($chunk as $doc) {
 					$doc->__destruct(); // because.
 				}
 			} catch (NoResultException $e) {
+				$this->updateRunnerInfoArray(['documentLeft' => 0]);
+
 				return;
 			} catch (Exception $e) {
 				throw $e;

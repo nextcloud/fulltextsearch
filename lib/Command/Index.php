@@ -63,8 +63,8 @@ class Index extends ExtendedBase {
 
 	const PANEL_STATUS = 'status';
 	const PANEL_STATUS_LINE_HEADER = '┌─ Status ────';
-	const PANEL_STATUS_LINE_DOCUMENTS_TOTAL = '│ Total document for this user:';
-	const PANEL_STATUS_LINE_DOCUMENTS_LEFT = '│ Document left:';
+	const PANEL_STATUS_LINE_DOCUMENTS = '│ Progress: %documentLeft:6s%/%documentTotal%';
+//	const PANEL_STATUS_LINE_DOCUMENTS_LEFT = '│ Document left:';
 	const PANEL_STATUS_LINE_ERRORS = '│ Errors:';
 	const PANEL_STATUS_LINE_FOOTER = '└──';
 
@@ -178,83 +178,14 @@ class Index extends ExtendedBase {
 		$this->indexService->setRunner($this->runner);
 		$this->cliService->setRunner($this->runner);
 
-		$this->cliService->createPanel(
-			self::PANEL_RUN,
-			[
-				self::PANEL_RUN_LINE_OPTIONS,
-				self::PANEL_RUN_LINE_MEMORY
-			]
-		);
-		$this->cliService->createPanel(
-			self::PANEL_INDEX, [
-								 self::PANEL_INDEX_LINE_HEADER,
-								 self::PANEL_INDEX_LINE_ACCOUNT,
-								 self::PANEL_INDEX_LINE_ACTION,
-								 self::PANEL_INDEX_LINE_DOCUMENT,
-								 self::PANEL_INDEX_LINE_INFO,
-								 self::PANEL_INDEX_LINE_TITLE,
-								 self::PANEL_INDEX_LINE_CONTENT,
-								 self::PANEL_INDEX_LINE_RESULT,
-								 self::PANEL_INDEX_LINE_FOOTER,
-							 ]
-		);
-
-		$this->cliService->createPanel(
-			self::PANEL_STATUS, [
-								  self::PANEL_STATUS_LINE_HEADER,
-								  self::PANEL_STATUS_LINE_DOCUMENTS_TOTAL,
-								  self::PANEL_STATUS_LINE_DOCUMENTS_LEFT,
-								  self::PANEL_STATUS_LINE_ERRORS,
-								  self::PANEL_LINE_EMPTY,
-								  self::PANEL_LINE_EMPTY,
-								  self::PANEL_LINE_EMPTY,
-								  self::PANEL_STATUS_LINE_FOOTER,
-							  ]
-		);
-
-		$this->cliService->createPanel(
-			self::PANEL_COMMANDS_ROOT, [
-										 self::PANEL_COMMANDS_ROOT_LINE
-									 ]
-		);
-
-		$this->cliService->createPanel(
-			self::PANEL_COMMANDS_PAUSED, [
-										   self::PANEL_COMMANDS_PAUSED_LINE
-									   ]
-		);
-
-
-		$this->cliService->initDisplay();
-		$this->cliService->displayPanel('run', self::PANEL_RUN);
-		$this->cliService->displayPanel('topPanel', self::PANEL_INDEX);
-		$this->cliService->displayPanel('bottomPanel', self::PANEL_STATUS);
-
-		if ($this->runner->isPaused()) {
-			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_PAUSED);
-		} else {
-			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
-		}
+		$this->generatePanels();
+		$this->runner->setInfo('options', json_encode($options));
 
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);
 			$this->runner->start();
 
-			$this->cliService->runDisplay(
-				$output, [
-						   'userId'        => '',
-						   'providerName'  => '',
-						   '_memory'       => '',
-						   'documentId'    => '',
-						   'action'        => '',
-						   'info'          => '',
-						   'title'         => '',
-						   '_paused'       => '',
-						   'content'       => '',
-						   'resultColored' => '',
-						   'options'       => json_encode($options)
-					   ]
-			);
+			$this->cliService->runDisplay($output);
 
 			$providers = $this->providerService->getProviders();
 			foreach ($providers as $provider) {
@@ -263,7 +194,6 @@ class Index extends ExtendedBase {
 					continue;
 				}
 
-//				$this->runner->output('indexing ' . $provider->getName() . '.');
 				$provider->setRunner($this->runner);
 				$provider->setIndexOptions($options);
 				$this->indexProvider($provider, $options);
@@ -274,6 +204,7 @@ class Index extends ExtendedBase {
 			throw $e;
 		}
 
+		$output->writeLn('done.');
 		$this->runner->stop();
 	}
 
@@ -403,6 +334,88 @@ class Index extends ExtendedBase {
 
 		return $this->userManager->search('');
 	}
+
+
+	/**
+	 *
+	 */
+	private function generatePanels() {
+
+		$this->cliService->createPanel(
+			self::PANEL_RUN,
+			[
+				self::PANEL_RUN_LINE_OPTIONS,
+				self::PANEL_RUN_LINE_MEMORY
+			]
+		);
+		$this->cliService->createPanel(
+			self::PANEL_INDEX, [
+								 self::PANEL_INDEX_LINE_HEADER,
+								 self::PANEL_INDEX_LINE_ACCOUNT,
+								 self::PANEL_INDEX_LINE_ACTION,
+								 self::PANEL_INDEX_LINE_DOCUMENT,
+								 self::PANEL_INDEX_LINE_INFO,
+								 self::PANEL_INDEX_LINE_TITLE,
+								 self::PANEL_INDEX_LINE_CONTENT,
+								 self::PANEL_INDEX_LINE_RESULT,
+								 self::PANEL_INDEX_LINE_FOOTER,
+							 ]
+		);
+
+		$this->cliService->createPanel(
+			self::PANEL_STATUS, [
+								  self::PANEL_STATUS_LINE_HEADER,
+								  self::PANEL_STATUS_LINE_DOCUMENTS,
+								  self::PANEL_STATUS_LINE_ERRORS,
+								  self::PANEL_LINE_EMPTY,
+								  self::PANEL_LINE_EMPTY,
+								  self::PANEL_LINE_EMPTY,
+								  self::PANEL_STATUS_LINE_FOOTER,
+							  ]
+		);
+
+		$this->cliService->createPanel(
+			self::PANEL_COMMANDS_ROOT, [
+										 self::PANEL_COMMANDS_ROOT_LINE
+									 ]
+		);
+
+		$this->cliService->createPanel(
+			self::PANEL_COMMANDS_PAUSED, [
+										   self::PANEL_COMMANDS_PAUSED_LINE
+									   ]
+		);
+
+
+		$this->cliService->initDisplay();
+		$this->cliService->displayPanel('run', self::PANEL_RUN);
+		$this->cliService->displayPanel('topPanel', self::PANEL_INDEX);
+		$this->cliService->displayPanel('bottomPanel', self::PANEL_STATUS);
+
+		if ($this->runner->isPaused()) {
+			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_PAUSED);
+		} else {
+			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
+		}
+
+		$this->runner->setInfoArray(
+			[
+				'userId'        => '',
+				'providerName'  => '',
+				'_memory'       => '',
+				'documentId'    => '',
+				'action'        => '',
+				'info'          => '',
+				'title'         => '',
+				'_paused'       => '',
+				'content'       => '',
+				'resultColored' => '',
+				'documentLeft'  => '',
+				'documentTotal' => ''
+			]
+		);
+	}
+
 }
 
 
