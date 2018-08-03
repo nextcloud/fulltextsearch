@@ -45,15 +45,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Index extends ExtendedBase {
 
+//			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
+	const PANEL_RUN = 'run';
+	const PANEL_RUN_LINE_OPTIONS = 'Options: %options%';
+	const PANEL_RUN_LINE_MEMORY = 'Memory: %_memory%';
 
 	const PANEL_INDEX = 'indexing';
-	const PANEL_INDEX_LINE_HEADER = '┌─ Indexing ────';
-	const PANEL_INDEX_LINE_ACCOUNT = '│ Account: %userId%';
-	const PANEL_INDEX_LINE_DOCUMENT = "│ Indexing <info>provider</info>/<info>document</info>";
-	const PANEL_INDEX_LINE_TITLE = '│ Title: %title%';
-	const PANEL_INDEX_LINE_CONTENT = '│ Content: empty';
-	const PANEL_INDEX_LINE_OPTIONS = '│ Options: []';
-	const PANEL_INDEX_LINE_RESULT = '│ Result: %result%';
+	const PANEL_INDEX_LINE_HEADER = '┌─ Indexing %_paused% ────';
+	const PANEL_INDEX_LINE_ACCOUNT = '│ Provider: <info>%providerName:-20s%</info> Account: <info>%userId%</info>';
+	const PANEL_INDEX_LINE_ACTION = '│ Action: <info>%action%</info>';
+	const PANEL_INDEX_LINE_DOCUMENT = '│ Document: <info>%documentId%</info>';
+	const PANEL_INDEX_LINE_INFO = '│ Info: <info>%info%</info>';
+	const PANEL_INDEX_LINE_TITLE = '│ Title: <info>%title%</info>';
+	const PANEL_INDEX_LINE_CONTENT = '│ Content size: <info>%content%</info>';
+	const PANEL_INDEX_LINE_RESULT = '│ Result: %resultColored%';
 	const PANEL_INDEX_LINE_FOOTER = '└──';
 
 	const PANEL_STATUS = 'status';
@@ -160,26 +165,37 @@ class Index extends ExtendedBase {
 			'', function() {
 		}
 		);
+
 		stream_set_blocking(STDIN, false);
 
 		$options = $this->generateIndexOptions($input);
 
-		$this->runner = new Runner($this->runningService, 'commandIndex');
+		$this->runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
 		$this->runner->onKeyPress([$this, 'onKeyPressed']);
+		$this->runner->onNewAction([$this, 'onNewAction']);
+		$this->runner->pause($options->getOption('pause', false));
+
 		$this->indexService->setRunner($this->runner);
 		$this->cliService->setRunner($this->runner);
 
 		$this->cliService->createPanel(
+			self::PANEL_RUN,
+			[
+				self::PANEL_RUN_LINE_OPTIONS,
+				self::PANEL_RUN_LINE_MEMORY
+			]
+		);
+		$this->cliService->createPanel(
 			self::PANEL_INDEX, [
 								 self::PANEL_INDEX_LINE_HEADER,
 								 self::PANEL_INDEX_LINE_ACCOUNT,
+								 self::PANEL_INDEX_LINE_ACTION,
 								 self::PANEL_INDEX_LINE_DOCUMENT,
+								 self::PANEL_INDEX_LINE_INFO,
 								 self::PANEL_INDEX_LINE_TITLE,
 								 self::PANEL_INDEX_LINE_CONTENT,
-								 self::PANEL_INDEX_LINE_OPTIONS,
 								 self::PANEL_INDEX_LINE_RESULT,
 								 self::PANEL_INDEX_LINE_FOOTER,
-
 							 ]
 		);
 
@@ -210,19 +226,35 @@ class Index extends ExtendedBase {
 
 
 		$this->cliService->initDisplay();
+		$this->cliService->displayPanel('run', self::PANEL_RUN);
 		$this->cliService->displayPanel('topPanel', self::PANEL_INDEX);
 		$this->cliService->displayPanel('bottomPanel', self::PANEL_STATUS);
-		$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
-		$this->cliService->runDisplay($output);
 
-//		while (1) {
-//			$this->runner->update();
-//			sleep(1);
-//		}
+		if ($this->runner->isPaused()) {
+			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_PAUSED);
+		} else {
+			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
+		}
 
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);
 			$this->runner->start();
+
+			$this->cliService->runDisplay(
+				$output, [
+						   'userId'        => '',
+						   'providerName'  => '',
+						   '_memory'       => '',
+						   'documentId'    => '',
+						   'action'        => '',
+						   'info'          => '',
+						   'title'         => '',
+						   '_paused'       => '',
+						   'content'       => '',
+						   'resultColored' => '',
+						   'options'       => json_encode($options)
+					   ]
+			);
 
 			$providers = $this->providerService->getProviders();
 			foreach ($providers as $provider) {
@@ -231,7 +263,7 @@ class Index extends ExtendedBase {
 					continue;
 				}
 
-				$this->runner->output('indexing ' . $provider->getName() . '.');
+//				$this->runner->output('indexing ' . $provider->getName() . '.');
 				$provider->setRunner($this->runner);
 				$provider->setIndexOptions($options);
 				$this->indexProvider($provider, $options);
@@ -259,12 +291,30 @@ class Index extends ExtendedBase {
 		if ($current === self::PANEL_COMMANDS_ROOT) {
 			if ($key === 'p') {
 				$this->cliService->switchPanel('commands', self::PANEL_COMMANDS_PAUSED);
+				$this->runner->pause(true);
 			}
 		}
 		if ($current === self::PANEL_COMMANDS_PAUSED) {
 			if ($key === 'u') {
 				$this->cliService->switchPanel('commands', self::PANEL_COMMANDS_ROOT);
+				$this->runner->pause(false);
 			}
+		}
+	}
+
+	/**
+	 * @param string $action
+	 */
+	public function onNewAction($action) {
+
+		if ($action === 'indexChunk' || $action === 'indexChunkEnd') {
+			$this->runner->setInfoArray(
+				[
+					'documentId' => '',
+					'title'      => '',
+					'content'    => ''
+				]
+			);
 		}
 	}
 
@@ -288,7 +338,6 @@ class Index extends ExtendedBase {
 				continue;
 			}
 
-			$this->runner->output(' USER: ' . $user->getUID());
 			$this->indexService->indexProviderContentFromUser(
 				$platform, $provider, $user->getUID(), $options
 			);
