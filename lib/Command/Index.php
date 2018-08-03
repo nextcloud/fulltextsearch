@@ -31,6 +31,7 @@ use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\ExtendedBase;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
+use OCA\FullTextSearch\Service\CliService;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
@@ -44,11 +45,40 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Index extends ExtendedBase {
 
+
+	const PANEL_INDEX = 'indexing';
+	const PANEL_INDEX_LINE_HEADER = '┌─ Indexing ────';
+	const PANEL_INDEX_LINE_ACCOUNT = '│ Account: %userId%';
+	const PANEL_INDEX_LINE_DOCUMENT = "│ Indexing <info>provider</info>/<info>document</info>";
+	const PANEL_INDEX_LINE_TITLE = '│ Title: %title%';
+	const PANEL_INDEX_LINE_CONTENT = '│ Content: empty';
+	const PANEL_INDEX_LINE_OPTIONS = '│ Options: []';
+	const PANEL_INDEX_LINE_RESULT = '│ Result: %result%';
+	const PANEL_INDEX_LINE_FOOTER = '└──';
+
+	const PANEL_STATUS = 'status';
+	const PANEL_STATUS_LINE_HEADER = '┌─ Status ────';
+	const PANEL_STATUS_LINE_DOCUMENTS_TOTAL = '│ Total document for this user:';
+	const PANEL_STATUS_LINE_DOCUMENTS_LEFT = '│ Document left:';
+	const PANEL_STATUS_LINE_ERRORS = '│ Errors:';
+	const PANEL_STATUS_LINE_FOOTER = '└──';
+
+	const PANEL_LINE_EMPTY = '│ ';
+
+	const PANEL_COMMANDS_ROOT = 'root';
+	const PANEL_COMMANDS_ROOT_LINE = '## q:quit ## p:pause';
+	const PANEL_COMMANDS_PAUSED = 'paused';
+	const PANEL_COMMANDS_PAUSED_LINE = '## q:quit ## u:unpause ## n:next';
+
+
 	/** @var IUserManager */
 	private $userManager;
 
 	/** @var RunningService */
 	private $runningService;
+
+	/** @var CliService */
+	private $cliService;
 
 	/** @var IndexService */
 	private $indexService;
@@ -72,19 +102,22 @@ class Index extends ExtendedBase {
 	 *
 	 * @param IUserManager $userManager
 	 * @param RunningService $runningService
+	 * @param CliService $cliService
 	 * @param IndexService $indexService
 	 * @param PlatformService $platformService
 	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IUserManager $userManager, RunningService $runningService, IndexService $indexService,
-		PlatformService $platformService, ProviderService $providerService, MiscService $miscService
+		IUserManager $userManager, RunningService $runningService, CliService $cliService,
+		IndexService $indexService, PlatformService $platformService,
+		ProviderService $providerService, MiscService $miscService
 	) {
 		parent::__construct();
 		$this->userManager = $userManager;
 
 		$this->runningService = $runningService;
+		$this->cliService = $cliService;
 		$this->indexService = $indexService;
 
 		$this->platformService = $platformService;
@@ -105,6 +138,16 @@ class Index extends ExtendedBase {
 
 
 	/**
+	 * @throws Exception
+	 */
+	public function interrupted() {
+		if ($this->hasBeenInterrupted()) {
+			throw new \Exception('ctrl-c');
+		}
+	}
+
+
+	/**
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
@@ -113,11 +156,69 @@ class Index extends ExtendedBase {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 
+		readline_callback_handler_install(
+			'', function() {
+		}
+		);
+		stream_set_blocking(STDIN, false);
+
 		$options = $this->generateIndexOptions($input);
 
 		$this->runner = new Runner($this->runningService, 'commandIndex');
+		$this->runner->onKeyPress([$this, 'onKeyPressed']);
 		$this->indexService->setRunner($this->runner);
+		$this->cliService->setRunner($this->runner);
 
+		$this->cliService->createPanel(
+			self::PANEL_INDEX, [
+								 self::PANEL_INDEX_LINE_HEADER,
+								 self::PANEL_INDEX_LINE_ACCOUNT,
+								 self::PANEL_INDEX_LINE_DOCUMENT,
+								 self::PANEL_INDEX_LINE_TITLE,
+								 self::PANEL_INDEX_LINE_CONTENT,
+								 self::PANEL_INDEX_LINE_OPTIONS,
+								 self::PANEL_INDEX_LINE_RESULT,
+								 self::PANEL_INDEX_LINE_FOOTER,
+
+							 ]
+		);
+
+		$this->cliService->createPanel(
+			self::PANEL_STATUS, [
+								  self::PANEL_STATUS_LINE_HEADER,
+								  self::PANEL_STATUS_LINE_DOCUMENTS_TOTAL,
+								  self::PANEL_STATUS_LINE_DOCUMENTS_LEFT,
+								  self::PANEL_STATUS_LINE_ERRORS,
+								  self::PANEL_LINE_EMPTY,
+								  self::PANEL_LINE_EMPTY,
+								  self::PANEL_LINE_EMPTY,
+								  self::PANEL_STATUS_LINE_FOOTER,
+							  ]
+		);
+
+		$this->cliService->createPanel(
+			self::PANEL_COMMANDS_ROOT, [
+										 self::PANEL_COMMANDS_ROOT_LINE
+									 ]
+		);
+
+		$this->cliService->createPanel(
+			self::PANEL_COMMANDS_PAUSED, [
+										   self::PANEL_COMMANDS_PAUSED_LINE
+									   ]
+		);
+
+
+		$this->cliService->initDisplay();
+		$this->cliService->displayPanel('topPanel', self::PANEL_INDEX);
+		$this->cliService->displayPanel('bottomPanel', self::PANEL_STATUS);
+		$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
+		$this->cliService->runDisplay($output);
+
+//		while (1) {
+//			$this->runner->update();
+//			sleep(1);
+//		}
 
 		try {
 			$this->runner->sourceIsCommandLine($this, $output);
@@ -142,6 +243,29 @@ class Index extends ExtendedBase {
 		}
 
 		$this->runner->stop();
+	}
+
+
+	/**
+	 * @param $key
+	 */
+	public function onKeyPressed($key) {
+		$key = strtolower($key);
+		if ($key === 'q') {
+			exit();
+		}
+
+		$current = $this->cliService->currentPanel('commands');
+		if ($current === self::PANEL_COMMANDS_ROOT) {
+			if ($key === 'p') {
+				$this->cliService->switchPanel('commands', self::PANEL_COMMANDS_PAUSED);
+			}
+		}
+		if ($current === self::PANEL_COMMANDS_PAUSED) {
+			if ($key === 'u') {
+				$this->cliService->switchPanel('commands', self::PANEL_COMMANDS_ROOT);
+			}
+		}
 	}
 
 

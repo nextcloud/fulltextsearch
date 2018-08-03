@@ -69,6 +69,10 @@ class Runner {
 	/** @var int */
 	private $ramTick = 0;
 
+	/** @var array */
+	private $methodOnKeyPress = [];
+
+
 	/**
 	 * Runner constructor.
 	 *
@@ -98,7 +102,17 @@ class Runner {
 	 * @throws InterruptException
 	 * @throws TickDoesNotExistException
 	 */
-	public function update($action) {
+	public function update($action = '') {
+		if (sizeof($this->methodOnKeyPress) > 0) {
+			$n = fread(STDIN, 1);
+			if ($n !== '') {
+				$this->keyPressed($n);
+			}
+		}
+
+		if ($action === '') {
+			return;
+		}
 
 		$tick = time();
 		try {
@@ -122,6 +136,24 @@ class Runner {
 		$this->updateInfo($tick);
 		$this->oldAction = $action;
 		$this->oldTick = $tick;
+	}
+
+
+	/**
+	 * @param array $method
+	 */
+	public function onKeyPress($method) {
+		$this->methodOnKeyPress[] = $method;
+	}
+
+
+	/**
+	 * @param $key
+	 */
+	public function keyPressed($key) {
+		foreach ($this->methodOnKeyPress as $method) {
+			call_user_func($method, $key);
+		}
 	}
 
 
