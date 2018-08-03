@@ -94,17 +94,41 @@ class IndexService {
 
 
 	/**
-	 * @param $action
+	 * @param string $action
+	 * @param bool $force
 	 *
 	 * @throws InterruptException
 	 * @throws TickDoesNotExistException
 	 */
-	private function updateRunner($action) {
+	private function updateRunnerAction($action, $force = false) {
 		if ($this->runner === null) {
 			return;
 		}
 
-		$this->runner->update($action);
+		$this->runner->updateAction($action, $force);
+	}
+
+	/**
+	 * @param string $info
+	 * @param string $value
+	 */
+	private function updateRunnerInfo($info, $value) {
+		if ($this->runner === null) {
+			return;
+		}
+
+		$this->runner->setInfo($info, $value);
+	}
+
+	/**
+	 * @param array $data
+	 */
+	private function updateRunnerInfoArray($data) {
+		if ($this->runner === null) {
+			return;
+		}
+
+		$this->runner->setInfoArray($data);
 	}
 
 
@@ -121,7 +145,15 @@ class IndexService {
 	public function indexProviderContentFromUser(
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $userId, $options
 	) {
-		$this->updateRunner('generateIndex' . $provider->getName());
+		$this->updateRunnerAction('generateIndex' . $provider->getName());
+		$this->updateRunnerInfoArray(
+			[
+				'userId'       => $userId,
+				'providerId'   => $provider->getId(),
+				'providerName' => $provider->getName()
+			]
+		);
+
 		$documents = $provider->generateIndexableDocuments($userId);
 
 		//$maxSize = sizeof($documents);
@@ -147,7 +179,7 @@ class IndexService {
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
 		foreach ($documents as $document) {
-			$this->updateRunner('compareWithCurrentIndex');
+			$this->updateRunnerAction('compareWithCurrentIndex');
 
 			$index = $currIndex->getIndex($document->getId());
 			if ($index === null) {
@@ -219,7 +251,7 @@ class IndexService {
 
 		$max = sizeof($documents);
 		for ($i = 0; $i < $max; $i++) {
-			$this->updateRunner('indexChunk');
+			$this->updateRunnerAction('indexChunk', true);
 			try {
 				$chunk = array_splice($documents, 0, $chunkSize);
 				$this->indexChunk($platform, $provider, $chunk);
@@ -234,6 +266,8 @@ class IndexService {
 				throw $e;
 			}
 		}
+
+		$this->updateRunnerAction('indexChunk', true);
 	}
 
 

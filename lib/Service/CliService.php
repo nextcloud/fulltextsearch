@@ -66,6 +66,8 @@ class CliService {
 	 */
 	public function setRunner(Runner $runner) {
 		$this->runner = $runner;
+
+		$this->runner->onInfoUpdate([$this, 'onInfoUpdated']);
 	}
 
 
@@ -105,7 +107,7 @@ class CliService {
 	/**
 	 * @param string $panelSlot
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function currentPanel($panelSlot) {
 		foreach ($this->displayedPanel as $panel) {
@@ -113,6 +115,8 @@ class CliService {
 				return $panel['id'];
 			}
 		}
+
+		return '';
 	}
 
 
@@ -136,10 +140,12 @@ class CliService {
 
 	/**
 	 * @param OutputInterface $output
+	 * @param array $initVar
 	 */
-	public function runDisplay(OutputInterface $output) {
+	public function runDisplay(OutputInterface $output, $initVar = []) {
 		$this->output = $output;
 
+		$output->writeLn('');
 		foreach ($this->displayedPanel as $displayedPanel) {
 			$panel = $this->panels[$displayedPanel['id']];
 			for ($i = 0; $i < sizeof($panel); $i++) {
@@ -149,6 +155,12 @@ class CliService {
 
 		$this->display = new ProgressBar($this->output);
 		$this->display->setOverwrite(true);
+
+		$keys = array_keys($initVar);
+		foreach ($keys as $key) {
+			$this->display->setMessage($initVar[$key], $key);
+		}
+
 		$this->display->clear();
 
 		$this->refreshDisplay();
@@ -156,6 +168,10 @@ class CliService {
 
 
 	public function refreshDisplay() {
+
+		if ($this->display === null) {
+			return;
+		}
 
 		$format = [];
 		foreach ($this->displayedPanel as $displayedPanel) {
@@ -165,14 +181,42 @@ class CliService {
 			}
 		}
 
-//		$this->display->setMessage('<info>toto</info>');
-//		$progress->setMessage('', 'jvm');
-//		$progress->setMessage('', 'duration');
 		$this->display->setFormat(implode("\n", $format) . "\n");
+		$this->refreshInfo();
 		$this->display->start();
 	}
 
-//			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
 
+	public function refreshInfo() {
+		if ($this->runner->isPauseRunning()) {
+			$this->display->setMessage('(paused)', '_paused');
+		} else {
+			$this->display->setMessage('', '_paused');
+		}
+	}
+
+	/**
+	 * @param array $info
+	 */
+	public function onInfoUpdated($info) {
+		if ($this->display === null) {
+			return;
+		}
+
+		$this->refreshInfo();
+		$keys = array_keys($info);
+		foreach ($keys as $k) {
+			if ($info[$k] === 'ok') {
+				$this->display->setMessage('<info>ok</info>', $k . 'Colored');
+			}
+			if ($info[$k] === 'fail') {
+				$this->display->setMessage('<error>failed</error>', $k . 'Colored');
+			}
+
+			$this->display->setMessage($info[$k], $k);
+		}
+
+		$this->display->display();
+	}
 
 }
