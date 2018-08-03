@@ -60,6 +60,9 @@ class Runner {
 	/** @var OutputInterface */
 	private $outputInterface = null;
 
+	/** @var array */
+	private $info = [];
+
 	/** @var int */
 	private $oldTick = 0;
 
@@ -72,16 +75,36 @@ class Runner {
 	/** @var array */
 	private $methodOnKeyPress = [];
 
+	/** @var array */
+	private $methodOnNewAction = [];
+
+	/** @var array */
+	private $methodOnInfoUpdate = [];
+
+	/** @var bool */
+	private $paused = false;
+
+	/** @var bool */
+	private $pauseRunning = false;
+
+	/** @var array */
+	private $keys = ['nextStep' => 'n'];
+
 
 	/**
 	 * Runner constructor.
 	 *
 	 * @param RunningService $runningService
 	 * @param string $source
+	 * @param array $keys
 	 */
-	public function __construct(RunningService $runningService, $source) {
+	public function __construct(RunningService $runningService, $source, $keys = []) {
 		$this->runningService = $runningService;
 		$this->source = $source;
+
+		if (sizeof($keys) > 0) {
+			$this->keys = $keys;
+		}
 	}
 
 
@@ -97,21 +120,25 @@ class Runner {
 
 
 	/**
-	 * @param $action
+	 * @param string $action
+	 * @param bool $force
 	 *
+	 * @return string
 	 * @throws InterruptException
 	 * @throws TickDoesNotExistException
 	 */
-	public function update($action = '') {
+	public function updateAction($action = '', $force = false) {
+		$n = '';
 		if (sizeof($this->methodOnKeyPress) > 0) {
-			$n = fread(STDIN, 1);
+			$n = fread(STDIN, 9999);
 			if ($n !== '') {
+				$n = substr($n, 0, 1);
 				$this->keyPressed($n);
 			}
 		}
 
 		if ($action === '') {
-			return;
+			return $n;
 		}
 
 		$tick = time();
@@ -122,10 +149,30 @@ class Runner {
 			throw $e;
 		}
 
-		if ($this->oldAction === $action && ($this->oldTick + self::TICK_MINIMUM > $tick)) {
-			return;
+		if ($this->oldAction !== $action || $force) {
+			while (true) {
+				if (!$this->isPaused()) {
+					$this->pauseRunning(false);
+					break;
+				}
+
+				$this->pauseRunning(true);
+				$pressed = strtolower($this->updateAction(''));
+				if ($pressed === $this->keys['nextStep']) {
+					$this->pauseRunning(false);
+					break;
+				}
+				usleep(300000);
+			}
+
+			$this->newAction($action);
 		}
 
+		if ($this->oldAction === $action && ($this->oldTick + self::TICK_MINIMUM > $tick)) {
+			return '';
+		}
+
+		$this->setInfo('action', $action);
 		try {
 			$this->runningService->update($this->tickId, $action);
 		} catch (TickIsNotAliveException $e) {
@@ -133,9 +180,34 @@ class Runner {
 			exit();
 		}
 
-		$this->updateInfo($tick);
+		$this->updateTick($tick);
 		$this->oldAction = $action;
 		$this->oldTick = $tick;
+
+		return '';
+	}
+
+
+	/**
+	 * @param string $info
+	 * @param string $value
+	 */
+	public function setInfo($info, $value) {
+		$this->info[$info] = $value;
+		$this->infoUpdated();
+	}
+
+	/**
+	 * @param array $data
+	 */
+	public function setInfoArray($data) {
+		$keys = array_keys($data);
+		//$this->info['info'] = '';
+		foreach ($keys as $k) {
+			$this->info[$k] = $data[$k];
+		}
+
+		$this->infoUpdated();
 	}
 
 
@@ -146,13 +218,46 @@ class Runner {
 		$this->methodOnKeyPress[] = $method;
 	}
 
-
 	/**
 	 * @param $key
 	 */
 	public function keyPressed($key) {
 		foreach ($this->methodOnKeyPress as $method) {
 			call_user_func($method, $key);
+		}
+	}
+
+
+	/**
+	 * @param array $method
+	 */
+	public function onNewAction($method) {
+		$this->methodOnNewAction[] = $method;
+	}
+
+	/**
+	 * @param $key
+	 */
+	public function newAction($action) {
+		foreach ($this->methodOnNewAction as $method) {
+			call_user_func($method, $action);
+		}
+	}
+
+
+	/**
+	 * @param array $method
+	 */
+	public function onInfoUpdate($method) {
+		$this->methodOnInfoUpdate[] = $method;
+	}
+
+	/**
+	 * @param $key
+	 */
+	public function infoUpdated() {
+		foreach ($this->methodOnInfoUpdate as $method) {
+			call_user_func($method, $this->info);
 		}
 	}
 
@@ -171,12 +276,12 @@ class Runner {
 	/**
 	 * @param $tick
 	 */
-	private function updateInfo($tick) {
+	private function updateTick($tick) {
 		if (($this->ramTick + self::INFO_UPDATE) > $tick) {
 			return;
 		}
 
-		$this->output('- RAM: ' . (memory_get_usage() / 1024 / 1024));
+		$this->setInfo('_memory', round((memory_get_usage() / 1024 / 1024)) . ' MB');
 		$this->ramTick = $tick;
 	}
 
@@ -208,6 +313,39 @@ class Runner {
 	}
 
 
+	/**
+	 * @param bool $pause
+	 */
+	public function pause($pause) {
+		$this->paused = $pause;
+		$this->infoUpdated();
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isPaused() {
+		return $this->paused;
+	}
+
+
+	/**
+	 * @param bool $running
+	 */
+	public function pauseRunning($running) {
+		$this->pauseRunning = $running;
+		$this->infoUpdated();
+	}
+
+
+	public function isPauseRunning() {
+		return $this->pauseRunning;
+	}
+
+
+	/**
+	 * @return bool
+	 */
 	public function isStrict() {
 		return $this->strict;
 	}
