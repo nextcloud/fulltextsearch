@@ -5,6 +5,7 @@ OC.L10N.register(
     "Index not found" : "Index niet gevonden",
     "Tick not found" : "Vinkje niet gevonden",
     "Full text search (BETA)" : "Volledige tekst doorzoeken (BETA)",
-    "Search on %s" : "Zoek op %s"
+    "Search on %s" : "Zoek op %s",
+    "General" : "Algemeen"
 },
 "nplurals=2; plural=(n != 1);");
