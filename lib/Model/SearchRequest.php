@@ -168,7 +168,7 @@ class SearchRequest implements \JsonSerializable {
 			return true;
 		}
 
-		$valuedOptions = ['in'];
+		$valuedOptions = ['in', 'tag'];
 		if (in_array($kw, $valuedOptions)) {
 			$this->addMultipleOption($kw, $value);
 
