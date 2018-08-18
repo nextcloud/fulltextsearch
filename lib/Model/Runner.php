@@ -351,6 +351,11 @@ class Runner {
 	}
 
 
+	/**
+	 * @deprecated - verifier l'interet !?
+	 * @param $reason
+	 * @param $stop
+	 */
 	public function exception($reason, $stop) {
 		if (!$stop) {
 			$this->output('Exception: ' . $reason);
