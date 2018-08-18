@@ -102,16 +102,18 @@ interface IFullTextSearchPlatform {
 	public function deleteIndexes($indexes);
 
 
-	/**
-	 * $command can be null. instanceof ExtendedBase if the method is called from CLI.
-	 * Use it to echo whatever and intercept ^C
-	 *
-	 * @param IFullTextSearchProvider $provider
-	 * @param IndexDocument[] $documents
-	 *
-	 * @return Index[]
-	 */
-	public function indexDocuments(IFullTextSearchProvider $provider, $documents);
+	// DEPRECATED !
+//	/**
+//	 * $command can be null. instanceof ExtendedBase if the method is called from CLI.
+//	 * Use it to echo whatever and intercept ^C
+//	 *
+//	 * @deprecated
+//	 * @param IFullTextSearchProvider $provider
+//	 * @param IndexDocument[] $documents
+//	 *
+//	 * @return Index[]
+//	 */
+//	public function indexDocuments(IFullTextSearchProvider $provider, $documents);
 
 
 	/**
