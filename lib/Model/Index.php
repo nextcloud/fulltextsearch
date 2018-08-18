@@ -1,6 +1,6 @@
 <?php
 /**
- * FullTextSearch - Full text search framework for Nextcloud
+ * FullTextSearch - Full text search framework for extcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
@@ -43,6 +43,11 @@ class Index implements \JsonSerializable {
 	const ERROR_FAILED2 = 2;
 	const ERROR_FAILED3 = 4;
 
+	const ERROR_SEV_1 = 1;
+	const ERROR_SEV_2 = 2;
+	const ERROR_SEV_3 = 3;
+	const ERROR_SEV_4 = 4;
+
 
 	/** @var string */
 	private $providerId;
@@ -65,8 +70,8 @@ class Index implements \JsonSerializable {
 	/** @var int */
 	private $err = 0;
 
-	/** @var string */
-	private $message;
+	/** @var array */
+	private $errors = [];
 
 	/** @var int */
 	private $lastIndex = 0;
@@ -226,7 +231,7 @@ class Index implements \JsonSerializable {
 	 *
 	 * @return $this
 	 */
-	public function setError($err) {
+	public function setErrorCount($err) {
 		$this->err = $err;
 
 		return $this;
@@ -235,36 +240,58 @@ class Index implements \JsonSerializable {
 	/**
 	 * @return int
 	 */
-	public function getError() {
+	public function getErrorCount() {
 		return $this->err;
 	}
 
 	/**
-	 * @return $this
+	 * @return array
 	 */
-	public function incrementError() {
-		$this->err++;
-
-		return $this;
+	public function getLastError() {
+		return array_values(array_slice($this->errors, -1))[0];
 	}
 
 
 	/**
-	 * @return string
+	 *
 	 */
-	public function getMessage() {
-		return $this->message;
+	public function resetErrors() {
+		$this->setErrors([]);
+		$this->setErrorCount(0);
 	}
 
 	/**
-	 * @param string $message
+	 * @return array
+	 */
+	public function getErrors() {
+		return $this->errors;
+	}
+
+	/**
+	 * @param array $messages
 	 *
 	 * @return Index
 	 */
-	public function setMessage($message) {
-		$this->message = substr($message, 0, 3800);
+	public function setErrors($messages) {
+		$this->errors = $messages;
 
 		return $this;
+	}
+
+
+	/**
+	 * @param string $message
+	 * @param string $exception
+	 * @param int $sev
+	 */
+	public function addError($message, $exception = '', $sev = self::ERROR_SEV_3) {
+		$this->errors[] = [
+			'message'  => substr($message, 0, 1800),
+			'exception' => $exception,
+			'severity' => $sev
+		];
+
+		$this->err++;
 	}
 
 
@@ -301,6 +328,8 @@ class Index implements \JsonSerializable {
 			'source'     => $this->getSource(),
 			'documentId' => $this->getDocumentId(),
 			'lastIndex'  => $this->getLastIndex(),
+			'errors'     => $this->getErrors(),
+			'errorCount' => $this->getErrorCount(),
 			'status'     => (int)$this->getStatus(),
 			'options'    => $this->getOptions()
 		];

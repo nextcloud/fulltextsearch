@@ -120,6 +120,18 @@ class CoreRequestBuilder {
 
 
 	/**
+	 * Limit to the documentId
+	 *
+	 * @param IQueryBuilder $qb
+	 * @param string $documentId
+	 */
+	protected function limitToErr(IQueryBuilder &$qb) {
+		$expr = $qb->expr();
+		$qb->andWhere($expr->gte('err', $qb->createNamedParameter(1)));
+	}
+
+
+	/**
 	 * Limit to documentIds
 	 *
 	 * @param IQueryBuilder $qb
@@ -167,7 +179,7 @@ class CoreRequestBuilder {
 		}
 
 		$orX = $expr->orX();
-		foreach($values as $value) {
+		foreach ($values as $value) {
 			$orX->add($expr->eq($field, $qb->createNamedParameter($value)));
 		}
 

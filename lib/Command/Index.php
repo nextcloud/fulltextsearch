@@ -27,9 +27,11 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
+use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\ExtendedBase;
 use OCA\FullTextSearch\Model\IndexOptions;
+use OCA\FullTextSearch\Model\Index as ModelIndex;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\CliService;
 use OCA\FullTextSearch\Service\IndexService;
@@ -38,6 +40,7 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\IUserManager;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -63,18 +66,26 @@ class Index extends ExtendedBase {
 
 	const PANEL_STATUS = 'status';
 	const PANEL_STATUS_LINE_HEADER = '┌─ Status ────';
-	const PANEL_STATUS_LINE_DOCUMENTS = '│ Progress: %documentLeft:6s%/%documentTotal%';
+	const PANEL_STATUS_LINE_DOCUMENTS = '│ Progress: %documentLeft:6s%/%documentTotal%   %progressStatus%';
 //	const PANEL_STATUS_LINE_DOCUMENTS_LEFT = '│ Document left:';
-	const PANEL_STATUS_LINE_ERRORS = '│ Errors:';
+	const PANEL_STATUS_LINE_ERRORS = '│ Error: <comment>%errorCurrent:6s%</comment>/<comment>%errorTotal%</comment>';
+	const PANEL_STATUS_LINE_ERROR_MESSAGE = '│ Message: <comment>%errorMessage%</comment>';
+	const PANEL_STATUS_LINE_ERROR_EXCEPTION = '│ Exception: <comment>%errorException%</comment>';
+	const PANEL_STATUS_LINE_ERROR_INDEX = '│ Index: <comment>%errorIndex%</comment>';
+
+
 	const PANEL_STATUS_LINE_FOOTER = '└──';
 
 	const PANEL_LINE_EMPTY = '│ ';
 
 	const PANEL_COMMANDS_ROOT = 'root';
-	const PANEL_COMMANDS_ROOT_LINE = '## q:quit ## p:pause';
+	const PANEL_COMMANDS_ROOT_LINE = '## <char>q</char>:quit ## <char>p</char>:pause ';
 	const PANEL_COMMANDS_PAUSED = 'paused';
-	const PANEL_COMMANDS_PAUSED_LINE = '## q:quit ## u:unpause ## n:next';
-
+	const PANEL_COMMANDS_PAUSED_LINE = '## <char>q</char>:quit ## <char>u</char>:unpause ## <char>n</char>:next step';
+	const PANEL_COMMANDS_DONE = 'done';
+	const PANEL_COMMANDS_DONE_LINE = '## <char>q</char>:quit';
+	const PANEL_COMMANDS_ERRORS = 'errors';
+	const PANEL_COMMANDS_ERRORS_LINE = '## <char>f</char>:first error ## <char>h</char>/<char>j</char>:prec/next error ## <char>d</char>:delete error ## <char>l</char>:last error';
 
 	/** @var IUserManager */
 	private $userManager;
@@ -100,6 +111,12 @@ class Index extends ExtendedBase {
 
 	/** @var Runner */
 	private $runner;
+
+	/** @var array */
+	private $errors = [];
+
+	/** @var bool */
+	private $navigateLastError = true;
 
 
 	/**
@@ -161,19 +178,24 @@ class Index extends ExtendedBase {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 
+		/** do not get stuck while waiting interactive input */
 		readline_callback_handler_install(
 			'', function() {
 		}
 		);
-
 		stream_set_blocking(STDIN, false);
+
+		$outputStyle = new OutputFormatterStyle('white', 'black', ['bold']);
+		$output->getFormatter()
+			   ->setStyle('char', $outputStyle);
 
 		$options = $this->generateIndexOptions($input);
 
 		$this->runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
 		$this->runner->onKeyPress([$this, 'onKeyPressed']);
 		$this->runner->onNewAction([$this, 'onNewAction']);
-		$this->runner->pause($options->getOption('pause', false));
+		$this->runner->onNewIndexError([$this, 'onNewIndexError']);
+		$this->runner->pause($options->getOption('paused', false));
 
 		$this->indexService->setRunner($this->runner);
 		$this->cliService->setRunner($this->runner);
@@ -185,7 +207,14 @@ class Index extends ExtendedBase {
 			$this->runner->sourceIsCommandLine($this, $output);
 			$this->runner->start();
 
+			if ($options->getOption('errors') === 'reset') {
+				$this->indexService->resetErrorsAll();
+			}
+
+			$this->testPlatform();
 			$this->cliService->runDisplay($output);
+			$this->generateIndexErrors();
+			$this->displayError();
 
 			$providers = $this->providerService->getProviders();
 			foreach ($providers as $provider) {
@@ -204,8 +233,22 @@ class Index extends ExtendedBase {
 			throw $e;
 		}
 
-		$output->writeLn('done.');
+		$this->runner->setInfo('progressStatus', 'done');
 		$this->runner->stop();
+
+//		while (true) {
+//			$this->runner->updateAction('_indexOver', true);
+//			$pressed = strtolower($this->updateAction(''));
+//			if ($pressed === $this->keys['nextStep']) {
+//				$this->pauseRunning(false);
+//				break;
+//			}
+//			usleep(300000);
+//		}
+
+
+//		$output->writeLn('');
+
 	}
 
 
@@ -215,21 +258,38 @@ class Index extends ExtendedBase {
 	public function onKeyPressed($key) {
 		$key = strtolower($key);
 		if ($key === 'q') {
+			try {
+				$this->runner->stop();
+			} catch (TickDoesNotExistException $e) {
+				/** we do nohtin' */
+			}
 			exit();
 		}
 
 		$current = $this->cliService->currentPanel('commands');
-		if ($current === self::PANEL_COMMANDS_ROOT) {
-			if ($key === 'p') {
-				$this->cliService->switchPanel('commands', self::PANEL_COMMANDS_PAUSED);
-				$this->runner->pause(true);
-			}
+		if ($current === self::PANEL_COMMANDS_ROOT && $key === 'p') {
+			$this->cliService->switchPanel('commands', self::PANEL_COMMANDS_PAUSED);
+			$this->runner->pause(true);
 		}
-		if ($current === self::PANEL_COMMANDS_PAUSED) {
-			if ($key === 'u') {
-				$this->cliService->switchPanel('commands', self::PANEL_COMMANDS_ROOT);
-				$this->runner->pause(false);
-			}
+		if ($current === self::PANEL_COMMANDS_PAUSED && $key === 'u') {
+			$this->cliService->switchPanel('commands', self::PANEL_COMMANDS_ROOT);
+			$this->runner->pause(false);
+		}
+
+		if ($key === 'f') {
+			$this->displayError(-99);
+		}
+		if ($key === 'h') {
+			$this->displayError(-1);
+		}
+		if ($key === 'j') {
+			$this->displayError(1);
+		}
+		if ($key === 'l') {
+			$this->displayError(99);
+		}
+		if ($key === 'd') {
+			$this->deleteError();
 		}
 	}
 
@@ -247,6 +307,24 @@ class Index extends ExtendedBase {
 				]
 			);
 		}
+	}
+
+
+	/**
+	 * @param array $error
+	 */
+	public function onNewIndexError($error) {
+		$this->errors[] = $error;
+		$this->displayError();
+	}
+
+
+	/**
+	 * @throws Exception
+	 */
+	private function testPlatform() {
+		$platform = $this->platformService->getPlatform();
+		$platform->testPlatform();
 	}
 
 
@@ -367,9 +445,9 @@ class Index extends ExtendedBase {
 								  self::PANEL_STATUS_LINE_HEADER,
 								  self::PANEL_STATUS_LINE_DOCUMENTS,
 								  self::PANEL_STATUS_LINE_ERRORS,
-								  self::PANEL_LINE_EMPTY,
-								  self::PANEL_LINE_EMPTY,
-								  self::PANEL_LINE_EMPTY,
+								  self::PANEL_STATUS_LINE_ERROR_MESSAGE,
+								  self::PANEL_STATUS_LINE_ERROR_EXCEPTION,
+								  self::PANEL_STATUS_LINE_ERROR_INDEX,
 								  self::PANEL_STATUS_LINE_FOOTER,
 							  ]
 		);
@@ -386,11 +464,18 @@ class Index extends ExtendedBase {
 									   ]
 		);
 
+		$this->cliService->createPanel(
+			self::PANEL_COMMANDS_ERRORS, [
+										   self::PANEL_COMMANDS_ERRORS_LINE
+									   ]
+		);
 
 		$this->cliService->initDisplay();
 		$this->cliService->displayPanel('run', self::PANEL_RUN);
 		$this->cliService->displayPanel('topPanel', self::PANEL_INDEX);
 		$this->cliService->displayPanel('bottomPanel', self::PANEL_STATUS);
+
+		$this->cliService->displayPanel('errors', self::PANEL_COMMANDS_ERRORS);
 
 		if ($this->runner->isPaused()) {
 			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_PAUSED);
@@ -400,20 +485,179 @@ class Index extends ExtendedBase {
 
 		$this->runner->setInfoArray(
 			[
-				'userId'        => '',
-				'providerName'  => '',
-				'_memory'       => '',
-				'documentId'    => '',
-				'action'        => '',
-				'info'          => '',
-				'title'         => '',
-				'_paused'       => '',
-				'content'       => '',
-				'resultColored' => '',
-				'documentLeft'  => '',
-				'documentTotal' => ''
+				'userId'         => '',
+				'providerName'   => '',
+				'_memory'        => '',
+				'documentId'     => '',
+				'action'         => '',
+				'info'           => '',
+				'title'          => '',
+				'_paused'        => '',
+				'content'        => '',
+				'resultColored'  => '',
+				'documentLeft'   => '',
+				'documentTotal'  => '',
+				'progressStatus' => '',
+				'errorCurrent'   => '0',
+				'errorTotal'     => '0',
+				'errorMessage'   => '',
+				'errorException' => '',
+				'errorIndex'     => ''
 			]
 		);
+	}
+
+
+	/**
+	 * @param int $pos
+	 */
+	private function displayError($pos = 0) {
+		$total = sizeof($this->errors);
+
+		if ($total === 0) {
+			$this->runner->setInfoArray(
+				[
+					'errorCurrent' => 0,
+					'errorTotal'   => 0,
+				]
+			);
+
+			return;
+		}
+
+		$current = key($this->errors) + 1;
+		$error = $this->getNavigationError($pos, ($current === 1), ($current === $total));
+		$current = key($this->errors) + 1;
+
+		if ($error === false) {
+			return;
+		}
+
+		/** @var ModelIndex $index */
+		$index = $error['index'];
+		$errorIndex = '';
+		if ($index !== null) {
+			$errorIndex = $index->getProviderId() . ':' . $index->getDocumentId();
+		}
+
+		$this->runner->setInfoArray(
+			[
+				'errorCurrent'   => $current,
+				'errorTotal'     => $total,
+				'errorMessage'   => MiscService::get('message', $error, ''),
+				'errorException' => MiscService::get('exception', $error, ''),
+				'errorIndex'     => $errorIndex
+			]
+		);
+	}
+
+
+	/**
+	 * @param int $pos
+	 * @param bool $isFirst
+	 * @param bool $isLast
+	 *
+	 * @return bool|array
+	 */
+	private function getNavigationError($pos, $isFirst, $isLast) {
+
+		if ($pos === 0) {
+			if ($this->navigateLastError === true) {
+				return end($this->errors);
+			} else {
+				return current($this->errors);
+			}
+		}
+
+		$this->navigateLastError = false;
+		if ($pos === -99) {
+			return reset($this->errors);
+		}
+
+		if ($pos === -1 && !$isFirst) {
+			return prev($this->errors);
+		}
+
+		if ($pos === 1 && !$isLast) {
+			return next($this->errors);
+		}
+
+		if ($pos === 99) {
+			$this->navigateLastError = true;
+
+			return end($this->errors);
+		}
+
+		return false;
+	}
+
+
+	/**
+	 *
+	 */
+	private function generateIndexErrors() {
+		$indexes = $this->indexService->getErrorIndexes();
+
+		foreach ($indexes as $index) {
+			foreach ($index->getErrors() as $error) {
+				$this->errors[] = [
+					'index'     => $index,
+					'message'   => $error['message'],
+					'exception' => $error['exception'],
+					'severity'  => $error['sev']
+				];
+			}
+
+		}
+
+
+	}
+
+
+	/**
+	 *
+	 */
+	private function deleteError() {
+		$current = current($this->errors);
+		if ($current === false) {
+			return;
+		}
+
+		$this->runner->setInfoArray(
+			[
+				'errorMessage'   => '',
+				'errorException' => '',
+				'errorIndex'     => ''
+			]
+		);
+
+		$pos = key($this->errors);
+
+		/** @var ModelIndex $index */
+		$index = $current['index'];
+		$this->indexService->resetErrorFromIndex($index);
+
+		$errors = [];
+		foreach ($this->errors as $error) {
+			/** @var ModelIndex $errorIndex */
+			$errorIndex = $error['index'];
+			if ($index->getProviderId() === $errorIndex->getProviderId()
+				&& $index->getDocumentId() === $errorIndex->getDocumentId()) {
+				continue;
+			}
+
+			$errors[] = $error;
+		}
+
+		$this->errors = $errors;
+		while (key($this->errors) < $pos) {
+			if (next($this->errors) === false) {
+				end($this->errors);
+				break;
+			}
+		}
+
+		$this->displayError();
 	}
 
 }

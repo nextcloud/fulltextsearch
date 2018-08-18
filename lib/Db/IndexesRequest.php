@@ -49,8 +49,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 			   ->setValue('provider_id', $qb->createNamedParameter($index->getProviderId()))
 			   ->setValue('document_id', $qb->createNamedParameter($index->getDocumentId()))
 			   ->setValue('source', $qb->createNamedParameter($index->getSource()))
-			   ->setValue('err', $qb->createNamedParameter($index->getError()))
-			   ->setValue('message', $qb->createNamedParameter($index->getMessage()))
+			   ->setValue('err', $qb->createNamedParameter($index->getErrorCount()))
+			   ->setValue('message', $qb->createNamedParameter(json_encode($index->getErrors())))
 			   ->setValue('status', $qb->createNamedParameter($index->getStatus()))
 			   ->setValue('options', $qb->createNamedParameter(json_encode($index->getOptions())))
 			   ->setValue('indexed', $qb->createNamedParameter($index->getLastIndex()));
@@ -61,6 +61,63 @@ class IndexesRequest extends IndexesRequestBuilder {
 		} catch (\Exception $e) {
 			throw $e;
 		}
+	}
+
+
+	/**
+	 * @param Index $index
+	 *
+	 * @return bool
+	 */
+	public function resetError(Index $index) {
+
+		try {
+			$this->getIndex($index->getProviderId(), $index->getDocumentId());
+		} catch (IndexDoesNotExistException $e) {
+			return false;
+		}
+
+		$qb = $this->getIndexesUpdateSql();
+		$qb->set('message', $qb->createNamedParameter(json_encode([])));
+		$qb->set('err', $qb->createNamedParameter(0));
+
+		$this->limitToProviderId($qb, $index->getProviderId());
+		$this->limitToDocumentId($qb, $index->getDocumentId());
+
+		$qb->execute();
+
+		return true;
+	}
+
+
+	/**
+	 *
+	 */
+	public function resetAllErrors() {
+		$qb = $this->getIndexesUpdateSql();
+		$qb->set('message', $qb->createNamedParameter(json_encode([])));
+		$qb->set('err', $qb->createNamedParameter(0));
+
+		$qb->execute();
+	}
+
+
+	/**
+	 * @return ExtendedIndex[]
+	 */
+	public function getErrorIndexes() {
+
+		$qb = $this->getIndexesSelectSql();
+		$this->limitToErr($qb);
+
+		$indexes = [];
+		$cursor = $qb->execute();
+		while ($data = $cursor->fetch()) {
+			$indexes[] = $this->parseIndexesSelectSql($data);
+		}
+		$cursor->closeCursor();
+
+		return $indexes;
 	}
 
 
@@ -90,7 +147,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 			$qb->set('indexed', $qb->createNamedParameter($index->getLastIndex()));
 		}
 
-		$qb->set('message', $qb->createNamedParameter($index->getMessage()));
+		$qb->set('message', $qb->createNamedParameter(json_encode($index->getErrors())));
 
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
