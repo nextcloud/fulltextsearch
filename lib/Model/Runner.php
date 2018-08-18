@@ -155,19 +155,18 @@ class Runner {
 		if ($this->oldAction !== $action || $force) {
 			while (true) {
 				if (!$this->isPaused()) {
-					$this->pauseRunning(false);
 					break;
 				}
 
 				$this->pauseRunning(true);
 				$pressed = strtolower($this->updateAction(''));
 				if ($pressed === $this->keys['nextStep']) {
-					$this->pauseRunning(false);
 					break;
 				}
 				usleep(300000);
 			}
 
+			$this->pauseRunning(false);
 			$this->newAction($action);
 		}
 
