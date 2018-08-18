@@ -2,8 +2,6 @@
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nextcloud/fulltextsearch/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nextcloud/fulltextsearch/?b=master)
 
-**BETA VERSION**  
-
 _Full text search_ is the core app of a full-text search framework for your Nextcloud. 
 To have it operate, and get content indexed, some other apps are needed: 
 

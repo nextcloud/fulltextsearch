@@ -2,7 +2,7 @@
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>fulltextsearch</id>
-	<name>Full text search (BETA)</name>
+	<name>Full text search</name>
 	<summary>Core of the full-text search framework for Nextcloud</summary>
 	<description><![CDATA[
 
@@ -10,7 +10,7 @@ Core App of the full-text search framework for your Nextcloud.
 
 ]]>
 	</description>
-	<version>0.8.2</version>
+	<version>0.99.0</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullTextSearch</namespace>

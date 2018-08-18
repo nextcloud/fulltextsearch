@@ -1,6 +1,18 @@
 # Changelog
 
 
+### 0.99.0 Release Candidate
+
+
+
+
+### 0.8.2
+
+- debug, testing tools
+- get document
+- multi-host
+
+
 ### 0.7.0
 
 - navigation app to search within all content from your providers
