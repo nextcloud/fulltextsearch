@@ -420,6 +420,8 @@ class IndexService {
 			return;
 		}
 
+		$document->getIndex()
+				 ->resetErrors();
 		$index = $platform->indexDocument($provider, $document);
 		$this->updateIndex($index);
 	}
@@ -555,10 +557,12 @@ class IndexService {
 
 
 	/**
+	 * @param bool $all
+	 *
 	 * @return Index[]
 	 */
-	public function getQueuedIndexes() {
-		return $this->indexesRequest->getQueuedIndexes();
+	public function getQueuedIndexes($all = false) {
+		return $this->indexesRequest->getQueuedIndexes($all);
 	}
 
 

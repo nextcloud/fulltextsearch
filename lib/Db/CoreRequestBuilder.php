@@ -123,11 +123,21 @@ class CoreRequestBuilder {
 	 * Limit to the documentId
 	 *
 	 * @param IQueryBuilder $qb
-	 * @param string $documentId
 	 */
 	protected function limitToErr(IQueryBuilder &$qb) {
 		$expr = $qb->expr();
 		$qb->andWhere($expr->gte('err', $qb->createNamedParameter(1)));
+	}
+
+
+	/**
+	 * Limit to the documentId
+	 *
+	 * @param IQueryBuilder $qb
+	 */
+	protected function limitToNoErr(IQueryBuilder &$qb) {
+		$expr = $qb->expr();
+		$qb->andWhere($expr->eq('err', $qb->createNamedParameter(0)));
 	}
 
 

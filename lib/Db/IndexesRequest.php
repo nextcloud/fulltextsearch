@@ -148,6 +148,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 
 		$qb->set('message', $qb->createNamedParameter(json_encode($index->getErrors())));
+		$qb->set('err', $qb->createNamedParameter($index->getErrorCount()));
 
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
@@ -258,11 +259,16 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 
 	/**
+	 * @param bool $all
+	 *
 	 * @return Index[]
 	 */
-	public function getQueuedIndexes() {
+	public function getQueuedIndexes($all = false) {
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToQueuedIndexes($qb);
+		if ($all === false) {
+			$this->limitToNoErr($qb);
+		}
 
 		$indexes = [];
 		$cursor = $qb->execute();
