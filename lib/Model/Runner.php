@@ -81,6 +81,9 @@ class Runner {
 	/** @var array */
 	private $methodOnInfoUpdate = [];
 
+	/** @var array */
+	private $methodOnIndexError = [];
+
 	/** @var bool */
 	private $paused = false;
 
@@ -191,9 +194,11 @@ class Runner {
 	/**
 	 * @param string $info
 	 * @param string $value
+	 * @param string $colored
 	 */
-	public function setInfo($info, $value) {
+	public function setInfo($info, $value, $colored = '') {
 		$this->info[$info] = $value;
+		$this->setInfoColored($info, $value, $colored);
 		$this->infoUpdated();
 	}
 
@@ -208,6 +213,40 @@ class Runner {
 		}
 
 		$this->infoUpdated();
+	}
+
+	private function setInfoColored($info, $value, $colored) {
+		if ($colored === '') {
+			return;
+		}
+
+		$color = '';
+		switch ($colored) {
+			case 'success':
+				$color = 'info';
+				break;
+
+			case 'fail' :
+				$color = 'error';
+				break;
+
+			case 'warning':
+				$color = 'comment';
+				break;
+		}
+
+		if ($color !== '') {
+			$this->info[$info . 'Colored'] = '<' . $color . '>' . $value . '</' . $color . '>';
+		}
+
+
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getInfo() {
+		return $this->info;
 	}
 
 
@@ -236,7 +275,7 @@ class Runner {
 	}
 
 	/**
-	 * @param $key
+	 * @param string $action
 	 */
 	public function newAction($action) {
 		foreach ($this->methodOnNewAction as $method) {
@@ -258,6 +297,33 @@ class Runner {
 	public function infoUpdated() {
 		foreach ($this->methodOnInfoUpdate as $method) {
 			call_user_func($method, $this->info);
+		}
+	}
+
+
+	/**
+	 * @param array $method
+	 */
+	public function onNewIndexError($method) {
+		$this->methodOnIndexError[] = $method;
+	}
+
+	/**
+	 * @param Index $index
+	 * @param string $message
+	 * @param string $class
+	 * @param int $sev
+	 */
+	public function newIndexError($index, $message, $class = '', $sev = 3) {
+		$error = [
+			'index'     => $index,
+			'message'   => $message,
+			'exception' => $class,
+			'severity'  => $sev
+		];
+
+		foreach ($this->methodOnIndexError as $method) {
+			call_user_func($method, $error);
 		}
 	}
 

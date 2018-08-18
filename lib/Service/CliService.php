@@ -156,6 +156,7 @@ class CliService {
 		$this->display = new ProgressBar($this->output);
 		$this->display->setOverwrite(true);
 
+		$initVar = $this->runner->getInfo();
 		$keys = array_keys($initVar);
 		foreach ($keys as $key) {
 			$this->display->setMessage($initVar[$key], $key);
@@ -193,6 +194,8 @@ class CliService {
 		} else {
 			$this->display->setMessage('', '_paused');
 		}
+
+		$this->display->display();
 	}
 
 	/**
@@ -203,18 +206,11 @@ class CliService {
 			return;
 		}
 
-		$this->refreshInfo();
 		$keys = array_keys($info);
 		foreach ($keys as $k) {
-			if ($info[$k] === 'ok') {
-				$this->display->setMessage('<info>ok</info>', $k . 'Colored');
-			}
-			if ($info[$k] === 'fail') {
-				$this->display->setMessage('<error>failed</error>', $k . 'Colored');
-			}
-
 			$this->display->setMessage($info[$k], $k);
 		}
+		$this->refreshInfo();
 
 		$this->display->display();
 	}
