@@ -503,13 +503,13 @@ class SearchRequest implements \JsonSerializable {
 	public static function fromArray($arr) {
 		$request = new SearchRequest();
 		$request->setProviders($arr['providers']);
-		$request->setAuthor(MiscService::get($arr, 'author', ''));
-		$request->setSearch(MiscService::get($arr, 'search', ''));
-		$request->setPage(MiscService::get($arr, 'page', 0));
-		$request->setParts(MiscService::get($arr, 'parts', []));
-		$request->setSize(MiscService::get($arr, 'size', 10));
-		$request->setOptions(MiscService::get($arr, 'options', []));
-		$request->setTags(MiscService::get($arr, 'tags', []));
+		$request->setAuthor(MiscService::get('author', $arr, ''));
+		$request->setSearch(MiscService::get('search', $arr, ''));
+		$request->setPage(MiscService::get('page', $arr, 0));
+		$request->setParts(MiscService::get('parts', $arr, []));
+		$request->setSize(MiscService::get('size', $arr, 10));
+		$request->setOptions(MiscService::get('options', $arr, []));
+		$request->setTags(MiscService::get('tags', $arr, []));
 
 		return $request;
 	}

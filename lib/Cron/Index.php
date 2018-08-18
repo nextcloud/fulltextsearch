@@ -32,6 +32,7 @@ use OC\BackgroundJob\TimedJob;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Model\Runner;
+use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
@@ -43,8 +44,14 @@ use OCP\IUserManager;
 
 class Index extends TimedJob {
 
+	const HOUR_ERR_RESET = 240;
+
+
 	/** @var IUserManager */
 	private $userManager;
+
+	/** @var ConfigService */
+	private $configService;
 
 	/** @var IndexService */
 	private $indexService;
@@ -79,6 +86,7 @@ class Index extends TimedJob {
 		$runningService = $c->query(RunningService::class);
 		$this->runner = new Runner($runningService, 'cronIndex');
 
+		$this->configService = $c->query(ConfigService::class);
 		$this->indexService = $c->query(IndexService::class);
 		$this->platformService = $c->query(PlatformService::class);
 		$this->providerService = $c->query(ProviderService::class);
@@ -102,10 +110,11 @@ class Index extends TimedJob {
 	private function liveCycle() {
 
 		$platform = $this->platformService->getPlatform(true);
-		$indexes = $this->indexService->getQueuedIndexes();
+		$all = $this->shouldWeGetAllIndex();
+		$indexes = $this->indexService->getQueuedIndexes($all);
 
 		foreach ($indexes as $index) {
-			$this->runner->update('indexing');
+			$this->runner->updateAction('indexing');
 
 			try {
 				$provider = $this->providerService->getProvider($index->getProviderId());
@@ -121,6 +130,34 @@ class Index extends TimedJob {
 			}
 		}
 
+	}
 
+
+	/**
+	 * @return bool
+	 */
+	private function shouldWeGetAllIndex() {
+		$lastErrReset = (int)$this->configService->getAppValue(ConfigService::CRON_LAST_ERR_RESET);
+
+		if ($lastErrReset === 0) {
+			$this->setLastErrReset();
+
+			return false;
+		}
+
+		if ($lastErrReset < (time() - (self::HOUR_ERR_RESET * 3600))) {
+			$this->setLastErrReset();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 *
+	 */
+	private function setLastErrReset() {
+		$this->configService->setAppValue(ConfigService::CRON_LAST_ERR_RESET, time());
 	}
 }

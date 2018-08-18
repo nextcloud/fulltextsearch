@@ -51,22 +51,22 @@ class ExtendedBase extends Base {
 			throw new InterruptException('Interrupted by user.');
 		}
 	}
-
-
-	/**
-	 * @param OutputInterface $output
-	 *
-	 * @deprecated
-	 */
-	public function setOutput(OutputInterface $output) {
-		$this->output = $output;
-	}
-
-	/**
-	 * @return OutputInterface
-	 * @deprecated
-	 */
-	public function getOutput() {
-		return $this->output;
-	}
+//
+//
+//	/**
+//	 * @param OutputInterface $output
+//	 *
+//	 * @deprecated
+//	 */
+//	public function setOutput(OutputInterface $output) {
+//		$this->output = $output;
+//	}
+//
+//	/**
+//	 * @return OutputInterface
+//	 * @deprecated
+//	 */
+//	public function getOutput() {
+//		return $this->output;
+//	}
 }

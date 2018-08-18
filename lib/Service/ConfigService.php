@@ -38,13 +38,15 @@ class ConfigService {
 	const SEARCH_PLATFORM = 'search_platform';
 	const CHUNK_INDEX = 'index_chunk';
 	const PROVIDER_INDEXED = 'provider_indexed';
+	const CRON_LAST_ERR_RESET = 'cron_err_reset';
 
 	/** @var array */
 	public $defaults = [
 		self::SEARCH_PLATFORM  => '',
 		self::CHUNK_INDEX      => '20',
 		self::APP_NAVIGATION   => '0',
-		self::PROVIDER_INDEXED => ''
+		self::PROVIDER_INDEXED => '',
+		self::CRON_LAST_ERR_RESET => '0'
 	];
 
 	/** @var IConfig */
