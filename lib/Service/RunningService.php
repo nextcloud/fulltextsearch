@@ -106,6 +106,7 @@ class RunningService {
 
 
 	/**
+	 * @deprecated - verifier l'interet !
 	 * @param int $runId
 	 * @param string $reason
 	 * @param bool $stop

@@ -63,6 +63,10 @@ class IndexService {
 	/** @var Runner */
 	private $runner = null;
 
+	/** @var array */
+	private $queuedDeleteIndex = [];
+
+
 	/**
 	 * IndexService constructor.
 	 *
@@ -94,17 +98,41 @@ class IndexService {
 
 
 	/**
-	 * @param $action
+	 * @param string $action
+	 * @param bool $force
 	 *
 	 * @throws InterruptException
 	 * @throws TickDoesNotExistException
 	 */
-	private function updateRunner($action) {
+	private function updateRunnerAction($action, $force = false) {
 		if ($this->runner === null) {
 			return;
 		}
 
-		$this->runner->update($action);
+		$this->runner->updateAction($action, $force);
+	}
+
+	/**
+	 * @param string $info
+	 * @param string $value
+	 */
+	private function updateRunnerInfo($info, $value, $color = '') {
+		if ($this->runner === null) {
+			return;
+		}
+
+		$this->runner->setInfo($info, $value, $color);
+	}
+
+	/**
+	 * @param array $data
+	 */
+	private function updateRunnerInfoArray($data) {
+		if ($this->runner === null) {
+			return;
+		}
+
+		$this->runner->setInfoArray($data);
 	}
 
 
@@ -121,13 +149,34 @@ class IndexService {
 	public function indexProviderContentFromUser(
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $userId, $options
 	) {
-		$this->updateRunner('generateIndex' . $provider->getName());
+		$this->updateRunnerAction('generateIndex' . $provider->getName());
+		$this->updateRunnerInfoArray(
+			[
+				'userId'       => $userId,
+				'providerId'   => $provider->getId(),
+				'providerName' => $provider->getName()
+			]
+		);
+
 		$documents = $provider->generateIndexableDocuments($userId);
+
+		$this->updateRunnerInfoArray(
+			[
+				'documentTotal' => sizeof($documents),
+				'documentLeft'  => ''
+			]
+		);
 
 		//$maxSize = sizeof($documents);
 
 		$toIndex = $this->updateDocumentsWithCurrIndex($provider, $documents, $options);
-		$this->indexChunks($platform, $provider, $toIndex);
+		$this->indexChunks($platform, $provider, $toIndex, $options);
+
+//		$this->updateRunnerInfoArray(
+//			[
+//				'documentLeft' => 0
+//			]
+//		);
 	}
 
 
@@ -141,19 +190,23 @@ class IndexService {
 	 * @throws TickDoesNotExistException
 	 */
 	private function updateDocumentsWithCurrIndex(
-		IFullTextSearchProvider $provider, array $documents, $options
+		IFullTextSearchProvider $provider, array $documents, IndexOptions $options
 	) {
 
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
 		foreach ($documents as $document) {
-			$this->updateRunner('compareWithCurrentIndex');
+			$this->updateRunnerAction('compareWithCurrentIndex');
 
 			$index = $currIndex->getIndex($document->getId());
 			if ($index === null) {
 				$index = new Index($document->getProviderId(), $document->getId());
 				$index->setStatus(Index::INDEX_FULL);
 				$index->setLastIndex();
+			}
+
+			if ($options->getOption('errors', '') !== 'ignore' && $index->getErrorCount() > 0) {
+				continue;
 			}
 
 			if ($options->getOption('force', false) === true) {
@@ -209,18 +262,27 @@ class IndexService {
 	 * @param IFullTextSearchPlatform $platform
 	 * @param IFullTextSearchProvider $provider
 	 * @param IndexDocument[] $documents
+	 * @param IndexOptions $options
 	 *
+	 * @throws InterruptException
+	 * @throws TickDoesNotExistException
 	 * @throws Exception
 	 */
 	private function indexChunks(
-		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $documents
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $documents,
+		IndexOptions $options
 	) {
-		$chunkSize = $this->configService->getAppValue(ConfigService::CHUNK_INDEX);
+		$chunkSize = $options->getOption(
+			'chunk', $this->configService->getAppValue(ConfigService::CHUNK_INDEX)
+		);
 
 		$max = sizeof($documents);
 		for ($i = 0; $i < $max; $i++) {
-			$this->updateRunner('indexChunk');
+			$this->updateRunnerAction('indexChunk', true);
 			try {
+
+				$this->updateRunnerInfoArray(['documentLeft' => sizeof($documents)]);
+
 				$chunk = array_splice($documents, 0, $chunkSize);
 				$this->indexChunk($platform, $provider, $chunk);
 
@@ -229,11 +291,15 @@ class IndexService {
 					$doc->__destruct(); // because.
 				}
 			} catch (NoResultException $e) {
+				$this->updateRunnerInfoArray(['documentLeft' => 0]);
+
 				return;
 			} catch (Exception $e) {
 				throw $e;
 			}
 		}
+
+		$this->updateRunnerAction('indexChunk', true);
 	}
 
 
@@ -244,6 +310,7 @@ class IndexService {
 	 *
 	 * @throws NoResultException
 	 * @throws DatabaseException
+	 * @throws Exception
 	 */
 	private function indexChunk(
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $chunk
@@ -254,7 +321,16 @@ class IndexService {
 
 		$documents = $provider->fillIndexDocuments($chunk);
 		$toIndex = $this->filterDocumentsToIndex($documents);
-		$indexes = $platform->indexDocuments($provider, $toIndex);
+
+		$indexes = [];
+		foreach ($toIndex as $document) {
+			try {
+				$index = $this->indexDocument($platform, $provider, $document);
+				$indexes[] = $index;
+			} catch (\Exception $e) {
+				throw $e;
+			}
+		}
 
 		$this->updateIndexes($indexes);
 	}
@@ -263,7 +339,7 @@ class IndexService {
 	/**
 	 * @param IndexDocument[] $documents
 	 *
-	 * @return array
+	 * @return IndexDocument[]
 	 */
 	private function filterDocumentsToIndex($documents) {
 		$toIndex = [];
@@ -279,6 +355,41 @@ class IndexService {
 		}
 
 		return $toIndex;
+	}
+
+
+	/**
+	 * @param IFullTextSearchPlatform $platform
+	 * @param IFullTextSearchProvider $provider
+	 * @param IndexDocument $document
+	 *
+	 * @return
+	 * @throws Exception
+	 */
+	public function indexDocument(
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $document
+	) {
+		$this->updateRunnerAction('indexDocument', true);
+		$this->updateRunnerInfoArray(
+			[
+				'documentId' => $document->getId(),
+				'title'      => $document->getTitle(),
+				'content'    => $document->getContentSize()
+			]
+		);
+
+		$index = null;
+		$document->getIndex()
+				 ->resetErrors();
+		try {
+			$index = $platform->indexDocument($provider, $document);
+		} catch (Exception $e) {
+			if ($this->runner->isStrict()) {
+				throw $e;
+			}
+		}
+
+		return $index;
 	}
 
 
@@ -309,6 +420,8 @@ class IndexService {
 			return;
 		}
 
+		$document->getIndex()
+				 ->resetErrors();
 		$index = $platform->indexDocument($provider, $document);
 		$this->updateIndex($index);
 	}
@@ -320,11 +433,11 @@ class IndexService {
 	 * @throws DatabaseException
 	 */
 	public function updateIndexes($indexes) {
-
 		try {
 			foreach ($indexes as $index) {
 				$this->updateIndex($index);
 			}
+			$this->resetErrorFromQueue();
 		} catch (Exception $e) {
 			throw new DatabaseException($e->getMessage());
 		}
@@ -338,6 +451,7 @@ class IndexService {
 	 */
 	private function updateIndex(Index $index) {
 
+		$this->updateIndexError($index);
 		if ($index->isStatus(Index::INDEX_REMOVE)) {
 
 			if ($index->isStatus(Index::INDEX_DONE)) {
@@ -358,6 +472,11 @@ class IndexService {
 		if (!$this->indexesRequest->update($index)) {
 			$this->indexesRequest->create($index);
 		}
+	}
+
+
+	private function updateIndexError(Index $index) {
+
 	}
 
 
@@ -391,6 +510,41 @@ class IndexService {
 
 
 	/**
+	 * @param Index $index
+	 */
+	public function resetErrorFromIndex(Index $index) {
+		if (!$this->indexesRequest->resetError($index)) {
+			$this->queuedDeleteIndex[] = $index;
+		}
+	}
+
+
+	/**
+	 *
+	 */
+	private function resetErrorFromQueue() {
+		foreach ($this->queuedDeleteIndex as $index) {
+			$this->indexesRequest->resetError($index);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function resetErrorsAll() {
+		$this->indexesRequest->resetAllErrors();
+	}
+
+
+	/**
+	 * @return ExtendedIndex[]
+	 */
+	public function getErrorIndexes() {
+		return $this->indexesRequest->getErrorIndexes();
+	}
+
+
+	/**
 	 * @param string $providerId
 	 * @param array $documentId
 	 *
@@ -403,10 +557,12 @@ class IndexService {
 
 
 	/**
+	 * @param bool $all
+	 *
 	 * @return Index[]
 	 */
-	public function getQueuedIndexes() {
-		return $this->indexesRequest->getQueuedIndexes();
+	public function getQueuedIndexes($all = false) {
+		return $this->indexesRequest->getQueuedIndexes($all);
 	}
 
 

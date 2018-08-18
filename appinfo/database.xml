@@ -88,7 +88,7 @@
 			<field>
 				<name>message</name>
 				<type>text</type>
-				<length>4000</length>
+				<length>8000</length>
 				<notnull>false</notnull>
 			</field>
 
