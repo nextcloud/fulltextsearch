@@ -43,6 +43,7 @@ use OCP\IUserManager;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Terminal;
 
 
 class Live extends ExtendedBase {
@@ -68,8 +69,10 @@ class Live extends ExtendedBase {
 	const PANEL_STATUS_LINE_DOCUMENTS = '│ Progress: %documentLeft:6s%/%documentTotal%   %progressStatus%';
 //	const PANEL_STATUS_LINE_DOCUMENTS_LEFT = '│ Document left:';
 	const PANEL_STATUS_LINE_ERRORS = '│ Error: <comment>%errorCurrent:6s%</comment>/<comment>%errorTotal%</comment>';
-	const PANEL_STATUS_LINE_ERROR_MESSAGE = '│ Message: <comment>%errorMessage%</comment>';
 	const PANEL_STATUS_LINE_ERROR_EXCEPTION = '│ Exception: <comment>%errorException%</comment>';
+	const PANEL_STATUS_LINE_ERROR_MESSAGE1 = '│ Message: <comment>%errorMessageA%</comment>';
+	const PANEL_STATUS_LINE_ERROR_MESSAGE2 = '│ <comment>%errorMessageB%</comment>';
+	const PANEL_STATUS_LINE_ERROR_MESSAGE3 = '│ <comment>%errorMessageC%</comment>';
 	const PANEL_STATUS_LINE_ERROR_INDEX = '│ Index: <comment>%errorIndex%</comment>';
 
 
@@ -111,9 +114,12 @@ class Live extends ExtendedBase {
 	/** @var MiscService */
 	private $miscService;
 
+
 	/** @var Runner */
 	private $runner;
 
+	/** @var Terminal */
+	private $terminal;
 
 	/** @var array */
 	private $errors = [];
@@ -121,8 +127,9 @@ class Live extends ExtendedBase {
 	/** @var bool */
 	private $navigateLastError = true;
 
+
 	/**
-	 * Index constructor.
+	 * Live constructor.
 	 *
 	 * @param IUserManager $userManager
 	 * @param RunningService $runningService
@@ -180,6 +187,8 @@ class Live extends ExtendedBase {
 		}
 		);
 		stream_set_blocking(STDIN, false);
+
+		$this->terminal = new Terminal();
 
 		$outputStyle = new OutputFormatterStyle('white', 'black', ['bold']);
 		$output->getFormatter()
@@ -334,8 +343,10 @@ class Live extends ExtendedBase {
 								  self::PANEL_STATUS_LINE_HEADER,
 								  self::PANEL_STATUS_LINE_DOCUMENTS,
 								  self::PANEL_STATUS_LINE_ERRORS,
-								  self::PANEL_STATUS_LINE_ERROR_MESSAGE,
 								  self::PANEL_STATUS_LINE_ERROR_EXCEPTION,
+								  self::PANEL_STATUS_LINE_ERROR_MESSAGE1,
+								  self::PANEL_STATUS_LINE_ERROR_MESSAGE2,
+								  self::PANEL_STATUS_LINE_ERROR_MESSAGE3,
 								  self::PANEL_STATUS_LINE_ERROR_INDEX,
 								  self::PANEL_STATUS_LINE_FOOTER,
 							  ]
@@ -389,7 +400,9 @@ class Live extends ExtendedBase {
 				'progressStatus' => '',
 				'errorCurrent'   => '0',
 				'errorTotal'     => '0',
-				'errorMessage'   => '',
+				'errorMessageA'  => '',
+				'errorMessageB'  => '',
+				'errorMessageC'  => '',
 				'errorException' => '',
 				'errorIndex'     => ''
 			]
@@ -451,11 +464,19 @@ class Live extends ExtendedBase {
 			$errorIndex = $index->getProviderId() . ':' . $index->getDocumentId();
 		}
 
+		$width = $this->terminal->getWidth() - 13;
+		$message = MiscService::get('message', $error, '');
+		$err1 = substr($message, 0, $width);
+		$err2 = substr($message, $width, $width + 10);
+		$err3 = substr($message, $width + $width + 10, $width + 10);
+
 		$this->runner->setInfoArray(
 			[
 				'errorCurrent'   => $current,
 				'errorTotal'     => $total,
-				'errorMessage'   => MiscService::get('message', $error, ''),
+				'errorMessageA'  => trim($err1),
+				'errorMessageB'  => trim($err2),
+				'errorMessageC'  => trim($err3),
 				'errorException' => MiscService::get('exception', $error, ''),
 				'errorIndex'     => $errorIndex
 			]
@@ -514,7 +535,9 @@ class Live extends ExtendedBase {
 
 		$this->runner->setInfoArray(
 			[
-				'errorMessage'   => '',
+				'errorMessageA'  => '',
+				'errorMessageB'  => '',
+				'errorMessageC'  => '',
 				'errorException' => '',
 				'errorIndex'     => ''
 			]
