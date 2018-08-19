@@ -4,7 +4,6 @@ OC.L10N.register(
     "Full text search" : "Претраге свих текстова",
     "Index not found" : "Индекс није нађен",
     "Tick not found" : "Тик није нађен",
-    "Full text search (BETA)" : "Претрага свих текстова (бета)",
     "Core of the full-text search framework for Nextcloud" : "Језгро радног оквира претраге свих текстова за Некстклауд",
     "Core App of the full-text search framework for your Nextcloud." : "Основна апликација радног оквира претраге свих текстова за Некстклауд.",
     "Search on %s" : "Претражи %s",

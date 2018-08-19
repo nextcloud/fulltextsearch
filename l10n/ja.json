@@ -1,6 +1,5 @@
 { "translations": {
     "Full text search" : "全文検索",
-    "Index not found" : "インデックスが見つかりません",
-    "Full text search (BETA)" : "全文検索(ベータ版)"
+    "Index not found" : "インデックスが見つかりません"
 },"pluralForm" :"nplurals=1; plural=0;"
 }
