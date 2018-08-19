@@ -213,6 +213,7 @@ class IndexService {
 				$index->setStatus(Index::INDEX_FULL);
 			}
 
+			$index->resetErrors();
 			$document->setIndex($index);
 			if ($options->getOption('force', false) === true
 				|| !$this->isDocumentUpToDate($provider, $document)) {
@@ -348,6 +349,7 @@ class IndexService {
 			$index = $document->getIndex();
 			$access = $document->getAccess();
 
+// INDEX_IGNORE is not used anymore, as we use addError()
 			if ($access !== null && !$index->isStatus(Index::INDEX_IGNORE)) {
 				$index->setOwnerId($access->getOwnerId());
 				$toIndex[] = $document;
@@ -379,8 +381,6 @@ class IndexService {
 		);
 
 		$index = null;
-		$document->getIndex()
-				 ->resetErrors();
 		try {
 			$index = $platform->indexDocument($provider, $document);
 		} catch (Exception $e) {
