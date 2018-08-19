@@ -3,7 +3,16 @@
 
 ### 0.99.0 Release Candidate
 
+Command Line Interface:
 
+- The indexing process is now embedded in a new graphical wrapper, including an interactive interface for both the fulltextsearch:index and fulltextsearch:live commands.
+- Errors are now displayed during index/live execution with navigation. Errors can be managed and deleted while indexing.
+- new command: ./occ fulltextsearch:test to test the indexing and search platform.
+- new command: ./occ fulltextsearch:document:provider to get info about a document from a provider.
+- new command: ./occ fulltextsearch:document:platform to get info about a document from the search platform.
+- ./occ fulltextsearch:reset can now be done for a specific provider only.
+- ./occ fulltextsearch:index now accept users, providers, errors, chunk and paused options.
+- fixing some display glitch.
 
 
 ### 0.8.2
