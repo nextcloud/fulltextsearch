@@ -153,6 +153,7 @@ class Test extends ExtendedBase {
 		try {
 			$this->testResetTest($output, $testProvider);
 			$this->pause($output, $platformDelay);
+			$this->testInitIndexing($output, $testPlatform);
 			$this->testIndexingDocuments($output, $testPlatform, $testProvider);
 			$this->pause($output, $platformDelay);
 			$this->testContentLicense($output, $testPlatform);
@@ -271,14 +272,13 @@ class Test extends ExtendedBase {
 		$this->output($output, true);
 
 		$this->output($output, 'Testing search platform.');
-		$this->output(
-			$output, (($testPlatform->testPlatform()) ? 'found index' : 'index not found'), false
-		);
+		if (!$testPlatform->testPlatform()) {
+			throw new Exception ('Search platform (' . $testPlatform->getName() . ') down ?');
+		}
 		$this->output($output, true);
 
 		return $testPlatform;
 	}
-
 
 	/**
 	 * @param OutputInterface $output
@@ -311,6 +311,18 @@ class Test extends ExtendedBase {
 	) {
 		$this->output($output, 'Removing test.');
 		$this->indexService->resetIndex($testProvider->getId());
+		$this->output($output, true);
+	}
+
+
+	/**
+	 * @param OutputInterface $output
+	 * @param IFullTextSearchPlatform $testPlatform
+	 */
+	private function testInitIndexing(OutputInterface $output, IFullTextSearchPlatform $testPlatform
+	) {
+		$this->output($output, 'Initializing index mapping.');
+		$testPlatform->initializeIndex();
 		$this->output($output, true);
 	}
 
@@ -398,27 +410,28 @@ class Test extends ExtendedBase {
 			[TestService::DOCUMENT_TYPE_SIMPLE]
 		);
 		$this->search(
-			$output, $testPlatform, $testProvider, $access, 'this is test',
+			$output, $testPlatform, $testProvider, $access, 'document is a simple test',
+//			[TestService::DOCUMENT_TYPE_SIMPLE]
 			[TestService::DOCUMENT_TYPE_SIMPLE, TestService::DOCUMENT_TYPE_LICENSE]
 		);
 		$this->search(
-			$output, $testPlatform, $testProvider, $access, '"this is test"',
+			$output, $testPlatform, $testProvider, $access, '"document is a test"',
 			[]
 		);
 		$this->search(
-			$output, $testPlatform, $testProvider, $access, '"this is a test"',
+			$output, $testPlatform, $testProvider, $access, '"document is a simple test"',
 			[TestService::DOCUMENT_TYPE_SIMPLE]
 		);
 		$this->search(
-			$output, $testPlatform, $testProvider, $access, 'this is -test',
+			$output, $testPlatform, $testProvider, $access, 'document is a simple -test',
 			[TestService::DOCUMENT_TYPE_LICENSE]
 		);
 		$this->search(
-			$output, $testPlatform, $testProvider, $access, 'this is +test',
+			$output, $testPlatform, $testProvider, $access, 'document is a simple +test',
 			[TestService::DOCUMENT_TYPE_SIMPLE]
 		);
 		$this->search(
-			$output, $testPlatform, $testProvider, $access, '-this is test',
+			$output, $testPlatform, $testProvider, $access, '-document is a simple test',
 			[]
 		);
 	}

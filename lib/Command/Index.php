@@ -324,7 +324,9 @@ class Index extends ExtendedBase {
 	 */
 	private function testPlatform() {
 		$platform = $this->platformService->getPlatform();
-		$platform->testPlatform();
+		if (!$platform->testPlatform()) {
+			throw new Exception('failed platform test.');
+		}
 	}
 
 
