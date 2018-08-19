@@ -4,7 +4,6 @@ OC.L10N.register(
     "Full text search" : "Полнотекстовый поиск",
     "Index not found" : "Индексирование не найдено",
     "Tick not found" : "Тик не найден",
-    "Full text search (BETA)" : "Полнотекстовый поиск (БЕТА)",
     "Core of the full-text search framework for Nextcloud" : "Ядро полнотекстового поиска для Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Основное приложение полнотекстового поиска для вашего Nextcloud.",
     "Search on %s" : "Поиск в %s",

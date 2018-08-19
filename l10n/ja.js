@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "Full text search" : "全文検索",
-    "Index not found" : "インデックスが見つかりません",
-    "Full text search (BETA)" : "全文検索(ベータ版)"
+    "Index not found" : "インデックスが見つかりません"
 },
 "nplurals=1; plural=0;");
