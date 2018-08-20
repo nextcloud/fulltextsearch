@@ -314,6 +314,23 @@ class Live extends ExtendedBase {
 
 
 	/**
+	 * @param string $action
+	 */
+	public function onNewAction($action) {
+
+		if ($action === 'indexChunk' || $action === 'indexChunkEnd') {
+			$this->runner->setInfoArray(
+				[
+					'documentId' => '',
+					'title'      => '',
+					'content'    => ''
+				]
+			);
+		}
+	}
+
+
+	/**
 	 *
 	 */
 	private function generatePanels() {
