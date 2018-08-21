@@ -45,8 +45,8 @@
 
 			<field>
 				<name>document_id</name>
-				<type>integer</type>
-				<length>4</length>
+				<type>text</type>
+				<length>31</length>
 				<notnull>true</notnull>
 			</field>
 
