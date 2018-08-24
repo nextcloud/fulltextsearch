@@ -46,12 +46,17 @@ class IndexDocument implements \JsonSerializable {
 	/** @var int */
 	public $modifiedTime = 0;
 
+	/** @var string */
+	public $source = '';
+
 	/** @var array */
 	public $tags = [];
 
-	// TODO: do we really need it in the base class ?
-	/** @var string */
-	public $source = '';
+	/** @var array */
+	public $metaTags = [];
+
+	/** @var array */
+	public $subTags = [];
 
 	/** @var string */
 	public $title = '';
@@ -218,6 +223,83 @@ class IndexDocument implements \JsonSerializable {
 
 		return $this;
 	}
+
+
+	/**
+	 * @param array $tags
+	 *
+	 * @return $this
+	 */
+	public function setMetaTags($tags) {
+		$this->metaTags = $tags;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getMetaTags() {
+		return $this->metaTags;
+	}
+
+	/**
+	 * @param $tags
+	 *
+	 * @return $this
+	 */
+	public function addMetaTag($tags) {
+		$this->metaTags[] = $tags;
+
+		return $this;
+	}
+
+
+	/**
+	 * @param array $tags
+	 *
+	 * @return $this
+	 */
+	public function setSubTags($tags) {
+		$this->subTags = $tags;
+
+		return $this;
+	}
+
+	/**
+	 * @param bool $formatted
+	 *
+	 * @return array
+	 */
+	public function getSubTags($formatted = false) {
+		if ($formatted === false) {
+			return $this->subTags;
+		}
+
+		$subTags = [];
+		$ak = array_keys($this->subTags);
+		foreach ($ak as $source) {
+			$tags = $this->subTags[$source];
+			foreach ($tags as $tag) {
+				$subTags[] = $source . '_' . $tag;
+			}
+		}
+
+		return $subTags;
+	}
+
+	/**
+	 * @param string $k
+	 * @param string $tag
+	 *
+	 * @return $this
+	 */
+	public function addSubTag($k, $tag) {
+		$this->subTags[$k] = $tag;
+
+		return $this;
+	}
+
 
 	/**
 	 * @return string
@@ -514,6 +596,8 @@ class IndexDocument implements \JsonSerializable {
 		unset($this->link);
 		unset($this->source);
 		unset($this->tags);
+		unset($this->metaTags);
+		unset($this->subTags);
 		unset($this->more);
 		unset($this->excerpts);
 		unset($this->score);
@@ -538,6 +622,8 @@ class IndexDocument implements \JsonSerializable {
 			'hash'         => $this->getHash(),
 			'contentSize'  => $this->getContentSize(),
 			'tags'         => $this->getTags(),
+			'metatags'     => $this->getMetaTags(),
+			'subtags'      => $this->getSubTags(),
 			'more'         => $this->getMore(),
 			'excerpts'     => $this->getExcerpts(),
 			'score'        => $this->getScore()

@@ -46,7 +46,13 @@ class SearchRequest implements \JsonSerializable {
 	private $author;
 
 	/** @var array */
-	private $tags;
+	private $tags = [];
+
+	/** @var array */
+	public $metaTags = [];
+
+	/** @var array */
+	public $subTags = [];
 
 	/** @var array */
 	private $options;
@@ -63,8 +69,8 @@ class SearchRequest implements \JsonSerializable {
 	/** @var array */
 	private $wildcardFields = [];
 
-	/** @var array */
-	private $wildcardQueries = [];
+//	/** @var array */
+//	private $wildcardQueries = [];
 
 	/** @var array */
 	private $wildcardFilters = [];
@@ -361,6 +367,86 @@ class SearchRequest implements \JsonSerializable {
 
 
 	/**
+	 * @param array $tags
+	 *
+	 * @return $this
+	 */
+	public function setMetaTags($tags) {
+		$this->metaTags = $tags;
+
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getMetaTags() {
+		return $this->metaTags;
+	}
+
+	/**
+	 * @param string $tags
+	 *
+	 * @return $this
+	 */
+	public function addMetaTag($tags) {
+		$this->metaTags[] = $tags;
+
+		return $this;
+	}
+
+
+	/**
+	 * @param array $tags
+	 *
+	 * @return $this
+	 */
+	public function setSubTags($tags) {
+		$this->subTags = $tags;
+
+		return $this;
+	}
+
+	/**
+	 * @param bool $formatted
+	 *
+	 * @return array
+	 */
+	public function getSubTags($formatted = false) {
+		if ($formatted === false) {
+			return $this->subTags;
+		}
+
+		$subTags = [];
+		$ak = array_keys($this->subTags);
+		foreach ($ak as $source) {
+			$tags = $this->subTags[$source];
+			foreach ($tags as $tag) {
+				$subTags[] = $source . '_' . $tag;
+			}
+		}
+
+		return $subTags;
+	}
+
+	/**
+	 * @param string $source
+	 * @param string $tag
+	 *
+	 * @return $this
+	 */
+	public function addSubTag($source, $tag) {
+		if (!array_key_exists($source, $this->subTags)) {
+			$this->subTags[$source] = [];
+		}
+
+		$this->subTags[$source][] = $tag;
+
+		return $this;
+	}
+
+
+	/**
 	 * @param string $field
 	 *
 	 * @return $this
@@ -481,6 +567,8 @@ class SearchRequest implements \JsonSerializable {
 			'size'      => $this->getSize(),
 			'parts'     => $this->getParts(),
 			'options'   => $this->getOptions(),
+			'metatags'  => $this->getMetaTags(),
+			'subtags'   => $this->getSubTags(),
 			'tags'      => $this->getTags()
 		];
 	}
@@ -509,6 +597,8 @@ class SearchRequest implements \JsonSerializable {
 		$request->setParts(MiscService::get('parts', $arr, []));
 		$request->setSize(MiscService::get('size', $arr, 10));
 		$request->setOptions(MiscService::get('options', $arr, []));
+		$request->setMetaTags(MiscService::get('metatags', $arr, []));
+		$request->setSubTags(MiscService::get('subtags', $arr, []));
 		$request->setTags(MiscService::get('tags', $arr, []));
 
 		return $request;
