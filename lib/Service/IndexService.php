@@ -32,6 +32,7 @@ use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\NoResultException;
+use OCA\FullTextSearch\Exceptions\NotIndexableDocumentException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\IFullTextSearchPlatform;
 use OCA\FullTextSearch\IFullTextSearchProvider;
@@ -65,6 +66,9 @@ class IndexService {
 
 	/** @var array */
 	private $queuedDeleteIndex = [];
+
+	/** @var int */
+	private $currentTotalDocuments = 0;
 
 
 	/**
@@ -159,24 +163,19 @@ class IndexService {
 		);
 
 		$documents = $provider->generateIndexableDocuments($userId);
+		$this->currentTotalDocuments = sizeof($documents);
 
 		$this->updateRunnerInfoArray(
 			[
-				'documentTotal' => sizeof($documents),
-				'documentLeft'  => ''
+				'documentTotal'   => $this->currentTotalDocuments,
+				'documentCurrent' => 0
 			]
 		);
 
 		//$maxSize = sizeof($documents);
 
 		$toIndex = $this->updateDocumentsWithCurrIndex($provider, $documents, $options);
-		$this->indexChunks($platform, $provider, $toIndex, $options);
-
-//		$this->updateRunnerInfoArray(
-//			[
-//				'documentLeft' => 0
-//			]
-//		);
+		$this->indexDocuments($platform, $provider, $toIndex, $options);
 	}
 
 
