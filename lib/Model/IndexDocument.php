@@ -219,7 +219,9 @@ class IndexDocument implements \JsonSerializable {
 	 * @return $this
 	 */
 	public function addTag($tag) {
-		$this->tags[] = $tag;
+		if (!in_array($tag, $this->tags)) {
+			$this->tags[] = $tag;
+		}
 
 		return $this;
 	}
