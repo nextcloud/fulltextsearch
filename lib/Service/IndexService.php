@@ -308,7 +308,6 @@ class IndexService {
 			$index = $this->indexDocument($platform, $provider, $document);
 
 			$this->updateIndex($index);
-			$this->duplicateInfoAsLast();
 
 			$document->__destruct();
 			unset($document);
