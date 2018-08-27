@@ -300,7 +300,8 @@ class IndexService {
 				);
 				$this->filterDocumentBeforeIndex($document);
 
-			} catch (NotIndexableDocumentException $e) {
+			} catch (Exception $e) {
+				$document->__destruct();
 				continue;
 			}
 
