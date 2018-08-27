@@ -72,17 +72,6 @@ Util::addStyle(Application::APP_NAME, 'admin');
 			</div>
 		</div>
 
-		<div class="div-table-row">
-			<div class="div-table-col div-table-col-left">
-				<span class="leftcol">Indexing Chunk Size :</span>
-				<br/>
-				<em>Lower the value if the server is short on memory.</em>
-			</div>
-			<div class="div-table-col">
-				<input type="text" class="small" id="fts_chunk_size"/>
-			</div>
-		</div>
-
 	</div>
 
 

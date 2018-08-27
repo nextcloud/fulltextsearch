@@ -73,10 +73,6 @@ class SettingsService {
 	 * @return bool
 	 */
 	public function checkConfig($data) {
-		if (!is_numeric($data['index_chunk'])) {
-			return false;
-		}
-
 		return true;
 	}
 

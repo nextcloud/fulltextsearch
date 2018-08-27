@@ -269,94 +269,69 @@ class IndexService {
 	 * @throws TickDoesNotExistException
 	 * @throws Exception
 	 */
-	private function indexChunks(
+	private function indexDocuments(
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $documents,
 		IndexOptions $options
 	) {
-		$chunkSize = $options->getOption(
-			'chunk', $this->configService->getAppValue(ConfigService::CHUNK_INDEX)
-		);
-
-		$max = sizeof($documents);
-		for ($i = 0; $i < $max; $i++) {
-			$this->updateRunnerAction('indexChunk', true);
+		while ($document = array_shift($documents)) {
 			try {
 
-				$this->updateRunnerInfoArray(['documentLeft' => sizeof($documents)]);
+				$this->updateRunnerInfoArray(
+					[
+						'documentCurrent' => ($this->currentTotalDocuments - sizeof($documents) - 1)
+					]
+				);
+				$this->updateRunnerAction('fillDocument', true);
+				$this->updateRunnerInfoArray(
+					[
+						'documentId'    => $document->getId(),
+						'title'         => '',
+						'content'       => '',
+						'status'        => '',
+						'statusColored' => ''
+					]
+				);
 
-				$chunk = array_splice($documents, 0, $chunkSize);
-				$this->indexChunk($platform, $provider, $chunk);
+				$provider->fillIndexDocument($document);
+				$this->updateRunnerInfoArray(
+					[
+						'title'   => $document->getTitle(),
+						'content' => $document->getContentSize()
+					]
+				);
+				$this->filterDocumentBeforeIndex($document);
 
-				/** @var IndexDocument $doc */
-				foreach ($chunk as $doc) {
-					$doc->__destruct(); // because.
-				}
-			} catch (NoResultException $e) {
-				$this->updateRunnerInfoArray(['documentLeft' => 0]);
-
-				return;
-			} catch (Exception $e) {
-				throw $e;
+			} catch (NotIndexableDocumentException $e) {
+				continue;
 			}
-		}
 
-		$this->updateRunnerAction('indexChunk', true);
+			$index = $this->indexDocument($platform, $provider, $document);
+
+			$this->updateIndex($index);
+			$this->duplicateInfoAsLast();
+
+			$document->__destruct();
+			unset($document);
+		}
 	}
 
 
 	/**
-	 * @param IFullTextSearchPlatform $platform
-	 * @param IFullTextSearchProvider $provider
-	 * @param IndexDocument[] $chunk
+	 * @param IndexDocument $document
 	 *
-	 * @throws NoResultException
-	 * @throws DatabaseException
-	 * @throws Exception
+	 * @throws NotIndexableDocumentException
 	 */
-	private function indexChunk(
-		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $chunk
-	) {
-		if (sizeof($chunk) === 0) {
-			throw new NoResultException();
-		}
-
-		$documents = $provider->fillIndexDocuments($chunk);
-		$toIndex = $this->filterDocumentsToIndex($documents);
-
-		$indexes = [];
-		foreach ($toIndex as $document) {
-			try {
-				$index = $this->indexDocument($platform, $provider, $document);
-				$indexes[] = $index;
-			} catch (\Exception $e) {
-				throw $e;
-			}
-		}
-
-		$this->updateIndexes($indexes);
-	}
-
-
-	/**
-	 * @param IndexDocument[] $documents
-	 *
-	 * @return IndexDocument[]
-	 */
-	private function filterDocumentsToIndex($documents) {
-		$toIndex = [];
-		foreach ($documents as $document) {
-			// TODO - rework the index/not_index
-			$index = $document->getIndex();
-			$access = $document->getAccess();
+	private function filterDocumentBeforeIndex(IndexDocument $document) {
+		// TODO - rework the index/not_index
+		$index = $document->getIndex();
+		$access = $document->getAccess();
 
 // INDEX_IGNORE is not used anymore, as we use addError()
-			if ($access !== null && !$index->isStatus(Index::INDEX_IGNORE)) {
-				$index->setOwnerId($access->getOwnerId());
-				$toIndex[] = $document;
-			}
+		if ($access === null || $index->isStatus(Index::INDEX_IGNORE)) {
+			throw new NotIndexableDocumentException();
 		}
 
-		return $toIndex;
+		$index->setOwnerId($access->getOwnerId());
 	}
 
 
@@ -405,6 +380,13 @@ class IndexService {
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, Index $index
 	) {
 		$document = null;
+		$this->updateRunnerInfoArray(
+			[
+				'providerName' => $provider->getName(),
+				'userId'       => $index->getOwnerId(),
+			]
+		);
+
 		if (!$index->isStatus(Index::INDEX_REMOVE)) {
 			try {
 				$document = $provider->updateDocument($index);
@@ -419,6 +401,15 @@ class IndexService {
 
 			return;
 		}
+
+		$this->updateRunnerAction('indexDocument', true);
+		$this->updateRunnerInfoArray(
+			[
+				'documentId' => $document->getId(),
+				'title'      => $document->getTitle(),
+				'content'    => $document->getContentSize()
+			]
+		);
 
 		$document->getIndex()
 				 ->resetErrors();

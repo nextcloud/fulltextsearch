@@ -164,6 +164,7 @@ class TestProvider implements IFullTextSearchProvider {
 
 		$result[] = $this->testService->generateIndexDocumentContentLicense($this->indexOptions);
 		$result[] = $this->testService->generateIndexDocumentSimple($this->indexOptions);
+
 //		$result[] = $this->testService->generateIndexDocuments(TestService::DOCUMENT_TEST_INDEX3);
 
 		return $result;
@@ -176,10 +177,20 @@ class TestProvider implements IFullTextSearchProvider {
 	 *
 	 * @param IndexDocument[] $chunk
 	 *
+	 * @deprecated
 	 * @return IndexDocument[]
 	 */
 	public function fillIndexDocuments($chunk) {
 		return $chunk;
+	}
+
+
+	/**
+	 * generate documents prior to the indexing.
+	 *
+	 * @param IndexDocument $document
+	 */
+	public function fillIndexDocument(IndexDocument $document) {
 	}
 
 

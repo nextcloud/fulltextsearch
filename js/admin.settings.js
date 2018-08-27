@@ -26,7 +26,6 @@
 /** global: OC */
 /** global: fts_admin_elements */
 
-/** @namespace result.index_chunk */
 /** @namespace result.platforms_all */
 /** @namespace result.search_platform */
 /** @namespace result.providers_all */
@@ -55,7 +54,6 @@ var fts_admin_settings = {
 		fts_admin_elements.fts_navigation.prop('checked', (result.app_navigation === '1'));
 
 		fts_admin_settings.updateSettingPagePlatforms(result);
-		fts_admin_settings.updateSettingPageChunkSize(result);
 
 		fts_admin_settings.updateCurrentPlatform(result);
 		fts_admin_settings.updateEnabledProviders(result);
@@ -86,12 +84,6 @@ var fts_admin_settings = {
 		}
 
 		fts_admin_elements.fts_platforms.fadeTo(300, 1);
-	},
-
-
-	updateSettingPageChunkSize: function (result) {
-		fts_admin_elements.fts_chunkSize.val(result.index_chunk);
-		fts_admin_elements.fts_chunkSize.fadeTo(300, 1);
 	},
 
 
@@ -163,8 +155,7 @@ var fts_admin_settings = {
 
 		var data = {
 			app_navigation: (fts_admin_elements.fts_navigation.is(':checked')) ? 1 : 0,
-			search_platform: fts_admin_elements.fts_platforms.val(),
-			index_chunk: fts_admin_elements.fts_chunkSize.val()
+			search_platform: fts_admin_elements.fts_platforms.val()
 		};
 
 		$.ajax({
