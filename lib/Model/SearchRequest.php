@@ -457,6 +457,7 @@ class SearchRequest implements \JsonSerializable {
 		return $this;
 	}
 
+
 	/**
 	 * @return array
 	 */
