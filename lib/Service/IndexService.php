@@ -284,6 +284,7 @@ class IndexService {
 				$this->updateRunnerInfoArray(
 					[
 						'documentId'    => $document->getId(),
+						'info'          => '',
 						'title'         => '',
 						'content'       => '',
 						'status'        => '',

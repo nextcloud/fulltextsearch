@@ -61,7 +61,6 @@ class Live extends ExtendedBase {
 	const PANEL_INDEX_LINE_INFO = '│ Info: <info>%info%</info>';
 	const PANEL_INDEX_LINE_TITLE = '│ Title: <info>%title%</info>';
 	const PANEL_INDEX_LINE_CONTENT = '│ Content size: <info>%content%</info>';
-	const PANEL_INDEX_LINE_PROGRESS = '│ Progress: %documentCurrent:6s%/%documentTotal%';
 	const PANEL_INDEX_LINE_FOOTER = '└──';
 
 	const PANEL_RESULT = 'result';
@@ -368,7 +367,6 @@ class Live extends ExtendedBase {
 								 self::PANEL_INDEX_LINE_INFO,
 								 self::PANEL_INDEX_LINE_TITLE,
 								 self::PANEL_INDEX_LINE_CONTENT,
-								 self::PANEL_INDEX_LINE_PROGRESS,
 								 self::PANEL_INDEX_LINE_FOOTER,
 							 ]
 		);
