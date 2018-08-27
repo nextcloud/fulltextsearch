@@ -174,7 +174,7 @@ class SearchRequest implements \JsonSerializable {
 			return true;
 		}
 
-		$valuedOptions = ['in'];
+		$valuedOptions = ['in', 'meta'];
 		if (in_array($kw, $valuedOptions)) {
 			$this->addMultipleOption($kw, $value);
 
@@ -263,15 +263,16 @@ class SearchRequest implements \JsonSerializable {
 
 	/**
 	 * @param string $option
+	 * @param string $default
 	 *
 	 * @return mixed|string
 	 */
-	public function getOption($option) {
+	public function getOption($option, $default = '') {
 		if (array_key_exists($option, $this->options)) {
 			return $this->options[$option];
 		}
 
-		return '';
+		return $default;
 	}
 
 
