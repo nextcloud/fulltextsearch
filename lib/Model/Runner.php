@@ -31,6 +31,7 @@ use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
+use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\RunningService;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -40,7 +41,11 @@ class Runner {
 
 	const TICK_TTL = 300;
 	const TICK_MINIMUM = 2;
-	const INFO_UPDATE = 10;
+	const MEMORY_INFO_UPDATE = 5;
+
+	const RESULT_TYPE_SUCCESS = 1;
+	const RESULT_TYPE_WARNING = 4;
+	const RESULT_TYPE_FAIL = 9;
 
 	/** @var RunningService */
 	private $runningService;
@@ -76,13 +81,13 @@ class Runner {
 	private $methodOnKeyPress = [];
 
 	/** @var array */
-	private $methodOnNewAction = [];
-
-	/** @var array */
 	private $methodOnInfoUpdate = [];
 
 	/** @var array */
 	private $methodOnIndexError = [];
+
+	/** @var array */
+	private $methodOnIndexResult = [];
 
 	/** @var bool */
 	private $paused = false;
@@ -167,7 +172,6 @@ class Runner {
 			}
 
 			$this->pauseRunning(false);
-			$this->newAction($action);
 		}
 
 		if ($this->oldAction === $action && ($this->oldTick + self::TICK_MINIMUM > $tick)) {
@@ -193,11 +197,11 @@ class Runner {
 	/**
 	 * @param string $info
 	 * @param string $value
-	 * @param string $colored
+	 * @param int $type
 	 */
-	public function setInfo($info, $value, $colored = '') {
+	public function setInfo($info, $value, $type = 0) {
 		$this->info[$info] = $value;
-		$this->setInfoColored($info, $value, $colored);
+		$this->setInfoColored($info, $type);
 		$this->infoUpdated();
 	}
 
@@ -214,23 +218,30 @@ class Runner {
 		$this->infoUpdated();
 	}
 
-	private function setInfoColored($info, $value, $colored) {
-		if ($colored === '') {
+
+	/**
+	 * @param string $info
+	 * @param int $level
+	 */
+	public function setInfoColored($info, $level) {
+
+		$value = $this->getInfo($info);
+		if ($value === '') {
 			return;
 		}
 
 		$color = '';
-		switch ($colored) {
-			case 'success':
+		switch ($level) {
+			case self::RESULT_TYPE_SUCCESS:
 				$color = 'info';
 				break;
 
-			case 'fail' :
-				$color = 'error';
+			case self::RESULT_TYPE_WARNING:
+				$color = 'comment';
 				break;
 
-			case 'warning':
-				$color = 'comment';
+			case self::RESULT_TYPE_FAIL:
+				$color = 'error';
 				break;
 		}
 
@@ -244,8 +255,18 @@ class Runner {
 	/**
 	 * @return array
 	 */
-	public function getInfo() {
+	public function getInfoAll() {
 		return $this->info;
+	}
+
+
+	/**
+	 * @param string $k
+	 *
+	 * @return string
+	 */
+	public function getInfo($k) {
+		return MiscService::get($k, $this->info, '');
 	}
 
 
@@ -262,23 +283,6 @@ class Runner {
 	public function keyPressed($key) {
 		foreach ($this->methodOnKeyPress as $method) {
 			call_user_func($method, $key);
-		}
-	}
-
-
-	/**
-	 * @param array $method
-	 */
-	public function onNewAction($method) {
-		$this->methodOnNewAction[] = $method;
-	}
-
-	/**
-	 * @param string $action
-	 */
-	public function newAction($action) {
-		foreach ($this->methodOnNewAction as $method) {
-			call_user_func($method, $action);
 		}
 	}
 
@@ -328,6 +332,34 @@ class Runner {
 
 
 	/**
+	 * @param array $method
+	 */
+	public function onNewIndexResult($method) {
+		$this->methodOnIndexResult[] = $method;
+	}
+
+
+	/**
+	 * @param Index $index
+	 * @param string $message
+	 * @param string $status
+	 * @param int $type
+	 */
+	public function newIndexResult($index, $message, $status, $type) {
+		$result = [
+			'index'   => $index,
+			'message' => $message,
+			'status'  => $status,
+			'type'    => $type
+		];
+
+		foreach ($this->methodOnIndexResult as $method) {
+			call_user_func($method, $result);
+		}
+	}
+
+
+	/**
 	 * @throws InterruptException
 	 */
 	private function hasBeenInterrupted() {
@@ -342,7 +374,7 @@ class Runner {
 	 * @param $tick
 	 */
 	private function updateTick($tick) {
-		if (($this->ramTick + self::INFO_UPDATE) > $tick) {
+		if (($this->ramTick + self::MEMORY_INFO_UPDATE) > $tick) {
 			return;
 		}
 
@@ -353,6 +385,7 @@ class Runner {
 
 	/**
 	 * @deprecated - verifier l'interet !?
+	 *
 	 * @param $reason
 	 * @param $stop
 	 */

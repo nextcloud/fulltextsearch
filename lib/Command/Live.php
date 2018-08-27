@@ -48,7 +48,7 @@ use Symfony\Component\Console\Terminal;
 
 class Live extends ExtendedBase {
 
-	const CYCLE_DELAY = 10;
+	const CYCLE_DELAY = 300000;
 
 	const PANEL_RUN = 'run';
 	const PANEL_RUN_LINE_MEMORY = 'Memory: %_memory%';
@@ -61,24 +61,28 @@ class Live extends ExtendedBase {
 	const PANEL_INDEX_LINE_INFO = '│ Info: <info>%info%</info>';
 	const PANEL_INDEX_LINE_TITLE = '│ Title: <info>%title%</info>';
 	const PANEL_INDEX_LINE_CONTENT = '│ Content size: <info>%content%</info>';
-	const PANEL_INDEX_LINE_RESULT = '│ Result: %resultColored%';
+	const PANEL_INDEX_LINE_PROGRESS = '│ Progress: %documentCurrent:6s%/%documentTotal%';
 	const PANEL_INDEX_LINE_FOOTER = '└──';
 
-	const PANEL_STATUS = 'status';
-	const PANEL_STATUS_LINE_HEADER = '┌─ Status ────';
-	const PANEL_STATUS_LINE_DOCUMENTS = '│ Progress: %documentLeft:6s%/%documentTotal%   %progressStatus%';
-//	const PANEL_STATUS_LINE_DOCUMENTS_LEFT = '│ Document left:';
-	const PANEL_STATUS_LINE_ERRORS = '│ Error: <comment>%errorCurrent:6s%</comment>/<comment>%errorTotal%</comment>';
-	const PANEL_STATUS_LINE_ERROR_EXCEPTION = '│ Exception: <comment>%errorException%</comment>';
-	const PANEL_STATUS_LINE_ERROR_MESSAGE1 = '│ Message: <comment>%errorMessageA%</comment>';
-	const PANEL_STATUS_LINE_ERROR_MESSAGE2 = '│ <comment>%errorMessageB%</comment>';
-	const PANEL_STATUS_LINE_ERROR_MESSAGE3 = '│ <comment>%errorMessageC%</comment>';
-	const PANEL_STATUS_LINE_ERROR_INDEX = '│ Index: <comment>%errorIndex%</comment>';
+	const PANEL_RESULT = 'result';
+	const PANEL_RESULT_LINE_HEADER = '┌─ Results ────';
+	const PANEL_RESULT_LINE_RESULT = '│ Result: <info>%resultCurrent:6s%</info>/<info>%resultTotal%</info>';
+	const PANEL_RESULT_LINE_INDEX = '│ Index: <info>%resultIndex%</info>';
+	const PANEL_RESULT_LINE_STATUS = '│ Status: %resultStatusColored%';
+	const PANEL_RESULT_LINE_MESSAGE1 = '│ Message: <info>%resultMessageA%</info>';
+	const PANEL_RESULT_LINE_MESSAGE2 = '│ <info>%resultMessageB%</info>';
+	const PANEL_RESULT_LINE_MESSAGE3 = '│ <info>%resultMessageC%</info>';
+	const PANEL_RESULT_LINE_FOOTER = '└──';
 
-
-	const PANEL_STATUS_LINE_FOOTER = '└──';
-
-	const PANEL_LINE_EMPTY = '│ ';
+	const PANEL_ERRORS = 'errors';
+	const PANEL_ERRORS_LINE_HEADER = '┌─ Errors ────';
+	const PANEL_ERRORS_LINE_ERRORS = '│ Error: <comment>%errorCurrent:6s%</comment>/<comment>%errorTotal%</comment>';
+	const PANEL_ERRORS_LINE_ERROR_INDEX = '│ Index: <comment>%errorIndex%</comment>';
+	const PANEL_ERRORS_LINE_ERROR_EXCEPTION = '│ Exception: <comment>%errorException%</comment>';
+	const PANEL_ERRORS_LINE_ERROR_MESSAGE1 = '│ Message: <comment>%errorMessageA%</comment>';
+	const PANEL_ERRORS_LINE_ERROR_MESSAGE2 = '│ <comment>%errorMessageB%</comment>';
+	const PANEL_ERRORS_LINE_ERROR_MESSAGE3 = '│ <comment>%errorMessageC%</comment>';
+	const PANEL_ERRORS_LINE_FOOTER = '└──';
 
 	const PANEL_COMMANDS_ROOT = 'root';
 	const PANEL_COMMANDS_ROOT_LINE = '## <char>q</char>:quit ## <char>p</char>:pause ';
@@ -86,8 +90,9 @@ class Live extends ExtendedBase {
 	const PANEL_COMMANDS_PAUSED_LINE = '## <char>q</char>:quit ## <char>u</char>:unpause ## <char>n</char>:next step';
 	const PANEL_COMMANDS_DONE = 'done';
 	const PANEL_COMMANDS_DONE_LINE = '## <char>q</char>:quit';
-	const PANEL_COMMANDS_ERRORS = 'errors';
+	const PANEL_COMMANDS_NAVIGATION = 'navigation';
 	const PANEL_COMMANDS_ERRORS_LINE = '## <char>f</char>:first error ## <char>h</char>/<char>j</char>:prec/next error ## <char>d</char>:delete error ## <char>l</char>:last error';
+	const PANEL_COMMANDS_RESULTS_LINE = '## <char>x</char>:first result ## <char>c</char>/<char>v</char>:prec/next result ## <char>b</char>:last result';
 
 
 	/** @var IUserManager */
@@ -127,6 +132,11 @@ class Live extends ExtendedBase {
 	/** @var bool */
 	private $navigateLastError = true;
 
+	/** @var array */
+	private $results = [];
+
+	/** @var bool */
+	private $navigateLastResult = true;
 
 	/**
 	 * Live constructor.
@@ -134,6 +144,7 @@ class Live extends ExtendedBase {
 	 * @param IUserManager $userManager
 	 * @param RunningService $runningService
 	 * @param ConfigService $configService
+	 * @param CliService $cliService
 	 * @param IndexService $indexService
 	 * @param PlatformService $platformService
 	 * @param ProviderService $providerService
@@ -196,8 +207,9 @@ class Live extends ExtendedBase {
 
 		$this->runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
 		$this->runner->onKeyPress([$this, 'onKeyPressed']);
-		$this->runner->onNewAction([$this, 'onNewAction']);
 		$this->runner->onNewIndexError([$this, 'onNewIndexError']);
+		$this->runner->onNewIndexResult([$this, 'onNewIndexResult']);
+
 
 		$this->indexService->setRunner($this->runner);
 		$this->cliService->setRunner($this->runner);
@@ -212,6 +224,7 @@ class Live extends ExtendedBase {
 			$this->cliService->runDisplay($output);
 			$this->generateIndexErrors();
 			$this->displayError();
+			$this->displayResult();
 
 			$this->liveCycle();
 
@@ -254,7 +267,7 @@ class Live extends ExtendedBase {
 
 			$this->runner->updateAction('waiting', true);
 
-			usleep(300000);
+			usleep(self::CYCLE_DELAY);
 		}
 
 		$this->runner->stop();
@@ -286,6 +299,19 @@ class Live extends ExtendedBase {
 			$this->runner->pause(false);
 		}
 
+		if ($key === 'x') {
+			$this->displayResult(-99);
+		}
+		if ($key === 'c') {
+			$this->displayResult(-1);
+		}
+		if ($key === 'v') {
+			$this->displayResult(1);
+		}
+		if ($key === 'b') {
+			$this->displayResult(99);
+		}
+
 		if ($key === 'f') {
 			$this->displayError(-99);
 		}
@@ -312,21 +338,12 @@ class Live extends ExtendedBase {
 		$this->displayError();
 	}
 
-
 	/**
-	 * @param string $action
+	 * @param array $result
 	 */
-	public function onNewAction($action) {
-
-		if ($action === 'indexChunk' || $action === 'indexChunkEnd') {
-			$this->runner->setInfoArray(
-				[
-					'documentId' => '',
-					'title'      => '',
-					'content'    => ''
-				]
-			);
-		}
+	public function onNewIndexResult($result) {
+		$this->results[] = $result;
+		$this->displayResult();
 	}
 
 
@@ -341,31 +358,44 @@ class Live extends ExtendedBase {
 				self::PANEL_RUN_LINE_MEMORY
 			]
 		);
+
 		$this->cliService->createPanel(
 			self::PANEL_INDEX, [
 								 self::PANEL_INDEX_LINE_HEADER,
-								 self::PANEL_INDEX_LINE_ACCOUNT,
 								 self::PANEL_INDEX_LINE_ACTION,
+								 self::PANEL_INDEX_LINE_ACCOUNT,
 								 self::PANEL_INDEX_LINE_DOCUMENT,
 								 self::PANEL_INDEX_LINE_INFO,
 								 self::PANEL_INDEX_LINE_TITLE,
 								 self::PANEL_INDEX_LINE_CONTENT,
-								 self::PANEL_INDEX_LINE_RESULT,
+								 self::PANEL_INDEX_LINE_PROGRESS,
 								 self::PANEL_INDEX_LINE_FOOTER,
 							 ]
 		);
 
 		$this->cliService->createPanel(
-			self::PANEL_STATUS, [
-								  self::PANEL_STATUS_LINE_HEADER,
-								  self::PANEL_STATUS_LINE_DOCUMENTS,
-								  self::PANEL_STATUS_LINE_ERRORS,
-								  self::PANEL_STATUS_LINE_ERROR_EXCEPTION,
-								  self::PANEL_STATUS_LINE_ERROR_MESSAGE1,
-								  self::PANEL_STATUS_LINE_ERROR_MESSAGE2,
-								  self::PANEL_STATUS_LINE_ERROR_MESSAGE3,
-								  self::PANEL_STATUS_LINE_ERROR_INDEX,
-								  self::PANEL_STATUS_LINE_FOOTER,
+			self::PANEL_RESULT, [
+								  self::PANEL_RESULT_LINE_HEADER,
+								  self::PANEL_RESULT_LINE_RESULT,
+								  self::PANEL_RESULT_LINE_INDEX,
+								  self::PANEL_RESULT_LINE_STATUS,
+								  self::PANEL_RESULT_LINE_MESSAGE1,
+								  self::PANEL_RESULT_LINE_MESSAGE2,
+								  self::PANEL_RESULT_LINE_MESSAGE3,
+								  self::PANEL_RESULT_LINE_FOOTER,
+							  ]
+		);
+
+		$this->cliService->createPanel(
+			self::PANEL_ERRORS, [
+								  self::PANEL_ERRORS_LINE_HEADER,
+								  self::PANEL_ERRORS_LINE_ERRORS,
+								  self::PANEL_ERRORS_LINE_ERROR_INDEX,
+								  self::PANEL_ERRORS_LINE_ERROR_EXCEPTION,
+								  self::PANEL_ERRORS_LINE_ERROR_MESSAGE1,
+								  self::PANEL_ERRORS_LINE_ERROR_MESSAGE2,
+								  self::PANEL_ERRORS_LINE_ERROR_MESSAGE3,
+								  self::PANEL_ERRORS_LINE_FOOTER,
 							  ]
 		);
 
@@ -382,17 +412,18 @@ class Live extends ExtendedBase {
 		);
 
 		$this->cliService->createPanel(
-			self::PANEL_COMMANDS_ERRORS, [
-										   self::PANEL_COMMANDS_ERRORS_LINE
-									   ]
+			self::PANEL_COMMANDS_NAVIGATION, [
+											   self::PANEL_COMMANDS_RESULTS_LINE,
+											   self::PANEL_COMMANDS_ERRORS_LINE
+										   ]
 		);
 
 		$this->cliService->initDisplay();
 		$this->cliService->displayPanel('run', self::PANEL_RUN);
-		$this->cliService->displayPanel('topPanel', self::PANEL_INDEX);
-		$this->cliService->displayPanel('bottomPanel', self::PANEL_STATUS);
-
-		$this->cliService->displayPanel('errors', self::PANEL_COMMANDS_ERRORS);
+		$this->cliService->displayPanel('indexPanel', self::PANEL_INDEX);
+		$this->cliService->displayPanel('resultsPanel', self::PANEL_RESULT);
+		$this->cliService->displayPanel('errorsPanel', self::PANEL_ERRORS);
+		$this->cliService->displayPanel('navigation', self::PANEL_COMMANDS_NAVIGATION);
 
 		if ($this->runner->isPaused()) {
 			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_PAUSED);
@@ -402,26 +433,32 @@ class Live extends ExtendedBase {
 
 		$this->runner->setInfoArray(
 			[
-				'userId'         => '',
-				'providerName'   => '',
-				'_memory'        => '',
-				'documentId'     => '',
-				'action'         => '',
-				'info'           => '',
-				'title'          => '',
-				'_paused'        => '',
-				'content'        => '',
-				'resultColored'  => '',
-				'documentLeft'   => '',
-				'documentTotal'  => '',
-				'progressStatus' => '',
-				'errorCurrent'   => '0',
-				'errorTotal'     => '0',
-				'errorMessageA'  => '',
-				'errorMessageB'  => '',
-				'errorMessageC'  => '',
-				'errorException' => '',
-				'errorIndex'     => ''
+				'userId'              => '',
+				'providerName'        => '',
+				'_memory'             => '',
+				'documentId'          => '',
+				'action'              => '',
+				'info'                => '',
+				'title'               => '',
+				'_paused'             => '',
+				'resultIndex'         => '',
+				'resultCurrent'       => '',
+				'resultTotal'         => '',
+				'resultMessageA'      => '',
+				'resultMessageB'      => '',
+				'resultMessageC'      => '',
+				'resultStatus'        => '',
+				'resultStatusColored' => '',
+				'content'             => '',
+				'statusColored'       => '',
+				'progressStatus'      => '',
+				'errorCurrent'        => '0',
+				'errorTotal'          => '0',
+				'errorMessageA'       => '',
+				'errorMessageB'       => '',
+				'errorMessageC'       => '',
+				'errorException'      => '',
+				'errorIndex'          => ''
 			]
 		);
 	}
@@ -445,9 +482,65 @@ class Live extends ExtendedBase {
 
 		}
 
-
 	}
 
+
+	/**
+	 * @param int $pos
+	 */
+	private function displayResult($pos = 0) {
+		$total = sizeof($this->results);
+
+		if ($total === 0) {
+			$this->runner->setInfoArray(
+				[
+					'resultCurrent' => 0,
+					'resultTotal'   => 0,
+				]
+			);
+
+			return;
+		}
+
+		$current = key($this->results) + 1;
+		$result = $this->getNavigationResult($pos, ($current === 1), ($current === $total));
+		$current = key($this->results) + 1;
+
+		if ($result === false) {
+			return;
+		}
+
+		/** @var ModelIndex $index */
+		$index = $result['index'];
+		$resultIndex = '';
+		if ($index !== null) {
+			$resultIndex = $index->getProviderId() . ':' . $index->getDocumentId();
+		}
+
+
+		$width = $this->terminal->getWidth() - 13;
+		$message = MiscService::get('message', $result, '');
+		$msg1 = substr($message, 0, $width);
+		$msg2 = substr($message, $width, $width + 10);
+		$msg3 = substr($message, $width + $width + 10, $width + 10);
+
+
+		$status = MiscService::get('status', $result, '');
+		$type = MiscService::get('type', $result, '');
+
+		$this->runner->setInfoArray(
+			[
+				'resultCurrent'  => $current,
+				'resultTotal'    => $total,
+				'resultMessageA' => trim($msg1),
+				'resultMessageB' => trim($msg2),
+				'resultMessageC' => trim($msg3),
+				'resultStatus'   => $status,
+				'resultIndex'    => $resultIndex
+			]
+		);
+		$this->runner->setInfoColored('resultStatus', $type);
+	}
 
 	/**
 	 * @param int $pos
@@ -498,6 +591,46 @@ class Live extends ExtendedBase {
 				'errorIndex'     => $errorIndex
 			]
 		);
+	}
+
+
+	/**
+	 * @param int $pos
+	 * @param bool $isFirst
+	 * @param bool $isLast
+	 *
+	 * @return bool|array
+	 */
+	private function getNavigationResult($pos, $isFirst, $isLast) {
+
+		if ($pos === 0) {
+			if ($this->navigateLastResult === true) {
+				return end($this->results);
+			} else {
+				return current($this->results);
+			}
+		}
+
+		$this->navigateLastResult = false;
+		if ($pos === -99) {
+			return reset($this->results);
+		}
+
+		if ($pos === -1 && !$isFirst) {
+			return prev($this->results);
+		}
+
+		if ($pos === 1 && !$isLast) {
+			return next($this->results);
+		}
+
+		if ($pos === 99) {
+			$this->navigateLastResult = true;
+
+			return end($this->results);
+		}
+
+		return false;
 	}
 
 

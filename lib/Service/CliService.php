@@ -156,7 +156,7 @@ class CliService {
 		$this->display = new ProgressBar($this->output);
 		$this->display->setOverwrite(true);
 
-		$initVar = $this->runner->getInfo();
+		$initVar = $this->runner->getInfoAll();
 		$keys = array_keys($initVar);
 		foreach ($keys as $key) {
 			$this->display->setMessage($initVar[$key], $key);
