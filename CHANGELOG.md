@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.99.1 Release Candidate 2
+
+- bugfix: crashing issue during :live
+- database: documentId is now a string
+- improvement: tags/metatags/subtags
+- improvement: no more chunks, documents are indexed one by one.
+- improvement: the :index command allow a navigation between results.
+
 
 ### 0.99.0 Release Candidate
 
