@@ -77,6 +77,12 @@ class Index implements \JsonSerializable {
 	private $lastIndex = 0;
 
 
+	/**
+	 * Index constructor.
+	 *
+	 * @param string $providerId
+	 * @param string $documentId
+	 */
 	public function __construct($providerId, $documentId) {
 		$this->providerId = $providerId;
 		$this->documentId = $documentId;
