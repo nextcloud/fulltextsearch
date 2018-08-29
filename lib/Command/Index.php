@@ -765,7 +765,7 @@ class Index extends ExtendedBase {
 					'index'     => $index,
 					'message'   => $error['message'],
 					'exception' => $error['exception'],
-					'severity'  => $error['sev']
+					'severity'  => $error['severity']
 				];
 			}
 
