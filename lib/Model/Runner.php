@@ -146,12 +146,12 @@ class Runner {
 		}
 
 		$tick = time();
-		try {
-			$this->hasBeenInterrupted();
-		} catch (InterruptException $e) {
-			$this->stop();
-			throw $e;
-		}
+//		try {
+//			$this->hasBeenInterrupted();
+//		} catch (InterruptException $e) {
+//			$this->stop();
+//			throw $e;
+//		}
 
 		if ($this->oldAction !== $action || $force) {
 			while (true) {
@@ -355,15 +355,15 @@ class Runner {
 	}
 
 
-	/**
-	 * @throws InterruptException
-	 */
-	private function hasBeenInterrupted() {
-		if ($this->commandBase === null) {
-			return;
-		}
-		$this->commandBase->hasBeenInterrupted();
-	}
+//	/**
+//	 * @throws InterruptException
+//	 */
+//	private function hasBeenInterrupted() {
+//		if ($this->commandBase === null) {
+//			return;
+//		}
+//		$this->commandBase->hasBeenInterrupted();
+//	}
 
 
 	/**
@@ -442,12 +442,12 @@ class Runner {
 	}
 
 
-	/**
-	 * @return bool
-	 */
-	public function isStrict() {
-		return $this->strict;
-	}
+//	/**
+//	 * @return bool
+//	 */
+//	public function isStrict() {
+//		return $this->strict;
+//	}
 
 	/**
 	 * @param string $line
