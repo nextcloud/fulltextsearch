@@ -293,7 +293,7 @@ class Test extends ExtendedBase {
 	) {
 		$this->output($output, 'Locking process');
 		$this->runner = new Runner($this->runningService, 'test');
-		$this->runner->start(true);
+		$this->runner->start();
 		$this->indexService->setRunner($this->runner);
 		$testPlatform->setRunner($this->runner);
 		$testProvider->setRunner($this->runner);
