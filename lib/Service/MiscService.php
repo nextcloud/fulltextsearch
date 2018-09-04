@@ -28,6 +28,7 @@ namespace OCA\FullTextSearch\Service;
 
 use OCA\FullTextSearch\AppInfo\Application;
 use OCP\ILogger;
+use OCP\Util;
 
 class MiscService {
 
@@ -87,5 +88,18 @@ class MiscService {
 
 		return ((float)$usec + (float)$sec);
 	}
+
+
+	public function addJavascript() {
+		Util::addStyle(Application::APP_NAME, 'fulltextsearch');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.api');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.settings');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.searchbox');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.result');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.navigation');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1');
+	}
+
+
 }
 
