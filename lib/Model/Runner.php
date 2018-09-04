@@ -27,7 +27,6 @@
 
 namespace OCA\FullTextSearch\Model;
 
-use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
@@ -53,8 +52,8 @@ class Runner {
 	/** @var string */
 	private $source;
 
-	/** @var bool */
-	private $strict = false;
+//	/** @var bool */
+//	private $strict = false;
 
 	/** @var int */
 	private $tickId;
@@ -117,12 +116,10 @@ class Runner {
 
 
 	/**
-	 * @param bool $strict
-	 *
 	 * @throws RunnerAlreadyUpException
 	 */
-	public function start($strict = false) {
-		$this->strict = $strict;
+	public function start() {
+//		$this->strict = $strict;
 		$this->tickId = $this->runningService->start($this->source);
 	}
 
@@ -132,8 +129,7 @@ class Runner {
 	 * @param bool $force
 	 *
 	 * @return string
-	 * @throws InterruptException
-	 * @throws TickDoesNotExistException
+	 * @throws \Exception
 	 */
 	public function updateAction($action = '', $force = false) {
 		$n = '';

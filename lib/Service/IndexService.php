@@ -31,7 +31,6 @@ use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\InterruptException;
-use OCA\FullTextSearch\Exceptions\NoResultException;
 use OCA\FullTextSearch\Exceptions\NotIndexableDocumentException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\IFullTextSearchPlatform;
@@ -82,8 +81,7 @@ class IndexService {
 	 */
 	public function __construct(
 		IndexesRequest $indexesRequest, ConfigService $configService,
-		ProviderService $providerService,
-		PlatformService $platformService, MiscService $miscService
+		ProviderService $providerService, PlatformService $platformService, MiscService $miscService
 	) {
 		$this->indexesRequest = $indexesRequest;
 		$this->configService = $configService;
@@ -359,9 +357,6 @@ class IndexService {
 		try {
 			$index = $platform->indexDocument($provider, $document);
 		} catch (Exception $e) {
-			if ($this->runner->isStrict()) {
-				throw $e;
-			}
 		}
 
 		return $index;
