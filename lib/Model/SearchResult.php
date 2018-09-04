@@ -219,6 +219,20 @@ class SearchResult implements \JsonSerializable {
 		$this->request = $request;
 	}
 
+	private $aggregations = [];
+
+	public function addAggregation($category, $value, $count) {
+		if (!array_key_exists($category, $this->aggregations)) {
+			$this->aggregations[$category] = [];
+		}
+		if (!array_key_exists($value, $this->aggregations[$category])) {
+			$this->aggregations[$category][$value] = $count;
+		}
+	}
+
+	public function getAggregation($category) {
+		return $this->aggregations[$category];
+	}
 
 	/**
 	 * @return array<string,array<string,string>|IndexDocument[]|integer>
