@@ -554,7 +554,13 @@ class Test extends ExtendedBase {
 		$request = new SearchRequest();
 
 		$request->setSearch($search);
-		$searchResult = $testPlatform->searchDocuments($testProvider, $access, $request);
+
+		$searchResult = new SearchResult($request);
+		$searchResult->setProvider($testProvider);
+		$searchResult->setPlatform($testPlatform);
+
+		$testPlatform->searchRequest($searchResult, $access);
+
 		$this->output(
 			$output,
 			'(result: ' . $searchResult->getCount() . ', expected: ' . json_encode($expected) . ')',

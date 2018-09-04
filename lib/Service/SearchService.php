@@ -102,7 +102,6 @@ class SearchService {
 	 * @param string $userId
 	 * @param SearchRequest $request
 	 *
-	 * @return SearchResult[]
 	 * @throws EmptySearchException
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
@@ -129,11 +128,11 @@ class SearchService {
 		$access = $this->getDocumentAccessFromUser($user);
 		$result = $this->searchFromProviders($platform, $providers, $access, $request);
 
-		foreach ($result as $searchResult) {
-			$searchResult->setPlatform($platform);
-			$searchResult->setRequest($request);
-		}
-
+//		foreach ($result as $searchResult) {
+//			$searchResult->setPlatform($platform);
+//			$searchResult->setRequest($request);
+//		}
+//
 		return $result;
 	}
 
@@ -165,11 +164,14 @@ class SearchService {
 		$result = [];
 		foreach ($providers AS $provider) {
 			$provider->improveSearchRequest($request);
-			$searchResult = $platform->searchDocuments($provider, $access, $request);
+
+			$searchResult = new SearchResult($request);
 			$searchResult->setProvider($provider);
 			$searchResult->setPlatform($platform);
 
+			$platform->searchRequest($searchResult, $access);
 			$provider->improveSearchResult($searchResult);
+
 			$result[] = $searchResult;
 		}
 
