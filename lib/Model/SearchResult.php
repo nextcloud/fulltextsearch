@@ -59,7 +59,8 @@ class SearchResult implements \JsonSerializable {
 	private $request;
 
 
-	public function __construct() {
+	public function __construct(SearchRequest $searchRequest = null) {
+		$this->request = $searchRequest;
 	}
 
 
