@@ -94,13 +94,9 @@ class SearchRequest implements \JsonSerializable {
 	}
 
 	/**
-	 * @param string|array $providers
+	 * @param array $providers
 	 */
 	public function setProviders($providers) {
-		if (!is_array($providers)) {
-			$providers = [$providers];
-		}
-
 		$this->providers = $providers;
 	}
 
@@ -246,6 +242,30 @@ class SearchRequest implements \JsonSerializable {
 	}
 
 	/**
+	 * @param string $k
+	 * @param array $array
+	 *
+	 * @return SearchRequest
+	 */
+	public function addOptionArray($k, $array) {
+		$this->options[$k] = $array;
+
+		return $this;
+	}
+
+	/**
+	 * @param string $k
+	 * @param bool $bool
+	 *
+	 * @return SearchRequest
+	 */
+	public function addOptionBool($k, $bool) {
+		$this->options[$k] = $bool;
+
+		return $this;
+	}
+
+	/**
 	 * @param $key
 	 * @param $value
 	 *
@@ -265,11 +285,29 @@ class SearchRequest implements \JsonSerializable {
 	 * @param string $option
 	 * @param string $default
 	 *
-	 * @return mixed|string
+	 * @return string
 	 */
 	public function getOption($option, $default = '') {
 		if (array_key_exists($option, $this->options)) {
 			return $this->options[$option];
+		}
+
+		return $default;
+	}
+
+
+	/**
+	 * @param string $option
+	 * @param array $default
+	 *
+	 * @return array
+	 */
+	public function getOptionArray($option, $default = []) {
+		if (array_key_exists($option, $this->options)) {
+			$options = $this->options[$option];
+			if (is_array($options)) {
+				return $this->options[$option];
+			}
 		}
 
 		return $default;
@@ -591,8 +629,13 @@ class SearchRequest implements \JsonSerializable {
 	 * @return SearchRequest
 	 */
 	public static function fromArray($arr) {
+		$providers = $arr['providers'];
+		if (!is_array($providers)) {
+			$providers = [$providers];
+		}
+
 		$request = new SearchRequest();
-		$request->setProviders($arr['providers']);
+		$request->setProviders($providers);
 		$request->setAuthor(MiscService::get('author', $arr, ''));
 		$request->setSearch(MiscService::get('search', $arr, ''));
 		$request->setPage(MiscService::get('page', $arr, 0));

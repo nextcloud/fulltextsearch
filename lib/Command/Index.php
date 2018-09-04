@@ -214,7 +214,7 @@ class Index extends ExtendedBase {
 		$this->runner->onKeyPress([$this, 'onKeyPressed']);
 		$this->runner->onNewIndexError([$this, 'onNewIndexError']);
 		$this->runner->onNewIndexResult([$this, 'onNewIndexResult']);
-		$this->runner->pause($options->getOption('paused', false));
+		$this->runner->pause($options->getOptionBool('paused', false));
 
 		$this->indexService->setRunner($this->runner);
 		$this->cliService->setRunner($this->runner);

@@ -199,6 +199,19 @@ class Index implements \JsonSerializable {
 	}
 
 	/**
+	 * @param string $option
+	 * @param int $value
+	 *
+	 * @return $this
+	 */
+	public function addOptionInt($option, $value) {
+		$this->options[$option] = $value;
+
+		return $this;
+	}
+
+
+	/**
 	 * @param array $options
 	 *
 	 * @return $this
@@ -221,7 +234,7 @@ class Index implements \JsonSerializable {
 	 * @param string $option
 	 * @param string $default
 	 *
-	 * @return mixed|string
+	 * @return string
 	 */
 	public function getOption($option, $default = '') {
 		if (!array_key_exists($option, $this->options)) {
@@ -231,6 +244,21 @@ class Index implements \JsonSerializable {
 		return $this->options[$option];
 	}
 
+
+
+	/**
+	 * @param string $option
+	 * @param int $default
+	 *
+	 * @return int
+	 */
+	public function getOptionInt($option, $default = 0) {
+		if (!array_key_exists($option, $this->options)) {
+			return $default;
+		}
+
+		return $this->options[$option];
+	}
 
 	/**
 	 * @param int $err

@@ -32,61 +32,61 @@ class IndexDocument implements \JsonSerializable {
 	const ENCODED_BASE64 = 1;
 
 	/** @var string|int */
-	public $id;
+	protected $id;
 
 	/** @var string */
-	public $providerId;
+	protected $providerId;
 
 	/** @var DocumentAccess */
-	public $access;
+	protected $access;
 
 	/** @var Index */
-	public $index;
+	protected $index;
 
 	/** @var int */
-	public $modifiedTime = 0;
+	protected $modifiedTime = 0;
 
 	/** @var string */
-	public $source = '';
+	protected $source = '';
 
 	/** @var array */
-	public $tags = [];
+	protected $tags = [];
 
 	/** @var array */
-	public $metaTags = [];
+	protected $metaTags = [];
 
 	/** @var array */
-	public $subTags = [];
+	protected $subTags = [];
 
 	/** @var string */
-	public $title = '';
+	protected $title = '';
 
 	/** @var string */
-	public $content = null;
+	protected $content = null;
 
 	/** @var string */
-	public $hash = '';
+	protected $hash = '';
 
 	/** @var array */
-	public $parts = [];
+	protected $parts = [];
 
 	/** @var string */
-	public $link = '';
+	protected $link = '';
 
 	/** @var array */
-	public $more = [];
+	protected $more = [];
 
 	/** @var array */
-	public $excerpts = [];
+	protected $excerpts = [];
 
 	/** @var string */
-	public $score;
+	protected $score;
 
 	/** @var array */
-	public $info = [];
+	protected $info = [];
 
 	/** @var int */
-	public $contentEncoded;
+	protected $contentEncoded;
 
 
 	public function __construct($providerId, $id) {
@@ -95,16 +95,16 @@ class IndexDocument implements \JsonSerializable {
 	}
 
 
-	/**
-	 * @param string|integer $id
-	 *
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-
-		return $this;
-	}
+//	/**
+//	 * @param string|integer $id
+//	 *
+//	 * @return $this
+//	 */
+//	public function setId($id) {
+//		$this->id = $id;
+//
+//		return $this;
+//	}
 
 	/**
 	 * @return string|integer
@@ -114,16 +114,16 @@ class IndexDocument implements \JsonSerializable {
 	}
 
 
-	/**
-	 * @param string $providerId
-	 *
-	 * @return $this
-	 */
-	public function setProviderId($providerId) {
-		$this->providerId = $providerId;
-
-		return $this;
-	}
+//	/**
+//	 * @param string $providerId
+//	 *
+//	 * @return $this
+//	 */
+//	public function setProviderId($providerId) {
+//		$this->providerId = $providerId;
+//
+//		return $this;
+//	}
 
 	/**
 	 * @return string

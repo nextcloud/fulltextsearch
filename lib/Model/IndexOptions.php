@@ -61,12 +61,28 @@ class IndexOptions implements \JsonSerializable {
 		$this->options[$k] = $v;
 	}
 
+	/**
+	 * @param string $k
+	 * @param array $array
+	 */
+	public function addOptionArray($k, $array) {
+		$this->options[$k] = $array;
+	}
+
+	/**
+	 * @param string $k
+	 * @param bool $bool
+	 */
+	public function addOptionBool($k, $bool) {
+		$this->options[$k] = $bool;
+	}
+
 
 	/**
 	 * @param string $k
 	 * @param string $default
 	 *
-	 * @return array|string
+	 * @return string
 	 */
 	public function getOption($k, $default = '') {
 		if (array_key_exists($k, $this->options)) {
@@ -75,6 +91,43 @@ class IndexOptions implements \JsonSerializable {
 
 		return $default;
 	}
+
+
+	/**
+	 * @param string $option
+	 * @param array $default
+	 *
+	 * @return array
+	 */
+	public function getOptionArray($option, $default = []) {
+		if (array_key_exists($option, $this->options)) {
+			$options = $this->options[$option];
+			if (is_array($options)) {
+				return $this->options[$option];
+			}
+		}
+
+		return $default;
+	}
+
+
+	/**
+	 * @param string $option
+	 * @param bool $default
+	 *
+	 * @return bool
+	 */
+	public function getOptionBool($option, $default) {
+		if (array_key_exists($option, $this->options)) {
+			$options = $this->options[$option];
+			if (is_bool($options)) {
+				return $this->options[$option];
+			}
+		}
+
+		return $default;
+	}
+
 
 	/**
 	 * Specify data which should be serialized to JSON
