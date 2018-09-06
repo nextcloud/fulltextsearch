@@ -13,12 +13,16 @@ version+=0.99.2
 
 all: appstore
 
-release: appstore
+release: appstore github-release github-upload
+
+github-release:
 	github-release release \
 		--user $(github_account) \
 		--repo $(app_name) \
 		--tag v$(version) \
 		--name "$(app_name) v$(version)"
+
+github-upload:
 	github-release upload \
 		--user $(github_account) \
 		--repo $(app_name) \
