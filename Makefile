@@ -7,12 +7,26 @@ source_dir=$(build_dir)/source
 sign_dir=$(build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
+github_account=nextcloud
 codecov_token_dir=$(HOME)/.nextcloud/codecov_token
-version+=0.99.1
+version+=0.99.2
 
 all: appstore
 
 release: appstore create-tag
+
+autorelease: release
+   github-release release \
+                  --user $(github_account) \
+                  --repo $(app_name) \
+                  --tag v$(version) \
+                  --name "$(app_name) v$(version)"
+   github-release upload \
+                  --user $(github_account) \
+                  --repo $(app_name) \
+                  --tag v$(version) \
+                  --name "$(app_name)-$(version)" \
+                  --file $(build_dir)/$(app_name)-$(version).tar.gz
 
 create-tag:
 	git tag -s -a v$(version) -m "Tagging the $(version) release."
