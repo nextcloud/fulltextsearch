@@ -13,9 +13,7 @@ version+=0.99.2
 
 all: appstore
 
-release: appstore create-tag
-
-autorelease: release
+release: appstore
 	github-release release \
 		--user $(github_account) \
 		--repo $(app_name) \
@@ -25,7 +23,7 @@ autorelease: release
 		--user $(github_account) \
 		--repo $(app_name) \
 		--tag v$(version) \
-		--name "$(app_name)-$(version)" \
+		--name "$(app_name)-$(version).tar.gz" \
 		--file $(build_dir)/$(app_name)-$(version).tar.gz
 
 create-tag:
@@ -42,7 +40,6 @@ test:
 	@if [ -f $(codecov_token_dir)/$(app_name) ]; then \
 		bash <(curl -s https://codecov.io/bash) -t @$(codecov_token_dir)/$(app_name) ; \
 	fi
-
 
 appstore: clean
 	mkdir -p $(sign_dir)
