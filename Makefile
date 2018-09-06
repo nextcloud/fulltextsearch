@@ -16,17 +16,17 @@ all: appstore
 release: appstore create-tag
 
 autorelease: release
-   github-release release \
-                  --user $(github_account) \
-                  --repo $(app_name) \
-                  --tag v$(version) \
-                  --name "$(app_name) v$(version)"
-   github-release upload \
-                  --user $(github_account) \
-                  --repo $(app_name) \
-                  --tag v$(version) \
-                  --name "$(app_name)-$(version)" \
-                  --file $(build_dir)/$(app_name)-$(version).tar.gz
+	github-release release \
+		--user $(github_account) \
+		--repo $(app_name) \
+		--tag v$(version) \
+		--name "$(app_name) v$(version)"
+	github-release upload \
+		--user $(github_account) \
+		--repo $(app_name) \
+		--tag v$(version) \
+		--name "$(app_name)-$(version)" \
+		--file $(build_dir)/$(app_name)-$(version).tar.gz
 
 create-tag:
 	git tag -s -a v$(version) -m "Tagging the $(version) release."
