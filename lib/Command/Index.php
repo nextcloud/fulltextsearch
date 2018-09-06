@@ -375,9 +375,13 @@ class Index extends ExtendedBase {
 				continue;
 			}
 
-			$this->indexService->indexProviderContentFromUser(
-				$platform, $provider, $user->getUID(), $options
-			);
+			try {
+				$this->indexService->indexProviderContentFromUser(
+					$platform, $provider, $user->getUID(), $options
+				);
+			} catch (Exception $e) {
+				continue;
+			}
 		}
 
 		$this->providerService->setProviderAsIndexed($provider, true);
