@@ -30,10 +30,6 @@ github-upload:
 		--name "$(app_name)-$(version).tar.gz" \
 		--file $(build_dir)/$(app_name)-$(version).tar.gz
 
-create-tag:
-	git tag -s -a v$(version) -m "Tagging the $(version) release."
-	git push origin v$(version)
-
 clean:
 	rm -rf $(build_dir)
 	rm -rf node_modules
