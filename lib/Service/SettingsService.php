@@ -27,7 +27,6 @@
 namespace OCA\FullTextSearch\Service;
 
 use Exception;
-use OCP\IConfig;
 
 class SettingsService {
 
