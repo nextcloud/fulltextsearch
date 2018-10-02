@@ -31,12 +31,6 @@ use OCP\IConfig;
 
 class SettingsService {
 
-	/** @var IConfig */
-	private $config;
-
-	/** @var string */
-	private $userId;
-
 	/** @var PlatformService */
 	private $platformService;
 
@@ -47,20 +41,16 @@ class SettingsService {
 	private $miscService;
 
 	/**
-	 * ConfigService constructor.
+	 * SettingsService constructor.
 	 *
-	 * @param IConfig $config
-	 * @param string $userId
 	 * @param PlatformService $platformService
 	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IConfig $config, $userId, PlatformService $platformService, ProviderService $providerService,
+		PlatformService $platformService, ProviderService $providerService,
 		MiscService $miscService
 	) {
-		$this->config = $config;
-		$this->userId = $userId;
 		$this->platformService = $platformService;
 		$this->providerService = $providerService;
 		$this->miscService = $miscService;
