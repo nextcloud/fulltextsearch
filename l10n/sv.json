@@ -1,6 +1,7 @@
 { "translations": {
     "Full text search" : "Fulltextsökning",
     "Index not found" : "Index hittades inte",
-    "Search on %s" : "Sök på %s"
+    "Search on %s" : "Sök på %s",
+    "General" : "Allmänt"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
