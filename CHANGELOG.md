@@ -1,5 +1,12 @@
 # Changelog
 
+
+### 1.0.0
+
+First stable release
+
+
+
 ### 0.99.1 Release Candidate 2
 
 - bugfix: crashing issue during :live
