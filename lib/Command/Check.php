@@ -115,13 +115,12 @@ class Check extends ExtendedBase {
 
 		try {
 			$platforms = $this->platformService->getPlatforms();
-			$ak = array_keys($platforms);
-			foreach ($ak as $k) {
-				$platform = $platforms[$k];
+			foreach ($platforms as $platformWrapper) {
+				$platform = $platformWrapper->getPlatform();
 				$platform->loadPlatform();
-				$resultPlatform[$platform->getId()] = [
-					'class'   => $k,
-					'version' => $platform->getVersion(),
+				$resultPlatform[] = [
+					'class'   => $platformWrapper->getClass(),
+					'version' => $platformWrapper->getVersion(),
 					'config'  => $platform->getConfiguration()
 				];
 			}
@@ -164,7 +163,8 @@ class Check extends ExtendedBase {
 	 */
 	private function displayPlatform(OutputInterface $output) {
 		try {
-			$platform = $this->platformService->getPlatform();
+			$wrapper = $this->platformService->getPlatform();
+			$platform = $wrapper->getPlatform();
 		} catch (Exception $e) {
 			$output->writeln('No search platform available');
 
@@ -173,7 +173,7 @@ class Check extends ExtendedBase {
 
 		$output->writeln('- Search Platform:');
 
-		$output->writeln($platform->getName() . ' ' . $platform->getVersion());
+		$output->writeln($platform->getName() . ' ' . $wrapper->getVersion());
 		echo json_encode($platform->getConfiguration(), JSON_PRETTY_PRINT);
 
 		$output->writeln(' ');

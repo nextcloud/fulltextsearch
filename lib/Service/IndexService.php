@@ -558,7 +558,8 @@ class IndexService {
 	 * @throws Exception
 	 */
 	public function resetIndex($providerId = '') {
-		$platform = $this->platformService->getPlatform();
+		$wrapper = $this->platformService->getPlatform();
+		$platform = $wrapper->getPlatform();
 
 		if ($providerId === '') {
 			$platform->resetIndex('all');

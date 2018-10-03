@@ -32,6 +32,7 @@ use OCA\FullTextSearch\Exceptions\PlatformDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\PlatformIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\PlatformNotSelectedException;
 use OCA\FullTextSearch\IFullTextSearchPlatform;
+use OCA\FullTextSearch\Model\PlatformWrapper;
 use OCP\AppFramework\QueryException;
 
 class PlatformService {
@@ -45,10 +46,10 @@ class PlatformService {
 	/** @var MiscService */
 	private $miscService;
 
-	/** @var array */
+	/** @var PlatformWrapper[] */
 	private $platforms = [];
 
-	/** @var IFullTextSearchPlatform */
+	/** @var PlatformWrapper */
 	private $platform;
 
 	/** @var bool */
@@ -76,7 +77,7 @@ class PlatformService {
 	/**
 	 * @param bool $silent
 	 *
-	 * @return IFullTextSearchPlatform
+	 * @return PlatformWrapper
 	 * @throws Exception
 	 */
 	public function getPlatform($silent = false) {
@@ -94,18 +95,20 @@ class PlatformService {
 
 
 	/**
-	 * @return IFullTextSearchPlatform[]
+	 * @return PlatformWrapper[]
 	 * @throws Exception
 	 */
 	public function getPlatforms() {
 		$this->loadPlatforms();
 
 		$platforms = [];
-		foreach ($this->platforms as $class) {
+		foreach ($this->platforms as $wrapper) {
+			$class = $wrapper->getClass();
 			try {
 				$platform = \OC::$server->query((string)$class);
 				if ($platform instanceof IFullTextSearchPlatform) {
-					$platforms[$class] = $platform;
+					$wrapper->setPlatform($platform);
+					$platforms[] = $wrapper;
 				}
 			} catch (QueryException $e) {
 				/** we cycle */
@@ -155,7 +158,7 @@ class PlatformService {
 		$this->loadPlatforms();
 
 		$selected = $this->getSelectedPlatform();
-		$platform = \OC::$server->query((string)$selected);
+		$platform = \OC::$server->query((string)$selected->getClass());
 		if (!($platform instanceof IFullTextSearchPlatform)) {
 			throw new PlatformIsNotCompatibleException(
 				$selected . ' is not a compatible FullTextSearchPlatform'
@@ -163,12 +166,14 @@ class PlatformService {
 		}
 
 		$platform->loadPlatform();
-		$this->platform = $platform;
+		$selected->setPlatform($platform);
+
+		$this->platform = $selected;
 	}
 
 
 	/**
-	 * @return string
+	 * @return PlatformWrapper
 	 * @throws PlatformDoesNotExistException
 	 * @throws PlatformNotSelectedException
 	 */
@@ -176,16 +181,20 @@ class PlatformService {
 		$selected = $this->configService->getAppValue(ConfigService::SEARCH_PLATFORM);
 
 		if ($selected === '') {
-			throw new PlatformNotSelectedException('Admin have not selected any IFullTextSearchPlatform');
-		}
-
-		if (!in_array($selected, $this->platforms)) {
-			throw new PlatformDoesNotExistException(
-				'FullTextSearchPlatform ' . $selected . ' is not available'
+			throw new PlatformNotSelectedException(
+				'Admin have not selected any IFullTextSearchPlatform'
 			);
 		}
 
-		return $selected;
+		foreach ($this->platforms as $wrapper) {
+			if ($wrapper->getClass() === $selected) {
+				return $wrapper;
+			}
+		}
+
+		throw new PlatformDoesNotExistException(
+			'FullTextSearchPlatform ' . $selected . ' is not available'
+		);
 	}
 
 
@@ -204,7 +213,14 @@ class PlatformService {
 			$platforms = [$platforms];
 		}
 
-		$this->platforms = array_merge($this->platforms, $platforms);
+		$wrappers = [];
+		foreach ($platforms as $class) {
+			$wrapper = new PlatformWrapper($appId, $class);
+			$wrapper->setVersion($this->configService->getAppVersion($appId));
+			$wrappers[] = $wrapper;
+		}
+
+		$this->platforms = array_merge($this->platforms, $wrappers);
 	}
 
 

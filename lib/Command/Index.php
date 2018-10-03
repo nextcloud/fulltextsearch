@@ -350,7 +350,9 @@ class Index extends ExtendedBase {
 	 * @throws Exception
 	 */
 	private function testPlatform() {
-		$platform = $this->platformService->getPlatform();
+		$wrapper = $this->platformService->getPlatform();
+		$platform = $wrapper->getPlatform();
+
 		if (!$platform->testPlatform()) {
 			throw new Exception('failed platform test.');
 		}
@@ -364,7 +366,9 @@ class Index extends ExtendedBase {
 	 * @throws Exception
 	 */
 	private function indexProvider(IFullTextSearchProvider $provider, IndexOptions $options) {
-		$platform = $this->platformService->getPlatform();
+		$wrapper = $this->platformService->getPlatform();
+		$platform = $wrapper->getPlatform();
+
 		$platform->initializeIndex();
 		$provider->onInitializingIndex($platform);
 

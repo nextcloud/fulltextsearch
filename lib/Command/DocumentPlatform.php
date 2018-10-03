@@ -84,7 +84,8 @@ class DocumentPlatform extends ExtendedBase {
 		$providerId = $input->getArgument('providerId');
 		$documentId = $input->getArgument('documentId');
 
-		$platform = $this->platformService->getPlatform();
+		$wrapper = $this->platformService->getPlatform();
+		$platform = $wrapper->getPlatform();
 
 		$indexDocument = $platform->getDocument($providerId, $documentId);
 		$result = [

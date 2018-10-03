@@ -89,10 +89,9 @@ class SettingsService {
 	private function completeSettingsPlatforms() {
 		$list = [];
 		$platforms = $this->platformService->getPlatforms();
-		$classes = array_keys($platforms);
-		foreach ($classes as $class) {
-			$platform = $platforms[$class];
-			$list[$class] = [
+		foreach ($platforms as $wrapper) {
+			$platform = $wrapper->getPlatform();
+			$list[$wrapper->getClass()] = [
 				'id'   => $platform->getId(),
 				'name' => $platform->getName()
 			];

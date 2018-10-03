@@ -243,7 +243,8 @@ class Live extends ExtendedBase {
 	 */
 	private function liveCycle() {
 
-		$platform = $this->platformService->getPlatform();
+		$wrapper = $this->platformService->getPlatform();
+		$platform = $wrapper->getPlatform();
 		$platform->setRunner($this->runner);
 
 		while (true) {

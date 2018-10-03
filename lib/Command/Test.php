@@ -270,7 +270,9 @@ class Test extends ExtendedBase {
 	 */
 	private function testLoadingPlatform($output) {
 		$this->output($output, 'Loading search platform.');
-		$testPlatform = $this->platformService->getPlatform();
+		$wrapper = $this->platformService->getPlatform();
+		$testPlatform = $wrapper->getPlatform();
+
 		$this->output($output, '(' . $testPlatform->getName() . ')', false);
 		$this->output($output, true);
 

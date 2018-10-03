@@ -123,7 +123,8 @@ class SearchService {
 		$request->cleanSearch();
 
 		$providers = $this->providerService->getFilteredProviders($request->getProviders());
-		$platform = $this->platformService->getPlatform();
+		$wrapper = $this->platformService->getPlatform();
+		$platform = $wrapper->getPlatform();
 
 		$access = $this->getDocumentAccessFromUser($user);
 		$result = $this->searchFromProviders($platform, $providers, $access, $request);

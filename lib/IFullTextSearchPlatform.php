@@ -51,12 +51,6 @@ interface IFullTextSearchPlatform {
 
 
 	/**
-	 * @return string
-	 */
-	public function getVersion();
-
-
-	/**
 	 * @return array
 	 */
 	public function getConfiguration();

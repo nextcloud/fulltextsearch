@@ -109,7 +109,9 @@ class Index extends TimedJob {
 	 */
 	private function liveCycle() {
 
-		$platform = $this->platformService->getPlatform(true);
+		$wrapper = $this->platformService->getPlatform(true);
+		$platform = $wrapper->getPlatform();
+
 		$all = $this->shouldWeGetAllIndex();
 		$indexes = $this->indexService->getQueuedIndexes($all);
 
