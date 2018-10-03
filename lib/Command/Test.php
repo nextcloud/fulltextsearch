@@ -187,9 +187,12 @@ class Test extends ExtendedBase {
 	 * @throws ProviderIsNotUniqueException
 	 */
 	private function generateMockProvider() {
-		$this->providerService->loadProvider('OCA\FullTextSearch\Provider\TestProvider');
+		$this->providerService->loadProvider(
+			'fulltextsearch', 'OCA\FullTextSearch\Provider\TestProvider'
+		);
+		$providerWrapper = $this->providerService->getProvider(TestProvider::TEST_PROVIDER_ID);
 
-		return $this->providerService->getProvider(TestProvider::TEST_PROVIDER_ID);
+		return $providerWrapper->getProvider();
 	}
 
 

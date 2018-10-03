@@ -89,7 +89,8 @@ class DocumentProvider extends ExtendedBase {
 		$documentId = $input->getArgument('documentId');
 		$userId = $input->getArgument('userId');
 
-		$provider = $this->providerService->getProvider($providerId);
+		$providerWrapper = $this->providerService->getProvider($providerId);
+		$provider = $providerWrapper->getProvider();
 
 		$index = new Index($providerId, $documentId);
 		$index->setOwnerId($userId);
@@ -99,7 +100,7 @@ class DocumentProvider extends ExtendedBase {
 						  ->isStatus(Index::INDEX_REMOVE)) {
 			throw new Exception('Unknown document');
 		}
-		
+
 		$output->writeln('Document: ');
 		$output->writeln(json_encode($indexDocument, JSON_PRETTY_PRINT));
 

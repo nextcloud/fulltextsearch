@@ -103,6 +103,18 @@ class ConfigService {
 
 
 	/**
+	 * Get a version of an app
+	 *
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+	public function getAppVersion($appId) {
+		return $this->config->getAppValue($appId, 'installed_version', '');
+	}
+
+
+	/**
 	 * Get a value by key
 	 *
 	 * @param string $key

@@ -567,7 +567,8 @@ class IndexService {
 
 			return;
 		} else {
-			$providers = [$this->providerService->getProvider($providerId)];
+			$providerWrapper = $this->providerService->getProvider($providerId);
+			$providers = [$providerWrapper->getProvider()];
 		}
 
 		foreach ($providers AS $provider) {

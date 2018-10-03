@@ -254,7 +254,9 @@ class Live extends ExtendedBase {
 				$this->runner->updateAction('indexing');
 
 				try {
-					$provider = $this->providerService->getProvider($index->getProviderId());
+					$providerWrapper = $this->providerService->getProvider($index->getProviderId());
+					$provider = $providerWrapper->getProvider();
+
 					$provider->setRunner($this->runner);
 					$this->indexService->updateDocument($platform, $provider, $index);
 				} catch (Exception $e) {

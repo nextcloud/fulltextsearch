@@ -30,6 +30,7 @@ use Exception;
 use OC\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
+use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\ProviderService;
@@ -86,7 +87,8 @@ class TemplatesController extends Controller {
 	 * @throws ProviderDoesNotExistException
 	 */
 	public function getOptionsPanel($providerId) {
-		$provider = $this->providerService->getProvider($providerId);
+		$providerWrapper = $this->providerService->getProvider($providerId);
+		$provider = $providerWrapper->getProvider();
 
 		$panel = [];
 		$options = $provider->getOptionsTemplate();
@@ -95,7 +97,8 @@ class TemplatesController extends Controller {
 		}
 
 		if (array_key_exists('template', $panel)) {
-			$tmpl = new TemplateResponse($provider->getAppId(), $panel['template'], [], 'blank');
+			$tmpl =
+				new TemplateResponse($providerWrapper->getAppId(), $panel['template'], [], 'blank');
 			$panel['template'] = $tmpl->render();
 		}
 
@@ -116,8 +119,9 @@ class TemplatesController extends Controller {
 		$providers = $this->providerService->getProviders();
 
 		$ret = [];
-		foreach ($providers as $provider) {
-			$providerAppId = $provider->getAppId();
+		foreach ($providers as $providerWrapper) {
+			$provider = $providerWrapper->getProvider();
+			$providerAppId = $providerWrapper->getAppId();
 
 			$options = $provider->getOptionsTemplate();
 			$nav = [];

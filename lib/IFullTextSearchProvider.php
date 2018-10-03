@@ -46,27 +46,11 @@ interface IFullTextSearchProvider {
 
 
 	/**
-	 * return a appId of the Provider
-	 *
-	 * @return string
-	 */
-	public function getAppId();
-
-
-	/**
 	 * return a display name of the Provider
 	 *
 	 * @return string
 	 */
 	public function getName();
-
-
-	/**
-	 * return a display version of the Provider
-	 *
-	 * @return string
-	 */
-	public function getVersion();
 
 
 	/**

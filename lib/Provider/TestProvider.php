@@ -96,26 +96,10 @@ class TestProvider implements IFullTextSearchProvider {
 
 
 	/**
-	 * @return string
-	 */
-	public function getVersion() {
-		return $this->configService->getAppValue('installed_version');
-	}
-
-
-	/**
 	 * @return array
 	 */
 	public function getConfiguration() {
 		return $this->configService->getConfig();
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getAppId() {
-		return Application::APP_NAME;
 	}
 
 

@@ -237,7 +237,8 @@ class Index extends ExtendedBase {
 			$this->displayResult();
 
 			$providers = $this->providerService->getProviders();
-			foreach ($providers as $provider) {
+			foreach ($providers as $providerWrapper) {
+				$provider = $providerWrapper->getProvider();
 
 				if (!$this->isIncludedProvider($options, $provider->getId())) {
 					continue;

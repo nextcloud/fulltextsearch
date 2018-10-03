@@ -231,8 +231,7 @@ class SearchResult implements \JsonSerializable {
 		if ($providerObj !== null) {
 			$provider = [
 				'id'      => $providerObj->getId(),
-				'name'    => $providerObj->getName(),
-				'version' => $providerObj->getVersion()
+				'name'    => $providerObj->getName()
 			];
 		}
 
@@ -241,8 +240,7 @@ class SearchResult implements \JsonSerializable {
 		if ($platformObj !== null) {
 			$platform = [
 				'id'      => $platformObj->getId(),
-				'name'    => $platformObj->getName(),
-				'version' => $platformObj->getVersion()
+				'name'    => $platformObj->getName()
 			];
 		}
 

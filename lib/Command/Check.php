@@ -133,9 +133,10 @@ class Check extends ExtendedBase {
 		$resultProviders = [];
 		try {
 			$providers = $this->providerService->getProviders();
-			foreach ($providers as $provider) {
+			foreach ($providers as $providerWrapper) {
+				$provider = $providerWrapper->getProvider();
 				$resultProviders[$provider->getId()] = [
-					'version' => $provider->getVersion(),
+					'version' => $providerWrapper->getVersion(),
 					'config'  => $provider->getConfiguration()
 				];
 			}
@@ -196,8 +197,9 @@ class Check extends ExtendedBase {
 
 		$output->writeln('- Content Providers:');
 
-		foreach ($providers as $provider) {
-			$output->writeln($provider->getName() . ' ' . $provider->getVersion());
+		foreach ($providers as $providerWrapper) {
+			$provider = $providerWrapper->getProvider();
+			$output->writeln($provider->getName() . ' ' . $providerWrapper->getVersion());
 			echo json_encode($provider->getConfiguration(), JSON_PRETTY_PRINT);
 			$output->writeln('');
 		}
