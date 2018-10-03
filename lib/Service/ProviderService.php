@@ -28,7 +28,6 @@ namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OC\App\AppManager;
-use OC_App;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotUniqueException;
@@ -236,7 +235,7 @@ class ProviderService {
 	 * @throws QueryException
 	 */
 	private function loadProvidersFromApp($appId) {
-		$appInfo = OC_App::getAppInfo($appId);
+		$appInfo = $this->appManager->getAppInfo($appId);
 		if (!is_array($appInfo) || !key_exists('fulltextsearch', $appInfo)
 			|| !key_exists('provider', $appInfo['fulltextsearch'])) {
 			return;

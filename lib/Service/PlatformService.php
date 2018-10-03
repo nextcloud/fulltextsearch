@@ -21,14 +21,13 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  */
 
 namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OC\App\AppManager;
-use OC_App;
 use OCA\FullTextSearch\Exceptions\PlatformDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\PlatformIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\PlatformNotSelectedException;
@@ -194,7 +193,7 @@ class PlatformService {
 	 * @param string $appId
 	 */
 	private function loadPlatformsFromApp($appId) {
-		$appInfo = OC_App::getAppInfo($appId);
+		$appInfo = $this->appManager->getAppInfo($appId);
 		if (!is_array($appInfo) || !key_exists('fulltextsearch', $appInfo)
 			|| !key_exists('platform', $appInfo['fulltextsearch'])) {
 			return;
