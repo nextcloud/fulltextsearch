@@ -96,7 +96,9 @@ interface IFullTextSearchProvider {
 
 	/**
 	 * fill a chunk of documents with more content, prior to index.
+	 *
 	 * @deprecated
+	 *
 	 * @param IndexDocument[] $chunk
 	 *
 	 * @return IndexDocument[]

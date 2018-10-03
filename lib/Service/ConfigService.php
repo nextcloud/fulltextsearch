@@ -41,9 +41,9 @@ class ConfigService {
 
 	/** @var array */
 	public $defaults = [
-		self::SEARCH_PLATFORM  => '',
-		self::APP_NAVIGATION   => '0',
-		self::PROVIDER_INDEXED => '',
+		self::SEARCH_PLATFORM     => '',
+		self::APP_NAVIGATION      => '0',
+		self::PROVIDER_INDEXED    => '',
 		self::CRON_LAST_ERR_RESET => '0'
 	];
 
