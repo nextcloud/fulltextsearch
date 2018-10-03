@@ -119,7 +119,8 @@ class Index extends TimedJob {
 			$this->runner->updateAction('indexing');
 
 			try {
-				$provider = $this->providerService->getProvider($index->getProviderId());
+				$providerWrapper = $this->providerService->getProvider($index->getProviderId());
+				$provider = $providerWrapper->getProvider();
 				if (!$this->providerService->isProviderIndexed($provider->getId())) {
 					continue;
 				}

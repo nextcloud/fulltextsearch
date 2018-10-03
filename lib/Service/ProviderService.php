@@ -33,6 +33,7 @@ use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotUniqueException;
 use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCA\FullTextSearch\IFullTextSearchProvider;
+use OCA\FullTextSearch\Model\ProviderWrapper;
 use OCP\AppFramework\QueryException;
 
 class ProviderService {
@@ -46,7 +47,7 @@ class ProviderService {
 	/** @var MiscService */
 	private $miscService;
 
-	/** @var IFullTextSearchProvider[] */
+	/** @var ProviderWrapper[] */
 	private $providers = [];
 
 	/** @var bool */
@@ -94,13 +95,14 @@ class ProviderService {
 
 
 	/**
+	 * @param string $appId
 	 * @param string $providerId
 	 *
 	 * @throws ProviderIsNotCompatibleException
 	 * @throws ProviderIsNotUniqueException
 	 * @throws QueryException
 	 */
-	public function loadProvider($providerId) {
+	public function loadProvider($appId, $providerId) {
 
 		$provider = \OC::$server->query((string)$providerId);
 		if (!($provider instanceof IFullTextSearchProvider)) {
@@ -110,16 +112,19 @@ class ProviderService {
 		}
 
 		$this->providerIdMustBeUnique($provider);
+
 		try {
 			$provider->loadProvider();
-			$this->providers[] = $provider;
+			$wrapper = new ProviderWrapper($appId, $provider);
+			$wrapper->setVersion($this->configService->getAppVersion($appId));
+			$this->providers[] = $wrapper;
 		} catch (Exception $e) {
 		}
 	}
 
 
 	/**
-	 * @return IFullTextSearchProvider[]
+	 * @return ProviderWrapper[]
 	 * @throws Exception
 	 */
 	public function getProviders() {
@@ -136,7 +141,8 @@ class ProviderService {
 		$this->loadProviders();
 
 		$providers = [];
-		foreach ($this->providers as $provider) {
+		foreach ($this->providers as $providerWrapper) {
+			$provider = $providerWrapper->getProvider();
 			if ($this->isProviderIndexed($provider->getId())) {
 				$providers[] = $provider;
 			}
@@ -164,7 +170,8 @@ class ProviderService {
 		$ret = [];
 		foreach ($providerList as $providerId) {
 			if ($this->isProviderIndexed($providerId)) {
-				$ret[] = $this->getProvider($providerId);
+				$providerWrapper = $this->getProvider($providerId);
+				$ret[] = $providerWrapper->getProvider();
 			}
 		}
 
@@ -175,16 +182,17 @@ class ProviderService {
 	/**
 	 * @param string $providerId
 	 *
-	 * @return IFullTextSearchProvider
+	 * @return ProviderWrapper
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
 	public function getProvider($providerId) {
 
 		$providers = $this->getProviders();
-		foreach ($providers as $provider) {
+		foreach ($providers as $providerWrapper) {
+			$provider = $providerWrapper->getProvider();
 			if ($provider->getId() === $providerId) {
-				return $provider;
+				return $providerWrapper;
 			}
 		}
 
@@ -242,24 +250,25 @@ class ProviderService {
 		}
 
 		$providers = $appInfo['fulltextsearch']['provider'];
-		$this->loadProvidersFromList($providers);
+		$this->loadProvidersFromList($appId, $providers);
 	}
 
 
 	/**
+	 * @param string $appId
 	 * @param string|array $providers
 	 *
 	 * @throws ProviderIsNotCompatibleException
 	 * @throws ProviderIsNotUniqueException
 	 * @throws QueryException
 	 */
-	private function loadProvidersFromList($providers) {
+	private function loadProvidersFromList($appId, $providers) {
 		if (!is_array($providers)) {
 			$providers = [$providers];
 		}
 
 		foreach ($providers AS $provider) {
-			$this->loadProvider($provider);
+			$this->loadProvider($appId, $provider);
 		}
 	}
 
@@ -268,9 +277,11 @@ class ProviderService {
 	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @throws ProviderIsNotUniqueException
+	 * @throws Exception
 	 */
 	private function providerIdMustBeUnique(IFullTextSearchProvider $provider) {
-		foreach ($this->providers AS $knownProvider) {
+		foreach ($this->providers AS $providerWrapper) {
+			$knownProvider = $providerWrapper->getProvider();
 			if ($knownProvider->getId() === $provider->getId()) {
 				throw new ProviderIsNotUniqueException(
 					'FullTextSearchProvider ' . $provider->getId() . ' already exist'

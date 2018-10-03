@@ -108,7 +108,9 @@ class SettingsService {
 	private function completeSettingsProviders() {
 		$list = [];
 		$providers = $this->providerService->getProviders();
-		foreach ($providers as $provider) {
+		foreach ($providers as $providerWrapper) {
+			$provider = $providerWrapper->getProvider();
+
 			$list[$provider->getId()] = $provider->getName();
 		}
 
