@@ -103,8 +103,7 @@ class IndexService {
 	 * @param string $action
 	 * @param bool $force
 	 *
-	 * @throws InterruptException
-	 * @throws TickDoesNotExistException
+	 * @throws Exception
 	 */
 	private function updateRunnerAction($action, $force = false) {
 		if ($this->runner === null) {
@@ -117,6 +116,7 @@ class IndexService {
 	/**
 	 * @param string $info
 	 * @param string $value
+	 * @param string $color
 	 */
 	private function updateRunnerInfo($info, $value, $color = '') {
 		if ($this->runner === null) {
@@ -262,8 +262,6 @@ class IndexService {
 	 * @param IndexDocument[] $documents
 	 * @param IndexOptions $options
 	 *
-	 * @throws InterruptException
-	 * @throws TickDoesNotExistException
 	 * @throws Exception
 	 */
 	private function indexDocuments(
