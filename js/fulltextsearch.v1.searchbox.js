@@ -113,7 +113,7 @@ var searchbox = {
 
 		box_elements.searchInput = $('<input>', {
 			id: 'fts-input',
-			placeholder: 'Search ' + settings.searchProviderName
+			placeholder: t('fulltextsearch', 'Search') + ' ' + settings.searchProviderName
 		}).on('keyup', searchbox.timedSearch);
 		box_elements.searchOptions = $('<div>', {id: 'fts-options'});
 		box_elements.searchTemplate = $('<div>', {id: 'fts-options-template'});

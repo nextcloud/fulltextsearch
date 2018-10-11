@@ -39,8 +39,11 @@ Util::addStyle(Application::APP_NAME, 'admin');
 <div id="fns" class="section">
 	<span>
 		<a href="https://github.com/nextcloud/fulltextsearch/wiki" target="_blank">
-			Please check the wiki</a>
-		for documentation related to the installation and the configuration of the Full text search within your Nextcloud
+			<?php p(
+				$l->t(
+					'Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud'
+				)
+			); ?></a>
 
 	</span>
 	&nbsp;<br/>
@@ -50,9 +53,11 @@ Util::addStyle(Application::APP_NAME, 'admin');
 
 		<div class="div-table-row">
 			<div class="div-table-col div-table-col-left">
-				<span class="leftcol">Search Platform :</span>
+				<span class="leftcol"><?php p($l->t('Search Platform')); ?>:</span>
 				<br/>
-				<em>Select the app to index content and answer search queries.</em>
+				<em><?php p(
+						$l->t('Select the app to index content and answer search queries.')
+					); ?></em>
 			</div>
 			<div class="div-table-col">
 				<select id="fts_platforms">
@@ -63,9 +68,9 @@ Util::addStyle(Application::APP_NAME, 'admin');
 
 		<div class="div-table-row">
 			<div class="div-table-col div-table-col-left">
-				<span class="leftcol">Navigation Icon :</span>
+				<span class="leftcol"><?php p($l->t('Navigation Icon')); ?>:</span>
 				<br/>
-				<em>Enable global search within all your content.</em>
+				<em><?php p($l->t('Enable global search within all your content.')); ?></em>
 			</div>
 			<div class="div-table-col">
 				<input type="checkbox" id="fts_navigation" value="1"/>
