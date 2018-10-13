@@ -1,6 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "Search" : "Suchen",
     "Full text search" : "Volltextsuche",
     "Index not found" : "Index nicht gefunden",
     "Tick not found" : "Tick nicht gefunden",
