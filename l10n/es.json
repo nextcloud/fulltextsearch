@@ -1,10 +1,16 @@
 { "translations": {
+    "Search" : "Buscar",
     "Full text search" : "Búsqueda de texto completo",
     "Index not found" : "Índice no encontrado",
     "Tick not found" : "Marca no encontrada",
     "Core of the full-text search framework for Nextcloud" : "Núcleo de la infraestructura de búsqueda de texto completo para Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "App núcleo de la infraestructura de búsqueda de texto completo para Nextcloud",
     "Search on %s" : "Buscar en %s",
-    "General" : "General"
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Por favor, comprueba la wiki para encontrar documentación relacionada con al instalación y la configuración de la búsqueda de texto completo en tu Nextcloud",
+    "General" : "General",
+    "Search Platform" : "Plataforma de búsqueda",
+    "Select the app to index content and answer search queries." : "Selecciona la app para indexar contenido y responder a peticiones de búsqueda",
+    "Navigation Icon" : "Icono de navegación",
+    "Enable global search within all your content." : "Activa la búsqueda global en todo tu contenido."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
