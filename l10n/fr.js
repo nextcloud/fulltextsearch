@@ -1,6 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "Search" : "Recherche",
     "Full text search" : "Recherche de texte intégrale",
     "Index not found" : "Index non trouvé",
     "Tick not found" : "Elément coché non-trouvé",
