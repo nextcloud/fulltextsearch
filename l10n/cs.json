@@ -6,8 +6,11 @@
     "Core of the full-text search framework for Nextcloud" : "Jádro aplikačního rámce pro plnotextové vyhledávání v Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Hlavní aplikace aplikačního rámce pro plnotextové hledání pro váš Nextcloud.",
     "Search on %s" : "Hledat v %s",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Nahlédněte do dokumentace (wiki) ohledně instalace a nastavení plnotextového vyhledávání v Nextcloud",
     "General" : "Obecné",
     "Search Platform" : "Vyhledávací platforma",
-    "Navigation Icon" : "Navigační ikona"
+    "Select the app to index content and answer search queries." : "Vyberte aplikaci kterou indexovat obsah a zodpovídat dotazy vyhledávání.",
+    "Navigation Icon" : "Navigační ikona",
+    "Enable global search within all your content." : "Zapnout globální vyhledávání ve veškerém vašem obsahu."
 },"pluralForm" :"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;"
 }
