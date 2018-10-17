@@ -8,7 +8,9 @@
     "Search on %s" : "Recherche sur %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Merci de consulter le wiki pour la documentation sur l'installation et la configuration de la recherche en texte intégral dans votre instance Nextcloud",
     "General" : "Général",
+    "Search Platform" : "Plateforme de recherche",
     "Select the app to index content and answer search queries." : "Sélectionner l'application pour indexer le contenu et répondre à des recherches.",
+    "Navigation Icon" : "Icône de navigation",
     "Enable global search within all your content." : "Activer la recherche dans tous votre contenu."
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }
