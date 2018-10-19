@@ -37,10 +37,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Runner {
 
+	const TICK_TTL = 1800;
 
-	const TICK_TTL = 300;
 	const TICK_MINIMUM = 2;
-	const MEMORY_INFO_UPDATE = 5;
+	const TICK_UPDATE = 10;
+	const MEMORY_UPDATE = 5;
 
 	const RESULT_TYPE_SUCCESS = 1;
 	const RESULT_TYPE_WARNING = 4;
@@ -74,7 +75,10 @@ class Runner {
 	private $oldAction = '';
 
 	/** @var int */
-	private $ramTick = 0;
+	private $ramUpdate = 0;
+
+	/** @var int */
+	private $tickUpdate = 0;
 
 	/** @var array */
 	private $methodOnKeyPress = [];
@@ -175,14 +179,10 @@ class Runner {
 		}
 
 		$this->setInfo('action', $action);
-		try {
-			$this->runningService->update($this->tickId, $action);
-		} catch (TickIsNotAliveException $e) {
-			$this->output('Force Quit');
-			exit();
-		}
 
-		$this->updateTick($tick);
+		$this->updateTick($tick, $action);
+		$this->updateRamInfo($tick);
+
 		$this->oldAction = $action;
 		$this->oldTick = $tick;
 
@@ -290,9 +290,7 @@ class Runner {
 		$this->methodOnInfoUpdate[] = $method;
 	}
 
-	/**
-	 * @param $key
-	 */
+
 	public function infoUpdated() {
 		foreach ($this->methodOnInfoUpdate as $method) {
 			call_user_func($method, $this->info);
@@ -367,15 +365,37 @@ class Runner {
 
 
 	/**
+	 * @param int $tick
+	 * @param string $action
+	 *
+	 * @throws TickDoesNotExistException
+	 */
+	private function updateTick($tick, $action) {
+		if ($this->oldAction === $action && ($this->tickUpdate + self::TICK_UPDATE > $tick)) {
+			return;
+		}
+
+		try {
+			$this->runningService->update($this->tickId, $action);
+		} catch (TickIsNotAliveException $e) {
+			$this->output('Force Quit');
+			exit();
+		}
+
+		$this->tickUpdate = $tick;
+	}
+
+
+	/**
 	 * @param $tick
 	 */
-	private function updateTick($tick) {
-		if (($this->ramTick + self::MEMORY_INFO_UPDATE) > $tick) {
+	private function updateRamInfo($tick) {
+		if (($this->ramUpdate + self::MEMORY_UPDATE) > $tick) {
 			return;
 		}
 
 		$this->setInfo('_memory', round((memory_get_usage() / 1024 / 1024)) . ' MB');
-		$this->ramTick = $tick;
+		$this->ramUpdate = $tick;
 	}
 
 

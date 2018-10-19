@@ -1,6 +1,17 @@
 # Changelog
 
 
+### 1.0.2
+
+- improvement: long process while indexing should not timeout (Force Quit).
+- misc: removing compat with NC12.
+
+
+### 1.0.1
+
+improvement: some rework on the process wrapper.
+
+
 ### 1.0.0
 
 First stable release
