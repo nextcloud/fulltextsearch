@@ -1,6 +1,11 @@
 # Changelog
 
 
+### 1.0.3
+
+- improvement: display process advancement during compareWithCurrentIndex
+
+
 ### 1.0.2
 
 - improvement: long process while indexing should not timeout (Force Quit).

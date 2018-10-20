@@ -1,6 +1,6 @@
 app_name=fulltextsearch
 
-project_dir=$(CURDIR)/../$(app_name)
+project_dir=$(CURDIR)
 build_dir=$(CURDIR)/build/artifacts
 appstore_dir=$(build_dir)/appstore
 source_dir=$(build_dir)/source
@@ -8,8 +8,9 @@ sign_dir=$(build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
+branch=stable14
 codecov_token_dir=$(HOME)/.nextcloud/codecov_token
-version+=1.0.2
+version+=1.0.3
 
 all: appstore
 
@@ -19,6 +20,7 @@ github-release:
 	github-release release \
 		--user $(github_account) \
 		--repo $(app_name) \
+		--target $(branch) \
 		--tag v$(version) \
 		--name "$(app_name) v$(version)"
 
