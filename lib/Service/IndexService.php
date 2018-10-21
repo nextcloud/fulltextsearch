@@ -183,8 +183,7 @@ class IndexService {
 	 * @param IndexOptions $options
 	 *
 	 * @return IndexDocument[]
-	 * @throws InterruptException
-	 * @throws TickDoesNotExistException
+	 * @throws Exception
 	 */
 	private function updateDocumentsWithCurrIndex(
 		IFullTextSearchProvider $provider, array $documents, IndexOptions $options
@@ -192,8 +191,14 @@ class IndexService {
 
 		$currIndex = $this->getProviderIndexFromProvider($provider);
 		$result = [];
+		$count = 0;
 		foreach ($documents as $document) {
-			$this->updateRunnerAction('compareWithCurrentIndex');
+
+			if ($count % 1000 === 0) {
+				$this->updateRunnerAction('compareWithCurrentIndex', true);
+				$this->updateRunnerInfo('documentCurrent', $count);
+			}
+			$count++;
 
 			$index = $currIndex->getIndex($document->getId());
 			if ($index === null) {
