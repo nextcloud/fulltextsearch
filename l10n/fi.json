@@ -1,0 +1,8 @@
+{ "translations": {
+    "Search" : "Haku",
+    "Full text search" : "Kokotekstihaku",
+    "Index not found" : "Indeksiä ei löydy",
+    "Search on %s" : "Etsi kohteesta %s",
+    "General" : "Yleiset"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
