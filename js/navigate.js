@@ -103,7 +103,6 @@ Navigate.prototype = {
 
 	initPanels: function () {
 		var self = this;
-
 		$.ajax({
 			method: 'GET',
 			url: OC.generateUrl('/apps/fulltextsearch/navigation/panels')
@@ -120,57 +119,59 @@ Navigate.prototype = {
 		for (var i = 0; i < ak.length; i++) {
 			var providerAppId = ak[i];
 			var title = data[ak[i]]['title'];
-			var nav = data[ak[i]]['navigation'];
+			var options = data[ak[i]]['options'];
+			var css = data[ak[i]]['css'];
+			var icon = data[ak[i]]['icon'];
 			var providerId = data[ak[i]]['provider'];
 
-			if (nav.css !== undefined) {
-				OC.addStyle(providerAppId, nav.css);
+			if (css !== '') {
+				OC.addStyle(providerAppId, css);
 			}
 
 			var li = $('<li>', {class: (nav.options !== undefined) ? 'collapsible open' : ''});
 			var aIcon = $('<a>', {
 				href: '#',
-				class: (nav.icon !== undefined) ? nav.icon : 'search_icon'
+				class: (icon !== undefined) ? icon : 'search_icon'
 			});
 			aIcon.text(title);
 
 			var ul = $('<ul>');
-			if (nav.options !== undefined) {
+			// if (nav.options !== undefined) {
 
-				aIcon.on('click', function () {
-					var li = $(this).closest('li');
-					if (li.hasClass('open')) {
-						li.removeClass('open');
-					} else {
-						li.addClass('open');
-					}
-				});
-
-				for (var j = 0; j < nav.options.length; j++) {
-					var sub = nav.options[j];
-					self.displayPanelCheckbox(ul, sub);
-					self.displayPanelInput(ul, sub);
-					self.displayPanelTags(ul, sub);
-					self.displayPanelSearch(providerAppId, ul, sub);
-					//
-					// <p id="tag_filter" class="open">
-					// 		<input value="" style="display: none;" type="text">
-					// 		<ul class="tagit ui-widget ui-widget-content ui-corner-all">
-					// 		<li class="tagit-new">
-					// 		<input class="ui-widget-content ui-autocomplete-input"
-					// placeholder="Filter by tag" autocomplete="off" type="text"> <span role="status"
-					// aria-live="polite" class="ui-helper-hidden-accessible"> 1 result is available,
-					// use up and down arrow keys to navigate.</span></li> <li class="tagit-choice
-					// ui-widget-content ui-state-default ui-corner-all"> <span
-					// class="tagit-label">test</span><a class="close"><span class="text-icon">×</span>
-					// <span class="ui-icon ui-icon-close"></span></a></li> <li class="tagit-choice
-					// ui-widget-content ui-state-default ui-corner-all"> <span
-					// class="tagit-label">perdu</span><a class="close"><span class="text-icon">×</span>
-					// <span class="ui-icon ui-icon-close"></span></a></li></ul> </p>
-
-
+			aIcon.on('click', function () {
+				var li = $(this).closest('li');
+				if (li.hasClass('open')) {
+					li.removeClass('open');
+				} else {
+					li.addClass('open');
 				}
+			});
+
+			for (var j = 0; j < options.length; j++) {
+				var sub = options[j];
+				self.displayPanelCheckbox(ul, sub);
+				self.displayPanelInput(ul, sub);
+				self.displayPanelTags(ul, sub);
+				self.displayPanelSearch(providerAppId, ul, sub);
+				//
+				// <p id="tag_filter" class="open">
+				// 		<input value="" style="display: none;" type="text">
+				// 		<ul class="tagit ui-widget ui-widget-content ui-corner-all">
+				// 		<li class="tagit-new">
+				// 		<input class="ui-widget-content ui-autocomplete-input"
+				// placeholder="Filter by tag" autocomplete="off" type="text"> <span role="status"
+				// aria-live="polite" class="ui-helper-hidden-accessible"> 1 result is available,
+				// use up and down arrow keys to navigate.</span></li> <li class="tagit-choice
+				// ui-widget-content ui-state-default ui-corner-all"> <span
+				// class="tagit-label">test</span><a class="close"><span class="text-icon">×</span>
+				// <span class="ui-icon ui-icon-close"></span></a></li> <li class="tagit-choice
+				// ui-widget-content ui-state-default ui-corner-all"> <span
+				// class="tagit-label">perdu</span><a class="close"><span class="text-icon">×</span>
+				// <span class="ui-icon ui-icon-close"></span></a></li></ul> </p>
+
+
 			}
+			// }
 
 			li.append(aIcon);
 			var aInput = $('<input>', {

@@ -30,7 +30,6 @@ namespace OCA\FullTextSearch\Cron;
 use Exception;
 use OC\BackgroundJob\TimedJob;
 use OCA\FullTextSearch\AppInfo\Application;
-use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
@@ -105,7 +104,6 @@ class Index extends TimedJob {
 
 	/**
 	 * @throws Exception
-	 * @throws InterruptException
 	 */
 	private function liveCycle() {
 

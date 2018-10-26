@@ -31,6 +31,7 @@ use OCP\AppFramework\QueryException;
 
 try {
 	$app = new Application();
+	$app->registerServices();
 	$app->registerNavigation();
 	$app->registerSettingsAdmin();
 } catch (QueryException $e) {

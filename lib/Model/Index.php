@@ -1,6 +1,9 @@
 <?php
+declare(strict_types=1);
+
+
 /**
- * FullTextSearch - Full text search framework for extcloud
+ * FullTextSearch - Full text search framework for Nextcloud
  *
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
@@ -24,29 +27,14 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Model;
 
-class Index implements \JsonSerializable {
+use JsonSerializable;
+use OCP\FullTextSearch\Model\IIndex;
 
-	const INDEX_OK = 1;
-	const INDEX_IGNORE = 2;
 
-	const INDEX_META = 4;
-	const INDEX_CONTENT = 8;
-	const INDEX_FULL = 12;
-	const INDEX_REMOVE = 16;
-
-	const INDEX_DONE = 32;
-	const INDEX_FAILED = 64;
-
-	const ERROR_FAILED = 1;
-	const ERROR_FAILED2 = 2;
-	const ERROR_FAILED3 = 4;
-
-	const ERROR_SEV_1 = 1;
-	const ERROR_SEV_2 = 2;
-	const ERROR_SEV_3 = 3;
-	const ERROR_SEV_4 = 4;
+class Index implements IIndex, JsonSerializable {
 
 
 	/** @var string */
@@ -83,7 +71,7 @@ class Index implements \JsonSerializable {
 	 * @param string $providerId
 	 * @param string $documentId
 	 */
-	public function __construct($providerId, $documentId) {
+	public function __construct(string $providerId, string $documentId) {
 		$this->providerId = $providerId;
 		$this->documentId = $documentId;
 	}
@@ -92,14 +80,14 @@ class Index implements \JsonSerializable {
 	/**
 	 * @return string
 	 */
-	public function getProviderId() {
+	public function getProviderId(): string {
 		return $this->providerId;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getDocumentId() {
+	public function getDocumentId(): string {
 		return $this->documentId;
 	}
 
@@ -107,9 +95,9 @@ class Index implements \JsonSerializable {
 	/**
 	 * @param string $source
 	 *
-	 * @return $this
+	 * @return IIndex
 	 */
-	public function setSource($source) {
+	public function setSource(string $source): IIndex {
 		$this->source = $source;
 
 		return $this;
@@ -118,7 +106,7 @@ class Index implements \JsonSerializable {
 	/**
 	 * @return string
 	 */
-	public function getSource() {
+	public function getSource(): string {
 		return $this->source;
 	}
 
@@ -126,9 +114,9 @@ class Index implements \JsonSerializable {
 	/**
 	 * @param string $ownerId
 	 *
-	 * @return $this
+	 * @return IIndex
 	 */
-	public function setOwnerId($ownerId) {
+	public function setOwnerId(string $ownerId): IIndex {
 		$this->ownerId = $ownerId;
 
 		return $this;
@@ -137,7 +125,7 @@ class Index implements \JsonSerializable {
 	/**
 	 * @return string
 	 */
-	public function getOwnerId() {
+	public function getOwnerId(): string {
 		return $this->ownerId;
 	}
 
@@ -146,9 +134,9 @@ class Index implements \JsonSerializable {
 	 * @param int $status
 	 * @param bool $reset
 	 *
-	 * @return $this
+	 * @return IIndex
 	 */
-	public function setStatus($status, $reset = false) {
+	public function setStatus(int $status, bool $reset = false): IIndex {
 		if ($reset === true) {
 			$this->status = $status;
 		} else if (!$this->isStatus($status)) {
@@ -161,7 +149,7 @@ class Index implements \JsonSerializable {
 	/**
 	 * @return int
 	 */
-	public function getStatus() {
+	public function getStatus(): int {
 		return $this->status;
 	}
 
@@ -170,29 +158,33 @@ class Index implements \JsonSerializable {
 	 *
 	 * @return bool
 	 */
-	public function isStatus($status) {
-		return ((int)$status & $this->getStatus());
+	public function isStatus(int $status): bool {
+		return (bool)((int)$status & $this->getStatus());
 	}
 
 	/**
 	 * @param int $status
+	 *
+	 * @return IIndex
 	 */
-	public function unsetStatus($status) {
+	public function unsetStatus(int $status): IIndex {
 		if (!$this->isStatus($status)) {
-			return;
+			return $this;
 		}
 
 		$this->status -= $status;
+
+		return $this;
 	}
 
 
 	/**
 	 * @param string $option
-	 * @param string|int $value
+	 * @param string $value
 	 *
-	 * @return $this
+	 * @return IIndex
 	 */
-	public function addOption($option, $value) {
+	public function addOption(string $option, string $value): IIndex {
 		$this->options[$option] = $value;
 
 		return $this;
@@ -202,9 +194,9 @@ class Index implements \JsonSerializable {
 	 * @param string $option
 	 * @param int $value
 	 *
-	 * @return $this
+	 * @return IIndex
 	 */
-	public function addOptionInt($option, $value) {
+	public function addOptionInt(string $option, int $value): IIndex {
 		$this->options[$option] = $value;
 
 		return $this;
@@ -214,9 +206,9 @@ class Index implements \JsonSerializable {
 	/**
 	 * @param array $options
 	 *
-	 * @return $this
+	 * @return IIndex
 	 */
-	public function setOptions($options) {
+	public function setOptions(array $options): IIndex {
 		$this->options = $options;
 
 		return $this;
@@ -225,7 +217,7 @@ class Index implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getOptions() {
+	public function getOptions(): array {
 		return $this->options;
 	}
 
@@ -236,7 +228,7 @@ class Index implements \JsonSerializable {
 	 *
 	 * @return string
 	 */
-	public function getOption($option, $default = '') {
+	public function getOption(string $option, string $default = ''): string {
 		if (!array_key_exists($option, $this->options)) {
 			return $default;
 		}
@@ -245,14 +237,13 @@ class Index implements \JsonSerializable {
 	}
 
 
-
 	/**
 	 * @param string $option
 	 * @param int $default
 	 *
 	 * @return int
 	 */
-	public function getOptionInt($option, $default = 0) {
+	public function getOptionInt(string $option, int $default = 0): int {
 		if (!array_key_exists($option, $this->options)) {
 			return $default;
 		}
@@ -263,9 +254,9 @@ class Index implements \JsonSerializable {
 	/**
 	 * @param int $err
 	 *
-	 * @return $this
+	 * @return IIndex
 	 */
-	public function setErrorCount($err) {
+	public function setErrorCount(int $err): IIndex {
 		$this->err = $err;
 
 		return $this;
@@ -274,14 +265,14 @@ class Index implements \JsonSerializable {
 	/**
 	 * @return int
 	 */
-	public function getErrorCount() {
+	public function getErrorCount(): int {
 		return $this->err;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getLastError() {
+	public function getLastError(): array {
 		return array_values(array_slice($this->errors, -1))[0];
 	}
 
@@ -289,24 +280,26 @@ class Index implements \JsonSerializable {
 	/**
 	 *
 	 */
-	public function resetErrors() {
+	public function resetErrors(): IIndex {
 		$this->setErrors([]);
 		$this->setErrorCount(0);
+
+		return $this;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getErrors() {
+	public function getErrors(): array {
 		return $this->errors;
 	}
 
 	/**
 	 * @param array $messages
 	 *
-	 * @return Index
+	 * @return IIndex
 	 */
-	public function setErrors($messages) {
+	public function setErrors(array $messages): IIndex {
 		$this->errors = $messages;
 
 		return $this;
@@ -317,24 +310,29 @@ class Index implements \JsonSerializable {
 	 * @param string $message
 	 * @param string $exception
 	 * @param int $sev
+	 *
+	 * @return IIndex
 	 */
-	public function addError($message, $exception = '', $sev = self::ERROR_SEV_3) {
+	public function addError(string $message, string $exception = '', int $sev = IIndex::ERROR_SEV_3
+	): IIndex {
 		$this->errors[] = [
-			'message'  => substr($message, 0, 1800),
+			'message'   => substr($message, 0, 1800),
 			'exception' => $exception,
-			'severity' => $sev
+			'severity'  => $sev
 		];
 
 		$this->err++;
+
+		return $this;
 	}
 
 
 	/**
 	 * @param int $lastIndex
 	 *
-	 * @return $this
+	 * @return IIndex
 	 */
-	public function setLastIndex($lastIndex = -1) {
+	public function setLastIndex(int $lastIndex = -1): IIndex {
 		if ($lastIndex === -1) {
 			$lastIndex = time();
 		}
@@ -347,7 +345,7 @@ class Index implements \JsonSerializable {
 	/**
 	 * @return int
 	 */
-	public function getLastIndex() {
+	public function getLastIndex(): int {
 		return $this->lastIndex;
 	}
 

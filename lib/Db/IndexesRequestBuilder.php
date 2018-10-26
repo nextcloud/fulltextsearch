@@ -27,7 +27,7 @@
 namespace OCA\FullTextSearch\Db;
 
 
-use OCA\FullTextSearch\Model\ExtendedIndex;
+use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -113,17 +113,17 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	/**
 	 * @param array $data
 	 *
-	 * @return ExtendedIndex
+	 * @return Index
 	 */
 	protected function parseIndexesSelectSql($data) {
-		$index = new ExtendedIndex($data['provider_id'], $data['document_id']);
+		$index = new Index($data['provider_id'], $data['document_id']);
 		$index->setStatus($data['status'])
 			  ->setSource($data['source'])
-			  ->setOptions(json_decode($data['options'], true))
-			  ->setErrorCount($data['err'])
-			  ->setErrors(json_decode($data['message'], true))
 			  ->setOwnerId($data['owner_id'])
 			  ->setLastIndex($data['indexed']);
+		$index->setOptions(json_decode($data['options'], true));
+		$index->setErrorCount($data['err']);
+		$index->setErrors(json_decode($data['message'], true));
 
 		return $index;
 	}

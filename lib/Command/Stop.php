@@ -26,14 +26,14 @@
 
 namespace OCA\FullTextSearch\Command;
 
-use OCA\FullTextSearch\Model\ExtendedBase;
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\RunningService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Stop extends ExtendedBase {
+class Stop extends Base {
 
 	/** @var RunningService */
 	private $runningService;

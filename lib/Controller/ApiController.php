@@ -102,7 +102,7 @@ class ApiController extends Controller {
 	 */
 	private function searchDocuments(SearchRequest $request) {
 		try {
-			$result = $this->searchService->search(null, $request);
+			$result = $this->searchService->search('', $request);
 
 			return $this->success(
 				[

@@ -187,4 +187,35 @@ class Tick {
 		return $this;
 	}
 
+
+	/**
+	 * @param string $key
+	 * @param string|int $value
+	 *
+	 * @return $this
+	 */
+	public function setInfo($key, $value) {
+		$this->data[$key] = $value;
+
+		return $this;
+	}
+
+	public function unsetInfo($key) {
+		unset($this->data[$key]);
+	}
+
+	/**
+	 * @param $key
+	 * @param int|string $default
+	 *
+	 * @return int|string
+	 */
+	public function getInfo($key, $default = '') {
+		if (!array_key_exists($key, $this->data)) {
+			return $default;
+		}
+
+		return $this->data[$key];
+
+	}
 }

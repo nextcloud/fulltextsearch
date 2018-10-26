@@ -28,11 +28,12 @@ namespace OCA\FullTextSearch\Command;
 
 use Exception;
 use OC\Core\Command\Base;
-use OCA\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
+use OCP\FullTextSearch\Model\IndexDocument;
+use OCP\FullTextSearch\Model\ISearchResult;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -103,8 +104,11 @@ class Search extends Base {
 	}
 
 
-	private function displaySearchResult(SearchResult $searchResult) {
-
+	/**
+	 * @param ISearchResult $searchResult
+	 */
+	private function displaySearchResult(ISearchResult $searchResult) {
+		/** @var SearchResult $searchResult */
 		echo '> ' . $searchResult->getProvider()
 								 ->getName() . "\n";
 

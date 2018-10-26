@@ -30,7 +30,7 @@ use OCA\FullTextSearch\Db\TickRequest;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
-use OCA\FullTextSearch\Model\ExtendedTick;
+use OCA\FullTextSearch\Model\Tick;
 use OCA\FullTextSearch\Model\Runner;
 
 class RunningService {
@@ -74,7 +74,7 @@ class RunningService {
 			throw new RunnerAlreadyUpException('Index is already running');
 		}
 
-		$tick = new ExtendedTick($source);
+		$tick = new Tick($source);
 		$tick->setStatus('run')
 			 ->setTick()
 			 ->setFirstTick()
@@ -164,13 +164,13 @@ class RunningService {
 
 
 	/**
-	 * @param ExtendedTick $tick
+	 * @param Tick $tick
 	 * @param bool $exception
 	 *
 	 * @return bool
 	 * @throws TickIsNotAliveException
 	 */
-	public function isStillAlive(ExtendedTick $tick, $exception = false) {
+	public function isStillAlive(Tick $tick, $exception = false) {
 		if ($tick->getStatus() !== 'run') {
 			if ($exception) {
 				throw new TickIsNotAliveException();
@@ -217,10 +217,10 @@ class RunningService {
 
 
 	/**
-	 * @param ExtendedTick $tick
+	 * @param Tick $tick
 	 * @param string $action
 	 */
-	private function assignActionToTick(ExtendedTick &$tick, $action) {
+	private function assignActionToTick(Tick &$tick, $action) {
 		$now = microtime(true);
 		$preAction = $tick->getAction();
 

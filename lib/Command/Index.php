@@ -28,8 +28,7 @@ namespace OCA\FullTextSearch\Command;
 
 use Exception;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullTextSearch\IFullTextSearchProvider;
-use OCA\FullTextSearch\Model\ExtendedBase;
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\Index as ModelIndex;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
@@ -39,6 +38,7 @@ use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
+use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\IUserManager;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
@@ -47,7 +47,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 
 
-class Index extends ExtendedBase {
+class Index extends Base {
 
 //			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
 	const PANEL_RUN = 'run';
@@ -176,14 +176,6 @@ class Index extends ExtendedBase {
 	}
 
 
-	/**
-	 * @throws Exception
-	 */
-	public function interrupted() {
-		if ($this->hasBeenInterrupted()) {
-			throw new \Exception('ctrl-c');
-		}
-	}
 
 
 	/**
@@ -223,7 +215,7 @@ class Index extends ExtendedBase {
 		$this->runner->setInfo('options', json_encode($options));
 
 		try {
-			$this->runner->sourceIsCommandLine($this, $output);
+			$this->runner->sourceIsCommandLine($output);
 			$this->runner->start();
 
 			if ($options->getOption('errors') === 'reset') {
@@ -423,9 +415,8 @@ class Index extends ExtendedBase {
 			return false;
 		}
 
-		if ($options->getOption('providers', null) !== null
-			&& is_array($options->getOption('providers'))) {
-			return (in_array($providerId, $options->getOption('providers')));
+		if ($options->getOptionArray('providers', []) !== []) {
+			return (in_array($providerId, $options->getOptionArray('providers')));
 		}
 
 		return true;
@@ -442,9 +433,8 @@ class Index extends ExtendedBase {
 			return [$this->userManager->get($options->getOption('user'))];
 		}
 
-		if ($options->getOption('users', null) !== null
-			&& is_array($options->getOption('users'))) {
-			return array_map([$this->userManager, 'get'], $options->getOption('users'));
+		if ($options->getOptionArray('users', []) !== []) {
+			return array_map([$this->userManager, 'get'], $options->getOptionArray('users'));
 		}
 
 		return $this->userManager->search('');
@@ -536,6 +526,7 @@ class Index extends ExtendedBase {
 			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
 		}
 
+		// full list of info that can be edited
 		$this->runner->setInfoArray(
 			[
 				'userId'       => '',

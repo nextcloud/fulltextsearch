@@ -28,7 +28,7 @@
 namespace OCA\FullTextSearch\Model;
 
 
-use OCA\FullTextSearch\IFullTextSearchPlatform;
+use OCP\FullTextSearch\IFullTextSearchPlatform;
 
 
 /**
@@ -56,9 +56,9 @@ class PlatformWrapper {
 	 * Provider constructor.
 	 *
 	 * @param string $appId
-	 * @param IFullTextSearchPlatform $platform
+	 * @param string $class
 	 */
-	public function __construct($appId, $class) {
+	public function __construct(string $appId, string $class) {
 		$this->appId = $appId;
 		$this->class = $class;
 	}
@@ -66,7 +66,7 @@ class PlatformWrapper {
 	/**
 	 * @return string
 	 */
-	public function getAppId() {
+	public function getAppId(): string {
 		return $this->appId;
 	}
 
@@ -75,7 +75,7 @@ class PlatformWrapper {
 	 *
 	 * @return PlatformWrapper
 	 */
-	public function setAppId($appId) {
+	public function setAppId(string $appId): PlatformWrapper {
 		$this->appId = $appId;
 
 		return $this;

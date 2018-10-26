@@ -27,7 +27,10 @@
 namespace OCA\FullTextSearch\Model;
 
 
-class IndexOptions implements \JsonSerializable {
+use JsonSerializable;
+use OCP\FullTextSearch\Model\IIndexOptions;
+
+class IndexOptions implements IIndexOptions, JsonSerializable {
 
 	/**
 	 * @var array
@@ -42,51 +45,67 @@ class IndexOptions implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getOptions() {
+	public function getOptions(): array {
 		return $this->options;
 	}
 
 	/**
 	 * @param array $options
+	 *
+	 * @return IIndexOptions
 	 */
-	public function setOptions($options) {
+	public function setOptions(array $options): IIndexOptions {
 		$this->options = $options;
+
+		return $this;
 	}
 
 	/**
-	 * @param string $k
-	 * @param string $v
+	 * @param string $option
+	 * @param string $value
+	 *
+	 * @return IIndexOptions
 	 */
-	public function addOption($k, $v) {
-		$this->options[$k] = $v;
+	public function addOption(string $option, string $value): IIndexOptions {
+		$this->options[$option] = $value;
+
+		return $this;
 	}
 
 	/**
-	 * @param string $k
-	 * @param array $array
+	 * @param string $option
+	 * @param array $value
+	 *
+	 * @return IIndexOptions
 	 */
-	public function addOptionArray($k, $array) {
-		$this->options[$k] = $array;
+	public function addOptionArray(string $option, array $value): IIndexOptions {
+		$this->options[$option] = $value;
+
+		return $this;
 	}
 
 	/**
-	 * @param string $k
-	 * @param bool $bool
+	 * @param string $option
+	 * @param bool $value
+	 *
+	 * @return IIndexOptions
 	 */
-	public function addOptionBool($k, $bool) {
-		$this->options[$k] = $bool;
+	public function addOptionBool(string $option, bool $value): IIndexOptions {
+		$this->options[$option] = $value;
+
+		return $this;
 	}
 
 
 	/**
-	 * @param string $k
+	 * @param string $option
 	 * @param string $default
 	 *
 	 * @return string
 	 */
-	public function getOption($k, $default = '') {
-		if (array_key_exists($k, $this->options)) {
-			return $this->options[$k];
+	public function getOption(string $option, string $default = ''): string {
+		if (array_key_exists($option, $this->options)) {
+			return $this->options[$option];
 		}
 
 		return $default;
@@ -99,7 +118,7 @@ class IndexOptions implements \JsonSerializable {
 	 *
 	 * @return array
 	 */
-	public function getOptionArray($option, $default = []) {
+	public function getOptionArray(string $option, array $default = []): array {
 		if (array_key_exists($option, $this->options)) {
 			$options = $this->options[$option];
 			if (is_array($options)) {
@@ -117,7 +136,7 @@ class IndexOptions implements \JsonSerializable {
 	 *
 	 * @return bool
 	 */
-	public function getOptionBool($option, $default) {
+	public function getOptionBool(string $option, bool $default): bool {
 		if (array_key_exists($option, $this->options)) {
 			$options = $this->options[$option];
 			if (is_bool($options)) {
@@ -130,12 +149,7 @@ class IndexOptions implements \JsonSerializable {
 
 
 	/**
-	 * Specify data which should be serialized to JSON
-	 *
-	 * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-	 * @return mixed data which can be serialized by <b>json_encode</b>,
-	 * which is a value of any type other than a resource.
-	 * @since 5.4.0
+	 * @return array
 	 */
 	public function jsonSerialize() {
 		return $this->options;

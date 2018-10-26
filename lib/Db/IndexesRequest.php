@@ -28,9 +28,9 @@ namespace OCA\FullTextSearch\Db;
 
 
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
-use OCA\FullTextSearch\IFullTextSearchProvider;
-use OCA\FullTextSearch\Model\ExtendedIndex;
 use OCA\FullTextSearch\Model\Index;
+use OCP\FullTextSearch\IFullTextSearchProvider;
+use OCP\FullTextSearch\Model\IIndex;
 
 class IndexesRequest extends IndexesRequestBuilder {
 
@@ -103,7 +103,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 
 	/**
-	 * @return ExtendedIndex[]
+	 * @return Index[]
 	 */
 	public function getErrorIndexes() {
 
@@ -171,9 +171,9 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 
 	/**
-	 * @param Index $index
+	 * @param IIndex $index
 	 */
-	public function deleteIndex(Index $index) {
+	public function deleteIndex(IIndex $index) {
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
@@ -209,10 +209,10 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param string $providerId
 	 * @param string|int $documentId
 	 *
-	 * @return ExtendedIndex
+	 * @return Index
 	 * @throws IndexDoesNotExistException
 	 */
-	public function getIndex($providerId, $documentId) {
+	public function getIndex($providerId, $documentId): Index {
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToProviderId($qb, $providerId);
 		$this->limitToDocumentId($qb, $documentId);
@@ -235,7 +235,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param string $providerId
 	 * @param array $documentIds
 	 *
-	 * @return ExtendedIndex[]
+	 * @return Index[]
 	 * @throws IndexDoesNotExistException
 	 */
 	public function getIndexes($providerId, $documentIds) {

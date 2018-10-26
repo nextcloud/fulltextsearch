@@ -28,7 +28,7 @@
 namespace OCA\FullTextSearch\Model;
 
 
-use OCA\FullTextSearch\IFullTextSearchProvider;
+use OCP\FullTextSearch\IFullTextSearchProvider;
 
 
 /**

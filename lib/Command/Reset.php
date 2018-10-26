@@ -27,7 +27,7 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OCA\FullTextSearch\Model\ExtendedBase;
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\MiscService;
@@ -37,7 +37,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Reset extends ExtendedBase {
+class Reset extends Base {
 
 	/** @var IndexService */
 	private $indexService;
@@ -85,7 +85,7 @@ class Reset extends ExtendedBase {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 
 		try {
-			$this->runner->sourceIsCommandLine($this, $output);
+			$this->runner->sourceIsCommandLine($output);
 			$this->runner->start();
 			$this->runner->output('reset.');
 

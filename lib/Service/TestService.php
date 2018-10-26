@@ -26,10 +26,10 @@
 
 namespace OCA\FullTextSearch\Service;
 
-use OCA\FullTextSearch\Model\DocumentAccess;
-use OCA\FullTextSearch\Model\IndexDocument;
-use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Provider\TestProvider;
+use OCP\FullTextSearch\Model\DocumentAccess;
+use OCP\FullTextSearch\Model\IIndexOptions;
+use OCP\FullTextSearch\Model\IndexDocument;
 
 class TestService {
 
@@ -65,11 +65,11 @@ class TestService {
 
 
 	/**
-	 * @param IndexOptions $options
+	 * @param IIndexOptions $options
 	 *
 	 * @return IndexDocument
 	 */
-	public function generateIndexDocumentContentLicense(IndexOptions $options = null) {
+	public function generateIndexDocumentContentLicense(IIndexOptions $options) {
 		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TYPE_LICENSE);
 
 		$content = file_get_contents(__DIR__ . '/../../LICENSE');
@@ -92,11 +92,11 @@ class TestService {
 
 
 	/**
-	 * @param IndexOptions $options
+	 * @param IIndexOptions $options
 	 *
 	 * @return IndexDocument
 	 */
-	public function generateIndexDocumentSimple(IndexOptions $options) {
+	public function generateIndexDocumentSimple(IIndexOptions $options) {
 
 		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TYPE_SIMPLE);
 		$indexDocument->setContent('document is a simple test');

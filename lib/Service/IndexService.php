@@ -30,19 +30,20 @@ use Exception;
 use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
-use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\NotIndexableDocumentException;
-use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullTextSearch\IFullTextSearchPlatform;
-use OCA\FullTextSearch\IFullTextSearchProvider;
-use OCA\FullTextSearch\Model\ExtendedIndex;
 use OCA\FullTextSearch\Model\Index;
-use OCA\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\ProviderIndexes;
 use OCA\FullTextSearch\Model\Runner;
+use OCP\FullTextSearch\IFullTextSearchPlatform;
+use OCP\FullTextSearch\IFullTextSearchProvider;
+use OCP\FullTextSearch\Model\IIndex;
+use OCP\FullTextSearch\Model\IIndexOptions;
+use OCP\FullTextSearch\Model\IndexDocument;
+use OCP\FullTextSearch\Model\IRunner;
+use OCP\FullTextSearch\Service\IIndexService;
 
-class IndexService {
+class IndexService implements IIndexService {
 
 	/** @var IndexesRequest */
 	private $indexesRequest;
@@ -105,7 +106,7 @@ class IndexService {
 	 *
 	 * @throws Exception
 	 */
-	private function updateRunnerAction($action, $force = false) {
+	private function updateRunnerAction(string $action, bool $force = false) {
 		if ($this->runner === null) {
 			return;
 		}
@@ -116,9 +117,11 @@ class IndexService {
 	/**
 	 * @param string $info
 	 * @param string $value
-	 * @param string $color
+	 * @param int $color
 	 */
-	private function updateRunnerInfo($info, $value, $color = '') {
+	private function updateRunnerInfo(
+		string $info, string $value, int $color = IRunner::RESULT_TYPE_SUCCESS
+	) {
 		if ($this->runner === null) {
 			return;
 		}
@@ -129,7 +132,7 @@ class IndexService {
 	/**
 	 * @param array $data
 	 */
-	private function updateRunnerInfoArray($data) {
+	private function updateRunnerInfoArray(array $data) {
 		if ($this->runner === null) {
 			return;
 		}
@@ -144,8 +147,6 @@ class IndexService {
 	 * @param string $userId
 	 * @param IndexOptions $options
 	 *
-	 * @throws InterruptException
-	 * @throws TickDoesNotExistException
 	 * @throws Exception
 	 */
 	public function indexProviderContentFromUser(
@@ -154,9 +155,11 @@ class IndexService {
 		$this->updateRunnerAction('generateIndex' . $provider->getName());
 		$this->updateRunnerInfoArray(
 			[
-				'userId'       => $userId,
-				'providerId'   => $provider->getId(),
-				'providerName' => $provider->getName()
+				'userId'          => $userId,
+				'providerId'      => $provider->getId(),
+				'providerName'    => $provider->getName(),
+				'documentCurrent' => 0,
+				'documentTotal'   => 0
 			]
 		);
 
@@ -180,13 +183,13 @@ class IndexService {
 	/**
 	 * @param IFullTextSearchProvider $provider
 	 * @param IndexDocument[] $documents
-	 * @param IndexOptions $options
+	 * @param IIndexOptions $options
 	 *
 	 * @return IndexDocument[]
 	 * @throws Exception
 	 */
 	private function updateDocumentsWithCurrIndex(
-		IFullTextSearchProvider $provider, array $documents, IndexOptions $options
+		IFullTextSearchProvider $provider, array $documents, IIndexOptions $options
 	) {
 
 		$currIndex = $this->getProviderIndexFromProvider($provider);
@@ -200,8 +203,9 @@ class IndexService {
 			}
 			$count++;
 
-			$index = $currIndex->getIndex($document->getId());
-			if ($index === null) {
+			try {
+				$index = $currIndex->getIndex($document->getId());
+			} catch (IndexDoesNotExistException $e) {
 				$index = new Index($document->getProviderId(), $document->getId());
 				$index->setStatus(Index::INDEX_FULL);
 				$index->setLastIndex();
@@ -302,14 +306,11 @@ class IndexService {
 				);
 				$this->filterDocumentBeforeIndex($document);
 
+				$index = $this->indexDocument($platform, $document);
+				$this->updateIndex($index);
+
 			} catch (Exception $e) {
-				$document->__destruct();
-				continue;
 			}
-
-			$index = $this->indexDocument($platform, $provider, $document);
-
-			$this->updateIndex($index);
 
 			$document->__destruct();
 			unset($document);
@@ -338,15 +339,12 @@ class IndexService {
 
 	/**
 	 * @param IFullTextSearchPlatform $platform
-	 * @param IFullTextSearchProvider $provider
 	 * @param IndexDocument $document
 	 *
-	 * @return
+	 * @return IIndex
 	 * @throws Exception
 	 */
-	public function indexDocument(
-		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $document
-	) {
+	public function indexDocument(IFullTextSearchPlatform $platform, $document) {
 		$this->updateRunnerAction('indexDocument', true);
 		$this->updateRunnerInfoArray(
 			[
@@ -356,13 +354,14 @@ class IndexService {
 			]
 		);
 
-		$index = null;
 		try {
-			$index = $platform->indexDocument($provider, $document);
+			$index = $platform->indexDocument($document);
+
+			return $index;
 		} catch (Exception $e) {
+			throw new IndexDoesNotExistException();
 		}
 
-		return $index;
 	}
 
 
@@ -421,7 +420,7 @@ class IndexService {
 	 *
 	 * @throws DatabaseException
 	 */
-	public function updateIndexes($indexes) {
+	public function updateIndexes(array $indexes) {
 		try {
 			foreach ($indexes as $index) {
 				$this->updateIndex($index);
@@ -434,16 +433,17 @@ class IndexService {
 
 
 	/**
-	 * @param Index $index
+	 * @param IIndex $index
 	 *
 	 * @throws Exception
 	 */
-	private function updateIndex(Index $index) {
+	private function updateIndex(IIndex $index) {
 
+		/** @var Index $index */
 		$this->updateIndexError($index);
-		if ($index->isStatus(Index::INDEX_REMOVE)) {
+		if ($index->isStatus(IIndex::INDEX_REMOVE)) {
 
-			if ($index->isStatus(Index::INDEX_DONE)) {
+			if ($index->isStatus(IIndex::INDEX_DONE)) {
 				$this->indexesRequest->deleteIndex($index);
 
 				return;
@@ -454,8 +454,8 @@ class IndexService {
 			return;
 		}
 
-		if ($index->isStatus(Index::INDEX_DONE)) {
-			$index->setStatus(Index::INDEX_OK, true);
+		if ($index->isStatus(IIndex::INDEX_DONE)) {
+			$index->setStatus(IIndex::INDEX_OK, true);
 		}
 
 		if (!$this->indexesRequest->update($index)) {
@@ -464,7 +464,7 @@ class IndexService {
 	}
 
 
-	private function updateIndexError(Index $index) {
+	private function updateIndexError(IIndex $index) {
 
 	}
 
@@ -477,7 +477,9 @@ class IndexService {
 	 *
 	 * @throws DatabaseException
 	 */
-	public function updateIndexesStatus($providerId, $documentIds, $status, $reset = false) {
+	public function updateIndexesStatus(
+		string $providerId, array $documentIds, int $status, bool $reset = false
+	) {
 		if ($reset === true) {
 			$this->indexesRequest->updateStatus($providerId, $documentIds, $status);
 
@@ -526,7 +528,7 @@ class IndexService {
 
 
 	/**
-	 * @return ExtendedIndex[]
+	 * @return Index[]
 	 */
 	public function getErrorIndexes() {
 		return $this->indexesRequest->getErrorIndexes();
@@ -537,7 +539,7 @@ class IndexService {
 	 * @param string $providerId
 	 * @param array $documentId
 	 *
-	 * @return ExtendedIndex[]
+	 * @return Index[]
 	 * @throws IndexDoesNotExistException
 	 */
 	public function getIndexes($providerId, $documentId) {
@@ -587,4 +589,27 @@ class IndexService {
 	}
 
 
+	/**
+	 * @param string $providerId
+	 * @param string $documentId
+	 *
+	 * @return IIndex
+	 * @throws IndexDoesNotExistException
+	 */
+	public function getIndex(string $providerId, string $documentId): IIndex {
+		return $this->indexesRequest->getIndex($providerId, $documentId);
+	}
+
+
+	/**
+	 * @param string $providerId
+	 * @param $documentId
+	 * @param int $status
+	 * @param bool $reset
+	 */
+	public function updateIndexStatus(
+		string $providerId, $documentId, int $status, bool $reset = false
+	) {
+		// TODO: Implement updateIndexStatus() method.
+	}
 }

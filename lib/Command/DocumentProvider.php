@@ -27,9 +27,9 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OCA\FullTextSearch\Model\ExtendedBase;
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\Index;
-use OCA\FullTextSearch\Model\IndexDocument;
+use OCP\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\ProviderService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -38,7 +38,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class DocumentProvider extends ExtendedBase {
+class DocumentProvider extends Base {
 
 
 	/** @var ProviderService */

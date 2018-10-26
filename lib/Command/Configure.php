@@ -27,7 +27,7 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OCA\FullTextSearch\Model\ExtendedBase;
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,7 +35,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Configure extends ExtendedBase {
+class Configure extends Base {
 
 	/** @var ConfigService */
 	private $configService;

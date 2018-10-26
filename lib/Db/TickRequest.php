@@ -28,8 +28,8 @@ namespace OCA\FullTextSearch\Db;
 
 
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullTextSearch\Model\ExtendedTick;
 use OCA\FullTextSearch\Model\Tick;
+
 
 class TickRequest extends TickRequestBuilder {
 
@@ -114,7 +114,7 @@ class TickRequest extends TickRequestBuilder {
 	 *
 	 * @param int $id
 	 *
-	 * @return ExtendedTick
+	 * @return Tick
 	 * @throws TickDoesNotExistException
 	 */
 	public function getTickById($id) {
@@ -138,7 +138,7 @@ class TickRequest extends TickRequestBuilder {
 	 *
 	 * @param string $status
 	 *
-	 * @return ExtendedTick[]
+	 * @return Tick[]
 	 */
 	public function getTickByStatus($status) {
 
@@ -160,7 +160,7 @@ class TickRequest extends TickRequestBuilder {
 	/**
 	 * @param string $source
 	 *
-	 * @return ExtendedTick[]
+	 * @return Tick[]
 	 */
 	public function getTickBySource($source) {
 		$qb = $this->getTickSelectSql();

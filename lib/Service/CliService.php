@@ -140,9 +140,8 @@ class CliService {
 
 	/**
 	 * @param OutputInterface $output
-	 * @param array $initVar
 	 */
-	public function runDisplay(OutputInterface $output, $initVar = []) {
+	public function runDisplay(OutputInterface $output) {
 		$this->output = $output;
 
 		$output->writeLn('');

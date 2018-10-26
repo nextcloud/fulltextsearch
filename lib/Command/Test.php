@@ -27,16 +27,13 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotUniqueException;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullTextSearch\IFullTextSearchPlatform;
-use OCA\FullTextSearch\IFullTextSearchProvider;
-use OCA\FullTextSearch\Model\DocumentAccess;
-use OCA\FullTextSearch\Model\ExtendedBase;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Model\SearchRequest;
@@ -49,12 +46,15 @@ use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCA\FullTextSearch\Service\TestService;
 use OCP\AppFramework\QueryException;
+use OCP\FullTextSearch\IFullTextSearchPlatform;
+use OCP\FullTextSearch\IFullTextSearchProvider;
+use OCP\FullTextSearch\Model\DocumentAccess;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Test extends ExtendedBase {
+class Test extends Base {
 
 	const DELAY_STABILIZE_PLATFORM = 3;
 
@@ -158,7 +158,6 @@ class Test extends ExtendedBase {
 			$this->pause($output, $platformDelay);
 			$this->testContentLicense($output, $testPlatform);
 			$this->testSearchSimple($output, $testPlatform, $testProvider);
-
 			$this->testUpdatingDocumentsAccess($output, $testPlatform, $testProvider);
 			$this->pause($output, $platformDelay);
 			$this->testSearchAccess($output, $testPlatform, $testProvider);
@@ -255,6 +254,7 @@ class Test extends ExtendedBase {
 	 */
 	private function testMockedProvider($output, IFullTextSearchProvider $testProvider) {
 		$this->output($output, 'Testing mocked provider: get indexable documents.');
+		$testProvider->setIndexOptions(new IndexOptions());
 		$indexableDocuments =
 			$testProvider->generateIndexableDocuments(TestService::DOCUMENT_USER1);
 		$this->output($output, '(' . sizeof($indexableDocuments) . ' items)', false);
@@ -337,8 +337,7 @@ class Test extends ExtendedBase {
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
 	 *
-	 * @throws InterruptException
-	 * @throws TickDoesNotExistException
+	 * @throws Exception
 	 */
 	private function testIndexingDocuments(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
@@ -386,7 +385,8 @@ class Test extends ExtendedBase {
 
 		$this->output($output, 'Comparing document with source.');
 		$this->testService->compareIndexDocument(
-			$this->testService->generateIndexDocumentContentLicense(), $indexDocument
+			$this->testService->generateIndexDocumentContentLicense(new IndexOptions()),
+			$indexDocument
 		);
 		$this->output($output, true);
 	}
@@ -447,8 +447,7 @@ class Test extends ExtendedBase {
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
 	 *
-	 * @throws InterruptException
-	 * @throws TickDoesNotExistException
+	 * @throws Exception
 	 */
 	private function testUpdatingDocumentsAccess(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,

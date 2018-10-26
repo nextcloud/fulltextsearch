@@ -28,9 +28,13 @@ namespace OCA\FullTextSearch\AppInfo;
 
 use OCA\FullTextSearch\Capabilities;
 use OCA\FullTextSearch\Service\ConfigService;
+use OCA\FullTextSearch\Service\IndexService;
+use OCA\FullTextSearch\Service\ProviderService;
+use OCA\FullTextSearch\Service\SearchService;
 use OCP\AppFramework\App;
 use OCP\AppFramework\IAppContainer;
 use OCP\AppFramework\QueryException;
+use OCP\FullTextSearch\IFullTextSearchManager;
 
 class Application extends App {
 
@@ -56,6 +60,25 @@ class Application extends App {
 	 * Register Hooks
 	 */
 	public function registerHooks() {
+	}
+
+
+	/**
+	 * Register Navigation Tab
+	 *
+	 * @throws QueryException
+	 */
+	public function registerServices() {
+		/** @var IFullTextSearchManager $fullTextSearchManager */
+		$fullTextSearchManager = $this->container->query(IFullTextSearchManager::class);
+
+		$providerService = $this->container->query(ProviderService::class);
+		$indexService = $this->container->query(IndexService::class);
+		$searchService = $this->container->query(SearchService::class);
+
+		$fullTextSearchManager->registerProviderService($providerService);
+		$fullTextSearchManager->registerIndexService($indexService);
+		$fullTextSearchManager->registerSearchService($searchService);
 	}
 
 

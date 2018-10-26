@@ -27,7 +27,7 @@
 namespace OCA\FullTextSearch\Db;
 
 
-use OCA\FullTextSearch\Model\ExtendedTick;
+use OCA\FullTextSearch\Model\Tick;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -111,10 +111,10 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	/**
 	 * @param array $data
 	 *
-	 * @return ExtendedTick
+	 * @return Tick
 	 */
 	protected function parseTickSelectSql($data) {
-		$tick = new ExtendedTick($data['source'], $data['id']);
+		$tick = new Tick($data['source'], $data['id']);
 		$tick->setData(json_decode($data['data'], true))
 			 ->setTick($data['tick'])
 			->setFirstTick($data['first_tick'])

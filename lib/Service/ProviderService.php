@@ -28,15 +28,19 @@ namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OC\App\AppManager;
+use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotUniqueException;
 use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
-use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Model\ProviderWrapper;
 use OCP\AppFramework\QueryException;
+use OCP\FullTextSearch\IFullTextSearchProvider;
+use OCP\FullTextSearch\Service\IProviderService;
+use OCP\Util;
 
-class ProviderService {
+
+class ProviderService implements IProviderService {
 
 	/** @var AppManager */
 	private $appManager;
@@ -205,7 +209,7 @@ class ProviderService {
 	 *
 	 * @return bool
 	 */
-	public function isProviderIndexed($providerId) {
+	public function isProviderIndexed(string $providerId) {
 		try {
 			$indexed = $this->configService->getProviderOptions(
 				$providerId, ConfigService::PROVIDER_INDEXED
@@ -307,5 +311,20 @@ class ProviderService {
 
 		return $arr;
 	}
+
+
+	/**
+	 *
+	 */
+	public function addJavascriptAPI() {
+		Util::addStyle(Application::APP_NAME, 'fulltextsearch');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.api');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.settings');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.searchbox');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.result');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.navigation');
+		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1');
+	}
+
 
 }

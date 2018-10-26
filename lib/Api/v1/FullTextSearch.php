@@ -29,7 +29,6 @@ namespace OCA\FullTextSearch\Api\v1;
 
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\AppInfo\Application;
-use OCA\FullTextSearch\Model\ExtendedIndex;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\ProviderService;
@@ -97,7 +96,7 @@ class FullTextSearch {
 	 * @param string $providerId
 	 * @param string|int $documentId
 	 *
-	 * @return ExtendedIndex
+	 * @return Index
 	 * @throws QueryException
 	 */
 	public static function getIndex($providerId, $documentId) {

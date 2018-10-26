@@ -32,20 +32,18 @@ use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\RunningService;
+use OCP\FullTextSearch\Model\IIndex;
+use OCP\FullTextSearch\Model\IRunner;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Runner {
+class Runner implements IRunner {
 
 	const TICK_TTL = 1800;
 
 	const TICK_MINIMUM = 2;
 	const TICK_UPDATE = 10;
 	const MEMORY_UPDATE = 5;
-
-	const RESULT_TYPE_SUCCESS = 1;
-	const RESULT_TYPE_WARNING = 4;
-	const RESULT_TYPE_FAIL = 9;
 
 	/** @var RunningService */
 	private $runningService;
@@ -58,9 +56,6 @@ class Runner {
 
 	/** @var int */
 	private $tickId;
-
-	/** @var ExtendedBase */
-	private $commandBase = null;
 
 	/** @var OutputInterface */
 	private $outputInterface = null;
@@ -135,7 +130,7 @@ class Runner {
 	 * @return string
 	 * @throws \Exception
 	 */
-	public function updateAction($action = '', $force = false) {
+	public function updateAction(string $action = '', bool $force = false): string {
 		$n = '';
 		if (sizeof($this->methodOnKeyPress) > 0) {
 			$n = fread(STDIN, 9999);
@@ -195,7 +190,7 @@ class Runner {
 	 * @param string $value
 	 * @param int $type
 	 */
-	public function setInfo($info, $value, $type = 0) {
+	public function setInfo(string $info, string $value, int $type = 0) {
 		$this->info[$info] = $value;
 		$this->setInfoColored($info, $type);
 		$this->infoUpdated();
@@ -204,7 +199,7 @@ class Runner {
 	/**
 	 * @param array $data
 	 */
-	public function setInfoArray($data) {
+	public function setInfoArray(array $data) {
 		$keys = array_keys($data);
 		//$this->info['info'] = '';
 		foreach ($keys as $k) {
@@ -219,7 +214,7 @@ class Runner {
 	 * @param string $info
 	 * @param int $level
 	 */
-	public function setInfoColored($info, $level) {
+	public function setInfoColored(string $info, int $level) {
 
 		$value = $this->getInfo($info);
 		if ($value === '') {
@@ -228,15 +223,15 @@ class Runner {
 
 		$color = '';
 		switch ($level) {
-			case self::RESULT_TYPE_SUCCESS:
+			case IRunner::RESULT_TYPE_SUCCESS:
 				$color = 'info';
 				break;
 
-			case self::RESULT_TYPE_WARNING:
+			case IRunner::RESULT_TYPE_WARNING:
 				$color = 'comment';
 				break;
 
-			case self::RESULT_TYPE_FAIL:
+			case IRunner::RESULT_TYPE_FAIL:
 				$color = 'error';
 				break;
 		}
@@ -306,12 +301,13 @@ class Runner {
 	}
 
 	/**
-	 * @param Index $index
+	 * @param IIndex $index
 	 * @param string $message
 	 * @param string $class
 	 * @param int $sev
 	 */
-	public function newIndexError($index, $message, $class = '', $sev = 3) {
+	public function newIndexError(IIndex $index, string $message, string $class = '', int $sev = 3
+	) {
 		$error = [
 			'index'     => $index,
 			'message'   => $message,
@@ -334,12 +330,12 @@ class Runner {
 
 
 	/**
-	 * @param Index $index
+	 * @param IIndex $index
 	 * @param string $message
 	 * @param string $status
 	 * @param int $type
 	 */
-	public function newIndexResult($index, $message, $status, $type) {
+	public function newIndexResult(IIndex $index, string $message, string $status, int $type) {
 		$result = [
 			'index'   => $index,
 			'message' => $message,
@@ -351,17 +347,6 @@ class Runner {
 			call_user_func($method, $result);
 		}
 	}
-
-
-//	/**
-//	 * @throws InterruptException
-//	 */
-//	private function hasBeenInterrupted() {
-//		if ($this->commandBase === null) {
-//			return;
-//		}
-//		$this->commandBase->hasBeenInterrupted();
-//	}
 
 
 	/**
@@ -402,10 +387,10 @@ class Runner {
 	/**
 	 * @deprecated - verifier l'interet !?
 	 *
-	 * @param $reason
-	 * @param $stop
+	 * @param string $reason
+	 * @param bool $stop
 	 */
-	public function exception($reason, $stop) {
+	public function exception(string $reason, bool $stop) {
 		if (!$stop) {
 			$this->output('Exception: ' . $reason);
 			// TODO: feed an array of exceptions for log;
@@ -423,12 +408,10 @@ class Runner {
 
 
 	/**
-	 * @param ExtendedBase $base
 	 * @param OutputInterface $output
 	 */
-	public function sourceIsCommandLine(ExtendedBase $base, OutputInterface $output) {
+	public function sourceIsCommandLine(OutputInterface $output) {
 		$this->outputInterface = $output;
-		$this->commandBase = $base;
 	}
 
 
