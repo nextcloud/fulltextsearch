@@ -27,8 +27,9 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
+use OC\Core\Command\InterruptedException;
+use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\Index as ModelIndex;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
@@ -47,7 +48,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 
 
-class Index extends Base {
+class Index extends ACommandBase {
 
 //			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
 	const PANEL_RUN = 'run';
@@ -176,8 +177,6 @@ class Index extends Base {
 	}
 
 
-
-
 	/**
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
@@ -215,7 +214,7 @@ class Index extends Base {
 		$this->runner->setInfo('options', json_encode($options));
 
 		try {
-			$this->runner->sourceIsCommandLine($output);
+			$this->runner->sourceIsCommandLine($this, $output);
 			$this->runner->start();
 
 			if ($options->getOption('errors') === 'reset') {
@@ -823,7 +822,14 @@ class Index extends Base {
 		$this->displayError();
 	}
 
+
+	/**
+	 * @throws InterruptedException
+	 */
+	public function abort() {
+		$this->abortIfInterrupted();
+	}
+
+
 }
-
-
 

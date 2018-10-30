@@ -27,7 +27,8 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\Base;
+use OC\Core\Command\InterruptedException;
+use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\Index as ModelIndex;
 use OCA\FullTextSearch\Model\Runner;
@@ -45,7 +46,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 
 
-class Live extends Base {
+class Live extends ACommandBase {
 
 	const CYCLE_DELAY = 300000;
 
@@ -216,7 +217,7 @@ class Live extends Base {
 
 
 		try {
-			$this->runner->sourceIsCommandLine($output);
+			$this->runner->sourceIsCommandLine($this, $output);
 			$this->runner->start();
 
 			$this->cliService->runDisplay($output);
@@ -720,7 +721,15 @@ class Live extends Base {
 
 		$this->displayError();
 	}
+
+
+	/**
+	 * @throws InterruptedException
+	 */
+	public function abort() {
+		$this->abortIfInterrupted();
+	}
+
+
 }
-
-
 

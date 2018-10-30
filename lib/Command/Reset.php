@@ -27,7 +27,8 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\Base;
+use OC\Core\Command\InterruptedException;
+use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\MiscService;
@@ -37,7 +38,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Reset extends Base {
+class Reset extends ACommandBase {
 
 	/** @var IndexService */
 	private $indexService;
@@ -85,7 +86,7 @@ class Reset extends Base {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 
 		try {
-			$this->runner->sourceIsCommandLine($output);
+			$this->runner->sourceIsCommandLine($this, $output);
 			$this->runner->start();
 			$this->runner->output('reset.');
 
@@ -119,6 +120,15 @@ class Reset extends Base {
 
 		return $providerId;
 	}
+
+
+	/**
+	 * @throws InterruptedException
+	 */
+	public function abort() {
+		$this->abortIfInterrupted();
+	}
+
 }
 
 

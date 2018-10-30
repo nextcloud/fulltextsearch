@@ -27,6 +27,7 @@
 
 namespace OCA\FullTextSearch\Model;
 
+use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
@@ -56,6 +57,9 @@ class Runner implements IRunner {
 
 	/** @var int */
 	private $tickId;
+
+	/** @var ACommandBase */
+	private $base = null;
 
 	/** @var OutputInterface */
 	private $outputInterface = null;
@@ -131,6 +135,9 @@ class Runner implements IRunner {
 	 * @throws \Exception
 	 */
 	public function updateAction(string $action = '', bool $force = false): string {
+
+		$this->base->abort();
+
 		$n = '';
 		if (sizeof($this->methodOnKeyPress) > 0) {
 			$n = fread(STDIN, 9999);
@@ -145,13 +152,6 @@ class Runner implements IRunner {
 		}
 
 		$tick = time();
-//		try {
-//			$this->hasBeenInterrupted();
-//		} catch (InterruptException $e) {
-//			$this->stop();
-//			throw $e;
-//		}
-
 		if ($this->oldAction !== $action || $force) {
 			while (true) {
 				if (!$this->isPaused()) {
@@ -163,7 +163,9 @@ class Runner implements IRunner {
 				if ($pressed === $this->keys['nextStep']) {
 					break;
 				}
+
 				usleep(300000);
+				$this->base->abort();
 			}
 
 			$this->pauseRunning(false);
@@ -408,9 +410,11 @@ class Runner implements IRunner {
 
 
 	/**
+	 * @param ACommandBase $base
 	 * @param OutputInterface $output
 	 */
-	public function sourceIsCommandLine(OutputInterface $output) {
+	public function sourceIsCommandLine(ACommandBase $base, OutputInterface $output) {
+		$this->base = $base;
 		$this->outputInterface = $output;
 	}
 
@@ -444,13 +448,6 @@ class Runner implements IRunner {
 		return $this->pauseRunning;
 	}
 
-
-//	/**
-//	 * @return bool
-//	 */
-//	public function isStrict() {
-//		return $this->strict;
-//	}
 
 	/**
 	 * @param string $line
