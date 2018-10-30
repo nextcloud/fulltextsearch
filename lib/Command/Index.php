@@ -43,11 +43,16 @@ use OCP\IUserManager;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
+use Throwable;
 
 
 class Index extends ExtendedBase {
+
+	const INDEX_OPTION_NO_READLINE = '_no-readline';
+
 
 //			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
 	const PANEL_RUN = 'run';
@@ -172,7 +177,11 @@ class Index extends ExtendedBase {
 		parent::configure();
 		$this->setName('fulltextsearch:index')
 			 ->setDescription('Index files')
-			 ->addArgument('options', InputArgument::OPTIONAL, 'options');
+			 ->addArgument('options', InputArgument::OPTIONAL, 'options')
+			 ->addOption(
+				 'no-readline', 'r', InputOption::VALUE_NONE,
+				 'disable readline - non interactive mode'
+			 );
 	}
 
 
@@ -195,11 +204,20 @@ class Index extends ExtendedBase {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 
-		/** do not get stuck while waiting interactive input */
-		readline_callback_handler_install(
-			'', function() {
+		$options = $this->generateIndexOptions($input);
+
+		if ($options->getOptionBool(self::INDEX_OPTION_NO_READLINE, false) === false) {
+			/** do not get stuck while waiting interactive input */
+			try {
+				readline_callback_handler_install(
+					'', function() {
+				}
+				);
+			} catch (Throwable $t) {
+				throw new Exception('Please install php-readline, or use --no-readline');
+			}
 		}
-		);
+
 		stream_set_blocking(STDIN, false);
 
 		$this->terminal = new Terminal();
@@ -207,8 +225,6 @@ class Index extends ExtendedBase {
 		$outputStyle = new OutputFormatterStyle('white', 'black', ['bold']);
 		$output->getFormatter()
 			   ->setStyle('char', $outputStyle);
-
-		$options = $this->generateIndexOptions($input);
 
 		$this->runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
 		$this->runner->onKeyPress([$this, 'onKeyPressed']);
@@ -219,7 +235,7 @@ class Index extends ExtendedBase {
 		$this->indexService->setRunner($this->runner);
 		$this->cliService->setRunner($this->runner);
 
-		$this->generatePanels();
+		$this->generatePanels($options);
 		$this->runner->setInfo('options', json_encode($options));
 
 		try {
@@ -407,6 +423,10 @@ class Index extends ExtendedBase {
 			$options = [];
 		}
 
+		if ($input->getOption('no-readline')) {
+			$options['_no-readline'] = true;
+		}
+
 		return new IndexOptions($options);
 	}
 
@@ -452,9 +472,9 @@ class Index extends ExtendedBase {
 
 
 	/**
-	 *
+	 * @param IndexOptions $options
 	 */
-	private function generatePanels() {
+	private function generatePanels(IndexOptions $options) {
 
 		$this->cliService->createPanel(
 			self::PANEL_RUN,
@@ -505,15 +525,15 @@ class Index extends ExtendedBase {
 		);
 
 		$this->cliService->createPanel(
-			self::PANEL_COMMANDS_ROOT, [
-										 self::PANEL_COMMANDS_ROOT_LINE
-									 ]
-		);
-
-		$this->cliService->createPanel(
 			self::PANEL_COMMANDS_PAUSED, [
 										   self::PANEL_COMMANDS_PAUSED_LINE
 									   ]
+		);
+
+		$this->cliService->createPanel(
+			self::PANEL_COMMANDS_ROOT, [
+										 self::PANEL_COMMANDS_ROOT_LINE
+									 ]
 		);
 
 		$this->cliService->createPanel(
@@ -528,12 +548,14 @@ class Index extends ExtendedBase {
 		$this->cliService->displayPanel('indexPanel', self::PANEL_INDEX);
 		$this->cliService->displayPanel('resultsPanel', self::PANEL_RESULT);
 		$this->cliService->displayPanel('errorsPanel', self::PANEL_ERRORS);
-		$this->cliService->displayPanel('navigation', self::PANEL_COMMANDS_NAVIGATION);
 
-		if ($this->runner->isPaused()) {
-			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_PAUSED);
-		} else {
-			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
+		if ($options->getOptionBool(self::INDEX_OPTION_NO_READLINE, false) === false) {
+			$this->cliService->displayPanel('navigation', self::PANEL_COMMANDS_NAVIGATION);
+			if ($this->runner->isPaused()) {
+				$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_PAUSED);
+			} else {
+				$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
+			}
 		}
 
 		$this->runner->setInfoArray(
