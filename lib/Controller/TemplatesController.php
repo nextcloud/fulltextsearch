@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Controller;
+
 
 use Exception;
 use OC\AppFramework\Http;
@@ -39,6 +44,12 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\IRequest;
 
+
+/**
+ * Class TemplatesController
+ *
+ * @package OCA\FullTextSearch\Controller
+ */
 class TemplatesController extends Controller {
 
 
@@ -80,13 +91,13 @@ class TemplatesController extends Controller {
 	 * @NoAdminRequired
 	 * @NoSubAdminRequired
 	 *
-	 * @param $providerId
+	 * @param string $providerId
 	 *
 	 * @return DataResponse
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function getOptionsPanel($providerId) {
+	public function getOptionsPanel(string $providerId): DataResponse {
 		$providerWrapper = $this->providerService->getProvider($providerId);
 		$provider = $providerWrapper->getProvider();
 
@@ -118,7 +129,7 @@ class TemplatesController extends Controller {
 	 * @return DataResponse
 	 * @throws Exception
 	 */
-	public function getNavigationPanels() {
+	public function getNavigationPanels(): DataResponse {
 		$providers = $this->providerService->getProviders();
 
 		$ret = [];

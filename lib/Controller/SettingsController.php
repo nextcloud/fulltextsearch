@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Controller;
+
 
 use Exception;
 use OCA\FullTextSearch\AppInfo\Application;
@@ -36,6 +41,12 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
+
+/**
+ * Class SettingsController
+ *
+ * @package OCA\FullTextSearch\Controller
+ */
 class SettingsController extends Controller {
 
 	/** @var ConfigService */
@@ -71,7 +82,7 @@ class SettingsController extends Controller {
 	 * @return DataResponse
 	 * @throws Exception
 	 */
-	public function getSettingsAdmin() {
+	public function getSettingsAdmin(): DataResponse {
 		$data = $this->configService->getConfig();
 		$this->settingsService->completeSettings($data);
 

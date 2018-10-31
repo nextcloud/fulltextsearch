@@ -43,6 +43,11 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
 
+/**
+ * Class ApiController
+ *
+ * @package OCA\FullTextSearch\Controller
+ */
 class ApiController extends Controller {
 
 

@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Controller;
+
 
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Service\ConfigService;
@@ -34,7 +39,14 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\IRequest;
 
+
+/**
+ * Class NavigationController
+ *
+ * @package OCA\FullTextSearch\Controller
+ */
 class NavigationController extends Controller {
+
 
 	/** @var IConfig */
 	private $config;
@@ -71,7 +83,7 @@ class NavigationController extends Controller {
 	 *
 	 * @return TemplateResponse
 	 */
-	public function navigate() {
+	public function navigate(): TemplateResponse {
 
 		$themingName = $this->config->getAppValue('theming', 'name', 'Nextcloud');
 
