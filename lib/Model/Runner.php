@@ -136,7 +136,9 @@ class Runner implements IRunner {
 	 */
 	public function updateAction(string $action = '', bool $force = false): string {
 
-		$this->base->abort();
+		if ($this->base !== null) {
+			$this->base->abort();
+		}
 
 		$n = '';
 		if (sizeof($this->methodOnKeyPress) > 0) {
