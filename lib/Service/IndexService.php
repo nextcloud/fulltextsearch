@@ -191,8 +191,7 @@ class IndexService implements IIndexService {
 	private function updateDocumentsWithCurrIndex(
 		IFullTextSearchProvider $provider, array $documents, IIndexOptions $options
 	) {
-
-		$currIndex = $this->getProviderIndexFromProvider($provider);
+		$currIndex = $this->getProviderIndexFromProvider($provider->getId());
 		$result = [];
 		$count = 0;
 		foreach ($documents as $document) {
@@ -254,12 +253,12 @@ class IndexService implements IIndexService {
 
 
 	/**
-	 * @param IFullTextSearchProvider $provider
+	 * @param string $providerId
 	 *
 	 * @return ProviderIndexes
 	 */
-	private function getProviderIndexFromProvider(IFullTextSearchProvider $provider) {
-		$indexes = $this->indexesRequest->getIndexesFromProvider($provider);
+	private function getProviderIndexFromProvider(string $providerId) {
+		$indexes = $this->indexesRequest->getIndexesFromProvider($providerId);
 
 		return new ProviderIndexes($indexes);
 	}
@@ -274,7 +273,7 @@ class IndexService implements IIndexService {
 	 * @throws Exception
 	 */
 	private function indexDocuments(
-		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $documents,
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, array $documents,
 		IndexOptions $options
 	) {
 		while ($document = array_shift($documents)) {
@@ -410,7 +409,7 @@ class IndexService implements IIndexService {
 
 		$document->getIndex()
 				 ->resetErrors();
-		$index = $platform->indexDocument($provider, $document);
+		$index = $platform->indexDocument($document);
 		$this->updateIndex($index);
 	}
 
@@ -471,6 +470,34 @@ class IndexService implements IIndexService {
 
 	/**
 	 * @param string $providerId
+	 * @param string $documentId
+	 * @param int $status
+	 * @param bool $reset
+	 *
+	 * @throws Exception
+	 */
+	public function updateIndexStatus(
+		string $providerId, string $documentId, int $status, bool $reset = false
+	) {
+		if ($reset === true) {
+			$this->indexesRequest->updateStatus($providerId, $documentId, $status);
+
+			return;
+		}
+
+		try {
+			$curr = $this->getIndex($providerId, $documentId);
+		} catch (IndexDoesNotExistException $e) {
+			return;
+		}
+
+		$curr->setStatus($status);
+		$this->updateIndex($curr);
+	}
+
+
+	/**
+	 * @param string $providerId
 	 * @param array $documentIds
 	 * @param int $status
 	 * @param bool $reset
@@ -481,7 +508,7 @@ class IndexService implements IIndexService {
 		string $providerId, array $documentIds, int $status, bool $reset = false
 	) {
 		if ($reset === true) {
-			$this->indexesRequest->updateStatus($providerId, $documentIds, $status);
+			$this->indexesRequest->updateStatuses($providerId, $documentIds, $status);
 
 			return;
 		}
@@ -496,7 +523,6 @@ class IndexService implements IIndexService {
 			$curr->setStatus($status);
 			$this->updateIndexes([$curr]);
 		}
-
 	}
 
 
@@ -601,15 +627,4 @@ class IndexService implements IIndexService {
 	}
 
 
-	/**
-	 * @param string $providerId
-	 * @param $documentId
-	 * @param int $status
-	 * @param bool $reset
-	 */
-	public function updateIndexStatus(
-		string $providerId, $documentId, int $status, bool $reset = false
-	) {
-		// TODO: Implement updateIndexStatus() method.
-	}
 }
