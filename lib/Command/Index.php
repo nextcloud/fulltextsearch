@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
+
 
 use Exception;
 use OC\Core\Command\InterruptedException;
@@ -41,6 +46,7 @@ use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\IUserManager;
+use OutOfBoundsException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -48,6 +54,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 
 
+/**
+ * Class Index
+ *
+ * @package OCA\FullTextSearch\Command
+ */
 class Index extends ACommandBase {
 
 //			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
@@ -265,9 +276,9 @@ class Index extends ACommandBase {
 
 
 	/**
-	 * @param $key
+	 * @param string $key
 	 */
-	public function onKeyPressed($key) {
+	public function onKeyPressed(string $key) {
 		$key = strtolower($key);
 		if ($key === 'q') {
 			try {
@@ -322,7 +333,7 @@ class Index extends ACommandBase {
 	/**
 	 * @param array $error
 	 */
-	public function onNewIndexError($error) {
+	public function onNewIndexError(array $error) {
 		$this->errors[] = $error;
 		$this->displayError();
 	}
@@ -331,7 +342,7 @@ class Index extends ACommandBase {
 	/**
 	 * @param array $result
 	 */
-	public function onNewIndexResult($result) {
+	public function onNewIndexResult(array $result) {
 		$this->results[] = $result;
 		$this->displayResult();
 	}
@@ -381,7 +392,6 @@ class Index extends ACommandBase {
 		}
 
 		$this->providerService->setProviderAsIndexed($provider, true);
-
 	}
 
 
@@ -390,8 +400,13 @@ class Index extends ACommandBase {
 	 *
 	 * @return IndexOptions
 	 */
-	private function generateIndexOptions(InputInterface $input) {
+	private function generateIndexOptions(InputInterface $input): IndexOptions {
 		$jsonOptions = $input->getArgument('options');
+
+		if (!is_string($jsonOptions)) {
+			return new IndexOptions([]);
+		}
+
 		$options = json_decode($jsonOptions, true);
 
 		if (!is_array($options)) {
@@ -408,14 +423,14 @@ class Index extends ACommandBase {
 	 *
 	 * @return bool
 	 */
-	private function isIncludedProvider(IndexOptions $options, $providerId) {
+	private function isIncludedProvider(IndexOptions $options, string $providerId): bool {
 		if ($options->getOption('provider', '') !== ''
 			&& $options->getOption('provider') !== $providerId) {
 			return false;
 		}
 
 		if ($options->getOptionArray('providers', []) !== []) {
-			return (in_array($providerId, $options->getOptionArray('providers')));
+			return (in_array($providerId, $options->getOptionArray('providers', [])));
 		}
 
 		return true;
@@ -427,7 +442,7 @@ class Index extends ACommandBase {
 	 *
 	 * @return array
 	 */
-	private function generateUserList(IndexOptions $options) {
+	private function generateUserList(IndexOptions $options): array {
 		if ($options->getOption('user', '') !== '') {
 			return [$this->userManager->get($options->getOption('user'))];
 		}
@@ -565,7 +580,7 @@ class Index extends ACommandBase {
 	/**
 	 * @param int $pos
 	 */
-	private function displayError($pos = 0) {
+	private function displayError(int $pos = 0) {
 		$total = sizeof($this->errors);
 
 		if ($total === 0) {
@@ -579,11 +594,11 @@ class Index extends ACommandBase {
 			return;
 		}
 
-		$current = key($this->errors) + 1;
-		$error = $this->getNavigationError($pos, ($current === 1), ($current === $total));
-		$current = key($this->errors) + 1;
-
-		if ($error === false) {
+		try {
+			$current = key($this->errors) + 1;
+			$error = $this->getNavigationError($pos, ($current === 1), ($current === $total));
+			$current = key($this->errors) + 1;
+		} catch (OutOfBoundsException $e) {
 			return;
 		}
 
@@ -617,7 +632,7 @@ class Index extends ACommandBase {
 	/**
 	 * @param int $pos
 	 */
-	private function displayResult($pos = 0) {
+	private function displayResult(int $pos = 0) {
 		$total = sizeof($this->results);
 
 		if ($total === 0) {
@@ -631,11 +646,11 @@ class Index extends ACommandBase {
 			return;
 		}
 
-		$current = key($this->results) + 1;
-		$result = $this->getNavigationResult($pos, ($current === 1), ($current === $total));
-		$current = key($this->results) + 1;
-
-		if ($result === false) {
+		try {
+			$current = key($this->results) + 1;
+			$result = $this->getNavigationResult($pos, ($current === 1), ($current === $total));
+			$current = key($this->results) + 1;
+		} catch (OutOfBoundsException $e) {
 			return;
 		}
 
@@ -649,10 +664,9 @@ class Index extends ACommandBase {
 
 		$width = $this->terminal->getWidth() - 13;
 		$message = MiscService::get('message', $result, '');
-		$msg1 = substr($message, 0, $width);
-		$msg2 = substr($message, $width, $width + 10);
-		$msg3 = substr($message, $width + $width + 10, $width + 10);
-
+		$msg1 = (string) substr($message, 0, $width);
+		$msg2 = (string) substr($message, $width, $width + 10);
+		$msg3 = (string) substr($message, $width + $width + 10, $width + 10);
 
 		$status = MiscService::get('status', $result, '');
 		$type = MiscService::get('type', $result, '');
@@ -677,9 +691,10 @@ class Index extends ACommandBase {
 	 * @param bool $isFirst
 	 * @param bool $isLast
 	 *
-	 * @return bool|array
+	 * @throw OutOfBoundsException
+	 * @return array
 	 */
-	private function getNavigationError($pos, $isFirst, $isLast) {
+	private function getNavigationError(int $pos, bool $isFirst, bool $isLast): array {
 
 		if ($pos === 0) {
 			if ($this->navigateLastError === true) {
@@ -708,7 +723,7 @@ class Index extends ACommandBase {
 			return end($this->errors);
 		}
 
-		return false;
+		throw new OutOfBoundsException();
 	}
 
 
@@ -717,9 +732,10 @@ class Index extends ACommandBase {
 	 * @param bool $isFirst
 	 * @param bool $isLast
 	 *
-	 * @return bool|array
+	 * @throw OutOfBoundsException
+	 * @return array
 	 */
-	private function getNavigationResult($pos, $isFirst, $isLast) {
+	private function getNavigationResult(int $pos, bool $isFirst, bool $isLast): array {
 
 		if ($pos === 0) {
 			if ($this->navigateLastResult === true) {
@@ -748,7 +764,7 @@ class Index extends ACommandBase {
 			return end($this->results);
 		}
 
-		return false;
+		throw new OutOfBoundsException();
 	}
 
 
@@ -769,8 +785,6 @@ class Index extends ACommandBase {
 			}
 
 		}
-
-
 	}
 
 
@@ -824,10 +838,15 @@ class Index extends ACommandBase {
 
 
 	/**
-	 * @throws InterruptedException
+	 * @throws TickDoesNotExistException
 	 */
 	public function abort() {
-		$this->abortIfInterrupted();
+		try {
+			$this->abortIfInterrupted();
+		} catch (InterruptedException $e) {
+			$this->runner->stop();
+			exit();
+		}
 	}
 
 

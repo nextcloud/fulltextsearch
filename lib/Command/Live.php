@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
+
 
 use Exception;
 use OC\Core\Command\InterruptedException;
@@ -40,6 +45,7 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\IUserManager;
+use OutOfBoundsException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -277,9 +283,9 @@ class Live extends ACommandBase {
 
 
 	/**
-	 * @param $key
+	 * @param string $key
 	 */
-	public function onKeyPressed($key) {
+	public function onKeyPressed(string $key) {
 		$key = strtolower($key);
 		if ($key === 'q') {
 			try {
@@ -334,7 +340,7 @@ class Live extends ACommandBase {
 	/**
 	 * @param array $error
 	 */
-	public function onNewIndexError($error) {
+	public function onNewIndexError(array $error) {
 		$this->errors[] = $error;
 		$this->displayError();
 	}
@@ -342,7 +348,7 @@ class Live extends ACommandBase {
 	/**
 	 * @param array $result
 	 */
-	public function onNewIndexResult($result) {
+	public function onNewIndexResult(array $result) {
 		$this->results[] = $result;
 		$this->displayResult();
 	}
@@ -488,7 +494,7 @@ class Live extends ACommandBase {
 	/**
 	 * @param int $pos
 	 */
-	private function displayResult($pos = 0) {
+	private function displayResult(int $pos = 0) {
 		$total = sizeof($this->results);
 
 		if ($total === 0) {
@@ -502,11 +508,11 @@ class Live extends ACommandBase {
 			return;
 		}
 
-		$current = key($this->results) + 1;
-		$result = $this->getNavigationResult($pos, ($current === 1), ($current === $total));
-		$current = key($this->results) + 1;
-
-		if ($result === false) {
+		try {
+			$current = key($this->results) + 1;
+			$result = $this->getNavigationResult($pos, ($current === 1), ($current === $total));
+			$current = key($this->results) + 1;
+		} catch (OutOfBoundsException $e) {
 			return;
 		}
 
@@ -545,7 +551,7 @@ class Live extends ACommandBase {
 	/**
 	 * @param int $pos
 	 */
-	private function displayError($pos = 0) {
+	private function displayError(int $pos = 0) {
 		$total = sizeof($this->errors);
 
 		if ($total === 0) {
@@ -559,11 +565,11 @@ class Live extends ACommandBase {
 			return;
 		}
 
-		$current = key($this->errors) + 1;
-		$error = $this->getNavigationError($pos, ($current === 1), ($current === $total));
-		$current = key($this->errors) + 1;
-
-		if ($error === false) {
+		try {
+			$current = key($this->errors) + 1;
+			$error = $this->getNavigationError($pos, ($current === 1), ($current === $total));
+			$current = key($this->errors) + 1;
+		} catch (OutOfBoundsException $e) {
 			return;
 		}
 
@@ -599,9 +605,10 @@ class Live extends ACommandBase {
 	 * @param bool $isFirst
 	 * @param bool $isLast
 	 *
-	 * @return bool|array
+	 * @return array
+	 * @throws OutOfBoundsException
 	 */
-	private function getNavigationResult($pos, $isFirst, $isLast) {
+	private function getNavigationResult(int $pos, bool $isFirst, bool $isLast): array {
 
 		if ($pos === 0) {
 			if ($this->navigateLastResult === true) {
@@ -630,7 +637,7 @@ class Live extends ACommandBase {
 			return end($this->results);
 		}
 
-		return false;
+		throw new OutOfBoundsException();
 	}
 
 
@@ -639,9 +646,9 @@ class Live extends ACommandBase {
 	 * @param bool $isFirst
 	 * @param bool $isLast
 	 *
-	 * @return bool|array
+	 * @return array
 	 */
-	private function getNavigationError($pos, $isFirst, $isLast) {
+	private function getNavigationError(int $pos, bool $isFirst, bool $isLast): array {
 
 		if ($pos === 0) {
 			if ($this->navigateLastError === true) {
@@ -670,7 +677,7 @@ class Live extends ACommandBase {
 			return end($this->errors);
 		}
 
-		return false;
+		throw new OutOfBoundsException();
 	}
 
 
@@ -724,10 +731,15 @@ class Live extends ACommandBase {
 
 
 	/**
-	 * @throws InterruptedException
+	 * @throws TickDoesNotExistException
 	 */
 	public function abort() {
-		$this->abortIfInterrupted();
+		try {
+			$this->abortIfInterrupted();
+		} catch (InterruptedException $e) {
+			$this->runner->stop();
+			exit();
+		}
 	}
 
 
