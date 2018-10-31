@@ -669,7 +669,7 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	 *
 	 * @return SearchRequest
 	 */
-	public static function fromJSON($json): SearchRequest {
+	public static function fromJSON(string $json): SearchRequest {
 		return self::fromArray(json_decode($json, true));
 	}
 

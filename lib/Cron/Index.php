@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 
 /**
  * FullTextSearch - Full text search framework for Nextcloud
@@ -25,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Cron;
+
 
 use Exception;
 use OC\BackgroundJob\TimedJob;
@@ -73,7 +77,7 @@ class Index extends TimedJob {
 
 
 	/**
-	 * @param $argument
+	 * @param mixed $argument
 	 *
 	 * @throws QueryException
 	 */
@@ -137,7 +141,7 @@ class Index extends TimedJob {
 	/**
 	 * @return bool
 	 */
-	private function shouldWeGetAllIndex() {
+	private function shouldWeGetAllIndex(): bool {
 		$lastErrReset = (int)$this->configService->getAppValue(ConfigService::CRON_LAST_ERR_RESET);
 
 		if ($lastErrReset === 0) {
