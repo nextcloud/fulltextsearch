@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\AppInfo;
+
 
 use OCA\FullTextSearch\Capabilities;
 use OCA\FullTextSearch\Service\ConfigService;
@@ -36,30 +41,26 @@ use OCP\AppFramework\IAppContainer;
 use OCP\AppFramework\QueryException;
 use OCP\FullTextSearch\IFullTextSearchManager;
 
+
 class Application extends App {
+
 
 	const APP_NAME = 'fulltextsearch';
 
 	/** @var IAppContainer */
 	private $container;
 
+
 	/**
+	 * Application constructor.
+	 *
 	 * @param array $params
 	 */
-	public function __construct(array $params = array()) {
+	public function __construct(array $params = []) {
 		parent::__construct(self::APP_NAME, $params);
 
 		$this->container = $this->getContainer();
 		$this->container->registerCapability(Capabilities::class);
-
-		$this->registerHooks();
-	}
-
-
-	/**
-	 * Register Hooks
-	 */
-	public function registerHooks() {
 	}
 
 
@@ -88,7 +89,6 @@ class Application extends App {
 	 * @throws QueryException
 	 */
 	public function registerNavigation() {
-
 		/** @var ConfigService $configService */
 		$configService = $this->container->query(ConfigService::class);
 		if ($configService->getAppValue(ConfigService::APP_NAVIGATION) !== '1') {
@@ -101,7 +101,10 @@ class Application extends App {
 	}
 
 
-	private function fullTextSearchNavigation() {
+	/**
+	 * @return array
+	 */
+	private function fullTextSearchNavigation(): array {
 		$urlGen = \OC::$server->getURLGenerator();
 		$navName = \OC::$server->getL10N(self::APP_NAME)
 							   ->t('Full text search');
@@ -115,10 +118,6 @@ class Application extends App {
 		];
 	}
 
-
-	public function registerSettingsAdmin() {
-		// \OCP\App::registerAdmin(self::APP_NAME, 'lib/admin');
-	}
 
 }
 
