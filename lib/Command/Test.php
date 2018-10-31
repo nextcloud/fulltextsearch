@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,10 +27,13 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
 
+
 use Exception;
-use OC\Core\Command\Base;
+use OC\Core\Command\InterruptedException;
+use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
@@ -54,7 +60,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Test extends Base {
+/**
+ * Class Test
+ *
+ * @package OCA\FullTextSearch\Command
+ */
+class Test extends ACommandBase {
 
 	const DELAY_STABILIZE_PLATFORM = 3;
 
@@ -80,9 +91,9 @@ class Test extends Base {
 	/** @var Runner */
 	private $runner;
 
-
 	/** @var boolean */
 	private $isJson = false;
+
 
 	/**
 	 * Index constructor.
@@ -129,7 +140,6 @@ class Test extends Base {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return int|null|void
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
@@ -146,7 +156,7 @@ class Test extends Base {
 			$testPlatform = $this->testLoadingPlatform($output);
 			$this->testLockingProcess($output, $testPlatform, $testProvider);
 		} catch (Exception $e) {
-			$this->output($output, false);
+			$this->outputResult($output, false);
 			throw $e;
 		}
 
@@ -166,10 +176,10 @@ class Test extends Base {
 			$this->testResetTest($output, $testProvider);
 			$this->testUnlockingProcess($output);
 		} catch (Exception $e) {
-			$this->output($output, false);
+			$this->outputResult($output, false);
 			$this->output($output, 'Error detected, unlocking process');
 			$this->runner->stop();
-			$this->output($output, true);
+			$this->outputResult($output, true);
 
 			throw $e;
 		}
@@ -185,7 +195,7 @@ class Test extends Base {
 	 * @throws ProviderDoesNotExistException
 	 * @throws ProviderIsNotUniqueException
 	 */
-	private function generateMockProvider() {
+	private function generateMockProvider(): IFullTextSearchProvider {
 		$this->providerService->loadProvider(
 			'fulltextsearch', 'OCA\FullTextSearch\Provider\TestProvider'
 		);
@@ -197,11 +207,10 @@ class Test extends Base {
 
 	/**
 	 * @param OutputInterface $output
-	 * @param string|bool $line
+	 * @param string $line
 	 * @param bool $isNewLine
 	 */
-	private function output(OutputInterface $output, $line, $isNewLine = true) {
-		$line = $this->convertBoolToLine($line, $isNewLine);
+	private function output(OutputInterface $output, string $line, bool $isNewLine = true) {
 		if ($isNewLine) {
 			$output->write(' ', true);
 		}
@@ -211,18 +220,25 @@ class Test extends Base {
 
 
 	/**
-	 * @param string|bool $line
-	 * @param $isNewLine
+	 * @param OutputInterface $output
+	 * @param bool $result
+	 */
+	private function outputResult(OutputInterface $output, bool $result) {
+		$line = $this->convertBoolToLine($result, $isNewLine);
+
+		$this->output($output, $line, $isNewLine);
+	}
+
+
+	/**
+	 * @param bool $result
+	 * @param bool $isNewLine
 	 *
 	 * @return string
 	 */
-	private function convertBoolToLine($line, &$isNewLine) {
-		if (!is_bool($line)) {
-			return $line;
-		}
-
+	private function convertBoolToLine(bool $result, bool &$isNewLine): string {
 		$isNewLine = false;
-		if ($line === false) {
+		if ($result === false) {
 			return '<error>fail</error>';
 		}
 
@@ -231,7 +247,7 @@ class Test extends Base {
 
 
 	/**
-	 * @param $output
+	 * @param OutputInterface $output
 	 *
 	 * @return IFullTextSearchProvider
 	 * @throws ProviderDoesNotExistException
@@ -239,48 +255,50 @@ class Test extends Base {
 	 * @throws ProviderIsNotUniqueException
 	 * @throws QueryException
 	 */
-	private function testCreatingProvider($output) {
+	private function testCreatingProvider(OutputInterface $output): IFullTextSearchProvider {
 		$this->output($output, 'Creating mocked content provider.');
 		$testProvider = $this->generateMockProvider();
-		$this->output($output, true);
+		$this->outputResult($output, true);
 
 		return $testProvider;
 	}
 
 
 	/**
-	 * @param $output
+	 * @param OutputInterface $output
 	 * @param IFullTextSearchProvider $testProvider
 	 */
-	private function testMockedProvider($output, IFullTextSearchProvider $testProvider) {
+	private function testMockedProvider(
+		OutputInterface $output, IFullTextSearchProvider $testProvider
+	) {
 		$this->output($output, 'Testing mocked provider: get indexable documents.');
 		$testProvider->setIndexOptions(new IndexOptions());
 		$indexableDocuments =
 			$testProvider->generateIndexableDocuments(TestService::DOCUMENT_USER1);
 		$this->output($output, '(' . sizeof($indexableDocuments) . ' items)', false);
-		$this->output($output, true);
+		$this->outputResult($output, true);
 	}
 
 
 	/**
-	 * @param $output
+	 * @param OutputInterface $output
 	 *
 	 * @return IFullTextSearchPlatform
 	 * @throws Exception
 	 */
-	private function testLoadingPlatform($output) {
+	private function testLoadingPlatform(OutputInterface $output): IFullTextSearchPlatform {
 		$this->output($output, 'Loading search platform.');
 		$wrapper = $this->platformService->getPlatform();
 		$testPlatform = $wrapper->getPlatform();
 
 		$this->output($output, '(' . $testPlatform->getName() . ')', false);
-		$this->output($output, true);
+		$this->outputResult($output, true);
 
 		$this->output($output, 'Testing search platform.');
 		if (!$testPlatform->testPlatform()) {
 			throw new Exception ('Search platform (' . $testPlatform->getName() . ') down ?');
 		}
-		$this->output($output, true);
+		$this->outputResult($output, true);
 
 		return $testPlatform;
 	}
@@ -298,11 +316,12 @@ class Test extends Base {
 	) {
 		$this->output($output, 'Locking process');
 		$this->runner = new Runner($this->runningService, 'test');
+		$this->runner->sourceIsCommandLine($this, $output);
 		$this->runner->start();
 		$this->indexService->setRunner($this->runner);
 		$testPlatform->setRunner($this->runner);
 		$testProvider->setRunner($this->runner);
-		$this->output($output, true);
+		$this->outputResult($output, true);
 	}
 
 
@@ -316,7 +335,7 @@ class Test extends Base {
 	) {
 		$this->output($output, 'Removing test.');
 		$this->indexService->resetIndex($testProvider->getId());
-		$this->output($output, true);
+		$this->outputResult($output, true);
 	}
 
 
@@ -328,7 +347,7 @@ class Test extends Base {
 	) {
 		$this->output($output, 'Initializing index mapping.');
 		$testPlatform->initializeIndex();
-		$this->output($output, true);
+		$this->outputResult($output, true);
 	}
 
 
@@ -352,7 +371,7 @@ class Test extends Base {
 		$this->indexService->indexProviderContentFromUser(
 			$testPlatform, $testProvider, TestService::DOCUMENT_USER1, $options
 		);
-		$this->output($output, true);
+		$this->outputResult($output, true);
 	}
 
 
@@ -375,7 +394,7 @@ class Test extends Base {
 			$this->output(
 				$output, '(size: ' . $indexDocument->getContentSize() . ')', false
 			);
-			$this->output($output, true);
+			$this->outputResult($output, true);
 		} catch (Exception $e) {
 			throw new Exception(
 				"Issue while getting test document '" . TestService::DOCUMENT_TYPE_LICENSE
@@ -388,14 +407,13 @@ class Test extends Base {
 			$this->testService->generateIndexDocumentContentLicense(new IndexOptions()),
 			$indexDocument
 		);
-		$this->output($output, true);
+		$this->outputResult($output, true);
 	}
 
 
 	/**
 	 * @param OutputInterface $output
 	 * @param IFullTextSearchPlatform $testPlatform
-	 *
 	 * @param IFullTextSearchProvider $testProvider
 	 *
 	 * @throws Exception
@@ -456,7 +474,7 @@ class Test extends Base {
 		$this->output($output, 'Updating documents access.');
 		$options = new IndexOptions(
 			[
-				'provider'                            => TestProvider::TEST_PROVIDER_ID,
+				'provider' => TestProvider::TEST_PROVIDER_ID,
 				TestService::DOCUMENT_INDEXING_OPTION => TestService::DOCUMENT_INDEXING_ACCESS
 			]
 		);
@@ -464,14 +482,13 @@ class Test extends Base {
 		$this->indexService->indexProviderContentFromUser(
 			$testPlatform, $testProvider, TestService::DOCUMENT_USER1, $options
 		);
-		$this->output($output, true);
+		$this->outputResult($output, true);
 	}
 
 
 	/**
 	 * @param OutputInterface $output
 	 * @param IFullTextSearchPlatform $platform
-	 *
 	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @throws Exception
@@ -480,7 +497,6 @@ class Test extends Base {
 		OutputInterface $output, IFullTextSearchPlatform $platform,
 		IFullTextSearchProvider $provider
 	) {
-
 		$this->output($output, 'Searching with group access rights:');
 
 		$this->searchGroups($output, $platform, $provider, [], []);
@@ -505,7 +521,6 @@ class Test extends Base {
 	/**
 	 * @param OutputInterface $output
 	 * @param IFullTextSearchPlatform $platform
-	 *
 	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @throws Exception
@@ -531,7 +546,7 @@ class Test extends Base {
 	private function testUnlockingProcess(OutputInterface $output) {
 		$this->output($output, 'Unlocking process');
 		$this->runner->stop();
-		$this->output($output, true);
+		$this->outputResult($output, true);
 	}
 
 
@@ -549,7 +564,7 @@ class Test extends Base {
 	private function search(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider,
-		DocumentAccess $access, $search, $expected, $moreOutput = ''
+		DocumentAccess $access, string $search, array $expected, string $moreOutput = ''
 	) {
 		$this->output(
 			$output,
@@ -571,7 +586,7 @@ class Test extends Base {
 			false
 		);
 		$this->compareSearchResult($searchResult, $expected);
-		$this->output($output, true);
+		$this->outputResult($output, true);
 	}
 
 
@@ -586,7 +601,7 @@ class Test extends Base {
 	 */
 	private function searchGroups(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
-		IFullTextSearchProvider $testProvider, $groups, $expected
+		IFullTextSearchProvider $testProvider, array $groups, array $expected
 	) {
 
 		$access = new DocumentAccess();
@@ -611,7 +626,7 @@ class Test extends Base {
 	 */
 	private function searchUsers(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
-		IFullTextSearchProvider $testProvider, $user, $expected
+		IFullTextSearchProvider $testProvider, string $user, array $expected
 	) {
 		$access = new DocumentAccess();
 		$access->setViewerId($user);
@@ -624,11 +639,11 @@ class Test extends Base {
 
 	/**
 	 * @param SearchResult $searchResult
-	 * @param $entries
+	 * @param array $entries
 	 *
 	 * @throws Exception
 	 */
-	private function compareSearchResult(SearchResult $searchResult, $entries) {
+	private function compareSearchResult(SearchResult $searchResult, array $entries) {
 		$documents = $searchResult->getDocuments();
 		if (sizeof($documents) !== sizeof($entries)) {
 			throw new \Exception('Unexpected SearchResult: ' . json_encode($searchResult));
@@ -648,7 +663,7 @@ class Test extends Base {
 	 *
 	 * @throws InterruptException
 	 */
-	private function pause(OutputInterface $output, $s) {
+	private function pause(OutputInterface $output, int $s) {
 		$this->output($output, 'Pausing ' . $s . ' seconds');
 
 		for ($i = 1; $i <= $s; $i++) {
@@ -656,10 +671,23 @@ class Test extends Base {
 				throw new InterruptException('Interrupted by user');
 			}
 
-			$this->output($output, $i, false);
+			$this->output($output, (string)$i, false);
 		}
 
-		$this->output($output, true);
+		$this->outputResult($output, true);
+	}
+
+
+	/**
+	 * @throws TickDoesNotExistException
+	 */
+	public function abort() {
+		try {
+			$this->abortIfInterrupted();
+		} catch (InterruptedException $e) {
+			$this->runner->stop();
+			exit();
+		}
 	}
 
 }

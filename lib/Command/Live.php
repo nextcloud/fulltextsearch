@@ -52,6 +52,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 
 
+/**
+ * Class Live
+ *
+ * @package OCA\FullTextSearch\Command
+ */
 class Live extends ACommandBase {
 
 	const CYCLE_DELAY = 300000;
