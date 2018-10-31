@@ -27,11 +27,10 @@
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\ExtendedBase;
-use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Model\Index as ModelIndex;
+use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\CliService;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
@@ -42,11 +41,15 @@ use OCA\FullTextSearch\Service\RunningService;
 use OCP\IUserManager;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
+use Throwable;
 
 
 class Live extends ExtendedBase {
+
+	const INDEX_OPTION_NO_READLINE = '_no-readline';
 
 	const CYCLE_DELAY = 300000;
 
@@ -174,7 +177,11 @@ class Live extends ExtendedBase {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:live')
-			 ->setDescription('Index files');
+			 ->setDescription('Index files')
+			 ->addOption(
+				 'no-readline', 'r', InputOption::VALUE_NONE,
+				 'disable readline - non interactive mode'
+			 );
 	}
 
 
@@ -191,11 +198,17 @@ class Live extends ExtendedBase {
 			throw new Exception('This feature is only available on Nextcloud 14 or newer');
 		}
 
-		/** do not get stuck while waiting interactive input */
-		readline_callback_handler_install(
-			'', function() {
+		if (!$input->getOption('no-readline')) {
+			try {
+				/** do not get stuck while waiting interactive input */
+				readline_callback_handler_install(
+					'', function() {
+				}
+				);
+			} catch (Throwable $t) {
+				throw new Exception('Please install php-readline, or use --no-readline');
+			}
 		}
-		);
 		stream_set_blocking(STDIN, false);
 
 		$this->terminal = new Terminal();
@@ -213,7 +226,7 @@ class Live extends ExtendedBase {
 		$this->indexService->setRunner($this->runner);
 		$this->cliService->setRunner($this->runner);
 
-		$this->generatePanels();
+		$this->generatePanels(!$input->getOption('no-readline'));
 
 
 		try {
@@ -238,7 +251,6 @@ class Live extends ExtendedBase {
 
 	/**
 	 * @throws Exception
-	 * @throws InterruptException
 	 * @throws TickDoesNotExistException
 	 */
 	private function liveCycle() {
@@ -350,9 +362,9 @@ class Live extends ExtendedBase {
 
 
 	/**
-	 *
+	 * @param bool $commands
 	 */
-	private function generatePanels() {
+	private function generatePanels(bool $commands) {
 
 		$this->cliService->createPanel(
 			self::PANEL_RUN,
@@ -424,12 +436,14 @@ class Live extends ExtendedBase {
 		$this->cliService->displayPanel('indexPanel', self::PANEL_INDEX);
 		$this->cliService->displayPanel('resultsPanel', self::PANEL_RESULT);
 		$this->cliService->displayPanel('errorsPanel', self::PANEL_ERRORS);
-		$this->cliService->displayPanel('navigation', self::PANEL_COMMANDS_NAVIGATION);
 
-		if ($this->runner->isPaused()) {
-			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_PAUSED);
-		} else {
-			$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
+		if ($commands) {
+			$this->cliService->displayPanel('navigation', self::PANEL_COMMANDS_NAVIGATION);
+			if ($this->runner->isPaused()) {
+				$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_PAUSED);
+			} else {
+				$this->cliService->displayPanel('commands', self::PANEL_COMMANDS_ROOT);
+			}
 		}
 
 		$this->runner->setInfoArray(

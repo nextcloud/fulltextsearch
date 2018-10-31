@@ -53,7 +53,6 @@ class Index extends ExtendedBase {
 
 	const INDEX_OPTION_NO_READLINE = '_no-readline';
 
-
 //			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
 	const PANEL_RUN = 'run';
 	const PANEL_RUN_LINE_OPTIONS = 'Options: %options%';
