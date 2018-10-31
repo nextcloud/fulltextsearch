@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use OCA\FullTextSearch\Db\TickRequest;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
@@ -33,7 +38,14 @@ use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullTextSearch\Model\Tick;
 use OCA\FullTextSearch\Model\Runner;
 
+
+/**
+ * Class RunningService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class RunningService {
+
 
 	/** @var TickRequest */
 	private $tickRequest;
@@ -62,13 +74,13 @@ class RunningService {
 
 
 	/**
-	 * @param $source
+	 * @param string $source
 	 *
 	 * @return int
 	 * @throws RunnerAlreadyUpException
 	 * @throws \Exception
 	 */
-	public function start($source) {
+	public function start(string $source): int {
 
 		if ($this->isAlreadyRunning()) {
 			throw new RunnerAlreadyUpException('Index is already running');
@@ -91,7 +103,7 @@ class RunningService {
 	 * @throws TickDoesNotExistException
 	 * @throws TickIsNotAliveException
 	 */
-	public function update($runId, $action = '') {
+	public function update(int $runId, string $action = '') {
 		$tick = $this->tickRequest->getTickById($runId);
 
 		$this->isStillAlive($tick, true);
@@ -107,11 +119,12 @@ class RunningService {
 
 	/**
 	 * @deprecated - verifier l'interet !
+	 *
 	 * @param int $runId
 	 * @param string $reason
 	 * @param bool $stop
 	 */
-	public function exception($runId, $reason, $stop = false) {
+	public function exception(int $runId, string $reason, bool $stop = false) {
 		if ($stop) {
 			try {
 				$this->stop($runId, $reason);
@@ -146,12 +159,12 @@ class RunningService {
 
 
 	/**
-	 * @param $runId
+	 * @param int $runId
 	 *
 	 * @return bool
 	 * @throws TickIsNotAliveException
 	 */
-	public function isAlive($runId) {
+	public function isAlive(int $runId): bool {
 		$tick = null;
 		try {
 			$tick = $this->tickRequest->getTickById($runId);
@@ -170,7 +183,7 @@ class RunningService {
 	 * @return bool
 	 * @throws TickIsNotAliveException
 	 */
-	public function isStillAlive(Tick $tick, $exception = false) {
+	public function isStillAlive(Tick $tick, bool $exception = false): bool {
 		if ($tick->getStatus() !== 'run') {
 			if ($exception) {
 				throw new TickIsNotAliveException();
@@ -186,7 +199,7 @@ class RunningService {
 	/**
 	 * @return bool
 	 */
-	public function isAlreadyRunning() {
+	public function isAlreadyRunning(): bool {
 		$ticks = $this->tickRequest->getTicksByStatus('run');
 
 		$isAlreadyRunning = false;
@@ -220,7 +233,7 @@ class RunningService {
 	 * @param Tick $tick
 	 * @param string $action
 	 */
-	private function assignActionToTick(Tick &$tick, $action) {
+	private function assignActionToTick(Tick &$tick, string $action) {
 		$now = microtime(true);
 		$preAction = $tick->getAction();
 

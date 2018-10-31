@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,22 +27,41 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use OCA\FullTextSearch\AppInfo\Application;
 use OCP\ILogger;
 use OCP\Util;
 
+
+/**
+ * Class MiscService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class MiscService {
 
 	/** @var ILogger */
 	private $logger;
 
+
+	/**
+	 * MiscService constructor.
+	 *
+	 * @param ILogger $logger
+	 */
 	public function __construct(ILogger $logger) {
 		$this->logger = $logger;
 	}
 
-	public function log($message, $level = 2) {
+
+	/**
+	 * @param string $message
+	 * @param int $level
+	 */
+	public function log(string $message, int $level = 2) {
 		$data = array(
 			'app'   => Application::APP_NAME,
 			'level' => $level
@@ -47,59 +69,6 @@ class MiscService {
 
 		$this->logger->log($level, $message, $data);
 	}
-
-	/**
-	 * @param $arr
-	 * @param $k
-	 *
-	 * @param string $default
-	 *
-	 * @return array|string|integer
-	 */
-	public static function get($k, $arr, $default = '') {
-		if ($arr === null) {
-			return $default;
-		}
-
-		if (!key_exists($k, $arr)) {
-			return $default;
-		}
-
-		return $arr[$k];
-	}
-
-
-	public static function noEndSlash($path) {
-		if (substr($path, -1) === '/') {
-			$path = substr($path, 0, -1);
-		}
-
-		return $path;
-	}
-
-
-	/**
-	 * @param string $time
-	 *
-	 * @return float
-	 */
-	public static function getMicroTime($time) {
-		list($usec, $sec) = explode(' ', $time);
-
-		return ((float)$usec + (float)$sec);
-	}
-
-
-	public function addJavascript() {
-		Util::addStyle(Application::APP_NAME, 'fulltextsearch');
-		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.api');
-		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.settings');
-		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.searchbox');
-		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.result');
-		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1.navigation');
-		Util::addScript(Application::APP_NAME, 'fulltextsearch.v1');
-	}
-
 
 }
 

@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
@@ -32,12 +37,20 @@ use OCP\IConfig;
 use OCP\PreConditionNotMetException;
 use OCP\Util;
 
+
+/**
+ * Class ConfigService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class ConfigService {
+
 
 	const APP_NAVIGATION = 'app_navigation';
 	const SEARCH_PLATFORM = 'search_platform';
 	const PROVIDER_INDEXED = 'provider_indexed';
 	const CRON_LAST_ERR_RESET = 'cron_err_reset';
+
 
 	/** @var array */
 	public $defaults = [
@@ -46,6 +59,7 @@ class ConfigService {
 		self::PROVIDER_INDEXED    => '',
 		self::CRON_LAST_ERR_RESET => '0'
 	];
+
 
 	/** @var IConfig */
 	private $config;
@@ -65,7 +79,7 @@ class ConfigService {
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IConfig $config, $userId, MiscService $miscService
+		IConfig $config, string $userId, MiscService $miscService
 	) {
 		$this->config = $config;
 		$this->userId = $userId;
@@ -76,7 +90,7 @@ class ConfigService {
 	/**
 	 * @return array
 	 */
-	public function getConfig() {
+	public function getConfig(): array {
 		$keys = array_keys($this->defaults);
 		$data = [];
 
@@ -91,7 +105,7 @@ class ConfigService {
 	/**
 	 * @param array $save
 	 */
-	public function setConfig($save) {
+	public function setConfig(array $save) {
 		$keys = array_keys($this->defaults);
 
 		foreach ($keys as $k) {
@@ -121,7 +135,7 @@ class ConfigService {
 	 *
 	 * @return string
 	 */
-	public function getAppValue($key) {
+	public function getAppValue(string $key): string {
 		$defaultValue = null;
 		if (array_key_exists($key, $this->defaults)) {
 			$defaultValue = $this->defaults[$key];
@@ -135,10 +149,8 @@ class ConfigService {
 	 *
 	 * @param string $key
 	 * @param string $value
-	 *
-	 * @return void
 	 */
-	public function setAppValue($key, $value) {
+	public function setAppValue(string $key, string $value) {
 		$this->config->setAppValue(Application::APP_NAME, $key, $value);
 	}
 
@@ -146,11 +158,9 @@ class ConfigService {
 	 * remove a key
 	 *
 	 * @param string $key
-	 *
-	 * @return string
 	 */
-	public function deleteAppValue($key) {
-		return $this->config->deleteAppValue(Application::APP_NAME, $key);
+	public function deleteAppValue(string $key) {
+		$this->config->deleteAppValue(Application::APP_NAME, $key);
 	}
 
 	/**
@@ -160,7 +170,7 @@ class ConfigService {
 	 *
 	 * @return string
 	 */
-	public function getUserValue($key) {
+	public function getUserValue(string $key): string {
 		$defaultValue = null;
 		if (array_key_exists($key, $this->defaults)) {
 			$defaultValue = $this->defaults[$key];
@@ -177,11 +187,10 @@ class ConfigService {
 	 * @param string $key
 	 * @param string $value
 	 *
-	 * @return string
 	 * @throws PreConditionNotMetException
 	 */
-	public function setUserValue($key, $value) {
-		return $this->config->setUserValue($this->userId, Application::APP_NAME, $key, $value);
+	public function setUserValue(string $key, string $value) {
+		$this->config->setUserValue($this->userId, Application::APP_NAME, $key, $value);
 	}
 
 	/**
@@ -192,7 +201,7 @@ class ConfigService {
 	 *
 	 * @return string
 	 */
-	public function getValueForUser($userId, $key) {
+	public function getValueForUser(string $userId, string $key) {
 		return $this->config->getUserValue($userId, Application::APP_NAME, $key);
 	}
 
@@ -206,8 +215,8 @@ class ConfigService {
 	 * @return string
 	 * @throws PreConditionNotMetException
 	 */
-	public function setValueForUser($userId, $key, $value) {
-		return $this->config->setUserValue($userId, Application::APP_NAME, $key, $value);
+	public function setValueForUser(string $userId, string $key, string $value) {
+		$this->config->setUserValue($userId, Application::APP_NAME, $key, $value);
 	}
 
 
@@ -216,7 +225,7 @@ class ConfigService {
 	 * @param string $options
 	 * @param string $value
 	 */
-	public function setProviderOptions($providerId, $options, $value) {
+	public function setProviderOptions(string $providerId, string $options, string $value) {
 		$arr = json_decode($this->getAppValue($options), true);
 		if ($arr === null) {
 			$arr = [];
@@ -231,7 +240,7 @@ class ConfigService {
 	/**
 	 * @param string $options
 	 */
-	public function resetProviderOptions($options) {
+	public function resetProviderOptions(string $options) {
 		$this->setAppValue($options, '');
 	}
 
@@ -243,7 +252,7 @@ class ConfigService {
 	 * @return string
 	 * @throws ProviderOptionsDoesNotExistException
 	 */
-	public function getProviderOptions($providerId, $options) {
+	public function getProviderOptions(string $providerId, string $options): string {
 		$arr = json_decode($this->getAppValue($options), true);
 		if ($arr === null) {
 			$arr = [];
@@ -259,18 +268,11 @@ class ConfigService {
 
 	/**
 	 * return the cloud version.
-	 * if $complete is true, return a string x.y.z
 	 *
-	 * @param boolean $complete
-	 *
-	 * @return string|integer
+	 * @return int
 	 */
-	public function getCloudVersion($complete = false) {
+	public function getCloudVersion(): int {
 		$ver = Util::getVersion();
-
-		if ($complete) {
-			return implode('.', $ver);
-		}
 
 		return $ver[0];
 	}

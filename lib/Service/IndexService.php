@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use Exception;
 use OCA\FullTextSearch\Db\IndexesRequest;
@@ -43,7 +48,14 @@ use OCP\FullTextSearch\Model\IndexDocument;
 use OCP\FullTextSearch\Model\IRunner;
 use OCP\FullTextSearch\Service\IIndexService;
 
+
+/**
+ * Class IndexService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class IndexService implements IIndexService {
+
 
 	/** @var IndexesRequest */
 	private $indexesRequest;
@@ -150,7 +162,8 @@ class IndexService implements IIndexService {
 	 * @throws Exception
 	 */
 	public function indexProviderContentFromUser(
-		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, $userId, $options
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, string $userId,
+		IndexOptions $options
 	) {
 		$this->updateRunnerAction('generateIndex' . $provider->getName());
 		$this->updateRunnerInfoArray(
@@ -190,7 +203,7 @@ class IndexService implements IIndexService {
 	 */
 	private function updateDocumentsWithCurrIndex(
 		IFullTextSearchProvider $provider, array $documents, IIndexOptions $options
-	) {
+	): array {
 		$currIndex = $this->getProviderIndexFromProvider($provider->getId());
 		$result = [];
 		$count = 0;
@@ -198,7 +211,7 @@ class IndexService implements IIndexService {
 
 			if ($count % 1000 === 0) {
 				$this->updateRunnerAction('compareWithCurrentIndex', true);
-				$this->updateRunnerInfo('documentCurrent', $count);
+				$this->updateRunnerInfo('documentCurrent', (string)$count);
 			}
 			$count++;
 
@@ -214,13 +227,13 @@ class IndexService implements IIndexService {
 				continue;
 			}
 
-			if ($options->getOption('force', false) === true) {
+			if ($options->getOptionBool('force', false) === true) {
 				$index->setStatus(Index::INDEX_FULL);
 			}
 
 			$index->resetErrors();
 			$document->setIndex($index);
-			if ($options->getOption('force', false) === true
+			if ($options->getOptionBool('force', false) === true
 				|| !$this->isDocumentUpToDate($provider, $document)) {
 				$result[] = $document;
 			}
@@ -237,7 +250,7 @@ class IndexService implements IIndexService {
 	 * @return bool
 	 */
 	private function isDocumentUpToDate(IFullTextSearchProvider $provider, IndexDocument $document
-	) {
+	): bool {
 		$index = $document->getIndex();
 
 		if (!$index->isStatus(Index::INDEX_OK)) {
@@ -257,7 +270,7 @@ class IndexService implements IIndexService {
 	 *
 	 * @return ProviderIndexes
 	 */
-	private function getProviderIndexFromProvider(string $providerId) {
+	private function getProviderIndexFromProvider(string $providerId): ProviderIndexes {
 		$indexes = $this->indexesRequest->getIndexesFromProvider($providerId);
 
 		return new ProviderIndexes($indexes);
@@ -343,7 +356,8 @@ class IndexService implements IIndexService {
 	 * @return IIndex
 	 * @throws Exception
 	 */
-	public function indexDocument(IFullTextSearchPlatform $platform, $document) {
+	public function indexDocument(IFullTextSearchPlatform $platform, IndexDocument $document
+	): IIndex {
 		$this->updateRunnerAction('indexDocument', true);
 		$this->updateRunnerInfoArray(
 			[
@@ -369,7 +383,6 @@ class IndexService implements IIndexService {
 	 * @param IFullTextSearchProvider $provider
 	 * @param Index $index
 	 *
-	 * @internal param int|string $documentId
 	 * @throws Exception
 	 */
 	public function updateDocument(
@@ -463,6 +476,9 @@ class IndexService implements IIndexService {
 	}
 
 
+	/**
+	 * @param IIndex $index
+	 */
 	private function updateIndexError(IIndex $index) {
 
 	}
@@ -556,7 +572,7 @@ class IndexService implements IIndexService {
 	/**
 	 * @return Index[]
 	 */
-	public function getErrorIndexes() {
+	public function getErrorIndexes(): array {
 		return $this->indexesRequest->getErrorIndexes();
 	}
 
@@ -578,7 +594,7 @@ class IndexService implements IIndexService {
 	 *
 	 * @return Index[]
 	 */
-	public function getQueuedIndexes($all = false) {
+	public function getQueuedIndexes(bool $all = false): array {
 		return $this->indexesRequest->getQueuedIndexes($all);
 	}
 
@@ -588,7 +604,7 @@ class IndexService implements IIndexService {
 	 *
 	 * @throws Exception
 	 */
-	public function resetIndex($providerId = '') {
+	public function resetIndex(string $providerId = '') {
 		$wrapper = $this->platformService->getPlatform();
 		$platform = $wrapper->getPlatform();
 

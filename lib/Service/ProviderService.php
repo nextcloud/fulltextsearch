@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use Exception;
 use OC\App\AppManager;
@@ -40,7 +45,13 @@ use OCP\FullTextSearch\Service\IProviderService;
 use OCP\Util;
 
 
+/**
+ * Class ProviderService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class ProviderService implements IProviderService {
+
 
 	/** @var AppManager */
 	private $appManager;
@@ -64,7 +75,6 @@ class ProviderService implements IProviderService {
 	 * @param AppManager $appManager
 	 * @param ConfigService $configService
 	 * @param MiscService $miscService
-	 *
 	 */
 	public function __construct(
 		AppManager $appManager, ConfigService $configService, MiscService $miscService
@@ -106,7 +116,7 @@ class ProviderService implements IProviderService {
 	 * @throws ProviderIsNotUniqueException
 	 * @throws QueryException
 	 */
-	public function loadProvider($appId, $providerId) {
+	public function loadProvider(string $appId, string $providerId) {
 
 		$provider = \OC::$server->query((string)$providerId);
 		if (!($provider instanceof IFullTextSearchProvider)) {
@@ -131,7 +141,7 @@ class ProviderService implements IProviderService {
 	 * @return ProviderWrapper[]
 	 * @throws Exception
 	 */
-	public function getProviders() {
+	public function getProviders(): array {
 		$this->loadProviders();
 
 		return $this->providers;
@@ -141,7 +151,7 @@ class ProviderService implements IProviderService {
 	 * @return IFullTextSearchProvider[]
 	 * @throws Exception
 	 */
-	public function getConfiguredProviders() {
+	public function getConfiguredProviders(): array {
 		$this->loadProviders();
 
 		$providers = [];
@@ -163,7 +173,7 @@ class ProviderService implements IProviderService {
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function getFilteredProviders($providerList) {
+	public function getFilteredProviders(array $providerList): array {
 		$this->loadProviders();
 
 		$providers = $this->getConfiguredProviders();
@@ -190,7 +200,7 @@ class ProviderService implements IProviderService {
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function getProvider($providerId) {
+	public function getProvider(string $providerId): ProviderWrapper {
 
 		$providers = $this->getProviders();
 		foreach ($providers as $providerWrapper) {
@@ -209,7 +219,7 @@ class ProviderService implements IProviderService {
 	 *
 	 * @return bool
 	 */
-	public function isProviderIndexed(string $providerId) {
+	public function isProviderIndexed(string $providerId): bool {
 		try {
 			$indexed = $this->configService->getProviderOptions(
 				$providerId, ConfigService::PROVIDER_INDEXED
@@ -227,13 +237,20 @@ class ProviderService implements IProviderService {
 	}
 
 
-	public function setProviderAsIndexed(IFullTextSearchProvider $provider, $boolean) {
+	/**
+	 * @param IFullTextSearchProvider $provider
+	 * @param bool $boolean
+	 */
+	public function setProviderAsIndexed(IFullTextSearchProvider $provider, bool $boolean) {
 		$this->configService->setProviderOptions(
 			$provider->getId(), ConfigService::PROVIDER_INDEXED, (($boolean) ? '1' : '0')
 		);
 	}
 
 
+	/**
+	 *
+	 */
 	public function setProvidersAsNotIndexed() {
 		$this->configService->resetProviderOptions(ConfigService::PROVIDER_INDEXED);
 	}
@@ -246,7 +263,7 @@ class ProviderService implements IProviderService {
 	 * @throws ProviderIsNotUniqueException
 	 * @throws QueryException
 	 */
-	private function loadProvidersFromApp($appId) {
+	private function loadProvidersFromApp(string $appId) {
 		$appInfo = $this->appManager->getAppInfo($appId);
 		if (!is_array($appInfo) || !key_exists('fulltextsearch', $appInfo)
 			|| !key_exists('provider', $appInfo['fulltextsearch'])) {
@@ -254,19 +271,23 @@ class ProviderService implements IProviderService {
 		}
 
 		$providers = $appInfo['fulltextsearch']['provider'];
+		if (!is_array($providers)) {
+			$providers = [$providers];
+		}
+
 		$this->loadProvidersFromList($appId, $providers);
 	}
 
 
 	/**
 	 * @param string $appId
-	 * @param string|array $providers
+	 * @param array $providers
 	 *
 	 * @throws ProviderIsNotCompatibleException
 	 * @throws ProviderIsNotUniqueException
 	 * @throws QueryException
 	 */
-	private function loadProvidersFromList($appId, $providers) {
+	private function loadProvidersFromList(string $appId, array $providers) {
 		if (!is_array($providers)) {
 			$providers = [$providers];
 		}
@@ -300,7 +321,7 @@ class ProviderService implements IProviderService {
 	 *
 	 * @return array
 	 */
-	public function serialize($providers) {
+	public function serialize(array $providers): array {
 		$arr = [];
 		foreach ($providers as $provider) {
 			$arr[] = [

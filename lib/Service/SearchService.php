@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use Exception;
 use OC\App\AppManager;
@@ -45,7 +50,13 @@ use OCP\IUser;
 use OCP\IUserManager;
 
 
+/**
+ * Class SearchService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class SearchService implements ISearchService {
+
 
 	/** @var string */
 	private $userId;
@@ -73,7 +84,7 @@ class SearchService implements ISearchService {
 
 
 	/**
-	 * IndexService constructor.
+	 * SearchService constructor.
 	 *
 	 * @param string $userId
 	 * @param AppManager $appManager
@@ -85,7 +96,8 @@ class SearchService implements ISearchService {
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		$userId, AppManager $appManager, IUserManager $userManager, IGroupManager $groupManager,
+		string $userId, AppManager $appManager, IUserManager $userManager,
+		IGroupManager $groupManager,
 		ConfigService $configService, ProviderService $providerService,
 		PlatformService $platformService,
 		MiscService $miscService
@@ -177,9 +189,9 @@ class SearchService implements ISearchService {
 	 * @return ISearchResult[]
 	 */
 	private function searchFromProviders(
-		IFullTextSearchPlatform $platform, $providers, DocumentAccess $access,
+		IFullTextSearchPlatform $platform, array $providers, DocumentAccess $access,
 		SearchRequest $request
-	) {
+	): array {
 		$result = [];
 		foreach ($providers AS $provider) {
 			$provider->improveSearchRequest($request);
@@ -203,7 +215,7 @@ class SearchService implements ISearchService {
 	 *
 	 * @return DocumentAccess
 	 */
-	private function getDocumentAccessFromUser(IUser $user) {
+	private function getDocumentAccessFromUser(IUser $user): DocumentAccess {
 		$rights = new DocumentAccess();
 
 		$rights->setViewerId($user->getUID());
