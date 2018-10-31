@@ -36,6 +36,7 @@ use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\IConfig;
 use OCP\IRequest;
 
@@ -50,6 +51,9 @@ class NavigationController extends Controller {
 
 	/** @var IConfig */
 	private $config;
+
+	/** @var IFullTextSearchManager */
+	private $fullTextSearchManager;
 
 	/** @var ConfigService */
 	private $configService;
@@ -67,10 +71,12 @@ class NavigationController extends Controller {
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IRequest $request, IConfig $config, ConfigService $configService, MiscService $miscService
+		IRequest $request, IConfig $config, IFullTextSearchManager $fullTextSearchManager,
+		ConfigService $configService, MiscService $miscService
 	) {
 		parent::__construct(Application::APP_NAME, $request);
 		$this->config = $config;
+		$this->fullTextSearchManager = $fullTextSearchManager;
 		$this->configService = $configService;
 		$this->miscService = $miscService;
 	}
@@ -87,7 +93,11 @@ class NavigationController extends Controller {
 
 		$themingName = $this->config->getAppValue('theming', 'name', 'Nextcloud');
 
-		$data = ['themingName' => $themingName];
+		$data = [
+			'themingName' => $themingName
+		];
+
+		$this->fullTextSearchManager->addJavascriptAPI();
 
 		return new TemplateResponse(Application::APP_NAME, 'navigate', $data);
 	}

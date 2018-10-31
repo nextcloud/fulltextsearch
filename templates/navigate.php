@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,11 +27,18 @@
  *
  */
 
-use OCA\FullTextSearch\Api\v1\FullTextSearch;
+
 use OCA\FullTextSearch\AppInfo\Application;
+use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\Util;
 
-FullTextSearch::addJavascriptAPI();
+
+if (isset($_) && is_array($_) && array_key_exists('fullTextSearchManager', $_)) {
+	/** @var IFullTextSearchManager $fullTextSearchManager */
+	$fullTextSearchManager = $_['fullTextSearchManager'];
+	$fullTextSearchManager->addJavascriptAPI();
+}
+
 Util::addScript(Application::APP_NAME, 'navigate');
 Util::addStyle(Application::APP_NAME, 'navigate');
 
@@ -37,14 +47,14 @@ Util::addStyle(Application::APP_NAME, 'navigate');
 <div id="app-navigation">
 	<ul id="search_navigation">
 		<li style="height: 50px">
-				<div id="search_header">
-					<div>
-						<input id="search_input"
-							   placeholder="<?php p(
-								   $l->t('Search on %s', [$_['themingName']])
-							   ); ?>">
-					</div>
+			<div id="search_header">
+				<div>
+					<input id="search_input"
+						   placeholder="<?php p(
+							   $l->t('Search on %s', [$_['themingName']])
+						   ); ?>">
 				</div>
+			</div>
 		</li>
 	</ul>
 </div>
