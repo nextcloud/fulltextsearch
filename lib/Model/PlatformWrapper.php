@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -28,6 +31,7 @@
 namespace OCA\FullTextSearch\Model;
 
 
+use OC\App\Platform;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 
 
@@ -85,7 +89,7 @@ class PlatformWrapper {
 	/**
 	 * @return string
 	 */
-	public function getClass() {
+	public function getClass(): string {
 		return $this->class;
 	}
 
@@ -94,7 +98,7 @@ class PlatformWrapper {
 	 *
 	 * @return PlatformWrapper
 	 */
-	public function setClass($class) {
+	public function setClass(string $class): PlatformWrapper {
 		$this->class = $class;
 
 		return $this;
@@ -104,7 +108,7 @@ class PlatformWrapper {
 	/**
 	 * @return IFullTextSearchPlatform
 	 */
-	public function getPlatform() {
+	public function getPlatform(): IFullTextSearchPlatform {
 		return $this->platform;
 	}
 
@@ -113,7 +117,7 @@ class PlatformWrapper {
 	 *
 	 * @return PlatformWrapper
 	 */
-	public function setPlatform($platform) {
+	public function setPlatform(IFullTextSearchPlatform $platform): PlatformWrapper {
 		$this->platform = $platform;
 
 		return $this;
@@ -123,7 +127,7 @@ class PlatformWrapper {
 	/**
 	 * @return string
 	 */
-	public function getVersion() {
+	public function getVersion(): string {
 		return $this->version;
 	}
 
@@ -132,7 +136,7 @@ class PlatformWrapper {
 	 *
 	 * @return PlatformWrapper
 	 */
-	public function setVersion($version) {
+	public function setVersion(string $version): PlatformWrapper {
 		$this->version = $version;
 
 		return $this;

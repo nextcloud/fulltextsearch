@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,13 +27,25 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Model;
 
+
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
-use OCA\FullTextSearch\Service\MiscService;
 use OCP\FullTextSearch\Model\ISearchRequest;
 
+
+/**
+ * Class SearchRequest
+ *
+ * @package OCA\FullTextSearch\Model
+ */
 class SearchRequest implements ISearchRequest, JsonSerializable {
+
+
+	use TArrayTools;
+
 
 	/** @var array */
 	private $providers;
@@ -316,11 +331,7 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	 * @return string
 	 */
 	public function getOption(string $option, string $default = ''): string {
-		if (array_key_exists($option, $this->options)) {
-			return $this->options[$option];
-		}
-
-		return $default;
+		return $this->get($option, $this->options, $default);
 	}
 
 
@@ -331,14 +342,7 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	 * @return array
 	 */
 	public function getOptionArray(string $option, array $default = []): array {
-		if (array_key_exists($option, $this->options)) {
-			$options = $this->options[$option];
-			if (is_array($options)) {
-				return $this->options[$option];
-			}
-		}
-
-		return $default;
+		return $this->getArray($option, $this->options, $default);
 	}
 
 
@@ -648,7 +652,7 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'providers' => $this->getProviders(),
 			'author'    => $this->getAuthor(),
@@ -665,39 +669,41 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 
 
 	/**
-	 * @param string $json
-	 *
-	 * @return SearchRequest
-	 */
-	public static function fromJSON(string $json): SearchRequest {
-		return self::fromArray(json_decode($json, true));
-	}
-
-	/**
 	 * @param array $arr
 	 *
 	 * @return SearchRequest
 	 */
-	public static function fromArray($arr): SearchRequest {
+	public function importFromArray($arr): SearchRequest {
 		$providers = $arr['providers'];
 		if (!is_array($providers)) {
 			$providers = [$providers];
 		}
 
-		$request = new SearchRequest();
-		$request->setProviders($providers);
-		$request->setAuthor(MiscService::get('author', $arr, ''));
-		$request->setSearch(MiscService::get('search', $arr, ''));
-		$request->setPage(MiscService::get('page', $arr, 0));
-		$request->setParts(MiscService::get('parts', $arr, []));
-		$request->setSize(MiscService::get('size', $arr, 10));
-		$request->setOptions(MiscService::get('options', $arr, []));
-		$request->setMetaTags(MiscService::get('metatags', $arr, []));
-		$request->setSubTags(MiscService::get('subtags', $arr, []));
-		$request->setTags(MiscService::get('tags', $arr, []));
+		$this->setProviders($providers);
+		$this->setAuthor($this->get('author', $arr, ''));
+		$this->setSearch($this->get('search', $arr, ''));
+		$this->setPage($this->getInt('page', $arr, 0));
+		$this->setParts($this->getArray('parts', $arr, []));
+		$this->setSize($this->getInt('size', $arr, 10));
+		$this->setOptions($this->getArray('options', $arr, []));
+		$this->setMetaTags($this->getArray('metatags', $arr, []));
+		$this->setSubTags($this->getArray('subtags', $arr, []));
+		$this->setTags($this->getArray('tags', $arr, []));
 
-		return $request;
+		return $this;
 	}
 
+
+	/**
+	 * @param string $json
+	 *
+	 * @return SearchRequest
+	 */
+	public static function fromJSON(string $json): SearchRequest {
+		$searchRequest = new SearchRequest();
+		$searchRequest->importFromArray(json_decode($json, true));
+
+		return $searchRequest;
+	}
 
 }

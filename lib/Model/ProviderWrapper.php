@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -55,7 +58,7 @@ class ProviderWrapper {
 	 * @param string $appId
 	 * @param IFullTextSearchProvider $provider
 	 */
-	public function __construct($appId, $provider) {
+	public function __construct(string $appId, IFullTextSearchProvider $provider) {
 		$this->appId = $appId;
 		$this->provider = $provider;
 	}
@@ -63,7 +66,7 @@ class ProviderWrapper {
 	/**
 	 * @return string
 	 */
-	public function getAppId() {
+	public function getAppId(): string {
 		return $this->appId;
 	}
 
@@ -72,7 +75,7 @@ class ProviderWrapper {
 	 *
 	 * @return ProviderWrapper
 	 */
-	public function setAppId($appId) {
+	public function setAppId(string $appId): ProviderWrapper {
 		$this->appId = $appId;
 
 		return $this;
@@ -82,7 +85,7 @@ class ProviderWrapper {
 	/**
 	 * @return IFullTextSearchProvider
 	 */
-	public function getProvider() {
+	public function getProvider(): IFullTextSearchProvider {
 		return $this->provider;
 	}
 
@@ -91,7 +94,7 @@ class ProviderWrapper {
 	 *
 	 * @return ProviderWrapper
 	 */
-	public function setProvider($provider) {
+	public function setProvider(IFullTextSearchProvider $provider): ProviderWrapper {
 		$this->provider = $provider;
 
 		return $this;
@@ -101,7 +104,7 @@ class ProviderWrapper {
 	/**
 	 * @return string
 	 */
-	public function getVersion() {
+	public function getVersion(): string {
 		return $this->version;
 	}
 
@@ -110,7 +113,7 @@ class ProviderWrapper {
 	 *
 	 * @return ProviderWrapper
 	 */
-	public function setVersion($version) {
+	public function setVersion(string $version): ProviderWrapper {
 		$this->version = $version;
 
 		return $this;
@@ -118,3 +121,4 @@ class ProviderWrapper {
 
 
 }
+

@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -28,7 +31,18 @@
 namespace OCA\FullTextSearch\Model;
 
 
+use daita\MySmallPhpTools\Traits\TArrayTools;
+
+/**
+ * Class Tick
+ *
+ * @package OCA\FullTextSearch\Model
+ */
 class Tick {
+
+
+	use TArrayTools;
+
 
 	/** @var int */
 	private $id;
@@ -52,7 +66,13 @@ class Tick {
 	private $action;
 
 
-	public function __construct($source, $id = 0) {
+	/**
+	 * Tick constructor.
+	 *
+	 * @param string $source
+	 * @param int $id
+	 */
+	public function __construct(string $source, int $id = 0) {
 		$this->source = $source;
 		$this->id = $id;
 	}
@@ -61,7 +81,7 @@ class Tick {
 	/**
 	 * @return int
 	 */
-	public function getId() {
+	public function getId(): int {
 		return $this->id;
 	}
 
@@ -70,7 +90,7 @@ class Tick {
 	 *
 	 * @return $this
 	 */
-	public function setId($id) {
+	public function setId(int $id): Tick {
 		$this->id = $id;
 
 		return $this;
@@ -80,7 +100,7 @@ class Tick {
 	/**
 	 * @return string
 	 */
-	public function getSource() {
+	public function getSource(): string {
 		return $this->source;
 	}
 
@@ -88,7 +108,7 @@ class Tick {
 	/**
 	 * @return array
 	 */
-	public function getData() {
+	public function getData(): array {
 		return $this->data;
 	}
 
@@ -97,7 +117,7 @@ class Tick {
 	 *
 	 * @return $this
 	 */
-	public function setData($data) {
+	public function setData(array $data): Tick {
 		$this->data = $data;
 
 		return $this;
@@ -107,7 +127,7 @@ class Tick {
 	/**
 	 * @return int
 	 */
-	public function getTick() {
+	public function getTick(): int {
 		return $this->tick;
 	}
 
@@ -116,7 +136,7 @@ class Tick {
 	 *
 	 * @return $this
 	 */
-	public function setTick($tick = 0) {
+	public function setTick(int $tick = 0): Tick {
 		if ($tick === 0) {
 			$tick = time();
 		}
@@ -130,7 +150,7 @@ class Tick {
 	/**
 	 * @return int
 	 */
-	public function getFirstTick() {
+	public function getFirstTick(): int {
 		return $this->firstTick;
 	}
 
@@ -139,7 +159,7 @@ class Tick {
 	 *
 	 * @return $this
 	 */
-	public function setFirstTick($tick = 0) {
+	public function setFirstTick(int $tick = 0): Tick {
 		if ($tick === 0) {
 			$tick = time();
 		}
@@ -153,7 +173,7 @@ class Tick {
 	/**
 	 * @return string
 	 */
-	public function getStatus() {
+	public function getStatus(): string {
 		return $this->status;
 	}
 
@@ -162,7 +182,7 @@ class Tick {
 	 *
 	 * @return $this
 	 */
-	public function setStatus($status) {
+	public function setStatus(string $status): Tick {
 		$this->status = $status;
 
 		return $this;
@@ -172,7 +192,7 @@ class Tick {
 	/**
 	 * @return string
 	 */
-	public function getAction() {
+	public function getAction(): string {
 		return $this->action;
 	}
 
@@ -181,7 +201,7 @@ class Tick {
 	 *
 	 * @return $this
 	 */
-	public function setAction($action) {
+	public function setAction(string $action): Tick {
 		$this->action = $action;
 
 		return $this;
@@ -189,33 +209,56 @@ class Tick {
 
 
 	/**
-	 * @param string $key
-	 * @param string|int $value
+	 * @param string $info
+	 * @param string $value
 	 *
 	 * @return $this
 	 */
-	public function setInfo($key, $value) {
-		$this->data[$key] = $value;
+	public function setInfo(string $info, string $value): Tick {
+		$this->data[$info] = $value;
 
 		return $this;
 	}
 
-	public function unsetInfo($key) {
-		unset($this->data[$key]);
+	/**
+	 * @param string $info
+	 * @param int $value
+	 *
+	 * @return $this
+	 */
+	public function setInfoInt(string $info, int $value): Tick {
+		$this->data[$info] = $value;
+
+		return $this;
 	}
 
 	/**
-	 * @param $key
-	 * @param int|string $default
-	 *
-	 * @return int|string
+	 * @param string $info
 	 */
-	public function getInfo($key, $default = '') {
-		if (!array_key_exists($key, $this->data)) {
-			return $default;
-		}
-
-		return $this->data[$key];
-
+	public function unsetInfo(string $info) {
+		unset($this->data[$info]);
 	}
+
+	/**
+	 * @param string $info
+	 * @param string $default
+	 *
+	 * @return string
+	 */
+	public function getInfo(string $info, string $default = ''): string {
+		return $this->get($info, $this->data, $default);
+	}
+
+
+	/**
+	 * @param string $info
+	 * @param int $default
+	 *
+	 * @return int
+	 */
+	public function getInfoInt(string $info, int $default = 0): int {
+		return $this->getInt($info, $this->data, $default);
+	}
+
 }
+

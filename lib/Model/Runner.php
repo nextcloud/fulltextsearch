@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,6 +30,8 @@
 
 namespace OCA\FullTextSearch\Model;
 
+
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
@@ -38,7 +43,16 @@ use OCP\FullTextSearch\Model\IRunner;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
+/**
+ * Class Runner
+ *
+ * @package OCA\FullTextSearch\Model
+ */
 class Runner implements IRunner {
+
+
+	use TArrayTools;
+
 
 	const TICK_TTL = 1800;
 
@@ -51,9 +65,6 @@ class Runner implements IRunner {
 
 	/** @var string */
 	private $source;
-
-//	/** @var bool */
-//	private $strict = false;
 
 	/** @var int */
 	private $tickId;
@@ -108,7 +119,7 @@ class Runner implements IRunner {
 	 * @param string $source
 	 * @param array $keys
 	 */
-	public function __construct(RunningService $runningService, $source, $keys = []) {
+	public function __construct(RunningService $runningService, string $source, array $keys = []) {
 		$this->runningService = $runningService;
 		$this->source = $source;
 
@@ -122,7 +133,6 @@ class Runner implements IRunner {
 	 * @throws RunnerAlreadyUpException
 	 */
 	public function start() {
-//		$this->strict = $strict;
 		$this->tickId = $this->runningService->start($this->source);
 	}
 
@@ -167,7 +177,9 @@ class Runner implements IRunner {
 				}
 
 				usleep(300000);
-				$this->base->abort();
+				if ($this->base !== null) {
+					$this->base->abort();
+				}
 			}
 
 			$this->pauseRunning(false);
@@ -205,7 +217,6 @@ class Runner implements IRunner {
 	 */
 	public function setInfoArray(array $data) {
 		$keys = array_keys($data);
-		//$this->info['info'] = '';
 		foreach ($keys as $k) {
 			$this->info[$k] = $data[$k];
 		}
@@ -243,39 +254,37 @@ class Runner implements IRunner {
 		if ($color !== '') {
 			$this->info[$info . 'Colored'] = '<' . $color . '>' . $value . '</' . $color . '>';
 		}
-
-
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getInfoAll() {
+	public function getInfoAll(): array {
 		return $this->info;
 	}
 
 
 	/**
-	 * @param string $k
+	 * @param string $info
 	 *
 	 * @return string
 	 */
-	public function getInfo($k) {
-		return MiscService::get($k, $this->info, '');
+	public function getInfo(string $info): string {
+		return $this->get($info, $this->info, '');
 	}
 
 
 	/**
 	 * @param array $method
 	 */
-	public function onKeyPress($method) {
+	public function onKeyPress(array $method) {
 		$this->methodOnKeyPress[] = $method;
 	}
 
 	/**
-	 * @param $key
+	 * @param string $key
 	 */
-	public function keyPressed($key) {
+	public function keyPressed(string $key) {
 		foreach ($this->methodOnKeyPress as $method) {
 			call_user_func($method, $key);
 		}
@@ -285,11 +294,14 @@ class Runner implements IRunner {
 	/**
 	 * @param array $method
 	 */
-	public function onInfoUpdate($method) {
+	public function onInfoUpdate(array $method) {
 		$this->methodOnInfoUpdate[] = $method;
 	}
 
 
+	/**
+	 *
+	 */
 	public function infoUpdated() {
 		foreach ($this->methodOnInfoUpdate as $method) {
 			call_user_func($method, $this->info);
@@ -300,7 +312,7 @@ class Runner implements IRunner {
 	/**
 	 * @param array $method
 	 */
-	public function onNewIndexError($method) {
+	public function onNewIndexError(array $method) {
 		$this->methodOnIndexError[] = $method;
 	}
 
@@ -328,7 +340,7 @@ class Runner implements IRunner {
 	/**
 	 * @param array $method
 	 */
-	public function onNewIndexResult($method) {
+	public function onNewIndexResult(array $method) {
 		$this->methodOnIndexResult[] = $method;
 	}
 
@@ -359,7 +371,7 @@ class Runner implements IRunner {
 	 *
 	 * @throws TickDoesNotExistException
 	 */
-	private function updateTick($tick, $action) {
+	private function updateTick(int $tick, string $action) {
 		if ($this->oldAction === $action && ($this->tickUpdate + self::TICK_UPDATE > $tick)) {
 			return;
 		}
@@ -376,9 +388,9 @@ class Runner implements IRunner {
 
 
 	/**
-	 * @param $tick
+	 * @param int $tick
 	 */
-	private function updateRamInfo($tick) {
+	private function updateRamInfo(int $tick) {
 		if (($this->ramUpdate + self::MEMORY_UPDATE) > $tick) {
 			return;
 		}
@@ -424,7 +436,7 @@ class Runner implements IRunner {
 	/**
 	 * @param bool $pause
 	 */
-	public function pause($pause) {
+	public function pause(bool $pause) {
 		$this->paused = $pause;
 		$this->infoUpdated();
 	}
@@ -432,7 +444,7 @@ class Runner implements IRunner {
 	/**
 	 * @return bool
 	 */
-	public function isPaused() {
+	public function isPaused(): bool {
 		return $this->paused;
 	}
 
@@ -440,13 +452,15 @@ class Runner implements IRunner {
 	/**
 	 * @param bool $running
 	 */
-	public function pauseRunning($running) {
+	public function pauseRunning(bool $running) {
 		$this->pauseRunning = $running;
 		$this->infoUpdated();
 	}
 
-
-	public function isPauseRunning() {
+	/**
+	 * @return bool
+	 */
+	public function isPauseRunning(): bool {
 		return $this->pauseRunning;
 	}
 
@@ -454,7 +468,7 @@ class Runner implements IRunner {
 	/**
 	 * @param string $line
 	 */
-	public function output($line) {
+	public function output(string $line) {
 		if ($this->outputInterface === null) {
 			return;
 		}

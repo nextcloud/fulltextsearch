@@ -30,11 +30,21 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Model;
 
+
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
 use OCP\FullTextSearch\Model\IIndex;
 
 
+/**
+ * Class Index
+ *
+ * @package OCA\FullTextSearch\Model
+ */
 class Index implements IIndex, JsonSerializable {
+
+
+	use TArrayTools;
 
 
 	/** @var string */
@@ -229,11 +239,7 @@ class Index implements IIndex, JsonSerializable {
 	 * @return string
 	 */
 	public function getOption(string $option, string $default = ''): string {
-		if (!array_key_exists($option, $this->options)) {
-			return $default;
-		}
-
-		return $this->options[$option];
+		return $this->get($option, $this->options, $default);
 	}
 
 
@@ -244,12 +250,9 @@ class Index implements IIndex, JsonSerializable {
 	 * @return int
 	 */
 	public function getOptionInt(string $option, int $default = 0): int {
-		if (!array_key_exists($option, $this->options)) {
-			return $default;
-		}
-
-		return $this->options[$option];
+		return $this->getInt($option, $this->options, $default);
 	}
+
 
 	/**
 	 * @param int $err
@@ -276,9 +279,8 @@ class Index implements IIndex, JsonSerializable {
 		return array_values(array_slice($this->errors, -1))[0];
 	}
 
-
 	/**
-	 *
+	 * @return IIndex
 	 */
 	public function resetErrors(): IIndex {
 		$this->setErrors([]);
@@ -351,9 +353,9 @@ class Index implements IIndex, JsonSerializable {
 
 
 	/**
-	 * @return array<string,string|integer>
+	 * @return array
 	 */
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'ownerId'    => $this->getOwnerId(),
 			'providerId' => $this->getProviderId(),
@@ -368,14 +370,18 @@ class Index implements IIndex, JsonSerializable {
 	}
 
 
+	/**
+	 *
+	 */
 	public function __destruct() {
 		unset($this->providerId);
 		unset($this->documentId);
+		unset($this->source);
 		unset($this->ownerId);
 		unset($this->status);
 		unset($this->options);
 		unset($this->err);
-		unset($this->message);
+		unset($this->errors);
 		unset($this->lastIndex);
 	}
 

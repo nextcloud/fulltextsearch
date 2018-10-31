@@ -30,6 +30,7 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Model;
 
+
 use JsonSerializable;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
@@ -38,6 +39,11 @@ use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
 
 
+/**
+ * Class SearchResult
+ *
+ * @package OCA\FullTextSearch\Model
+ */
 class SearchResult implements ISearchResult, JsonSerializable {
 
 	/** @var IndexDocument[] */
@@ -68,7 +74,12 @@ class SearchResult implements ISearchResult, JsonSerializable {
 	private $request;
 
 
-	public function __construct(SearchRequest $searchRequest = null) {
+	/**
+	 * SearchResult constructor.
+	 *
+	 * @param SearchRequest $searchRequest
+	 */
+	public function __construct(SearchRequest $searchRequest) {
 		$this->request = $searchRequest;
 	}
 
@@ -160,7 +171,7 @@ class SearchResult implements ISearchResult, JsonSerializable {
 	 *
 	 * @return ISearchResult
 	 */
-	public function setPlatform($platform): ISearchResult {
+	public function setPlatform(IFullTextSearchPlatform $platform): ISearchResult {
 		$this->platform = $platform;
 
 		return $this;
@@ -263,9 +274,38 @@ class SearchResult implements ISearchResult, JsonSerializable {
 
 
 	/**
-	 * @return array<string,array<string,string>|IndexDocument[]|integer>
+	 * @since 15.0.0
+	 *
+	 * @param string $category
+	 * @param string $value
+	 * @param int $count
+	 *
+	 * @return ISearchResult
 	 */
-	public function jsonSerialize() {
+	public function addAggregation(string $category, string $value, int $count): ISearchResult {
+		// TODO: Implement addAggregation() method.
+
+		return $this;
+	}
+
+	/**
+	 * @since 15.0.0
+	 *
+	 * @param string $category
+	 *
+	 * @return array
+	 */
+	public function getAggregations(string $category): array {
+		// TODO: Implement getAggregations() method.
+
+		return [];
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function jsonSerialize(): array {
 
 		$providerObj = $this->getProvider();
 		$provider = [];
@@ -300,31 +340,5 @@ class SearchResult implements ISearchResult, JsonSerializable {
 		];
 	}
 
-	/**
-	 * @since 15.0.0
-	 *
-	 * @param string $category
-	 * @param string $value
-	 * @param int $count
-	 *
-	 * @return ISearchResult
-	 */
-	public function addAggregation(string $category, string $value, int $count): ISearchResult {
-		// TODO: Implement addAggregation() method.
-
-		return $this;
-	}
-
-	/**
-	 * @since 15.0.0
-	 *
-	 * @param string $category
-	 *
-	 * @return array
-	 */
-	public function getAggregations(string $category): array {
-		// TODO: Implement getAggregations() method.
-
-		return [];
-	}
 }
+

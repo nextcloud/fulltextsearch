@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,13 +27,25 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Model;
 
 
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
 use OCP\FullTextSearch\Model\IIndexOptions;
 
+
+/**
+ * Class IndexOptions
+ *
+ * @package OCA\FullTextSearch\Model
+ */
 class IndexOptions implements IIndexOptions, JsonSerializable {
+
+
+	use TArrayTools;
+
 
 	/**
 	 * @var array
@@ -38,9 +53,15 @@ class IndexOptions implements IIndexOptions, JsonSerializable {
 	private $options = [];
 
 
+	/**
+	 * IndexOptions constructor.
+	 *
+	 * @param array $options
+	 */
 	public function __construct($options = []) {
 		$this->options = $options;
 	}
+
 
 	/**
 	 * @return array
@@ -104,13 +125,8 @@ class IndexOptions implements IIndexOptions, JsonSerializable {
 	 * @return string
 	 */
 	public function getOption(string $option, string $default = ''): string {
-		if (array_key_exists($option, $this->options)) {
-			return $this->options[$option];
-		}
-
-		return $default;
+		return $this->get($option, $this->options, $default);
 	}
-
 
 	/**
 	 * @param string $option
@@ -119,14 +135,7 @@ class IndexOptions implements IIndexOptions, JsonSerializable {
 	 * @return array
 	 */
 	public function getOptionArray(string $option, array $default = []): array {
-		if (array_key_exists($option, $this->options)) {
-			$options = $this->options[$option];
-			if (is_array($options)) {
-				return $this->options[$option];
-			}
-		}
-
-		return $default;
+		return $this->getArray($option, $this->options, $default);
 	}
 
 
@@ -137,21 +146,15 @@ class IndexOptions implements IIndexOptions, JsonSerializable {
 	 * @return bool
 	 */
 	public function getOptionBool(string $option, bool $default): bool {
-		if (array_key_exists($option, $this->options)) {
-			$options = $this->options[$option];
-			if (is_bool($options)) {
-				return $this->options[$option];
-			}
-		}
-
-		return $default;
+		return $this->getBool($option, $this->options, $default);
 	}
 
 
 	/**
 	 * @return array
 	 */
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return $this->options;
 	}
 }
+

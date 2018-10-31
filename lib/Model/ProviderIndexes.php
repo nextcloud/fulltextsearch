@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,16 +30,24 @@
 
 namespace OCA\FullTextSearch\Model;
 
+
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCP\FullTextSearch\Model\IIndex;
 
+
+/**
+ * Class ProviderIndexes
+ *
+ * @package OCA\FullTextSearch\Model
+ */
 class ProviderIndexes {
+
 
 	/** @var IIndex[] */
 	private $indexes;
 
 
-	public function __construct($indexes) {
+	public function __construct(array $indexes) {
 		$this->indexes = $indexes;
 	}
 
@@ -44,7 +55,7 @@ class ProviderIndexes {
 	/**
 	 * @return IIndex[]
 	 */
-	public function getIndexes():array {
+	public function getIndexes(): array {
 		return $this->indexes;
 	}
 
