@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,14 +27,20 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Db;
 
 
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
-use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IIndex;
 
+
+/**
+ * Class IndexesRequest
+ *
+ * @package OCA\FullTextSearch\Db
+ */
 class IndexesRequest extends IndexesRequestBuilder {
 
 
@@ -41,7 +50,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function create(Index $index) {
+	public function create(Index $index): bool {
 
 		try {
 			$qb = $this->getIndexesInsertSql();
@@ -69,7 +78,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 *
 	 * @return bool
 	 */
-	public function resetError(Index $index) {
+	public function resetError(Index $index): bool {
 
 		try {
 			$this->getIndex($index->getProviderId(), $index->getDocumentId());
@@ -105,7 +114,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	/**
 	 * @return Index[]
 	 */
-	public function getErrorIndexes() {
+	public function getErrorIndexes(): array {
 
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToErr($qb);
@@ -126,7 +135,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 *
 	 * @return bool
 	 */
-	public function update(Index $index) {
+	public function update(Index $index): bool {
 
 		try {
 			$this->getIndex($index->getProviderId(), $index->getDocumentId());
@@ -159,12 +168,32 @@ class IndexesRequest extends IndexesRequestBuilder {
 	}
 
 
-	public function updateStatus($providerId, $indexes, $status) {
+	/**
+	 * @param string $providerId
+	 * @param string $documentId
+	 * @param int $status
+	 */
+	public function updateStatus(string $providerId, string $documentId, int $status) {
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('status', $qb->createNamedParameter($status));
 
 		$this->limitToProviderId($qb, $providerId);
-		$this->limitToDocumentId($qb, $indexes);
+		$this->limitToDocumentId($qb, $documentId);
+
+		$qb->execute();
+	}
+
+	/**
+	 * @param string $providerId
+	 * @param array $indexes
+	 * @param int $status
+	 */
+	public function updateStatuses(string $providerId, array $indexes, int $status) {
+		$qb = $this->getIndexesUpdateSql();
+		$qb->set('status', $qb->createNamedParameter($status));
+
+		$this->limitToProviderId($qb, $providerId);
+		$this->limitToDocumentIds($qb, $indexes);
 
 		$qb->execute();
 	}
@@ -185,7 +214,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	/**
 	 * @param string $providerId
 	 */
-	public function deleteFromProviderId($providerId) {
+	public function deleteFromProviderId(string $providerId) {
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToProviderId($qb, $providerId);
 
@@ -207,12 +236,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * return index.
 	 *
 	 * @param string $providerId
-	 * @param string|int $documentId
+	 * @param string $documentId
 	 *
 	 * @return Index
 	 * @throws IndexDoesNotExistException
 	 */
-	public function getIndex($providerId, $documentId): Index {
+	public function getIndex(string $providerId, string $documentId): Index {
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToProviderId($qb, $providerId);
 		$this->limitToDocumentId($qb, $documentId);
@@ -238,7 +267,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @return Index[]
 	 * @throws IndexDoesNotExistException
 	 */
-	public function getIndexes($providerId, $documentIds) {
+	public function getIndexes(string $providerId, array $documentIds): array {
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToProviderId($qb, $providerId);
 		$this->limitToDocumentIds($qb, $documentIds);
@@ -263,7 +292,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 *
 	 * @return Index[]
 	 */
-	public function getQueuedIndexes($all = false) {
+	public function getQueuedIndexes(bool $all = false): array {
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToQueuedIndexes($qb);
 		if ($all === false) {
@@ -284,13 +313,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 	/**
 	 * return list of last indexes from a providerId.
 	 *
-	 * @param IFullTextSearchProvider $provider
+	 * @param string $providerId
 	 *
 	 * @return Index[]
 	 */
-	public function getIndexesFromProvider(IFullTextSearchProvider $provider) {
+	public function getIndexesFromProvider(string $providerId): array {
 		$qb = $this->getIndexesSelectSql();
-		$this->limitToProviderId($qb, $provider->getId());
+		$this->limitToProviderId($qb, $providerId);
 
 		$indexes = [];
 		$cursor = $qb->execute();

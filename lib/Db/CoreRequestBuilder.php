@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,6 +27,7 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Db;
 
 
@@ -35,6 +39,12 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\IL10N;
 
+
+/**
+ * Class CoreRequestBuilder
+ *
+ * @package OCA\FullTextSearch\Db
+ */
 class CoreRequestBuilder {
 
 	const TABLE_INDEXES = 'fulltextsearch_indexes';
@@ -81,8 +91,8 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param int $id
 	 */
-	protected function limitToId(IQueryBuilder &$qb, $id) {
-		$this->limitToDBField($qb, 'id', $id);
+	protected function limitToId(IQueryBuilder &$qb, int $id) {
+		$this->limitToDBFieldInt($qb, 'id', $id);
 	}
 
 
@@ -92,18 +102,18 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param string $userId
 	 */
-	protected function limitToOwnerId(IQueryBuilder &$qb, $userId) {
+	protected function limitToOwnerId(IQueryBuilder &$qb, string $userId) {
 		$this->limitToDBField($qb, 'owner_id', $userId);
 	}
 
 
 	/**
-	 * Limit to the type
+	 * Limit to the providerId
 	 *
 	 * @param IQueryBuilder $qb
 	 * @param string $providerId
 	 */
-	protected function limitToProviderId(IQueryBuilder &$qb, $providerId) {
+	protected function limitToProviderId(IQueryBuilder &$qb, string $providerId) {
 		$this->limitToDBField($qb, 'provider_id', $providerId);
 	}
 
@@ -114,13 +124,13 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param string $documentId
 	 */
-	protected function limitToDocumentId(IQueryBuilder &$qb, $documentId) {
+	protected function limitToDocumentId(IQueryBuilder &$qb, string $documentId) {
 		$this->limitToDBField($qb, 'document_id', $documentId);
 	}
 
 
 	/**
-	 * Limit to the documentId
+	 * Limit to the entry with at least one Error
 	 *
 	 * @param IQueryBuilder $qb
 	 */
@@ -131,7 +141,7 @@ class CoreRequestBuilder {
 
 
 	/**
-	 * Limit to the documentId
+	 * Limit to the entry with no error
 	 *
 	 * @param IQueryBuilder $qb
 	 */
@@ -147,30 +157,57 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param array $documentIds
 	 */
-	protected function limitToDocumentIds(IQueryBuilder &$qb, $documentIds) {
-		$this->limitToDBField($qb, 'document_id', $documentIds);
+	protected function limitToDocumentIds(IQueryBuilder &$qb, array $documentIds) {
+		$this->limitToDBFieldArray($qb, 'document_id', $documentIds);
 	}
 
 
 	/**
-	 * Limit the request to the Source
+	 * Limit the request to source
 	 *
 	 * @param IQueryBuilder $qb
 	 * @param string $source
 	 */
-	protected function limitToSource(IQueryBuilder &$qb, $source) {
+	protected function limitToSource(IQueryBuilder &$qb, string $source) {
 		$this->limitToDBField($qb, 'id', $source);
 	}
 
 
 	/**
-	 * Limit the request to the Source
+	 * Limit the request to status
 	 *
 	 * @param IQueryBuilder $qb
 	 * @param string $status
 	 */
-	protected function limitToStatus(IQueryBuilder &$qb, $status) {
+	protected function limitToStatus(IQueryBuilder &$qb, string $status) {
 		$this->limitToDBField($qb, 'status', $status);
+	}
+
+
+	/**
+	 * @param IQueryBuilder $qb
+	 * @param string $field
+	 * @param string $value
+	 */
+	private function limitToDBField(IQueryBuilder &$qb, string $field, string $value) {
+		$expr = $qb->expr();
+		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
+		$field = $pf . $field;
+
+		$qb->andWhere($expr->eq($field, $qb->createNamedParameter($value)));
+	}
+
+	/**
+	 * @param IQueryBuilder $qb
+	 * @param string $field
+	 * @param int $value
+	 */
+	private function limitToDBFieldInt(IQueryBuilder &$qb, string $field, int $value) {
+		$expr = $qb->expr();
+		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
+		$field = $pf . $field;
+
+		$qb->andWhere($expr->eq($field, $qb->createNamedParameter($value)));
 	}
 
 
@@ -179,7 +216,7 @@ class CoreRequestBuilder {
 	 * @param string $field
 	 * @param string|integer|array $values
 	 */
-	private function limitToDBField(IQueryBuilder &$qb, $field, $values) {
+	private function limitToDBFieldArray(IQueryBuilder &$qb, string $field, array $values) {
 		$expr = $qb->expr();
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
 		$field = $pf . $field;

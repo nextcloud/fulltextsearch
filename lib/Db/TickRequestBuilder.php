@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,6 +27,7 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Db;
 
 
@@ -34,19 +38,13 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\IL10N;
 
+
+/**
+ * Class TickRequestBuilder
+ *
+ * @package OCA\FullTextSearch\Db
+ */
 class TickRequestBuilder extends CoreRequestBuilder {
-
-
-	/**
-	 * TicksRequestBuilder constructor.
-	 *
-	 * {@inheritdoc}
-	 */
-	public function __construct(
-		IL10N $l10n, IDBConnection $connection, ConfigService $configService, MiscService $miscService
-	) {
-		parent::__construct($l10n, $connection, $configService, $miscService);
-	}
 
 
 	/**
@@ -54,7 +52,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getTickInsertSql() {
+	protected function getTickInsertSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->insert(self::TABLE_TICKS);
 
@@ -67,7 +65,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getTickUpdateSql() {
+	protected function getTickUpdateSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->update(self::TABLE_TICKS);
 
@@ -80,7 +78,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getTickSelectSql() {
+	protected function getTickSelectSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
@@ -100,7 +98,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getTickDeleteSql() {
+	protected function getTickDeleteSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->delete(self::TABLE_INDEXES);
 
@@ -113,12 +111,12 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return Tick
 	 */
-	protected function parseTickSelectSql($data) {
+	protected function parseTickSelectSql(array $data): Tick {
 		$tick = new Tick($data['source'], $data['id']);
 		$tick->setData(json_decode($data['data'], true))
 			 ->setTick($data['tick'])
-			->setFirstTick($data['first_tick'])
-			->setStatus($data['status'])
+			 ->setFirstTick($data['first_tick'])
+			 ->setStatus($data['status'])
 			 ->setAction($data['action']);
 
 		return $tick;

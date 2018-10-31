@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,30 +27,20 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Db;
 
 
 use OCA\FullTextSearch\Model\Index;
-use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCP\IDBConnection;
-use OCP\IL10N;
 
+
+/**
+ * Class IndexesRequestBuilder
+ *
+ * @package OCA\FullTextSearch\Db
+ */
 class IndexesRequestBuilder extends CoreRequestBuilder {
-
-
-	/**
-	 * WebsitesRequestBuilder constructor.
-	 *
-	 * {@inheritdoc}
-	 */
-	public function __construct(
-		IL10N $l10n, IDBConnection $connection, ConfigService $configService,
-		MiscService $miscService
-	) {
-		parent::__construct($l10n, $connection, $configService, $miscService);
-	}
 
 
 	/**
@@ -55,7 +48,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getIndexesInsertSql() {
+	protected function getIndexesInsertSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->insert(self::TABLE_INDEXES);
 
@@ -68,7 +61,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getIndexesUpdateSql() {
+	protected function getIndexesUpdateSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->update(self::TABLE_INDEXES);
 
@@ -81,7 +74,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getIndexesSelectSql() {
+	protected function getIndexesSelectSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
@@ -102,7 +95,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getIndexesDeleteSql() {
+	protected function getIndexesDeleteSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->delete(self::TABLE_INDEXES);
 
@@ -115,7 +108,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return Index
 	 */
-	protected function parseIndexesSelectSql($data) {
+	protected function parseIndexesSelectSql(array $data): Index {
 		$index = new Index($data['provider_id'], $data['document_id']);
 		$index->setStatus($data['status'])
 			  ->setSource($data['source'])
@@ -129,3 +122,4 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	}
 
 }
+
