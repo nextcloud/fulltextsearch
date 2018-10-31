@@ -49,9 +49,9 @@ var api = {
 				request: JSON.stringify(request)
 			}
 		}).done(function (res) {
-			if (_.has(res, 'error')) {
+			if (res.status === -1) {
 				result.displayError(res);
-				nav.onError(res.error);
+				nav.onError(res.message);
 				api.onCallback(callbackError, res);
 				return;
 			}
@@ -61,7 +61,7 @@ var api = {
 			api.onCallback(callback, res);
 		}).fail(function () {
 			if (!api.onCallback(callbackError, res)) {
-				nav.onError(res.error);
+				nav.onError(res.message);
 			}
 		});
 	},

@@ -31,15 +31,9 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\AppInfo;
 
 
-use OCP\AppFramework\QueryException;
+$composerDir = __DIR__ . '/../vendor/';
 
-
-require_once __DIR__ . '/autoload.php';
-
-try {
-	$app = new Application();
-	$app->registerServices();
-	$app->registerNavigation();
-} catch (QueryException $e) {
-	/** we do nothing */
+if (is_dir($composerDir) && file_exists($composerDir . 'autoload.php')) {
+	require_once $composerDir . 'autoload.php';
 }
+

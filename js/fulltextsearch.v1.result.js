@@ -53,7 +53,7 @@ var result = {
 
 
 	displayError: function (res) {
-		box_elements.searchError.text(res.error).show();
+		box_elements.searchError.text(res.message).show();
 	},
 
 
