@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -21,23 +24,33 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  */
 
+
 namespace OCA\FullTextSearch\Settings;
+
 
 use OCA\FullTextSearch\AppInfo\Application;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\Settings\IIconSection;
 
+
+/**
+ * Class AdminSection
+ *
+ * @package OCA\FullTextSearch\Settings
+ */
 class AdminSection implements IIconSection {
+
 
 	/** @var IL10N */
 	private $l10n;
 
 	/** @var IURLGenerator */
 	private $urlGenerator;
+
 
 	/**
 	 * @param IL10N $l10n
@@ -51,28 +64,28 @@ class AdminSection implements IIconSection {
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getID() {
+	public function getID(): string {
 		return Application::APP_NAME;
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getName() {
+	public function getName(): string {
 		return $this->l10n->t('Full text search');
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getPriority() {
+	public function getPriority(): int {
 		return 55;
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getIcon() {
+	public function getIcon(): string {
 		return $this->urlGenerator->imagePath(Application::APP_NAME, 'fulltextsearch_black.svg');
 	}
 }

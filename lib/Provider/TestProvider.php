@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,6 +30,7 @@
 
 namespace OCA\FullTextSearch\Provider;
 
+
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\ConfigService;
@@ -42,6 +46,12 @@ use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
 use OCP\FullTextSearch\Model\SearchTemplate;
 
+
+/**
+ * Class TestProvider
+ *
+ * @package OCA\FullTextSearch\Provider
+ */
 class TestProvider implements IFullTextSearchProvider {
 
 
@@ -148,8 +158,6 @@ class TestProvider implements IFullTextSearchProvider {
 
 		$result[] = $this->testService->generateIndexDocumentContentLicense($this->indexOptions);
 		$result[] = $this->testService->generateIndexDocumentSimple($this->indexOptions);
-
-//		$result[] = $this->testService->generateIndexDocuments(TestService::DOCUMENT_TEST_INDEX3);
 
 		return $result;
 	}

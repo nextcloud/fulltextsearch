@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch;
+
 
 use Exception;
 use OCA\FullTextSearch\Service\ProviderService;
@@ -59,16 +64,18 @@ class Capabilities implements ICapability {
 	 * Result to be expected:
 	 *    {"fulltextsearch":{"remote":true,"providers":[{"id":"files","name":"Files"}]}}
 	 *
-	 * if 'remote' is false, it means administrator does not allow search request with no CSRF check.
+	 * if 'remote' is false, it means administrator does not allow search request with no CSRF
+	 * check.
 	 *
 	 * 'providers' will returns the list of provider configured for this user.
-	 * If a provider is not listed, no search will be available on it; so replace the 'files' search
+	 * If a provider is not listed, no search will be available on it; so replace the 'files'
+	 * search
 	 * only if the 'files' provider is in the list
 	 *
 	 * @return array<string,array<string,boolean|array>>
 	 * @throws Exception
 	 */
-	public function getCapabilities() {
+	public function getCapabilities(): array {
 
 		$providers = $this->providerService->getConfiguredProviders();
 
