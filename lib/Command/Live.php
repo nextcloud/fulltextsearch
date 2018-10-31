@@ -531,9 +531,9 @@ class Live extends ACommandBase {
 
 		$width = $this->terminal->getWidth() - 13;
 		$message = MiscService::get('message', $result, '');
-		$msg1 = substr($message, 0, $width);
-		$msg2 = substr($message, $width, $width + 10);
-		$msg3 = substr($message, $width + $width + 10, $width + 10);
+		$msg1 = (string) substr($message, 0, $width);
+		$msg2 = (string) substr($message, $width, $width + 10);
+		$msg3 = (string) substr($message, $width + $width + 10, $width + 10);
 
 
 		$status = MiscService::get('status', $result, '');
@@ -587,9 +587,9 @@ class Live extends ACommandBase {
 
 		$width = $this->terminal->getWidth() - 13;
 		$message = MiscService::get('message', $error, '');
-		$err1 = substr($message, 0, $width);
-		$err2 = substr($message, $width, $width + 10);
-		$err3 = substr($message, $width + $width + 10, $width + 10);
+		$err1 = (string) substr($message, 0, $width);
+		$err2 = (string) substr($message, $width, $width + 10);
+		$err3 = (string) substr($message, $width + $width + 10, $width + 10);
 
 		$this->runner->setInfoArray(
 			[
