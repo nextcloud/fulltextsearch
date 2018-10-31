@@ -107,7 +107,10 @@ class SearchService implements ISearchService {
 	 * @return ISearchRequest
 	 */
 	public function generateSearchRequest(array $request): ISearchRequest {
-		return SearchRequest::fromArray($request);
+		$searchRequest = new SearchRequest();
+		$searchRequest->importFromArray($request);
+
+		return $searchRequest;
 	}
 
 

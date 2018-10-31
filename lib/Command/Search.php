@@ -97,7 +97,8 @@ class Search extends Base {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$output->writeln('search');
 
-		$request = SearchRequest::fromArray(
+		$searchRequest = new SearchRequest();
+		$searchRequest->importFromArray(
 			[
 				'providers' => 'all',
 				'search'    => $input->getArgument('string')
@@ -105,7 +106,7 @@ class Search extends Base {
 		);
 
 		try {
-			$result = $this->searchService->search($input->getArgument('user'), $request);
+			$result = $this->searchService->search($input->getArgument('user'), $searchRequest);
 
 			foreach ($result as $searchResult) {
 				$this->displaySearchResult($searchResult);
