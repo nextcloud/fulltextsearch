@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,8 +27,10 @@
  *
  */
 
+
 use OCA\FullTextSearch\AppInfo\Application;
 use OCP\Util;
+
 
 Util::addScript(Application::APP_NAME, 'admin.elements');
 Util::addScript(Application::APP_NAME, 'admin.settings');
