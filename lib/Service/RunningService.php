@@ -78,7 +78,7 @@ class RunningService {
 		$tick->setStatus('run')
 			 ->setTick()
 			 ->setFirstTick()
-			 ->setInfo('runStart ', time());
+			 ->setInfoInt('runStart ', time());
 
 		return $this->tickRequest->create($tick);
 	}
@@ -129,12 +129,12 @@ class RunningService {
 	 *
 	 * @throws TickDoesNotExistException
 	 */
-	public function stop($runId, $reason = '') {
+	public function stop(int $runId, string $reason = '') {
 		$tick = $this->tickRequest->getTickById($runId);
 		$tick->setStatus('stop')
 			 ->setTick()
-			 ->setInfo('runStop', time())
-			 ->setInfo('totalDocuments', 42);
+			 ->setInfoInt('runStop', time())
+			 ->setInfoInt('totalDocuments', 42);
 
 		if ($reason !== '') {
 			$tick->setStatus('exception');
@@ -187,7 +187,7 @@ class RunningService {
 	 * @return bool
 	 */
 	public function isAlreadyRunning() {
-		$ticks = $this->tickRequest->getTickByStatus('run');
+		$ticks = $this->tickRequest->getTicksByStatus('run');
 
 		$isAlreadyRunning = false;
 		foreach ($ticks as $tick) {
@@ -207,7 +207,7 @@ class RunningService {
 	 *
 	 */
 	public function forceStop() {
-		$ticks = $this->tickRequest->getTickByStatus('run');
+		$ticks = $this->tickRequest->getTicksByStatus('run');
 
 		foreach ($ticks as $tick) {
 			$tick->setStatus('forceStop');
@@ -225,18 +225,18 @@ class RunningService {
 		$preAction = $tick->getAction();
 
 		if ($preAction !== '') {
-			$preActionTotal = $tick->getInfo($preAction . 'Total', 0);
-			$preActionStart = $tick->getInfo($preAction . 'Init', 0);
+			$preActionTotal = $tick->getInfoInt($preAction . 'Total', 0);
+			$preActionStart = $tick->getInfoInt($preAction . 'Init', 0);
 
 			if ($preActionStart > 0) {
 
 				$preActionTotal += ($now - $preActionStart);
-				$tick->setInfo($preAction . 'Total', $preActionTotal);
+				$tick->setInfoInt($preAction . 'Total', $preActionTotal);
 				$tick->unsetInfo($preAction . 'Init');
 			}
 		}
 		$tick->setAction($action)
-			 ->setInfo($action . 'Init', $now);
+			 ->setInfoInt($action . 'Init', $now);
 	}
 
 
