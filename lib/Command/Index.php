@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use Exception;
 use OC\Core\Command\InterruptedException;
 use OCA\FullTextSearch\ACommandBase;
@@ -60,6 +61,10 @@ use Symfony\Component\Console\Terminal;
  * @package OCA\FullTextSearch\Command
  */
 class Index extends ACommandBase {
+
+
+	use TArrayTools;
+
 
 //			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
 	const PANEL_RUN = 'run';
@@ -610,10 +615,10 @@ class Index extends ACommandBase {
 		}
 
 		$width = $this->terminal->getWidth() - 13;
-		$message = MiscService::get('message', $error, '');
-		$err1 = (string) substr($message, 0, $width);
-		$err2 = (string) substr($message, $width, $width + 10);
-		$err3 = (string) substr($message, $width + $width + 10, $width + 10);
+		$message = $this->get('message', $error, '');
+		$err1 = (string)substr($message, 0, $width);
+		$err2 = (string)substr($message, $width, $width + 10);
+		$err3 = (string)substr($message, $width + $width + 10, $width + 10);
 
 		$this->runner->setInfoArray(
 			[
@@ -622,7 +627,7 @@ class Index extends ACommandBase {
 				'errorMessageA'  => trim($err1),
 				'errorMessageB'  => trim($err2),
 				'errorMessageC'  => trim($err3),
-				'errorException' => MiscService::get('exception', $error, ''),
+				'errorException' => $this->get('exception', $error, ''),
 				'errorIndex'     => $errorIndex
 			]
 		);
@@ -663,13 +668,13 @@ class Index extends ACommandBase {
 
 
 		$width = $this->terminal->getWidth() - 13;
-		$message = MiscService::get('message', $result, '');
-		$msg1 = (string) substr($message, 0, $width);
-		$msg2 = (string) substr($message, $width, $width + 10);
-		$msg3 = (string) substr($message, $width + $width + 10, $width + 10);
+		$message = $this->get('message', $result, '');
+		$msg1 = (string)substr($message, 0, $width);
+		$msg2 = (string)substr($message, $width, $width + 10);
+		$msg3 = (string)substr($message, $width + $width + 10, $width + 10);
 
-		$status = MiscService::get('status', $result, '');
-		$type = MiscService::get('type', $result, '');
+		$status = $this->get('status', $result, '');
+		$type = $this->getInt('type', $result, 0);
 
 		$this->runner->setInfoArray(
 			[
