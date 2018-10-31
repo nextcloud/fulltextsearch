@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Model;
 
 
-use OC\App\Platform;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 
 

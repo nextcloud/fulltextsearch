@@ -67,6 +67,7 @@ class NavigationController extends Controller {
 	 *
 	 * @param IRequest $request
 	 * @param IConfig $config
+	 * @param IFullTextSearchManager $fullTextSearchManager
 	 * @param ConfigService $configService
 	 * @param MiscService $miscService
 	 */

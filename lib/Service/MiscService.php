@@ -33,7 +33,6 @@ namespace OCA\FullTextSearch\Service;
 
 use OCA\FullTextSearch\AppInfo\Application;
 use OCP\ILogger;
-use OCP\Util;
 
 
 /**

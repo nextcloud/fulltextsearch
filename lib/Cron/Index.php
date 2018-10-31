@@ -163,6 +163,6 @@ class Index extends TimedJob {
 	 *
 	 */
 	private function setLastErrReset() {
-		$this->configService->setAppValue(ConfigService::CRON_LAST_ERR_RESET, time());
+		$this->configService->setAppValue(ConfigService::CRON_LAST_ERR_RESET, (string) time());
 	}
 }

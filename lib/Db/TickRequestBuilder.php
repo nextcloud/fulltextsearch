@@ -32,11 +32,7 @@ namespace OCA\FullTextSearch\Db;
 
 
 use OCA\FullTextSearch\Model\Tick;
-use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCP\IDBConnection;
-use OCP\IL10N;
 
 
 /**

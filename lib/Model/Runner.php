@@ -36,7 +36,6 @@ use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\FullTextSearch\Model\IRunner;

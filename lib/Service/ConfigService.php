@@ -212,7 +212,6 @@ class ConfigService {
 	 * @param string $key
 	 * @param string $value
 	 *
-	 * @return string
 	 * @throws PreConditionNotMetException
 	 */
 	public function setValueForUser(string $userId, string $key, string $value) {
