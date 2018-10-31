@@ -29,15 +29,7 @@ declare(strict_types=1);
 
 
 use OCA\FullTextSearch\AppInfo\Application;
-use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\Util;
-
-
-if (isset($_) && is_array($_) && array_key_exists('fullTextSearchManager', $_)) {
-	/** @var IFullTextSearchManager $fullTextSearchManager */
-	$fullTextSearchManager = $_['fullTextSearchManager'];
-	$fullTextSearchManager->addJavascriptAPI();
-}
 
 Util::addScript(Application::APP_NAME, 'navigate');
 Util::addStyle(Application::APP_NAME, 'navigate');
