@@ -1,0 +1,56 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "30bac8230c691b2aa3c666987235b4c9",
+    "packages": [
+        {
+            "name": "daita/my-small-php-tools",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/daita/my-small-php-tools.git",
+                "reference": "e0d7d135d75839419cc9f46b6e0543720234a791"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/daita/my-small-php-tools/zipball/e0d7d135d75839419cc9f46b6e0543720234a791",
+                "reference": "e0d7d135d75839419cc9f46b6e0543720234a791",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "daita\\MySmallPhpTools\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "AGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Maxence Lange",
+                    "email": "maxence@artificial-owl.com"
+                }
+            ],
+            "description": "My small PHP Tools",
+            "time": "2018-10-12T13:48:31+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "daita/my-small-php-tools": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

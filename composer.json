@@ -1,0 +1,15 @@
+{
+  "name": "nextcloud/fulltextsearch",
+  "description": "Full text search framework for Nextcloud",
+  "minimum-stability": "stable",
+  "license": "agpl",
+  "authors": [
+    {
+      "name": "Maxence Lange",
+      "email": "maxence@artificial-owl.com"
+    }
+  ],
+  "require": {
+    "daita/my-small-php-tools": "dev-master"
+  }
+}
