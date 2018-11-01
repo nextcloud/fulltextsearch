@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,10 +27,12 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
 
+
 use Exception;
-use OCA\FullTextSearch\Model\ExtendedBase;
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,7 +41,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class DocumentPlatform extends ExtendedBase {
+class DocumentPlatform extends Base {
 
 
 	/** @var PlatformService */
@@ -77,7 +82,6 @@ class DocumentPlatform extends ExtendedBase {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return int|null|void
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {

@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,7 +27,9 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use Exception;
 use OC\App\AppManager;
@@ -32,17 +37,26 @@ use OC\User\NoUserException;
 use OCA\Circles\Api\v1\Circles;
 use OCA\FullTextSearch\Exceptions\EmptySearchException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
-use OCA\FullTextSearch\IFullTextSearchPlatform;
-use OCA\FullTextSearch\IFullTextSearchProvider;
-use OCA\FullTextSearch\Model\DocumentAccess;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
+use OCP\FullTextSearch\IFullTextSearchPlatform;
+use OCP\FullTextSearch\IFullTextSearchProvider;
+use OCP\FullTextSearch\Model\DocumentAccess;
+use OCP\FullTextSearch\Model\ISearchRequest;
+use OCP\FullTextSearch\Model\ISearchResult;
+use OCP\FullTextSearch\Service\ISearchService;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
 
 
-class SearchService {
+/**
+ * Class SearchService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
+class SearchService implements ISearchService {
+
 
 	/** @var string */
 	private $userId;
@@ -70,7 +84,7 @@ class SearchService {
 
 
 	/**
-	 * IndexService constructor.
+	 * SearchService constructor.
 	 *
 	 * @param string $userId
 	 * @param AppManager $appManager
@@ -82,7 +96,8 @@ class SearchService {
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		$userId, AppManager $appManager, IUserManager $userManager, IGroupManager $groupManager,
+		$userId, AppManager $appManager, IUserManager $userManager,
+		IGroupManager $groupManager,
 		ConfigService $configService, ProviderService $providerService,
 		PlatformService $platformService,
 		MiscService $miscService
@@ -99,18 +114,32 @@ class SearchService {
 
 
 	/**
-	 * @param string $userId
-	 * @param SearchRequest $request
+	 * @param array $request
 	 *
+	 * @return ISearchRequest
+	 */
+	public function generateSearchRequest(array $request): ISearchRequest {
+		$searchRequest = new SearchRequest();
+		$searchRequest->importFromArray($request);
+
+		return $searchRequest;
+	}
+
+
+	/**
+	 * @param string $userId
+	 * @param ISearchRequest $request
+	 *
+	 * @return ISearchResult[]
 	 * @throws EmptySearchException
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function search($userId, SearchRequest $request) {
+	public function search(string $userId, ISearchRequest $request): array {
 
 		$this->searchRequestCannotBeEmpty($request);
 
-		if ($userId === null) {
+		if ($userId === '') {
 			$userId = $this->userId;
 		}
 
@@ -119,6 +148,7 @@ class SearchService {
 			throw new NoUserException('User does not exist');
 		}
 
+		/** @var $request SearchRequest */
 		$request->setAuthor($user->getUID());
 		$request->cleanSearch();
 
@@ -139,11 +169,11 @@ class SearchService {
 
 
 	/**
-	 * @param SearchRequest $request
+	 * @param ISearchRequest $request
 	 *
 	 * @throws EmptySearchException
 	 */
-	private function searchRequestCannotBeEmpty(SearchRequest $request) {
+	private function searchRequestCannotBeEmpty(ISearchRequest $request) {
 		if ($request === null || strlen($request->getSearch()) < 1) {
 			throw new EmptySearchException('search cannot be empty');
 		}
@@ -156,12 +186,12 @@ class SearchService {
 	 * @param IFullTextSearchProvider[] $providers
 	 * @param SearchRequest $request
 	 *
-	 * @return SearchResult[]
+	 * @return ISearchResult[]
 	 */
 	private function searchFromProviders(
-		IFullTextSearchPlatform $platform, $providers, DocumentAccess $access,
+		IFullTextSearchPlatform $platform, array $providers, DocumentAccess $access,
 		SearchRequest $request
-	) {
+	): array {
 		$result = [];
 		foreach ($providers AS $provider) {
 			$provider->improveSearchRequest($request);
@@ -185,7 +215,7 @@ class SearchService {
 	 *
 	 * @return DocumentAccess
 	 */
-	private function getDocumentAccessFromUser(IUser $user) {
+	private function getDocumentAccessFromUser(IUser $user): DocumentAccess {
 		$rights = new DocumentAccess();
 
 		$rights->setViewerId($user->getUID());

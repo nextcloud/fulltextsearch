@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,11 +27,20 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use Exception;
 
+
+/**
+ * Class SettingsService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class SettingsService {
+
 
 	/** @var PlatformService */
 	private $platformService;
@@ -38,6 +50,7 @@ class SettingsService {
 
 	/** @var MiscService */
 	private $miscService;
+
 
 	/**
 	 * SettingsService constructor.
@@ -57,11 +70,11 @@ class SettingsService {
 
 
 	/**
-	 * @param $data
+	 * @param array $data
 	 *
 	 * @return bool
 	 */
-	public function checkConfig($data) {
+	public function checkConfig(array $data): bool {
 		return true;
 	}
 
@@ -71,7 +84,7 @@ class SettingsService {
 	 *
 	 * @throws Exception
 	 */
-	public function completeSettings(&$data) {
+	public function completeSettings(array &$data) {
 		$data = array_merge(
 			$data, [
 					 'platforms_all' => $this->completeSettingsPlatforms(),
@@ -86,7 +99,7 @@ class SettingsService {
 	 * @return array
 	 * @throws Exception
 	 */
-	private function completeSettingsPlatforms() {
+	private function completeSettingsPlatforms(): array {
 		$list = [];
 		$platforms = $this->platformService->getPlatforms();
 		foreach ($platforms as $wrapper) {
@@ -105,7 +118,7 @@ class SettingsService {
 	 * @return array
 	 * @throws Exception
 	 */
-	private function completeSettingsProviders() {
+	private function completeSettingsProviders(): array {
 		$list = [];
 		$providers = $this->providerService->getProviders();
 		foreach ($providers as $providerWrapper) {

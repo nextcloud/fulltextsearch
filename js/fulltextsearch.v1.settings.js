@@ -49,29 +49,28 @@ var settings = {
 	 */
 	generateDefaultTemplate: function () {
 
-			var resultContent = $('<div>', {class: 'result_content'});
-			resultContent.append($('<div>', {
-				id: 'title',
-				class: 'result_title'
-			}));
-			resultContent.append($('<div>', {
-				id: 'extract',
-				class: 'result_extract'
-			}));
+		var resultContent = $('<div>', {class: 'result_content'});
+		resultContent.append($('<div>', {
+			id: 'title',
+			class: 'result_title'
+		}));
+		resultContent.append($('<div>', {
+			id: 'extract',
+			class: 'result_extract'
+		}));
 
-			var resultEntry = $('<div>', {class: 'result_entry'});
-			resultEntry.append($('<div>', {class: 'result_div_checkbox'}));
+		var resultEntry = $('<div>', {class: 'result_entry'});
+		resultEntry.append($('<div>', {class: 'result_div_checkbox'}));
 
-			resultEntry.append($('<div>', {class: 'result_div result_div_content'}).append(resultContent));
+		resultEntry.append($('<div>', {class: 'result_div result_div_content'}).append(resultContent));
 
-			var resultRight = $('<div>', {class: 'result_div result_div_right'});
-			resultRight.append($('<div>', {id: 'source'}));
-			resultRight.append($('<div>', {id: 'info'}));
-			resultEntry.append(resultRight);
+		var resultRight = $('<div>', {class: 'result_div result_div_right'});
+		resultRight.append($('<div>', {id: 'source'}));
+		resultRight.append($('<div>', {id: 'info'}));
+		resultEntry.append(resultRight);
 
-			return $('<div>').append(resultEntry);
-		},
-
+		return $('<div>').append(resultEntry);
+	},
 
 
 	// 	var divLeft = $('<div>', {class: 'result_entry_left'});
@@ -156,12 +155,41 @@ var settings = {
 	 * check that the app that call the lib contains a specific method
 	 *
 	 * @param method
+	 * @param context
 	 * @returns {boolean}
 	 */
-	parentHasMethod: function (method) {
+	parentHasMethod: function (method, context) {
 		if (settings.parent === null) {
 			return false;
 		}
-		return (typeof eval('settings.parent. ' + method) === "function");
+
+		var functionName = 'settings.parent.' + method;
+		var args = Array.prototype.slice.call(arguments, 2);
+		var namespaces = functionName.split(".");
+		for (var i = 0; i < namespaces.length; i++) {
+			if (context[namespaces[i]] === undefined) {
+				return false;
+			}
+			context = context[namespaces[i]];
+		}
+		return true;
+	},
+
+
+	executeFunction: function (functionName, context) {
+		var args = Array.prototype.slice.call(arguments, 2);
+		var namespaces = functionName.split(".");
+		var func = namespaces.pop();
+		for (var i = 0; i < namespaces.length; i++) {
+			if (context[namespaces[i]] === undefined) {
+				// console.log('Unknown function \'' + functionName + '\'');
+				return false;
+			}
+			context = context[namespaces[i]];
+		}
+
+		return context[func].apply(context, args);
 	}
+
+
 };

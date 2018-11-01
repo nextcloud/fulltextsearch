@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,13 +27,21 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
 
-use OCA\FullTextSearch\Model\DocumentAccess;
-use OCA\FullTextSearch\Model\IndexDocument;
-use OCA\FullTextSearch\Model\IndexOptions;
-use OCA\FullTextSearch\Provider\TestProvider;
 
+use OCA\FullTextSearch\Provider\TestProvider;
+use OCP\FullTextSearch\Model\DocumentAccess;
+use OCP\FullTextSearch\Model\IIndexOptions;
+use OCP\FullTextSearch\Model\IndexDocument;
+
+
+/**
+ * Class TestService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class TestService {
 
 	const DOCUMENT_USER1 = 'user1';
@@ -65,11 +76,11 @@ class TestService {
 
 
 	/**
-	 * @param IndexOptions $options
+	 * @param IIndexOptions $options
 	 *
 	 * @return IndexDocument
 	 */
-	public function generateIndexDocumentContentLicense(IndexOptions $options = null) {
+	public function generateIndexDocumentContentLicense(IIndexOptions $options): IndexDocument {
 		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TYPE_LICENSE);
 
 		$content = file_get_contents(__DIR__ . '/../../LICENSE');
@@ -92,11 +103,11 @@ class TestService {
 
 
 	/**
-	 * @param IndexOptions $options
+	 * @param IIndexOptions $options
 	 *
 	 * @return IndexDocument
 	 */
-	public function generateIndexDocumentSimple(IndexOptions $options) {
+	public function generateIndexDocumentSimple(IIndexOptions $options): IndexDocument {
 
 		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TYPE_SIMPLE);
 		$indexDocument->setContent('document is a simple test');
@@ -141,7 +152,7 @@ class TestService {
 	 *
 	 * @return IndexDocument
 	 */
-	private function generateIndexDocument($documentType) {
+	private function generateIndexDocument(string $documentType): IndexDocument {
 		$indexDocument = new IndexDocument(TestProvider::TEST_PROVIDER_ID, $documentType);
 
 		$access = new DocumentAccess(self::DOCUMENT_USER1);

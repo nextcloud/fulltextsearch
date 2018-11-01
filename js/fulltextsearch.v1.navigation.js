@@ -252,46 +252,46 @@ var nav = {
 
 
 		onEntryGenerated: function (divEntry, entry) {
-			if (settings.parentHasMethod('onEntryGenerated')) {
+			if (settings.parentHasMethod('onEntryGenerated', window)) {
 				settings.parent.onEntryGenerated(divEntry, entry);
 			}
 		},
 
 
 		onEntrySelected: function (divEntry, event) {
-			return !!(settings.parentHasMethod('onEntrySelected') &&
+			return !!(settings.parentHasMethod('onEntrySelected', window) &&
 				settings.parent.onEntrySelected(divEntry, event));
 		},
 
 
 		onSearchRequest: function (data) {
-			if (settings.parentHasMethod('onSearchRequest')) {
+			if (settings.parentHasMethod('onSearchRequest', window)) {
 				settings.parent.onSearchRequest(data);
 			}
 		},
 
 
 		onSearchReset: function () {
-			if (settings.parentHasMethod('onSearchReset')) {
+			if (settings.parentHasMethod('onSearchReset', window)) {
 				settings.parent.onSearchReset();
 			}
 		},
 
 
 		onResultDisplayed: function (data) {
-			if (settings.parentHasMethod('onResultDisplayed')) {
+			if (settings.parentHasMethod('onResultDisplayed', window)) {
 				settings.parent.onResultDisplayed(data);
 			}
 		},
 
 		onResultClose: function () {
-			if (settings.parentHasMethod('onResultClose')) {
+			if (settings.parentHasMethod('onResultClose', window)) {
 				settings.parent.onResultClose();
 			}
 		},
 
 		onError: function (data) {
-			if (settings.parentHasMethod('onError')) {
+			if (settings.parentHasMethod('onError', window)) {
 				settings.parent.onError(data);
 			}
 		},

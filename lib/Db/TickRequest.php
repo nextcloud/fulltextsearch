@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,13 +27,19 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Db;
 
 
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullTextSearch\Model\ExtendedTick;
 use OCA\FullTextSearch\Model\Tick;
 
+
+/**
+ * Class TickRequest
+ *
+ * @package OCA\FullTextSearch\Db
+ */
 class TickRequest extends TickRequestBuilder {
 
 
@@ -40,7 +49,7 @@ class TickRequest extends TickRequestBuilder {
 	 * @return int
 	 * @throws \Exception
 	 */
-	public function create(Tick $tick) {
+	public function create(Tick $tick): int {
 
 		try {
 			$qb = $this->getTickInsertSql();
@@ -65,7 +74,7 @@ class TickRequest extends TickRequestBuilder {
 	 *
 	 * @return bool
 	 */
-	public function update(Tick $tick) {
+	public function update(Tick $tick): bool {
 
 		try {
 			$this->getTickById($tick->getId());
@@ -114,10 +123,10 @@ class TickRequest extends TickRequestBuilder {
 	 *
 	 * @param int $id
 	 *
-	 * @return ExtendedTick
+	 * @return Tick
 	 * @throws TickDoesNotExistException
 	 */
-	public function getTickById($id) {
+	public function getTickById(int $id): Tick {
 		$qb = $this->getTickSelectSql();
 		$this->limitToId($qb, $id);
 
@@ -134,13 +143,13 @@ class TickRequest extends TickRequestBuilder {
 
 
 	/**
-	 * return tick.
+	 * return ticks.
 	 *
 	 * @param string $status
 	 *
-	 * @return ExtendedTick[]
+	 * @return Tick[]
 	 */
-	public function getTickByStatus($status) {
+	public function getTicksByStatus(string $status): array {
 
 		$ticks = [];
 
@@ -160,9 +169,9 @@ class TickRequest extends TickRequestBuilder {
 	/**
 	 * @param string $source
 	 *
-	 * @return ExtendedTick[]
+	 * @return Tick[]
 	 */
-	public function getTickBySource($source) {
+	public function getTicksBySource(string $source): array {
 		$qb = $this->getTickSelectSql();
 		$this->limitToSource($qb, $source);
 

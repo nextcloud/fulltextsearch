@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,16 +27,25 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use OCA\FullTextSearch\Db\TickRequest;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
-use OCA\FullTextSearch\Model\ExtendedTick;
+use OCA\FullTextSearch\Model\Tick;
 use OCA\FullTextSearch\Model\Runner;
 
+
+/**
+ * Class RunningService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class RunningService {
+
 
 	/** @var TickRequest */
 	private $tickRequest;
@@ -62,23 +74,23 @@ class RunningService {
 
 
 	/**
-	 * @param $source
+	 * @param string $source
 	 *
 	 * @return int
 	 * @throws RunnerAlreadyUpException
 	 * @throws \Exception
 	 */
-	public function start($source) {
+	public function start(string $source): int {
 
 		if ($this->isAlreadyRunning()) {
 			throw new RunnerAlreadyUpException('Index is already running');
 		}
 
-		$tick = new ExtendedTick($source);
+		$tick = new Tick($source);
 		$tick->setStatus('run')
 			 ->setTick()
 			 ->setFirstTick()
-			 ->setInfo('runStart ', time());
+			 ->setInfoInt('runStart ', time());
 
 		return $this->tickRequest->create($tick);
 	}
@@ -91,7 +103,7 @@ class RunningService {
 	 * @throws TickDoesNotExistException
 	 * @throws TickIsNotAliveException
 	 */
-	public function update($runId, $action = '') {
+	public function update(int $runId, string $action = '') {
 		$tick = $this->tickRequest->getTickById($runId);
 
 		$this->isStillAlive($tick, true);
@@ -107,11 +119,12 @@ class RunningService {
 
 	/**
 	 * @deprecated - verifier l'interet !
+	 *
 	 * @param int $runId
 	 * @param string $reason
 	 * @param bool $stop
 	 */
-	public function exception($runId, $reason, $stop = false) {
+	public function exception(int $runId, string $reason, bool $stop = false) {
 		if ($stop) {
 			try {
 				$this->stop($runId, $reason);
@@ -129,12 +142,12 @@ class RunningService {
 	 *
 	 * @throws TickDoesNotExistException
 	 */
-	public function stop($runId, $reason = '') {
+	public function stop(int $runId, string $reason = '') {
 		$tick = $this->tickRequest->getTickById($runId);
 		$tick->setStatus('stop')
 			 ->setTick()
-			 ->setInfo('runStop', time())
-			 ->setInfo('totalDocuments', 42);
+			 ->setInfoInt('runStop', time())
+			 ->setInfoInt('totalDocuments', 42);
 
 		if ($reason !== '') {
 			$tick->setStatus('exception');
@@ -146,12 +159,12 @@ class RunningService {
 
 
 	/**
-	 * @param $runId
+	 * @param int $runId
 	 *
 	 * @return bool
 	 * @throws TickIsNotAliveException
 	 */
-	public function isAlive($runId) {
+	public function isAlive(int $runId): bool {
 		$tick = null;
 		try {
 			$tick = $this->tickRequest->getTickById($runId);
@@ -164,13 +177,13 @@ class RunningService {
 
 
 	/**
-	 * @param ExtendedTick $tick
+	 * @param Tick $tick
 	 * @param bool $exception
 	 *
 	 * @return bool
 	 * @throws TickIsNotAliveException
 	 */
-	public function isStillAlive(ExtendedTick $tick, $exception = false) {
+	public function isStillAlive(Tick $tick, bool $exception = false): bool {
 		if ($tick->getStatus() !== 'run') {
 			if ($exception) {
 				throw new TickIsNotAliveException();
@@ -186,8 +199,8 @@ class RunningService {
 	/**
 	 * @return bool
 	 */
-	public function isAlreadyRunning() {
-		$ticks = $this->tickRequest->getTickByStatus('run');
+	public function isAlreadyRunning(): bool {
+		$ticks = $this->tickRequest->getTicksByStatus('run');
 
 		$isAlreadyRunning = false;
 		foreach ($ticks as $tick) {
@@ -207,7 +220,7 @@ class RunningService {
 	 *
 	 */
 	public function forceStop() {
-		$ticks = $this->tickRequest->getTickByStatus('run');
+		$ticks = $this->tickRequest->getTicksByStatus('run');
 
 		foreach ($ticks as $tick) {
 			$tick->setStatus('forceStop');
@@ -217,26 +230,26 @@ class RunningService {
 
 
 	/**
-	 * @param ExtendedTick $tick
+	 * @param Tick $tick
 	 * @param string $action
 	 */
-	private function assignActionToTick(ExtendedTick &$tick, $action) {
+	private function assignActionToTick(Tick &$tick, string $action) {
 		$now = microtime(true);
 		$preAction = $tick->getAction();
 
 		if ($preAction !== '') {
-			$preActionTotal = $tick->getInfo($preAction . 'Total', 0);
-			$preActionStart = $tick->getInfo($preAction . 'Init', 0);
+			$preActionTotal = $tick->getInfoFloat($preAction . 'Total', 0);
+			$preActionStart = $tick->getInfoFloat($preAction . 'Init', 0);
 
 			if ($preActionStart > 0) {
 
 				$preActionTotal += ($now - $preActionStart);
-				$tick->setInfo($preAction . 'Total', $preActionTotal);
+				$tick->setInfoFloat($preAction . 'Total', $preActionTotal);
 				$tick->unsetInfo($preAction . 'Init');
 			}
 		}
 		$tick->setAction($action)
-			 ->setInfo($action . 'Init', $now);
+			 ->setInfoFloat($action . 'Init', $now);
 	}
 
 

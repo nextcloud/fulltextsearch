@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,10 +27,12 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
 
+
 use Exception;
-use OCA\FullTextSearch\Model\ExtendedBase;
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
@@ -37,7 +42,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Check extends ExtendedBase {
+class Check extends Base {
 
 	/** @var ConfigService */
 	private $configService;
@@ -88,7 +93,6 @@ class Check extends ExtendedBase {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return int|null|void
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
@@ -109,7 +113,10 @@ class Check extends ExtendedBase {
 	}
 
 
-	private function displayAsJson() {
+	/**
+	 * @return array
+	 */
+	private function displayAsJson(): array {
 
 		$resultPlatform = [];
 
@@ -209,6 +216,4 @@ class Check extends ExtendedBase {
 
 
 }
-
-
 

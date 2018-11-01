@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,13 +27,14 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Controller;
+
 
 use Exception;
 use OC\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
-use OCA\FullTextSearch\IFullTextSearchProvider;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\ProviderService;
@@ -40,7 +44,14 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\IRequest;
 
+
+/**
+ * Class TemplatesController
+ *
+ * @package OCA\FullTextSearch\Controller
+ */
 class TemplatesController extends Controller {
+
 
 	/** @var IConfig */
 	private $config;
@@ -80,29 +91,32 @@ class TemplatesController extends Controller {
 	 * @NoAdminRequired
 	 * @NoSubAdminRequired
 	 *
-	 * @param $providerId
+	 * @param string $providerId
 	 *
 	 * @return DataResponse
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function getOptionsPanel($providerId) {
+	public function getOptionsPanel(string $providerId): DataResponse {
 		$providerWrapper = $this->providerService->getProvider($providerId);
 		$provider = $providerWrapper->getProvider();
 
-		$panel = [];
-		$options = $provider->getOptionsTemplate();
-		if (is_array($options) && array_key_exists('panel', $options)) {
-			$panel = $options['panel'];
-		}
+		$searchTemplate = $provider->getSearchTemplate();
 
-		if (array_key_exists('template', $panel)) {
+		$template = '';
+		if ($searchTemplate->getTemplate() !== '') {
 			$tmpl =
-				new TemplateResponse($providerWrapper->getAppId(), $panel['template'], [], 'blank');
-			$panel['template'] = $tmpl->render();
+				new TemplateResponse(
+					$providerWrapper->getAppId(), $searchTemplate->getTemplate(), [], 'blank'
+				);
+			$template = $tmpl->render();
 		}
 
-		$ret[$providerId] = $panel;
+		$ret[$providerId] =
+			[
+				'options'  => $searchTemplate->getPanelOptions(),
+				'template' => $template
+			];
 
 		return new DataResponse($ret, Http::STATUS_OK);
 	}
@@ -115,7 +129,7 @@ class TemplatesController extends Controller {
 	 * @return DataResponse
 	 * @throws Exception
 	 */
-	public function getNavigationPanels() {
+	public function getNavigationPanels(): DataResponse {
 		$providers = $this->providerService->getProviders();
 
 		$ret = [];
@@ -123,17 +137,14 @@ class TemplatesController extends Controller {
 			$provider = $providerWrapper->getProvider();
 			$providerAppId = $providerWrapper->getAppId();
 
-			$options = $provider->getOptionsTemplate();
-			$nav = [];
-			if (is_array($options) && array_key_exists('navigation', $options)) {
-				$nav = $options['navigation'];
-			}
-
+			$searchTemplate = $provider->getSearchTemplate();
 			$ret[$providerAppId] =
 				[
-					'provider'   => $provider->getId(),
-					'title'      => $provider->getName(),
-					'navigation' => $nav
+					'provider' => $provider->getId(),
+					'title'    => $provider->getName(),
+					'options'  => $searchTemplate->getNavigationOptions(),
+					'css'      => $searchTemplate->getCss(),
+					'icon'     => $searchTemplate->getIcon()
 				];
 		}
 

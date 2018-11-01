@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,15 +30,28 @@
 
 namespace OCA\FullTextSearch\Model;
 
+
+use daita\MySmallPhpTools\Traits\TArrayTools;
+use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\RunningService;
+use OCP\FullTextSearch\Model\IIndex;
+use OCP\FullTextSearch\Model\IRunner;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Runner {
+/**
+ * Class Runner
+ *
+ * @package OCA\FullTextSearch\Model
+ */
+class Runner implements IRunner {
+
+
+	use TArrayTools;
+
 
 	const TICK_TTL = 1800;
 
@@ -43,24 +59,17 @@ class Runner {
 	const TICK_UPDATE = 10;
 	const MEMORY_UPDATE = 5;
 
-	const RESULT_TYPE_SUCCESS = 1;
-	const RESULT_TYPE_WARNING = 4;
-	const RESULT_TYPE_FAIL = 9;
-
 	/** @var RunningService */
 	private $runningService;
 
 	/** @var string */
 	private $source;
 
-//	/** @var bool */
-//	private $strict = false;
-
 	/** @var int */
-	private $tickId;
+	private $tickId = 0;
 
-	/** @var ExtendedBase */
-	private $commandBase = null;
+	/** @var ACommandBase */
+	private $base = null;
 
 	/** @var OutputInterface */
 	private $outputInterface = null;
@@ -109,7 +118,7 @@ class Runner {
 	 * @param string $source
 	 * @param array $keys
 	 */
-	public function __construct(RunningService $runningService, $source, $keys = []) {
+	public function __construct(RunningService $runningService, string $source, array $keys = []) {
 		$this->runningService = $runningService;
 		$this->source = $source;
 
@@ -123,7 +132,6 @@ class Runner {
 	 * @throws RunnerAlreadyUpException
 	 */
 	public function start() {
-//		$this->strict = $strict;
 		$this->tickId = $this->runningService->start($this->source);
 	}
 
@@ -135,7 +143,12 @@ class Runner {
 	 * @return string
 	 * @throws \Exception
 	 */
-	public function updateAction($action = '', $force = false) {
+	public function updateAction(string $action = '', bool $force = false): string {
+
+		if ($this->base !== null) {
+			$this->base->abort();
+		}
+
 		$n = '';
 		if (sizeof($this->methodOnKeyPress) > 0) {
 			$n = fread(STDIN, 9999);
@@ -150,13 +163,6 @@ class Runner {
 		}
 
 		$tick = time();
-//		try {
-//			$this->hasBeenInterrupted();
-//		} catch (InterruptException $e) {
-//			$this->stop();
-//			throw $e;
-//		}
-
 		if ($this->oldAction !== $action || $force) {
 			while (true) {
 				if (!$this->isPaused()) {
@@ -168,7 +174,11 @@ class Runner {
 				if ($pressed === $this->keys['nextStep']) {
 					break;
 				}
+
 				usleep(300000);
+				if ($this->base !== null) {
+					$this->base->abort();
+				}
 			}
 
 			$this->pauseRunning(false);
@@ -195,7 +205,7 @@ class Runner {
 	 * @param string $value
 	 * @param int $type
 	 */
-	public function setInfo($info, $value, $type = 0) {
+	public function setInfo(string $info, string $value, int $type = 0) {
 		$this->info[$info] = $value;
 		$this->setInfoColored($info, $type);
 		$this->infoUpdated();
@@ -204,9 +214,8 @@ class Runner {
 	/**
 	 * @param array $data
 	 */
-	public function setInfoArray($data) {
+	public function setInfoArray(array $data) {
 		$keys = array_keys($data);
-		//$this->info['info'] = '';
 		foreach ($keys as $k) {
 			$this->info[$k] = $data[$k];
 		}
@@ -219,7 +228,7 @@ class Runner {
 	 * @param string $info
 	 * @param int $level
 	 */
-	public function setInfoColored($info, $level) {
+	public function setInfoColored(string $info, int $level) {
 
 		$value = $this->getInfo($info);
 		if ($value === '') {
@@ -228,15 +237,15 @@ class Runner {
 
 		$color = '';
 		switch ($level) {
-			case self::RESULT_TYPE_SUCCESS:
+			case IRunner::RESULT_TYPE_SUCCESS:
 				$color = 'info';
 				break;
 
-			case self::RESULT_TYPE_WARNING:
+			case IRunner::RESULT_TYPE_WARNING:
 				$color = 'comment';
 				break;
 
-			case self::RESULT_TYPE_FAIL:
+			case IRunner::RESULT_TYPE_FAIL:
 				$color = 'error';
 				break;
 		}
@@ -244,39 +253,37 @@ class Runner {
 		if ($color !== '') {
 			$this->info[$info . 'Colored'] = '<' . $color . '>' . $value . '</' . $color . '>';
 		}
-
-
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getInfoAll() {
+	public function getInfoAll(): array {
 		return $this->info;
 	}
 
 
 	/**
-	 * @param string $k
+	 * @param string $info
 	 *
 	 * @return string
 	 */
-	public function getInfo($k) {
-		return MiscService::get($k, $this->info, '');
+	public function getInfo(string $info): string {
+		return $this->get($info, $this->info, '');
 	}
 
 
 	/**
 	 * @param array $method
 	 */
-	public function onKeyPress($method) {
+	public function onKeyPress(array $method) {
 		$this->methodOnKeyPress[] = $method;
 	}
 
 	/**
-	 * @param $key
+	 * @param string $key
 	 */
-	public function keyPressed($key) {
+	public function keyPressed(string $key) {
 		foreach ($this->methodOnKeyPress as $method) {
 			call_user_func($method, $key);
 		}
@@ -286,11 +293,14 @@ class Runner {
 	/**
 	 * @param array $method
 	 */
-	public function onInfoUpdate($method) {
+	public function onInfoUpdate(array $method) {
 		$this->methodOnInfoUpdate[] = $method;
 	}
 
 
+	/**
+	 *
+	 */
 	public function infoUpdated() {
 		foreach ($this->methodOnInfoUpdate as $method) {
 			call_user_func($method, $this->info);
@@ -301,17 +311,18 @@ class Runner {
 	/**
 	 * @param array $method
 	 */
-	public function onNewIndexError($method) {
+	public function onNewIndexError(array $method) {
 		$this->methodOnIndexError[] = $method;
 	}
 
 	/**
-	 * @param Index $index
+	 * @param IIndex $index
 	 * @param string $message
 	 * @param string $class
 	 * @param int $sev
 	 */
-	public function newIndexError($index, $message, $class = '', $sev = 3) {
+	public function newIndexError(IIndex $index, string $message, string $class = '', int $sev = 3
+	) {
 		$error = [
 			'index'     => $index,
 			'message'   => $message,
@@ -328,18 +339,18 @@ class Runner {
 	/**
 	 * @param array $method
 	 */
-	public function onNewIndexResult($method) {
+	public function onNewIndexResult(array $method) {
 		$this->methodOnIndexResult[] = $method;
 	}
 
 
 	/**
-	 * @param Index $index
+	 * @param IIndex $index
 	 * @param string $message
 	 * @param string $status
 	 * @param int $type
 	 */
-	public function newIndexResult($index, $message, $status, $type) {
+	public function newIndexResult(IIndex $index, string $message, string $status, int $type) {
 		$result = [
 			'index'   => $index,
 			'message' => $message,
@@ -353,24 +364,13 @@ class Runner {
 	}
 
 
-//	/**
-//	 * @throws InterruptException
-//	 */
-//	private function hasBeenInterrupted() {
-//		if ($this->commandBase === null) {
-//			return;
-//		}
-//		$this->commandBase->hasBeenInterrupted();
-//	}
-
-
 	/**
 	 * @param int $tick
 	 * @param string $action
 	 *
 	 * @throws TickDoesNotExistException
 	 */
-	private function updateTick($tick, $action) {
+	private function updateTick(int $tick, string $action) {
 		if ($this->oldAction === $action && ($this->tickUpdate + self::TICK_UPDATE > $tick)) {
 			return;
 		}
@@ -387,9 +387,9 @@ class Runner {
 
 
 	/**
-	 * @param $tick
+	 * @param int $tick
 	 */
-	private function updateRamInfo($tick) {
+	private function updateRamInfo(int $tick) {
 		if (($this->ramUpdate + self::MEMORY_UPDATE) > $tick) {
 			return;
 		}
@@ -402,10 +402,10 @@ class Runner {
 	/**
 	 * @deprecated - verifier l'interet !?
 	 *
-	 * @param $reason
-	 * @param $stop
+	 * @param string $reason
+	 * @param bool $stop
 	 */
-	public function exception($reason, $stop) {
+	public function exception(string $reason, bool $stop) {
 		if (!$stop) {
 			$this->output('Exception: ' . $reason);
 			// TODO: feed an array of exceptions for log;
@@ -423,19 +423,19 @@ class Runner {
 
 
 	/**
-	 * @param ExtendedBase $base
+	 * @param ACommandBase $base
 	 * @param OutputInterface $output
 	 */
-	public function sourceIsCommandLine(ExtendedBase $base, OutputInterface $output) {
+	public function sourceIsCommandLine(ACommandBase $base, OutputInterface $output) {
+		$this->base = $base;
 		$this->outputInterface = $output;
-		$this->commandBase = $base;
 	}
 
 
 	/**
 	 * @param bool $pause
 	 */
-	public function pause($pause) {
+	public function pause(bool $pause) {
 		$this->paused = $pause;
 		$this->infoUpdated();
 	}
@@ -443,7 +443,7 @@ class Runner {
 	/**
 	 * @return bool
 	 */
-	public function isPaused() {
+	public function isPaused(): bool {
 		return $this->paused;
 	}
 
@@ -451,28 +451,23 @@ class Runner {
 	/**
 	 * @param bool $running
 	 */
-	public function pauseRunning($running) {
+	public function pauseRunning(bool $running) {
 		$this->pauseRunning = $running;
 		$this->infoUpdated();
 	}
 
-
-	public function isPauseRunning() {
+	/**
+	 * @return bool
+	 */
+	public function isPauseRunning(): bool {
 		return $this->pauseRunning;
 	}
 
 
-//	/**
-//	 * @return bool
-//	 */
-//	public function isStrict() {
-//		return $this->strict;
-//	}
-
 	/**
 	 * @param string $line
 	 */
-	public function output($line) {
+	public function output(string $line) {
 		if ($this->outputInterface === null) {
 			return;
 		}

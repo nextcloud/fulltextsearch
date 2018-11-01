@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,12 +27,24 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Model;
 
-use OCA\FullTextSearch\IFullTextSearchPlatform;
-use OCA\FullTextSearch\IFullTextSearchProvider;
 
-class SearchResult implements \JsonSerializable {
+use JsonSerializable;
+use OCP\FullTextSearch\IFullTextSearchPlatform;
+use OCP\FullTextSearch\IFullTextSearchProvider;
+use OCP\FullTextSearch\Model\IndexDocument;
+use OCP\FullTextSearch\Model\ISearchRequest;
+use OCP\FullTextSearch\Model\ISearchResult;
+
+
+/**
+ * Class SearchResult
+ *
+ * @package OCA\FullTextSearch\Model
+ */
+class SearchResult implements ISearchResult, JsonSerializable {
 
 	/** @var IndexDocument[] */
 	private $documents = [];
@@ -55,11 +70,16 @@ class SearchResult implements \JsonSerializable {
 	/** @var boolean */
 	private $timedOut;
 
-	/** @var SearchRequest */
+	/** @var ISearchRequest */
 	private $request;
 
 
-	public function __construct(SearchRequest $searchRequest = null) {
+	/**
+	 * SearchResult constructor.
+	 *
+	 * @param SearchRequest $searchRequest
+	 */
+	public function __construct(SearchRequest $searchRequest) {
 		$this->request = $searchRequest;
 	}
 
@@ -67,9 +87,9 @@ class SearchResult implements \JsonSerializable {
 	/**
 	 * @param IndexDocument[] $documents
 	 *
-	 * @return $this
+	 * @return ISearchResult
 	 */
-	public function setDocuments($documents) {
+	public function setDocuments(array $documents): ISearchResult {
 		$this->documents = $documents;
 
 		return $this;
@@ -78,16 +98,16 @@ class SearchResult implements \JsonSerializable {
 	/**
 	 * @return IndexDocument[]
 	 */
-	public function getDocuments() {
+	public function getDocuments(): array {
 		return $this->documents;
 	}
 
 	/**
 	 * @param IndexDocument $document
 	 *
-	 * @return $this
+	 * @return ISearchResult
 	 */
-	public function addDocument(IndexDocument $document) {
+	public function addDocument(IndexDocument $document): ISearchResult {
 		$this->documents[] = $document;
 
 		return $this;
@@ -96,37 +116,45 @@ class SearchResult implements \JsonSerializable {
 	/**
 	 * @return int
 	 */
-	public function getCount() {
+	public function getCount(): int {
 		return count($this->documents);
 	}
 
 
 	/**
 	 * @param string $result
+	 *
+	 * @return ISearchResult
 	 */
-	public function setRawResult($result) {
+	public function setRawResult(string $result): ISearchResult {
 		$this->rawResult = $result;
+
+		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getRawResult() {
+	public function getRawResult(): string {
 		return $this->rawResult;
 	}
 
 
 	/**
 	 * @param IFullTextSearchProvider $provider
+	 *
+	 * @return ISearchResult
 	 */
-	public function setProvider(IFullTextSearchProvider $provider) {
+	public function setProvider(IFullTextSearchProvider $provider): ISearchResult {
 		$this->provider = $provider;
+
+		return $this;
 	}
 
 	/**
 	 * @return IFullTextSearchProvider
 	 */
-	public function getProvider() {
+	public function getProvider(): IFullTextSearchProvider {
 		return $this->provider;
 	}
 
@@ -134,30 +162,38 @@ class SearchResult implements \JsonSerializable {
 	/**
 	 * @return IFullTextSearchPlatform
 	 */
-	public function getPlatform() {
+	public function getPlatform(): IFullTextSearchPlatform {
 		return $this->platform;
 	}
 
 	/**
 	 * @param IFullTextSearchPlatform $platform
+	 *
+	 * @return ISearchResult
 	 */
-	public function setPlatform($platform) {
+	public function setPlatform(IFullTextSearchPlatform $platform): ISearchResult {
 		$this->platform = $platform;
+
+		return $this;
 	}
 
 
 	/**
 	 * @return int
 	 */
-	public function getTotal() {
+	public function getTotal(): int {
 		return $this->total;
 	}
 
 	/**
 	 * @param int $total
+	 *
+	 * @return ISearchResult
 	 */
-	public function setTotal($total) {
+	public function setTotal(int $total): ISearchResult {
 		$this->total = $total;
+
+		return $this;
 	}
 
 
@@ -170,68 +206,113 @@ class SearchResult implements \JsonSerializable {
 
 	/**
 	 * @param int $maxScore
+	 *
+	 * @return ISearchResult
 	 */
-	public function setMaxScore($maxScore) {
+	public function setMaxScore(int $maxScore): ISearchResult {
 		$this->maxScore = $maxScore;
+
+		return $this;
 	}
 
 
 	/**
 	 * @return int
 	 */
-	public function getTime() {
+	public function getTime(): int {
 		return $this->time;
 	}
 
 	/**
 	 * @param int $time
+	 *
+	 * @return ISearchResult
 	 */
-	public function setTime($time) {
+	public function setTime(int $time): ISearchResult {
 		$this->time = $time;
+
+		return $this;
 	}
 
 
 	/**
 	 * @return bool
 	 */
-	public function isTimedOut() {
+	public function isTimedOut(): bool {
 		return $this->timedOut;
 	}
 
 	/**
 	 * @param bool $timedOut
+	 *
+	 * @return ISearchResult
 	 */
-	public function setTimedOut($timedOut) {
+	public function setTimedOut(bool $timedOut): ISearchResult {
 		$this->timedOut = $timedOut;
+
+		return $this;
 	}
 
 
 	/**
-	 * @return SearchRequest
+	 * @return ISearchRequest
 	 */
-	public function getRequest() {
+	public function getRequest(): ISearchRequest {
 		return $this->request;
 	}
 
 	/**
-	 * @param SearchRequest $request
+	 * @param ISearchRequest $request
+	 *
+	 * @return ISearchResult
 	 */
-	public function setRequest($request) {
+	public function setRequest(ISearchRequest $request): ISearchResult {
 		$this->request = $request;
+
+		return $this;
 	}
 
 
 	/**
-	 * @return array<string,array<string,string>|IndexDocument[]|integer>
+	 * @since 15.0.0
+	 *
+	 * @param string $category
+	 * @param string $value
+	 * @param int $count
+	 *
+	 * @return ISearchResult
 	 */
-	public function jsonSerialize() {
+	public function addAggregation(string $category, string $value, int $count): ISearchResult {
+		// TODO: Implement addAggregation() method.
+
+		return $this;
+	}
+
+	/**
+	 * @since 15.0.0
+	 *
+	 * @param string $category
+	 *
+	 * @return array
+	 */
+	public function getAggregations(string $category): array {
+		// TODO: Implement getAggregations() method.
+
+		return [];
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function jsonSerialize(): array {
 
 		$providerObj = $this->getProvider();
 		$provider = [];
 		if ($providerObj !== null) {
 			$provider = [
-				'id'      => $providerObj->getId(),
-				'name'    => $providerObj->getName()
+				'id'   => $providerObj->getId(),
+				'name' => $providerObj->getName()
 			];
 		}
 
@@ -239,8 +320,8 @@ class SearchResult implements \JsonSerializable {
 		$platform = [];
 		if ($platformObj !== null) {
 			$platform = [
-				'id'      => $platformObj->getId(),
-				'name'    => $platformObj->getName()
+				'id'   => $platformObj->getId(),
+				'name' => $platformObj->getName()
 			];
 		}
 
@@ -258,4 +339,6 @@ class SearchResult implements \JsonSerializable {
 				]
 		];
 	}
+
 }
+

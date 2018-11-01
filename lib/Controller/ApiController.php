@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,8 +27,11 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Controller;
 
+
+use daita\MySmallPhpTools\Traits\TNCDataResponse;
 use Exception;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Model\SearchRequest;
@@ -33,11 +39,20 @@ use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
+
+/**
+ * Class ApiController
+ *
+ * @package OCA\FullTextSearch\Controller
+ */
 class ApiController extends Controller {
+
+
+	use TNCDataResponse;
+
 
 	/** @var SearchService */
 	private $searchService;
@@ -76,7 +91,7 @@ class ApiController extends Controller {
 	 *
 	 * @return DataResponse
 	 */
-	public function search($request) {
+	public function search(string $request): DataResponse {
 		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
@@ -90,7 +105,7 @@ class ApiController extends Controller {
 	 *
 	 * @return DataResponse
 	 */
-	public function searchFromRemote($request) {
+	public function searchFromRemote(string $request): DataResponse {
 		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
@@ -100,54 +115,27 @@ class ApiController extends Controller {
 	 *
 	 * @return DataResponse
 	 */
-	private function searchDocuments(SearchRequest $request) {
+	private function searchDocuments(SearchRequest $request): DataResponse {
 		try {
-			$result = $this->searchService->search(null, $request);
+			$result = $this->searchService->search('', $request);
 
 			return $this->success(
+				$result,
 				[
 					'request' => $request,
-					'result'  => $result,
 					'version' => $this->configService->getAppValue('installed_version')
 				]
 			);
 		} catch (Exception $e) {
 			return $this->fail(
+				$e->getMessage(),
 				[
 					'request' => $request,
-					'error'   => $e->getMessage(),
 					'version' => $this->configService->getAppValue('installed_version')
 				]
 			);
 		}
 	}
 
-
-	/**
-	 * @param $data
-	 *
-	 * @return DataResponse
-	 */
-	protected function fail($data) {
-		$this->miscService->log(json_encode($data));
-
-		return new DataResponse(
-			array_merge($data, array('status' => 0)),
-			Http::STATUS_NON_AUTHORATIVE_INFORMATION
-		);
-	}
-
-
-	/**
-	 * @param $data
-	 *
-	 * @return DataResponse
-	 */
-	protected function success($data) {
-		return new DataResponse(
-			array_merge($data, array('status' => 1)),
-			Http::STATUS_CREATED
-		);
-	}
-
 }
+

@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -25,40 +28,12 @@
  */
 
 
-namespace OCA\FullTextSearch\Model;
+namespace OCA\FullTextSearch\AppInfo;
 
 
-class ExtendedTick extends Tick {
+$composerDir = __DIR__ . '/../vendor/';
 
-	/**
-	 * @param string $key
-	 * @param string|int $value
-	 *
-	 * @return $this
-	 */
-	public function setInfo($key, $value) {
-		$this->data[$key] = $value;
-
-		return $this;
-	}
-
-	public function unsetInfo($key) {
-		unset($this->data[$key]);
-	}
-
-	/**
-	 * @param $key
-	 * @param int|string $default
-	 *
-	 * @return int|string
-	 */
-	public function getInfo($key, $default = '') {
-		if (!array_key_exists($key, $this->data)) {
-			return $default;
-		}
-
-		return $this->data[$key];
-
-	}
-
+if (is_dir($composerDir) && file_exists($composerDir . 'autoload.php')) {
+	require_once $composerDir . 'autoload.php';
 }
+

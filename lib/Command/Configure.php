@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,10 +27,12 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
 
+
 use Exception;
-use OCA\FullTextSearch\Model\ExtendedBase;
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,7 +40,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Configure extends ExtendedBase {
+/**
+ * Class Configure
+ *
+ * @package OCA\FullTextSearch\Command
+ */
+class Configure extends Base {
 
 	/** @var ConfigService */
 	private $configService;
@@ -73,7 +83,6 @@ class Configure extends ExtendedBase {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return int|null|void
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {

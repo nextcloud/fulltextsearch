@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,16 +27,24 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
 
-use OCA\FullTextSearch\Model\ExtendedBase;
+
+use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\RunningService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Stop extends ExtendedBase {
+/**
+ * Class Stop
+ *
+ * @package OCA\FullTextSearch\Command
+ */
+class Stop extends Base {
+
 
 	/** @var RunningService */
 	private $runningService;
@@ -56,6 +67,9 @@ class Stop extends ExtendedBase {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:stop')
@@ -63,6 +77,10 @@ class Stop extends ExtendedBase {
 	}
 
 
+	/**
+	 * @param InputInterface $input
+	 * @param OutputInterface $output
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$output->writeln('stopping all running indexes');
 

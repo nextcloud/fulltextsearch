@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -28,7 +31,7 @@
 namespace OCA\FullTextSearch\Model;
 
 
-use OCA\FullTextSearch\IFullTextSearchPlatform;
+use OCP\FullTextSearch\IFullTextSearchPlatform;
 
 
 /**
@@ -56,9 +59,9 @@ class PlatformWrapper {
 	 * Provider constructor.
 	 *
 	 * @param string $appId
-	 * @param IFullTextSearchPlatform $platform
+	 * @param string $class
 	 */
-	public function __construct($appId, $class) {
+	public function __construct(string $appId, string $class) {
 		$this->appId = $appId;
 		$this->class = $class;
 	}
@@ -66,7 +69,7 @@ class PlatformWrapper {
 	/**
 	 * @return string
 	 */
-	public function getAppId() {
+	public function getAppId(): string {
 		return $this->appId;
 	}
 
@@ -75,7 +78,7 @@ class PlatformWrapper {
 	 *
 	 * @return PlatformWrapper
 	 */
-	public function setAppId($appId) {
+	public function setAppId(string $appId): PlatformWrapper {
 		$this->appId = $appId;
 
 		return $this;
@@ -85,7 +88,7 @@ class PlatformWrapper {
 	/**
 	 * @return string
 	 */
-	public function getClass() {
+	public function getClass(): string {
 		return $this->class;
 	}
 
@@ -94,7 +97,7 @@ class PlatformWrapper {
 	 *
 	 * @return PlatformWrapper
 	 */
-	public function setClass($class) {
+	public function setClass(string $class): PlatformWrapper {
 		$this->class = $class;
 
 		return $this;
@@ -104,7 +107,7 @@ class PlatformWrapper {
 	/**
 	 * @return IFullTextSearchPlatform
 	 */
-	public function getPlatform() {
+	public function getPlatform(): IFullTextSearchPlatform {
 		return $this->platform;
 	}
 
@@ -113,7 +116,7 @@ class PlatformWrapper {
 	 *
 	 * @return PlatformWrapper
 	 */
-	public function setPlatform($platform) {
+	public function setPlatform(IFullTextSearchPlatform $platform): PlatformWrapper {
 		$this->platform = $platform;
 
 		return $this;
@@ -123,7 +126,7 @@ class PlatformWrapper {
 	/**
 	 * @return string
 	 */
-	public function getVersion() {
+	public function getVersion(): string {
 		return $this->version;
 	}
 
@@ -132,7 +135,7 @@ class PlatformWrapper {
 	 *
 	 * @return PlatformWrapper
 	 */
-	public function setVersion($version) {
+	public function setVersion(string $version): PlatformWrapper {
 		$this->version = $version;
 
 		return $this;

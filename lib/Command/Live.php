@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,11 +27,15 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
 
+
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use Exception;
+use OC\Core\Command\InterruptedException;
+use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullTextSearch\Model\ExtendedBase;
 use OCA\FullTextSearch\Model\Index as ModelIndex;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\CliService;
@@ -39,6 +46,7 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\IUserManager;
+use OutOfBoundsException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -47,7 +55,16 @@ use Symfony\Component\Console\Terminal;
 use Throwable;
 
 
-class Live extends ExtendedBase {
+/**
+ * Class Live
+ *
+ * @package OCA\FullTextSearch\Command
+ */
+class Live extends ACommandBase {
+
+
+	use TArrayTools;
+
 
 	const INDEX_OPTION_NO_READLINE = '_no-readline';
 
@@ -290,9 +307,9 @@ class Live extends ExtendedBase {
 
 
 	/**
-	 * @param $key
+	 * @param string $key
 	 */
-	public function onKeyPressed($key) {
+	public function onKeyPressed(string $key) {
 		$key = strtolower($key);
 		if ($key === 'q') {
 			try {
@@ -347,7 +364,7 @@ class Live extends ExtendedBase {
 	/**
 	 * @param array $error
 	 */
-	public function onNewIndexError($error) {
+	public function onNewIndexError(array $error) {
 		$this->errors[] = $error;
 		$this->displayError();
 	}
@@ -355,7 +372,7 @@ class Live extends ExtendedBase {
 	/**
 	 * @param array $result
 	 */
-	public function onNewIndexResult($result) {
+	public function onNewIndexResult(array $result) {
 		$this->results[] = $result;
 		$this->displayResult();
 	}
@@ -503,7 +520,7 @@ class Live extends ExtendedBase {
 	/**
 	 * @param int $pos
 	 */
-	private function displayResult($pos = 0) {
+	private function displayResult(int $pos = 0) {
 		$total = sizeof($this->results);
 
 		if ($total === 0) {
@@ -517,11 +534,11 @@ class Live extends ExtendedBase {
 			return;
 		}
 
-		$current = key($this->results) + 1;
-		$result = $this->getNavigationResult($pos, ($current === 1), ($current === $total));
-		$current = key($this->results) + 1;
-
-		if ($result === false) {
+		try {
+			$current = key($this->results) + 1;
+			$result = $this->getNavigationResult($pos, ($current === 1), ($current === $total));
+			$current = key($this->results) + 1;
+		} catch (OutOfBoundsException $e) {
 			return;
 		}
 
@@ -534,14 +551,15 @@ class Live extends ExtendedBase {
 
 
 		$width = $this->terminal->getWidth() - 13;
-		$message = MiscService::get('message', $result, '');
-		$msg1 = substr($message, 0, $width);
-		$msg2 = substr($message, $width, $width + 10);
-		$msg3 = substr($message, $width + $width + 10, $width + 10);
+		$message = $this->get('message', $result, '');
+		$msg1 = (string)substr($message, 0, $width);
+		$msg2 = (string)substr($message, $width, $width + 10);
+		$msg3 = (string)substr($message, $width + $width + 10, $width + 10);
 
 
-		$status = MiscService::get('status', $result, '');
-		$type = MiscService::get('type', $result, '');
+		$status = $this->get('status', $result, '');
+		$type = $this->getInt('type', $result, 0);
+
 
 		$this->runner->setInfoArray(
 			[
@@ -560,7 +578,7 @@ class Live extends ExtendedBase {
 	/**
 	 * @param int $pos
 	 */
-	private function displayError($pos = 0) {
+	private function displayError(int $pos = 0) {
 		$total = sizeof($this->errors);
 
 		if ($total === 0) {
@@ -574,11 +592,11 @@ class Live extends ExtendedBase {
 			return;
 		}
 
-		$current = key($this->errors) + 1;
-		$error = $this->getNavigationError($pos, ($current === 1), ($current === $total));
-		$current = key($this->errors) + 1;
-
-		if ($error === false) {
+		try {
+			$current = key($this->errors) + 1;
+			$error = $this->getNavigationError($pos, ($current === 1), ($current === $total));
+			$current = key($this->errors) + 1;
+		} catch (OutOfBoundsException $e) {
 			return;
 		}
 
@@ -590,10 +608,10 @@ class Live extends ExtendedBase {
 		}
 
 		$width = $this->terminal->getWidth() - 13;
-		$message = MiscService::get('message', $error, '');
-		$err1 = substr($message, 0, $width);
-		$err2 = substr($message, $width, $width + 10);
-		$err3 = substr($message, $width + $width + 10, $width + 10);
+		$message = $this->get('message', $error, '');
+		$err1 = (string)substr($message, 0, $width);
+		$err2 = (string)substr($message, $width, $width + 10);
+		$err3 = (string)substr($message, $width + $width + 10, $width + 10);
 
 		$this->runner->setInfoArray(
 			[
@@ -602,7 +620,7 @@ class Live extends ExtendedBase {
 				'errorMessageA'  => trim($err1),
 				'errorMessageB'  => trim($err2),
 				'errorMessageC'  => trim($err3),
-				'errorException' => MiscService::get('exception', $error, ''),
+				'errorException' => $this->get('exception', $error, ''),
 				'errorIndex'     => $errorIndex
 			]
 		);
@@ -614,9 +632,10 @@ class Live extends ExtendedBase {
 	 * @param bool $isFirst
 	 * @param bool $isLast
 	 *
-	 * @return bool|array
+	 * @return array
+	 * @throws OutOfBoundsException
 	 */
-	private function getNavigationResult($pos, $isFirst, $isLast) {
+	private function getNavigationResult(int $pos, bool $isFirst, bool $isLast): array {
 
 		if ($pos === 0) {
 			if ($this->navigateLastResult === true) {
@@ -645,7 +664,7 @@ class Live extends ExtendedBase {
 			return end($this->results);
 		}
 
-		return false;
+		throw new OutOfBoundsException();
 	}
 
 
@@ -654,9 +673,9 @@ class Live extends ExtendedBase {
 	 * @param bool $isFirst
 	 * @param bool $isLast
 	 *
-	 * @return bool|array
+	 * @return array
 	 */
-	private function getNavigationError($pos, $isFirst, $isLast) {
+	private function getNavigationError(int $pos, bool $isFirst, bool $isLast): array {
 
 		if ($pos === 0) {
 			if ($this->navigateLastError === true) {
@@ -685,7 +704,7 @@ class Live extends ExtendedBase {
 			return end($this->errors);
 		}
 
-		return false;
+		throw new OutOfBoundsException();
 	}
 
 
@@ -736,7 +755,20 @@ class Live extends ExtendedBase {
 
 		$this->displayError();
 	}
+
+
+	/**
+	 * @throws TickDoesNotExistException
+	 */
+	public function abort() {
+		try {
+			$this->abortIfInterrupted();
+		} catch (InterruptedException $e) {
+			$this->runner->stop();
+			exit();
+		}
+	}
+
+
 }
-
-
 

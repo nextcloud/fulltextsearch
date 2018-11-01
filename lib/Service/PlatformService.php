@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,18 +27,27 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use Exception;
 use OC\App\AppManager;
 use OCA\FullTextSearch\Exceptions\PlatformDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\PlatformIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\PlatformNotSelectedException;
-use OCA\FullTextSearch\IFullTextSearchPlatform;
 use OCA\FullTextSearch\Model\PlatformWrapper;
 use OCP\AppFramework\QueryException;
+use OCP\FullTextSearch\IFullTextSearchPlatform;
 
+
+/**
+ * Class PlatformService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class PlatformService {
+
 
 	/** @var AppManager */
 	private $appManager;
@@ -62,7 +74,6 @@ class PlatformService {
 	 * @param AppManager $appManager
 	 * @param ConfigService $configService
 	 * @param MiscService $miscService
-	 *
 	 */
 	public function __construct(
 		AppManager $appManager, ConfigService $configService, MiscService $miscService
@@ -80,7 +91,7 @@ class PlatformService {
 	 * @return PlatformWrapper
 	 * @throws Exception
 	 */
-	public function getPlatform($silent = false) {
+	public function getPlatform(bool $silent = false): PlatformWrapper {
 		try {
 			$this->loadPlatform();
 		} catch (Exception $e) {
@@ -98,7 +109,7 @@ class PlatformService {
 	 * @return PlatformWrapper[]
 	 * @throws Exception
 	 */
-	public function getPlatforms() {
+	public function getPlatforms(): array {
 		$this->loadPlatforms();
 
 		$platforms = [];
@@ -161,7 +172,7 @@ class PlatformService {
 		$platform = \OC::$server->query((string)$selected->getClass());
 		if (!($platform instanceof IFullTextSearchPlatform)) {
 			throw new PlatformIsNotCompatibleException(
-				$selected . ' is not a compatible FullTextSearchPlatform'
+				$selected->getClass() . ' is not a compatible FullTextSearchPlatform'
 			);
 		}
 
@@ -177,7 +188,7 @@ class PlatformService {
 	 * @throws PlatformDoesNotExistException
 	 * @throws PlatformNotSelectedException
 	 */
-	private function getSelectedPlatform() {
+	private function getSelectedPlatform(): PlatformWrapper {
 		$selected = $this->configService->getAppValue(ConfigService::SEARCH_PLATFORM);
 
 		if ($selected === '') {
@@ -201,7 +212,7 @@ class PlatformService {
 	/**
 	 * @param string $appId
 	 */
-	private function loadPlatformsFromApp($appId) {
+	private function loadPlatformsFromApp(string $appId) {
 		$appInfo = $this->appManager->getAppInfo($appId);
 		if (!is_array($appInfo) || !key_exists('fulltextsearch', $appInfo)
 			|| !key_exists('platform', $appInfo['fulltextsearch'])) {

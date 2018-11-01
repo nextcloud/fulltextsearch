@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,11 +27,25 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Model;
 
-use OCA\FullTextSearch\Service\MiscService;
 
-class SearchRequest implements \JsonSerializable {
+use daita\MySmallPhpTools\Traits\TArrayTools;
+use JsonSerializable;
+use OCP\FullTextSearch\Model\ISearchRequest;
+
+
+/**
+ * Class SearchRequest
+ *
+ * @package OCA\FullTextSearch\Model
+ */
+class SearchRequest implements ISearchRequest, JsonSerializable {
+
+
+	use TArrayTools;
+
 
 	/** @var array */
 	private $providers;
@@ -89,52 +106,64 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getProviders() {
+	public function getProviders(): array {
 		return $this->providers;
 	}
 
 	/**
 	 * @param array $providers
+	 *
+	 * @return ISearchRequest
 	 */
-	public function setProviders($providers) {
+	public function setProviders(array $providers): ISearchRequest {
 		$this->providers = $providers;
+
+		return $this;
 	}
 
 
 	/**
 	 * @return string
 	 */
-	public function getAuthor() {
+	public function getAuthor(): string {
 		return $this->author;
 	}
 
 	/**
 	 * @param string $author
+	 *
+	 * @return ISearchRequest
 	 */
-	public function setAuthor($author) {
+	public function setAuthor(string $author): ISearchRequest {
 		$this->author = $author;
+
+		return $this;
 	}
 
 
 	/**
 	 * @return string
 	 */
-	public function getSearch() {
+	public function getSearch(): string {
 		return $this->search;
 	}
 
 	/**
 	 * @param string $search
+	 *
+	 * @return ISearchRequest
 	 */
-	public function setSearch($search) {
+	public function setSearch(string $search): ISearchRequest {
 		$this->search = $search;
+
+		return $this;
 	}
 
 
 	/**
 	 *
 	 */
-	public function cleanSearch() {
+	public function cleanSearch(): ISearchRequest {
 		$search = trim(str_replace('  ', ' ', $this->getSearch()));
 
 		preg_match_all('/[^?]"(?:\\\\.|[^\\\\"])*"|\S+/', " $search ", $words);
@@ -148,15 +177,17 @@ class SearchRequest implements \JsonSerializable {
 		}
 
 		$this->setSearch(implode(" ", $searchItems));
+
+		return $this;
 	}
 
 
 	/**
-	 * @param $word
+	 * @param string $word
 	 *
 	 * @return bool
 	 */
-	private function searchQueryOptions($word) {
+	private function searchQueryOptions(string $word): bool {
 		if (($pos = strpos($word, ':')) === false) {
 			return false;
 		}
@@ -184,99 +215,111 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return int
 	 */
-	public function getPage() {
+	public function getPage(): int {
 		return $this->page;
 	}
 
 	/**
 	 * @param int $page
+	 *
+	 * @return ISearchRequest
 	 */
-	public function setPage($page) {
+	public function setPage(int $page): ISearchRequest {
 		if ($page < 1) {
 			$page = 1;
 		}
 
 		$this->page = $page;
+
+		return $this;
 	}
 
 
 	/**
 	 * @return int
 	 */
-	public function getSize() {
+	public function getSize(): int {
 		return $this->size;
 	}
 
 	/**
 	 * @param int $size
+	 *
+	 * @return ISearchRequest
 	 */
-	public function setSize($size) {
+	public function setSize(int $size): ISearchRequest {
 		$this->size = $size;
+
+		return $this;
 	}
 
 
 	/**
 	 * @return array
 	 */
-	public function getOptions() {
+	public function getOptions(): array {
 		return $this->options;
 	}
 
 	/**
 	 * @param array $options
+	 *
+	 * @return ISearchRequest
 	 */
-	public function setOptions($options) {
+	public function setOptions(array $options): ISearchRequest {
 		$this->options = $options;
+
+		return $this;
 	}
 
 	/**
-	 * @param $key
+	 * @param $option
 	 * @param $value
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addOption($key, $value) {
-		$this->options[$key] = $value;
+	public function addOption(string $option, string $value): ISearchRequest {
+		$this->options[$option] = $value;
 
 		return $this;
 	}
 
 	/**
-	 * @param string $k
-	 * @param array $array
+	 * @param string $option
+	 * @param array $value
 	 *
-	 * @return SearchRequest
+	 * @return ISearchRequest
 	 */
-	public function addOptionArray($k, $array) {
-		$this->options[$k] = $array;
+	public function addOptionArray(string $option, array $value): ISearchRequest {
+		$this->options[$option] = $value;
 
 		return $this;
 	}
 
 	/**
-	 * @param string $k
-	 * @param bool $bool
+	 * @param string $option
+	 * @param bool $value
 	 *
-	 * @return SearchRequest
+	 * @return ISearchRequest
 	 */
-	public function addOptionBool($k, $bool) {
-		$this->options[$k] = $bool;
+	public function addOptionBool(string $option, bool $value): ISearchRequest {
+		$this->options[$option] = $value;
 
 		return $this;
 	}
 
 	/**
-	 * @param $key
-	 * @param $value
+	 * @param string $option
+	 * @param string $value
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addMultipleOption($key, $value) {
-		if (!array_key_exists($key, $this->options)) {
-			$this->options[$key] = [];
+	public function addMultipleOption(string $option, string $value): ISearchRequest {
+		if (!array_key_exists($option, $this->options)) {
+			$this->options[$option] = [];
 		}
 
-		$this->options[$key][] = $value;
+		$this->options[$option][] = $value;
 
 		return $this;
 	}
@@ -287,12 +330,8 @@ class SearchRequest implements \JsonSerializable {
 	 *
 	 * @return string
 	 */
-	public function getOption($option, $default = '') {
-		if (array_key_exists($option, $this->options)) {
-			return $this->options[$option];
-		}
-
-		return $default;
+	public function getOption(string $option, string $default = ''): string {
+		return $this->get($option, $this->options, $default);
 	}
 
 
@@ -302,25 +341,18 @@ class SearchRequest implements \JsonSerializable {
 	 *
 	 * @return array
 	 */
-	public function getOptionArray($option, $default = []) {
-		if (array_key_exists($option, $this->options)) {
-			$options = $this->options[$option];
-			if (is_array($options)) {
-				return $this->options[$option];
-			}
-		}
-
-		return $default;
+	public function getOptionArray(string $option, array $default = []): array {
+		return $this->getArray($option, $this->options, $default);
 	}
 
 
 	/**
-	 * @param array $parts
+	 * @param string $part
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function setParts($parts) {
-		$this->parts = $parts;
+	public function addPart(string $part): ISearchRequest {
+		$this->parts[] = $part;
 
 		return $this;
 	}
@@ -328,24 +360,38 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getParts() {
+	public function getParts(): array {
 		return $this->parts;
+	}
+
+
+	/**
+	 * @since 15.0.0
+	 *
+	 * @param array $parts
+	 *
+	 * @return ISearchRequest
+	 */
+	public function setParts(array $parts): ISearchRequest {
+		$this->parts = $parts;
+
+		return $this;
 	}
 
 
 	/**
 	 * @return array
 	 */
-	public function getFields() {
+	public function getFields(): array {
 		return $this->fields;
 	}
 
 	/**
 	 * @param array $fields
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function setFields($fields) {
+	public function setFields(array $fields): ISearchRequest {
 		$this->fields = $fields;
 
 		return $this;
@@ -353,11 +399,11 @@ class SearchRequest implements \JsonSerializable {
 
 
 	/**
-	 * @param $field
+	 * @param string $field
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function limitToField($field) {
+	public function addLimitField(string $field): ISearchRequest {
 		array_push($this->limitFields, $field);
 
 		return $this;
@@ -366,17 +412,17 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getLimitFields() {
+	public function getLimitFields(): array {
 		return $this->limitFields;
 	}
 
 
 	/**
-	 * @param $field
+	 * @param string $field
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addField($field) {
+	public function addField(string $field): ISearchRequest {
 		$this->fields[] = $field;
 
 		return $this;
@@ -385,32 +431,40 @@ class SearchRequest implements \JsonSerializable {
 
 	/**
 	 * @param string $tag
+	 *
+	 * @return ISearchRequest
 	 */
-	public function addTag($tag) {
+	public function addTag(string $tag): ISearchRequest {
 		$this->tags[] = $tag;
+
+		return $this;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getTags() {
+	public function getTags(): array {
 		return $this->tags;
 	}
 
 	/**
 	 * @param array $tags
+	 *
+	 * @return ISearchRequest
 	 */
-	public function setTags($tags) {
+	public function setTags(array $tags): ISearchRequest {
 		$this->tags = $tags;
+
+		return $this;
 	}
 
 
 	/**
 	 * @param array $tags
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function setMetaTags($tags) {
+	public function setMetaTags(array $tags): ISearchRequest {
 		$this->metaTags = $tags;
 
 		return $this;
@@ -419,17 +473,17 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getMetaTags() {
+	public function getMetaTags(): array {
 		return $this->metaTags;
 	}
 
 	/**
-	 * @param string $tags
+	 * @param string $tag
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addMetaTag($tags) {
-		$this->metaTags[] = $tags;
+	public function addMetaTag(string $tag): ISearchRequest {
+		$this->metaTags[] = $tag;
 
 		return $this;
 	}
@@ -438,9 +492,9 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @param array $tags
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function setSubTags($tags) {
+	public function setSubTags(array $tags): ISearchRequest {
 		$this->subTags = $tags;
 
 		return $this;
@@ -451,7 +505,7 @@ class SearchRequest implements \JsonSerializable {
 	 *
 	 * @return array
 	 */
-	public function getSubTags($formatted = false) {
+	public function getSubTags(bool $formatted = false): array {
 		if ($formatted === false) {
 			return $this->subTags;
 		}
@@ -472,9 +526,9 @@ class SearchRequest implements \JsonSerializable {
 	 * @param string $source
 	 * @param string $tag
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addSubTag($source, $tag) {
+	public function addSubTag(string $source, string $tag): ISearchRequest {
 		if (!array_key_exists($source, $this->subTags)) {
 			$this->subTags[$source] = [];
 		}
@@ -488,9 +542,9 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @param string $field
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addWildcardField($field) {
+	public function addWildcardField(string $field): ISearchRequest {
 		$this->wildcardFields[] = $field;
 
 		return $this;
@@ -500,7 +554,7 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getWildcardFields() {
+	public function getWildcardFields(): array {
 		return $this->wildcardFields;
 	}
 
@@ -508,7 +562,7 @@ class SearchRequest implements \JsonSerializable {
 //	/**
 //	 * @param array $query
 //	 *
-//	 * @return $this
+//	 * @return ISearchRequest
 //	 */
 //	public function addWildcardQuery($query) {
 //		$this->addWildcardQueries([$query]);
@@ -519,7 +573,7 @@ class SearchRequest implements \JsonSerializable {
 //	/**
 //	 * @param array $query
 //	 *
-//	 * @return $this
+//	 * @return ISearchRequest
 //	 */
 //	public function addWildcardQueries($query) {
 //		array_push($this->wildcardQueries, $query);
@@ -538,9 +592,9 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @param array $filter
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addWildcardFilter($filter) {
+	public function addWildcardFilter(array $filter): ISearchRequest {
 		$this->addWildcardFilters([$filter]);
 
 		return $this;
@@ -549,9 +603,9 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @param array $filters
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addWildcardFilters($filters) {
+	public function addWildcardFilters(array $filters): ISearchRequest {
 		array_push($this->wildcardFilters, $filters);
 
 		return $this;
@@ -560,17 +614,17 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getWildcardFilters() {
+	public function getWildcardFilters(): array {
 		return $this->wildcardFilters;
 	}
 
 
 	/**
-	 * @param array $filter
+	 * @param string $filter
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addRegexFilter($filter) {
+	public function addRegexFilter(string $filter): ISearchRequest {
 		$this->addRegexFilters([$filter]);
 
 		return $this;
@@ -579,9 +633,9 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @param array $filters
 	 *
-	 * @return $this
+	 * @return ISearchRequest
 	 */
-	public function addRegexFilters($filters) {
+	public function addRegexFilters(array $filters): ISearchRequest {
 		array_push($this->regexFilters, $filters);
 
 		return $this;
@@ -590,7 +644,7 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getRegexFilters() {
+	public function getRegexFilters(): array {
 		return $this->regexFilters;
 	}
 
@@ -598,7 +652,7 @@ class SearchRequest implements \JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'providers' => $this->getProviders(),
 			'author'    => $this->getAuthor(),
@@ -615,39 +669,41 @@ class SearchRequest implements \JsonSerializable {
 
 
 	/**
-	 * @param string $json
-	 *
-	 * @return SearchRequest
-	 */
-	public static function fromJSON($json) {
-		return self::fromArray(json_decode($json, true));
-	}
-
-	/**
 	 * @param array $arr
 	 *
 	 * @return SearchRequest
 	 */
-	public static function fromArray($arr) {
+	public function importFromArray($arr): SearchRequest {
 		$providers = $arr['providers'];
 		if (!is_array($providers)) {
 			$providers = [$providers];
 		}
 
-		$request = new SearchRequest();
-		$request->setProviders($providers);
-		$request->setAuthor(MiscService::get('author', $arr, ''));
-		$request->setSearch(MiscService::get('search', $arr, ''));
-		$request->setPage(MiscService::get('page', $arr, 0));
-		$request->setParts(MiscService::get('parts', $arr, []));
-		$request->setSize(MiscService::get('size', $arr, 10));
-		$request->setOptions(MiscService::get('options', $arr, []));
-		$request->setMetaTags(MiscService::get('metatags', $arr, []));
-		$request->setSubTags(MiscService::get('subtags', $arr, []));
-		$request->setTags(MiscService::get('tags', $arr, []));
+		$this->setProviders($providers);
+		$this->setAuthor($this->get('author', $arr, ''));
+		$this->setSearch($this->get('search', $arr, ''));
+		$this->setPage($this->getInt('page', $arr, 0));
+		$this->setParts($this->getArray('parts', $arr, []));
+		$this->setSize($this->getInt('size', $arr, 10));
+		$this->setOptions($this->getArray('options', $arr, []));
+		$this->setMetaTags($this->getArray('metatags', $arr, []));
+		$this->setSubTags($this->getArray('subtags', $arr, []));
+		$this->setTags($this->getArray('tags', $arr, []));
 
-		return $request;
+		return $this;
 	}
 
+
+	/**
+	 * @param string $json
+	 *
+	 * @return SearchRequest
+	 */
+	public static function fromJSON(string $json): SearchRequest {
+		$searchRequest = new SearchRequest();
+		$searchRequest->importFromArray(json_decode($json, true));
+
+		return $searchRequest;
+	}
 
 }

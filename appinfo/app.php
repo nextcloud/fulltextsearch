@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,15 +27,19 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\AppInfo;
+
 
 use OCP\AppFramework\QueryException;
 
 
+require_once __DIR__ . '/autoload.php';
+
 try {
 	$app = new Application();
+	$app->registerServices();
 	$app->registerNavigation();
-	$app->registerSettingsAdmin();
 } catch (QueryException $e) {
 	/** we do nothing */
 }

@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,10 +27,14 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
 
+
 use Exception;
-use OCA\FullTextSearch\Model\ExtendedBase;
+use OC\Core\Command\InterruptedException;
+use OCA\FullTextSearch\ACommandBase;
+use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\MiscService;
@@ -37,7 +44,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Reset extends ExtendedBase {
+/**
+ * Class Reset
+ *
+ * @package OCA\FullTextSearch\Command
+ */
+class Reset extends ACommandBase {
+
 
 	/** @var IndexService */
 	private $indexService;
@@ -67,6 +80,9 @@ class Reset extends ExtendedBase {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:reset')
@@ -79,7 +95,6 @@ class Reset extends ExtendedBase {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return int|null|void
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
@@ -111,7 +126,7 @@ class Reset extends ExtendedBase {
 	 *
 	 * @return string
 	 */
-	private function getProviderIdFromArgument(InputInterface $input) {
+	private function getProviderIdFromArgument(InputInterface $input): string {
 		$providerId = $input->getArgument('provider');
 		if ($providerId === null) {
 			$providerId = '';
@@ -119,6 +134,20 @@ class Reset extends ExtendedBase {
 
 		return $providerId;
 	}
+
+
+	/**
+	 * @throws TickDoesNotExistException
+	 */
+	public function abort() {
+		try {
+			$this->abortIfInterrupted();
+		} catch (InterruptedException $e) {
+			$this->runner->stop();
+			exit();
+		}
+	}
+
 }
 
 

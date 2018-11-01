@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,12 +27,20 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Service;
+
 
 use OCA\FullTextSearch\Model\Runner;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
+
+/**
+ * Class CliService
+ *
+ * @package OCA\FullTextSearch\Service
+ */
 class CliService {
 
 
@@ -51,8 +62,9 @@ class CliService {
 	/** @var OutputInterface */
 	private $output = null;
 
+
 	/**
-	 * TestService constructor.
+	 * CliService constructor.
 	 *
 	 * @param MiscService $miscService
 	 */
@@ -75,7 +87,7 @@ class CliService {
 	 * @param string $panelId
 	 * @param array $lines
 	 */
-	public function createPanel($panelId, $lines) {
+	public function createPanel(string $panelId, array $lines) {
 		if (!is_array($lines)) {
 			$lines = [$lines];
 		}
@@ -96,7 +108,7 @@ class CliService {
 	 * @param string $panelSlot
 	 * @param string $panelId
 	 */
-	public function displayPanel($panelSlot, $panelId) {
+	public function displayPanel(string $panelSlot, string $panelId) {
 		$this->displayedPanel[] = [
 			'slot' => $panelSlot,
 			'id'   => $panelId
@@ -109,7 +121,7 @@ class CliService {
 	 *
 	 * @return string
 	 */
-	public function currentPanel($panelSlot) {
+	public function currentPanel(string $panelSlot): string {
 		foreach ($this->displayedPanel as $panel) {
 			if ($panel['slot'] === $panelSlot) {
 				return $panel['id'];
@@ -124,7 +136,7 @@ class CliService {
 	 * @param string $panelSlot
 	 * @param string $panelId
 	 */
-	public function switchPanel($panelSlot, $panelId) {
+	public function switchPanel(string $panelSlot, string $panelId) {
 		$this->displayedPanel = array_map(
 			function($item) use ($panelId, $panelSlot) {
 				if ($item['slot'] === $panelSlot) {
@@ -140,9 +152,8 @@ class CliService {
 
 	/**
 	 * @param OutputInterface $output
-	 * @param array $initVar
 	 */
-	public function runDisplay(OutputInterface $output, $initVar = []) {
+	public function runDisplay(OutputInterface $output) {
 		$this->output = $output;
 
 		$output->writeLn('');
@@ -168,6 +179,9 @@ class CliService {
 	}
 
 
+	/**
+	 *
+	 */
 	public function refreshDisplay() {
 
 		if ($this->display === null) {
@@ -188,6 +202,9 @@ class CliService {
 	}
 
 
+	/**
+	 *
+	 */
 	public function refreshInfo() {
 		if ($this->runner->isPauseRunning()) {
 			$this->display->setMessage('(paused)', '_paused');
@@ -201,7 +218,7 @@ class CliService {
 	/**
 	 * @param array $info
 	 */
-	public function onInfoUpdated($info) {
+	public function onInfoUpdated(array $info) {
 		if ($this->display === null) {
 			return;
 		}
@@ -216,3 +233,4 @@ class CliService {
 	}
 
 }
+

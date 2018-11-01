@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,29 +27,20 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Db;
 
 
-use OCA\FullTextSearch\Model\ExtendedTick;
-use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
+use OCA\FullTextSearch\Model\Tick;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCP\IDBConnection;
-use OCP\IL10N;
 
+
+/**
+ * Class TickRequestBuilder
+ *
+ * @package OCA\FullTextSearch\Db
+ */
 class TickRequestBuilder extends CoreRequestBuilder {
-
-
-	/**
-	 * TicksRequestBuilder constructor.
-	 *
-	 * {@inheritdoc}
-	 */
-	public function __construct(
-		IL10N $l10n, IDBConnection $connection, ConfigService $configService, MiscService $miscService
-	) {
-		parent::__construct($l10n, $connection, $configService, $miscService);
-	}
 
 
 	/**
@@ -54,7 +48,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getTickInsertSql() {
+	protected function getTickInsertSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->insert(self::TABLE_TICKS);
 
@@ -67,7 +61,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getTickUpdateSql() {
+	protected function getTickUpdateSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->update(self::TABLE_TICKS);
 
@@ -80,7 +74,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getTickSelectSql() {
+	protected function getTickSelectSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
@@ -100,7 +94,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 *
 	 * @return IQueryBuilder
 	 */
-	protected function getTickDeleteSql() {
+	protected function getTickDeleteSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 		$qb->delete(self::TABLE_INDEXES);
 
@@ -111,14 +105,14 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	/**
 	 * @param array $data
 	 *
-	 * @return ExtendedTick
+	 * @return Tick
 	 */
-	protected function parseTickSelectSql($data) {
-		$tick = new ExtendedTick($data['source'], $data['id']);
+	protected function parseTickSelectSql(array $data): Tick {
+		$tick = new Tick($data['source'], (int) $data['id']);
 		$tick->setData(json_decode($data['data'], true))
-			 ->setTick($data['tick'])
-			->setFirstTick($data['first_tick'])
-			->setStatus($data['status'])
+			 ->setTick((int) $data['tick'])
+			 ->setFirstTick((int) $data['first_tick'])
+			 ->setStatus($data['status'])
 			 ->setAction($data['action']);
 
 		return $tick;

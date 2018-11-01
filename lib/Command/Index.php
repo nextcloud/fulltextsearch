@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,12 +27,15 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
 
+
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use Exception;
+use OC\Core\Command\InterruptedException;
+use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullTextSearch\IFullTextSearchProvider;
-use OCA\FullTextSearch\Model\ExtendedBase;
 use OCA\FullTextSearch\Model\Index as ModelIndex;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
@@ -39,7 +45,9 @@ use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
+use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\IUserManager;
+use OutOfBoundsException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -49,7 +57,16 @@ use Symfony\Component\Console\Terminal;
 use Throwable;
 
 
-class Index extends ExtendedBase {
+/**
+ * Class Index
+ *
+ * @package OCA\FullTextSearch\Command
+ */
+class Index extends ACommandBase {
+
+
+	use TArrayTools;
+
 
 	const INDEX_OPTION_NO_READLINE = '_no-readline';
 
@@ -185,16 +202,6 @@ class Index extends ExtendedBase {
 
 
 	/**
-	 * @throws Exception
-	 */
-	public function interrupted() {
-		if ($this->hasBeenInterrupted()) {
-			throw new \Exception('ctrl-c');
-		}
-	}
-
-
-	/**
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
@@ -289,9 +296,9 @@ class Index extends ExtendedBase {
 
 
 	/**
-	 * @param $key
+	 * @param string $key
 	 */
-	public function onKeyPressed($key) {
+	public function onKeyPressed(string $key) {
 		$key = strtolower($key);
 		if ($key === 'q') {
 			try {
@@ -346,7 +353,7 @@ class Index extends ExtendedBase {
 	/**
 	 * @param array $error
 	 */
-	public function onNewIndexError($error) {
+	public function onNewIndexError(array $error) {
 		$this->errors[] = $error;
 		$this->displayError();
 	}
@@ -355,7 +362,7 @@ class Index extends ExtendedBase {
 	/**
 	 * @param array $result
 	 */
-	public function onNewIndexResult($result) {
+	public function onNewIndexResult(array $result) {
 		$this->results[] = $result;
 		$this->displayResult();
 	}
@@ -405,7 +412,6 @@ class Index extends ExtendedBase {
 		}
 
 		$this->providerService->setProviderAsIndexed($provider, true);
-
 	}
 
 
@@ -414,8 +420,13 @@ class Index extends ExtendedBase {
 	 *
 	 * @return IndexOptions
 	 */
-	private function generateIndexOptions(InputInterface $input) {
+	private function generateIndexOptions(InputInterface $input): IndexOptions {
 		$jsonOptions = $input->getArgument('options');
+
+		if (!is_string($jsonOptions)) {
+			return new IndexOptions([]);
+		}
+
 		$options = json_decode($jsonOptions, true);
 
 		if (!is_array($options)) {
@@ -436,15 +447,14 @@ class Index extends ExtendedBase {
 	 *
 	 * @return bool
 	 */
-	private function isIncludedProvider(IndexOptions $options, $providerId) {
+	private function isIncludedProvider(IndexOptions $options, string $providerId): bool {
 		if ($options->getOption('provider', '') !== ''
 			&& $options->getOption('provider') !== $providerId) {
 			return false;
 		}
 
-		if ($options->getOption('providers', null) !== null
-			&& is_array($options->getOption('providers'))) {
-			return (in_array($providerId, $options->getOption('providers')));
+		if ($options->getOptionArray('providers', []) !== []) {
+			return (in_array($providerId, $options->getOptionArray('providers', [])));
 		}
 
 		return true;
@@ -456,14 +466,13 @@ class Index extends ExtendedBase {
 	 *
 	 * @return array
 	 */
-	private function generateUserList(IndexOptions $options) {
+	private function generateUserList(IndexOptions $options): array {
 		if ($options->getOption('user', '') !== '') {
 			return [$this->userManager->get($options->getOption('user'))];
 		}
 
-		if ($options->getOption('users', null) !== null
-			&& is_array($options->getOption('users'))) {
-			return array_map([$this->userManager, 'get'], $options->getOption('users'));
+		if ($options->getOptionArray('users', []) !== []) {
+			return array_map([$this->userManager, 'get'], $options->getOptionArray('users'));
 		}
 
 		return $this->userManager->search('');
@@ -557,6 +566,7 @@ class Index extends ExtendedBase {
 			}
 		}
 
+		// full list of info that can be edited
 		$this->runner->setInfoArray(
 			[
 				'userId'       => '',
@@ -596,7 +606,7 @@ class Index extends ExtendedBase {
 	/**
 	 * @param int $pos
 	 */
-	private function displayError($pos = 0) {
+	private function displayError(int $pos = 0) {
 		$total = sizeof($this->errors);
 
 		if ($total === 0) {
@@ -610,11 +620,11 @@ class Index extends ExtendedBase {
 			return;
 		}
 
-		$current = key($this->errors) + 1;
-		$error = $this->getNavigationError($pos, ($current === 1), ($current === $total));
-		$current = key($this->errors) + 1;
-
-		if ($error === false) {
+		try {
+			$current = key($this->errors) + 1;
+			$error = $this->getNavigationError($pos, ($current === 1), ($current === $total));
+			$current = key($this->errors) + 1;
+		} catch (OutOfBoundsException $e) {
 			return;
 		}
 
@@ -626,10 +636,10 @@ class Index extends ExtendedBase {
 		}
 
 		$width = $this->terminal->getWidth() - 13;
-		$message = MiscService::get('message', $error, '');
-		$err1 = substr($message, 0, $width);
-		$err2 = substr($message, $width, $width + 10);
-		$err3 = substr($message, $width + $width + 10, $width + 10);
+		$message = $this->get('message', $error, '');
+		$err1 = (string)substr($message, 0, $width);
+		$err2 = (string)substr($message, $width, $width + 10);
+		$err3 = (string)substr($message, $width + $width + 10, $width + 10);
 
 		$this->runner->setInfoArray(
 			[
@@ -638,7 +648,7 @@ class Index extends ExtendedBase {
 				'errorMessageA'  => trim($err1),
 				'errorMessageB'  => trim($err2),
 				'errorMessageC'  => trim($err3),
-				'errorException' => MiscService::get('exception', $error, ''),
+				'errorException' => $this->get('exception', $error, ''),
 				'errorIndex'     => $errorIndex
 			]
 		);
@@ -648,7 +658,7 @@ class Index extends ExtendedBase {
 	/**
 	 * @param int $pos
 	 */
-	private function displayResult($pos = 0) {
+	private function displayResult(int $pos = 0) {
 		$total = sizeof($this->results);
 
 		if ($total === 0) {
@@ -662,11 +672,11 @@ class Index extends ExtendedBase {
 			return;
 		}
 
-		$current = key($this->results) + 1;
-		$result = $this->getNavigationResult($pos, ($current === 1), ($current === $total));
-		$current = key($this->results) + 1;
-
-		if ($result === false) {
+		try {
+			$current = key($this->results) + 1;
+			$result = $this->getNavigationResult($pos, ($current === 1), ($current === $total));
+			$current = key($this->results) + 1;
+		} catch (OutOfBoundsException $e) {
 			return;
 		}
 
@@ -679,14 +689,13 @@ class Index extends ExtendedBase {
 
 
 		$width = $this->terminal->getWidth() - 13;
-		$message = MiscService::get('message', $result, '');
-		$msg1 = substr($message, 0, $width);
-		$msg2 = substr($message, $width, $width + 10);
-		$msg3 = substr($message, $width + $width + 10, $width + 10);
+		$message = $this->get('message', $result, '');
+		$msg1 = (string)substr($message, 0, $width);
+		$msg2 = (string)substr($message, $width, $width + 10);
+		$msg3 = (string)substr($message, $width + $width + 10, $width + 10);
 
-
-		$status = MiscService::get('status', $result, '');
-		$type = MiscService::get('type', $result, '');
+		$status = $this->get('status', $result, '');
+		$type = $this->getInt('type', $result, 0);
 
 		$this->runner->setInfoArray(
 			[
@@ -708,9 +717,10 @@ class Index extends ExtendedBase {
 	 * @param bool $isFirst
 	 * @param bool $isLast
 	 *
-	 * @return bool|array
+	 * @throw OutOfBoundsException
+	 * @return array
 	 */
-	private function getNavigationError($pos, $isFirst, $isLast) {
+	private function getNavigationError(int $pos, bool $isFirst, bool $isLast): array {
 
 		if ($pos === 0) {
 			if ($this->navigateLastError === true) {
@@ -739,7 +749,7 @@ class Index extends ExtendedBase {
 			return end($this->errors);
 		}
 
-		return false;
+		throw new OutOfBoundsException();
 	}
 
 
@@ -748,9 +758,10 @@ class Index extends ExtendedBase {
 	 * @param bool $isFirst
 	 * @param bool $isLast
 	 *
-	 * @return bool|array
+	 * @throw OutOfBoundsException
+	 * @return array
 	 */
-	private function getNavigationResult($pos, $isFirst, $isLast) {
+	private function getNavigationResult(int $pos, bool $isFirst, bool $isLast): array {
 
 		if ($pos === 0) {
 			if ($this->navigateLastResult === true) {
@@ -779,7 +790,7 @@ class Index extends ExtendedBase {
 			return end($this->results);
 		}
 
-		return false;
+		throw new OutOfBoundsException();
 	}
 
 
@@ -800,8 +811,6 @@ class Index extends ExtendedBase {
 			}
 
 		}
-
-
 	}
 
 
@@ -853,7 +862,19 @@ class Index extends ExtendedBase {
 		$this->displayError();
 	}
 
+
+	/**
+	 * @throws TickDoesNotExistException
+	 */
+	public function abort() {
+		try {
+			$this->abortIfInterrupted();
+		} catch (InterruptedException $e) {
+			$this->runner->stop();
+			exit();
+		}
+	}
+
+
 }
-
-
 

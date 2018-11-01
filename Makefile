@@ -8,9 +8,9 @@ sign_dir=$(build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
-branch=stable14
+branch=master
 codecov_token_dir=$(HOME)/.nextcloud/codecov_token
-version+=1.0.3
+version+=1.2.0
 
 all: appstore
 
@@ -36,6 +36,9 @@ clean:
 	rm -rf $(build_dir)
 	rm -rf node_modules
 
+composer:
+	composer install --prefer-dist
+
 test: SHELL:=/bin/bash
 test:
 	phpunit --coverage-clover=coverage.xml --configuration=tests/phpunit.xml tests
@@ -43,7 +46,7 @@ test:
 		bash <(curl -s https://codecov.io/bash) -t @$(codecov_token_dir)/$(app_name) ; \
 	fi
 
-appstore: clean
+appstore: composer clean
 	mkdir -p $(sign_dir)
 	rsync -a \
 	--exclude=/build \

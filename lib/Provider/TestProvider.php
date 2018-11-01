@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,19 +30,28 @@
 
 namespace OCA\FullTextSearch\Provider;
 
-use OCA\FullTextSearch\AppInfo\Application;
-use OCA\FullTextSearch\IFullTextSearchPlatform;
-use OCA\FullTextSearch\IFullTextSearchProvider;
-use OCA\FullTextSearch\Model\Index;
-use OCA\FullTextSearch\Model\IndexDocument;
+
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
-use OCA\FullTextSearch\Model\SearchRequest;
-use OCA\FullTextSearch\Model\SearchResult;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\TestService;
+use OCP\FullTextSearch\IFullTextSearchPlatform;
+use OCP\FullTextSearch\IFullTextSearchProvider;
+use OCP\FullTextSearch\Model\IIndex;
+use OCP\FullTextSearch\Model\IIndexOptions;
+use OCP\FullTextSearch\Model\IndexDocument;
+use OCP\FullTextSearch\Model\IRunner;
+use OCP\FullTextSearch\Model\ISearchRequest;
+use OCP\FullTextSearch\Model\ISearchResult;
+use OCP\FullTextSearch\Model\SearchTemplate;
 
+
+/**
+ * Class TestProvider
+ *
+ * @package OCA\FullTextSearch\Provider
+ */
 class TestProvider implements IFullTextSearchProvider {
 
 
@@ -74,15 +86,13 @@ class TestProvider implements IFullTextSearchProvider {
 		$this->configService = $configService;
 		$this->testService = $testService;
 		$this->miscService = $miscService;
-
-		$this->indexOptions = new IndexOptions();
 	}
 
 
 	/**
 	 * return unique id of the provider
 	 */
-	public function getId() {
+	public function getId(): string {
 		return self::TEST_PROVIDER_ID;
 	}
 
@@ -90,7 +100,7 @@ class TestProvider implements IFullTextSearchProvider {
 	/**
 	 * return name of the provider
 	 */
-	public function getName() {
+	public function getName(): string {
 		return 'Test Provider';
 	}
 
@@ -98,29 +108,29 @@ class TestProvider implements IFullTextSearchProvider {
 	/**
 	 * @return array
 	 */
-	public function getConfiguration() {
+	public function getConfiguration(): array {
 		return $this->configService->getConfig();
 	}
 
 
-	public function setRunner(Runner $runner) {
+	public function setRunner(IRunner $runner) {
 		$this->runner = $runner;
 	}
 
 
 	/**
-	 * @param IndexOptions $options
+	 * @param IIndexOptions $options
 	 */
-	public function setIndexOptions($options) {
+	public function setIndexOptions(IIndexOptions $options) {
 		$this->indexOptions = $options;
 	}
 
 
 	/**
-	 * @return array
+	 * @return SearchTemplate
 	 */
-	public function getOptionsTemplate() {
-		return [];
+	public function getSearchTemplate(): SearchTemplate {
+		return new SearchTemplate();
 	}
 
 
@@ -143,29 +153,13 @@ class TestProvider implements IFullTextSearchProvider {
 	 *
 	 * @return IndexDocument[]
 	 */
-	public function generateIndexableDocuments($userId) {
+	public function generateIndexableDocuments(string $userId): array {
 		$result = [];
 
 		$result[] = $this->testService->generateIndexDocumentContentLicense($this->indexOptions);
 		$result[] = $this->testService->generateIndexDocumentSimple($this->indexOptions);
 
-//		$result[] = $this->testService->generateIndexDocuments(TestService::DOCUMENT_TEST_INDEX3);
-
 		return $result;
-	}
-
-
-	/**
-	 * generate documents prior to the indexing.
-	 * throw NoResultException if no more result
-	 *
-	 * @param IndexDocument[] $chunk
-	 *
-	 * @deprecated
-	 * @return IndexDocument[]
-	 */
-	public function fillIndexDocuments($chunk) {
-		return $chunk;
 	}
 
 
@@ -183,17 +177,17 @@ class TestProvider implements IFullTextSearchProvider {
 	 *
 	 * @return bool
 	 */
-	public function isDocumentUpToDate($document) {
+	public function isDocumentUpToDate(IndexDocument $document): bool {
 		return false;
 	}
 
 
 	/**
-	 * @param Index $index
+	 * @param IIndex $index
 	 *
-	 * @return IndexDocument|null
+	 * @return IndexDocument
 	 */
-	public function updateDocument(Index $index) {
+	public function updateDocument(IIndex $index): IndexDocument {
 		return null;
 	}
 
@@ -222,18 +216,18 @@ class TestProvider implements IFullTextSearchProvider {
 	/**
 	 * before a search, improve the request
 	 *
-	 * @param SearchRequest $request
+	 * @param ISearchRequest $request
 	 */
-	public function improveSearchRequest(SearchRequest $request) {
+	public function improveSearchRequest(ISearchRequest $request) {
 	}
 
 
 	/**
 	 * after a search, improve results
 	 *
-	 * @param SearchResult $searchResult
+	 * @param ISearchResult $searchResult
 	 */
-	public function improveSearchResult(SearchResult $searchResult) {
+	public function improveSearchResult(ISearchResult $searchResult) {
 	}
 
 

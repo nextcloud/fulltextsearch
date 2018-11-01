@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -24,20 +27,28 @@
  *
  */
 
+
 namespace OCA\FullTextSearch\Command;
+
 
 use Exception;
 use OC\Core\Command\Base;
-use OCA\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
+use OCP\FullTextSearch\Model\IndexDocument;
+use OCP\FullTextSearch\Model\ISearchResult;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
+/**
+ * Class Search
+ *
+ * @package OCA\FullTextSearch\Command
+ */
 class Search extends Base {
 
 	/** @var SearchService */
@@ -63,6 +74,9 @@ class Search extends Base {
 	}
 
 
+	/**
+	 *
+	 */
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:search')
@@ -74,16 +88,17 @@ class Search extends Base {
 
 
 	/**
+	 *
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return int|null|void
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$output->writeln('search');
 
-		$request = SearchRequest::fromArray(
+		$searchRequest = new SearchRequest();
+		$searchRequest->importFromArray(
 			[
 				'providers' => 'all',
 				'search'    => $input->getArgument('string')
@@ -91,7 +106,7 @@ class Search extends Base {
 		);
 
 		try {
-			$result = $this->searchService->search($input->getArgument('user'), $request);
+			$result = $this->searchService->search($input->getArgument('user'), $searchRequest);
 
 			foreach ($result as $searchResult) {
 				$this->displaySearchResult($searchResult);
@@ -103,8 +118,11 @@ class Search extends Base {
 	}
 
 
-	private function displaySearchResult(SearchResult $searchResult) {
-
+	/**
+	 * @param ISearchResult $searchResult
+	 */
+	private function displaySearchResult(ISearchResult $searchResult) {
+		/** @var SearchResult $searchResult */
 		echo '> ' . $searchResult->getProvider()
 								 ->getName() . "\n";
 

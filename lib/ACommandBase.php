@@ -1,4 +1,7 @@
 <?php
+declare(strict_types=1);
+
+
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -21,15 +24,22 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  */
 
 
-namespace OCA\FullTextSearch\Model;
+namespace OCA\FullTextSearch;
 
 
-class ExtendedIndex extends Index {
+use OC\Core\Command\Base;
 
 
+/**
+ * Abstract class ICommandBase
+ */
+abstract class ACommandBase extends Base {
+
+	abstract public function abort();
 
 }
+
