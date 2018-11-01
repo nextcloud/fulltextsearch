@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.2.0 (NC15)
+
+- Compat NC15 + full php7.
+- breaking index on Ctrl-C.
+- non interactive mode available during :index and :live
+
 
 ### 1.0.3
 
