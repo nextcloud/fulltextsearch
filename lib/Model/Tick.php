@@ -63,7 +63,7 @@ class Tick {
 	private $status;
 
 	/** @var string */
-	private $action;
+	private $action = '';
 
 
 	/**
@@ -234,6 +234,18 @@ class Tick {
 
 	/**
 	 * @param string $info
+	 * @param float $value
+	 *
+	 * @return $this
+	 */
+	public function setInfoFloat(string $info, float $value): Tick {
+		$this->data[$info] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * @param string $info
 	 */
 	public function unsetInfo(string $info) {
 		unset($this->data[$info]);
@@ -258,6 +270,16 @@ class Tick {
 	 */
 	public function getInfoInt(string $info, int $default = 0): int {
 		return $this->getInt($info, $this->data, $default);
+	}
+
+	/**
+	 * @param string $info
+	 * @param float $default
+	 *
+	 * @return float
+	 */
+	public function getInfoFloat(string $info, float $default = 0): float {
+		return $this->getFloat($info, $this->data, $default);
 	}
 
 }

@@ -238,18 +238,18 @@ class RunningService {
 		$preAction = $tick->getAction();
 
 		if ($preAction !== '') {
-			$preActionTotal = $tick->getInfoInt($preAction . 'Total', 0);
-			$preActionStart = $tick->getInfoInt($preAction . 'Init', 0);
+			$preActionTotal = $tick->getInfoFloat($preAction . 'Total', 0);
+			$preActionStart = $tick->getInfoFloat($preAction . 'Init', 0);
 
 			if ($preActionStart > 0) {
 
 				$preActionTotal += ($now - $preActionStart);
-				$tick->setInfoInt($preAction . 'Total', $preActionTotal);
+				$tick->setInfoFloat($preAction . 'Total', $preActionTotal);
 				$tick->unsetInfo($preAction . 'Init');
 			}
 		}
 		$tick->setAction($action)
-			 ->setInfoInt($action . 'Init', $now);
+			 ->setInfoFloat($action . 'Init', $now);
 	}
 
 
