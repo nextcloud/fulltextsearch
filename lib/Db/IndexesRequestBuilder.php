@@ -110,12 +110,12 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 */
 	protected function parseIndexesSelectSql(array $data): Index {
 		$index = new Index($data['provider_id'], $data['document_id']);
-		$index->setStatus($data['status'])
+		$index->setStatus((int)$data['status'])
 			  ->setSource($data['source'])
 			  ->setOwnerId($data['owner_id'])
-			  ->setLastIndex($data['indexed']);
+			  ->setLastIndex((int)$data['indexed']);
 		$index->setOptions(json_decode($data['options'], true));
-		$index->setErrorCount($data['err']);
+		$index->setErrorCount((int)$data['err']);
 		$index->setErrors(json_decode($data['message'], true));
 
 		return $index;

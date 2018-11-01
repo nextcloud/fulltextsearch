@@ -108,10 +108,10 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 * @return Tick
 	 */
 	protected function parseTickSelectSql(array $data): Tick {
-		$tick = new Tick($data['source'], $data['id']);
+		$tick = new Tick($data['source'], (int) $data['id']);
 		$tick->setData(json_decode($data['data'], true))
-			 ->setTick($data['tick'])
-			 ->setFirstTick($data['first_tick'])
+			 ->setTick((int) $data['tick'])
+			 ->setFirstTick((int) $data['first_tick'])
 			 ->setStatus($data['status'])
 			 ->setAction($data['action']);
 

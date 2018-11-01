@@ -66,7 +66,7 @@ class Runner implements IRunner {
 	private $source;
 
 	/** @var int */
-	private $tickId;
+	private $tickId = 0;
 
 	/** @var ACommandBase */
 	private $base = null;
