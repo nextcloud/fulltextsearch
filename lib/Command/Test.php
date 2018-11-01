@@ -224,6 +224,7 @@ class Test extends ACommandBase {
 	 * @param bool $result
 	 */
 	private function outputResult(OutputInterface $output, bool $result) {
+		$isNewLine = false;
 		$line = $this->convertBoolToLine($result, $isNewLine);
 
 		$this->output($output, $line, $isNewLine);
@@ -474,7 +475,7 @@ class Test extends ACommandBase {
 		$this->output($output, 'Updating documents access.');
 		$options = new IndexOptions(
 			[
-				'provider' => TestProvider::TEST_PROVIDER_ID,
+				'provider'                            => TestProvider::TEST_PROVIDER_ID,
 				TestService::DOCUMENT_INDEXING_OPTION => TestService::DOCUMENT_INDEXING_ACCESS
 			]
 		);
