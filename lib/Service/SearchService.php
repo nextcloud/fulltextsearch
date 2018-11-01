@@ -96,7 +96,7 @@ class SearchService implements ISearchService {
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		string $userId, AppManager $appManager, IUserManager $userManager,
+		$userId, AppManager $appManager, IUserManager $userManager,
 		IGroupManager $groupManager,
 		ConfigService $configService, ProviderService $providerService,
 		PlatformService $platformService,

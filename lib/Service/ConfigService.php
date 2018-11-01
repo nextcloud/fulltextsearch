@@ -78,9 +78,7 @@ class ConfigService {
 	 * @param string $userId
 	 * @param MiscService $miscService
 	 */
-	public function __construct(
-		IConfig $config, string $userId, MiscService $miscService
-	) {
+	public function __construct(IConfig $config, $userId, MiscService $miscService) {
 		$this->config = $config;
 		$this->userId = $userId;
 		$this->miscService = $miscService;
