@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.1.0 (NC14)
+
+- non interactive mode available during :index and :live
+
 
 ### 1.0.3
 
