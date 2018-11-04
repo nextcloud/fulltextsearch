@@ -208,6 +208,14 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 			return true;
 		}
 
+		$valuedSubOptions = ['and'];
+		if (in_array($kw, $valuedSubOptions)) {
+			list($key, $value) = explode(':', $value, 2);
+			$this->addMultipleOption($kw . ':' . $key, $value);
+
+			return true;
+		}
+
 		return false;
 	}
 
