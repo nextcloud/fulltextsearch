@@ -59,16 +59,16 @@ class SearchResult implements ISearchResult, JsonSerializable {
 	private $platform;
 
 	/** @var int */
-	private $total;
+	private $total = 0;
 
 	/** @var int */
-	private $maxScore;
+	private $maxScore = 0;
 
 	/** @var int */
-	private $time;
+	private $time = 0;
 
 	/** @var boolean */
-	private $timedOut;
+	private $timedOut = false;
 
 	/** @var ISearchRequest */
 	private $request;
