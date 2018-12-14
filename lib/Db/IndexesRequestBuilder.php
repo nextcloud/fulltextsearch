@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Db;
 
 
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use OCA\FullTextSearch\Model\Index;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
@@ -41,6 +42,9 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
  * @package OCA\FullTextSearch\Db
  */
 class IndexesRequestBuilder extends CoreRequestBuilder {
+
+
+	use TArrayTools;
 
 
 	/**
@@ -111,7 +115,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	protected function parseIndexesSelectSql(array $data): Index {
 		$index = new Index($data['provider_id'], $data['document_id']);
 		$index->setStatus((int)$data['status'])
-			  ->setSource($data['source'])
+			  ->setSource($this->get('source', $data, ''))
 			  ->setOwnerId($data['owner_id'])
 			  ->setLastIndex((int)$data['indexed']);
 		$index->setOptions(json_decode($data['options'], true));
