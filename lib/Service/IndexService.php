@@ -42,6 +42,7 @@ use OCA\FullTextSearch\Model\ProviderIndexes;
 use OCA\FullTextSearch\Model\Runner;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
+use OCP\FullTextSearch\Model\DocumentAccess;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\FullTextSearch\Model\IIndexOptions;
 use OCP\FullTextSearch\Model\IndexDocument;
@@ -309,6 +310,7 @@ class IndexService implements IIndexService {
 					]
 				);
 
+				$document->setAccess(new DocumentAccess());
 				$provider->fillIndexDocument($document);
 				$this->updateRunnerInfoArray(
 					[
