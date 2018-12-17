@@ -113,13 +113,15 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 * @return Index
 	 */
 	protected function parseIndexesSelectSql(array $data): Index {
-		$index = new Index($data['provider_id'], $data['document_id']);
-		$index->setStatus((int)$data['status'])
+		$index =
+			new Index($this->get('provider_id', $data, ''), $this->get('document_id', $data, ''));
+
+		$index->setStatus($this->getInt('status', $data))
 			  ->setSource($this->get('source', $data, ''))
-			  ->setOwnerId($data['owner_id'])
-			  ->setLastIndex((int)$data['indexed']);
+			  ->setOwnerId($this->get('owner_id', $data, ''))
+			  ->setLastIndex($this->getInt('indexed', $data, 0));
 		$index->setOptions(json_decode($data['options'], true));
-		$index->setErrorCount((int)$data['err']);
+		$index->setErrorCount($this->getInt('err', $data, 0));
 		$index->setErrors(json_decode($data['message'], true));
 
 		return $index;
