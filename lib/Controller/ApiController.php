@@ -128,7 +128,7 @@ class ApiController extends Controller {
 			);
 		} catch (Exception $e) {
 			return $this->fail(
-				$e->getMessage(),
+				$e,
 				[
 					'request' => $request,
 					'version' => $this->configService->getAppValue('installed_version')
