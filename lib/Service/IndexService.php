@@ -643,4 +643,24 @@ class IndexService implements IIndexService {
 	}
 
 
+	/**
+	 * @param string $providerId
+	 * @param string $documentId
+	 * @param string $userId
+	 * @param int $status
+	 *
+	 * @return IIndex
+	 * @throws Exception
+	 */
+	public function createIndex(string $providerId, string $documentId, string $userId, int $status
+	): IIndex {
+		$index = new Index($providerId, $documentId);
+		$index->setOwnerId($userId);
+		$index->setStatus($status);
+
+		$this->indexesRequest->create($index);
+
+		return $index;
+	}
+
 }
