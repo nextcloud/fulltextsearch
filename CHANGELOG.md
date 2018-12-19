@@ -1,6 +1,11 @@
 # Changelog
 
 
+### 1.2.3
+
+- fixing issue with tests.
+- adding IndexService->createIndex() (NC 15.0.1)
+
 
 ### 1.2.2
 
