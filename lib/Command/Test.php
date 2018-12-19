@@ -144,7 +144,7 @@ class Test extends ACommandBase {
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$this->isJson = ($input->getOption('json') === true);
-		$platformDelay = ($input->getOption('platform_delay') > 0) ? $input->getOption(
+		$platformDelay = ($input->getOption('platform_delay') > 0) ? (int)$input->getOption(
 			'platform_delay'
 		) : self::DELAY_STABILIZE_PLATFORM;
 
