@@ -100,6 +100,7 @@ class Index extends TimedJob {
 			$this->liveCycle();
 			$this->runner->stop();
 		} catch (Exception $e) {
+			$this->miscService->log('Exception while cronIndex: ' . get_class($e) . ' - ' . $e->getMessage());
 			$this->runner->exception($e->getMessage(), true);
 		}
 
