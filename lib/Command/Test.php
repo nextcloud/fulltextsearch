@@ -275,7 +275,7 @@ class Test extends ACommandBase {
 		$this->output($output, 'Testing mocked provider: get indexable documents.');
 		$testProvider->setIndexOptions(new IndexOptions());
 		$indexableDocuments =
-			$testProvider->generateIndexableDocuments(TestService::DOCUMENT_USER1);
+			$testProvider->generateIndexableDocuments(TestService::DOCUMENT_USER1, '');
 		$this->output($output, '(' . sizeof($indexableDocuments) . ' items)', false);
 		$this->outputResult($output, true);
 	}

@@ -225,7 +225,7 @@ class CliService {
 
 		$keys = array_keys($info);
 		foreach ($keys as $k) {
-			$this->display->setMessage($info[$k], $k);
+			$this->display->setMessage((string)$info[$k], $k);
 		}
 		$this->refreshInfo();
 

@@ -171,25 +171,37 @@ class IndexService implements IIndexService {
 				'userId'          => $userId,
 				'providerId'      => $provider->getId(),
 				'providerName'    => $provider->getName(),
+				'chunkCurrent'    => 0,
+				'chunkTotal'      => 0,
 				'documentCurrent' => 0,
 				'documentTotal'   => 0
 			]
 		);
 
-		$documents = $provider->generateIndexableDocuments($userId);
-		$this->currentTotalDocuments = sizeof($documents);
+		$chunks = $provider->generateChunks($userId);
+		if (empty($chunks)) {
+			$chunks = [$userId];
+		}
 
-		$this->updateRunnerInfoArray(
-			[
-				'documentTotal'   => $this->currentTotalDocuments,
-				'documentCurrent' => 0
-			]
-		);
+		$this->updateRunnerInfo('chunkTotal', (string)count($chunks));
+		$curr = 0;
+		foreach ($chunks as $chunk) {
+			$this->updateRunnerInfo('chunkCurrent', (string)++$curr);
 
-		//$maxSize = sizeof($documents);
+			$documents = $provider->generateIndexableDocuments($userId, $chunk);
+			$this->currentTotalDocuments = sizeof($documents);
+			$this->updateRunnerInfoArray(
+				[
+					'documentTotal'   => $this->currentTotalDocuments,
+					'documentCurrent' => 0
+				]
+			);
 
-		$toIndex = $this->updateDocumentsWithCurrIndex($provider, $documents, $options);
-		$this->indexDocuments($platform, $provider, $toIndex, $options);
+			//$maxSize = sizeof($documents);
+
+			$toIndex = $this->updateDocumentsWithCurrIndex($provider, $documents, $options);
+			$this->indexDocuments($platform, $provider, $toIndex, $options);
+		}
 	}
 
 
