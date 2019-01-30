@@ -304,6 +304,7 @@ class Test extends ACommandBase {
 		return $testPlatform;
 	}
 
+
 	/**
 	 * @param OutputInterface $output
 	 * @param IFullTextSearchPlatform $testPlatform
