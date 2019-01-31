@@ -1,6 +1,11 @@
 # Changelog
 
 
+### 1.0.4
+
+- l10n
+
+
 ### 1.0.3
 
 - improvement: display process advancement during compareWithCurrentIndex
