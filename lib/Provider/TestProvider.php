@@ -143,6 +143,11 @@ class TestProvider implements IFullTextSearchProvider {
 	}
 
 
+	public function generateChunks(string $userId): array {
+		return [];
+	}
+
+
 	/**
 	 * returns all indexable document for a user.
 	 * There is no need to fill the document with content at this point.
@@ -150,10 +155,11 @@ class TestProvider implements IFullTextSearchProvider {
 	 * $platform is provided if the mapping needs to be changed.
 	 *
 	 * @param string $userId
+	 * @param string $chunk
 	 *
 	 * @return IndexDocument[]
 	 */
-	public function generateIndexableDocuments(string $userId): array {
+	public function generateIndexableDocuments(string $userId, string $chunk): array {
 		$result = [];
 
 		$result[] = $this->testService->generateIndexDocumentContentLicense($this->indexOptions);
@@ -230,5 +236,5 @@ class TestProvider implements IFullTextSearchProvider {
 	public function improveSearchResult(ISearchResult $searchResult) {
 	}
 
-
 }
+

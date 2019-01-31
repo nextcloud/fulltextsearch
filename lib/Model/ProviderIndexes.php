@@ -67,13 +67,11 @@ class ProviderIndexes {
 	 * @throws IndexDoesNotExistException
 	 */
 	public function getIndex(string $documentId): IIndex {
-		foreach ($this->indexes as $index) {
-			if ($index->getDocumentId() === (string)$documentId) {
-				return $index;
-			}
+		if (!array_key_exists($documentId, $this->indexes)) {
+			throw new IndexDoesNotExistException();
 		}
 
-		throw new IndexDoesNotExistException();
+		return $this->indexes[$documentId];
 	}
 
 
