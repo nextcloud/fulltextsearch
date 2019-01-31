@@ -1,6 +1,11 @@
 # Changelog
 
 
+### 1.2.4
+
+- adding some logs on cron Index
+
+
 ### 1.2.3
 
 - fixing issue with tests.
