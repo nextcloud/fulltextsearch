@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Db;
 
 
+use daita\MySmallPhpTools\Traits\TArrayTools;
 use OCA\FullTextSearch\Model\Tick;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
@@ -41,6 +42,9 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
  * @package OCA\FullTextSearch\Db
  */
 class TickRequestBuilder extends CoreRequestBuilder {
+
+
+	use TArrayTools;
 
 
 	/**
@@ -108,12 +112,12 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 * @return Tick
 	 */
 	protected function parseTickSelectSql(array $data): Tick {
-		$tick = new Tick($data['source'], (int) $data['id']);
-		$tick->setData(json_decode($data['data'], true))
-			 ->setTick((int) $data['tick'])
-			 ->setFirstTick((int) $data['first_tick'])
-			 ->setStatus($data['status'])
-			 ->setAction($data['action']);
+		$tick = new Tick($this->get('source', $data, ''), $this->getInt('id', $data, 0));
+		$tick->setData($this->getArray('data', $data, []))
+			 ->setTick($this->getInt('tick', $data, 0))
+			 ->setFirstTick($this->getInt('first_tick', $data, 0))
+			 ->setStatus($this->get('status', $data, ''))
+			 ->setAction($this->get('action', $data, ''));
 
 		return $tick;
 	}
