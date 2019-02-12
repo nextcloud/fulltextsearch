@@ -174,7 +174,9 @@ class IndexService implements IIndexService {
 				'chunkCurrent'    => 0,
 				'chunkTotal'      => 0,
 				'documentCurrent' => 0,
-				'documentTotal'   => 0
+				'documentTotal'   => 0,
+				'info'            => '',
+				'title'           => ''
 			]
 		);
 
