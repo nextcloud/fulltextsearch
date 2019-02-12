@@ -172,7 +172,9 @@ class IndexService implements IIndexService {
 				'providerId'      => $provider->getId(),
 				'providerName'    => $provider->getName(),
 				'documentCurrent' => 0,
-				'documentTotal'   => 0
+				'documentTotal'   => 0,
+				'info'            => '',
+				'title'           => ''
 			]
 		);
 
