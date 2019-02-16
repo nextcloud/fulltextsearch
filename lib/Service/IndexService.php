@@ -413,6 +413,9 @@ class IndexService implements IIndexService {
 		if (!$index->isStatus(Index::INDEX_REMOVE)) {
 			try {
 				$document = $provider->updateDocument($index);
+				if (!$document->gotIndex()) {
+					$document->setIndex($index);
+				}
 			} catch (Exception $e) {
 				/** we do nothing, because we're not sure provider manage the right MissingDocumentException */
 			}
