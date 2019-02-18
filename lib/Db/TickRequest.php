@@ -135,7 +135,7 @@ class TickRequest extends TickRequestBuilder {
 		$cursor->closeCursor();
 
 		if ($data === false) {
-			throw new TickDoesNotExistException($this->l10n->t('Tick not found'));
+			throw new TickDoesNotExistException($this->l10n->t('Process timed out'));
 		}
 
 		return $this->parseTickSelectSql($data);
