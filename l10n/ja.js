@@ -4,7 +4,6 @@ OC.L10N.register(
     "Search" : "検索",
     "Full text search" : "全文検索",
     "Index not found" : "インデックスが見つかりません",
-    "Tick not found" : "チックが見つかりません",
     "Core of the full-text search framework for Nextcloud" : "NextCloudの全文検索フレームワークのコア",
     "Core App of the full-text search framework for your Nextcloud." : "NextCloudの全文検索フレームワークのコアアプリケーション",
     "Search on %s" : "%s で検索",

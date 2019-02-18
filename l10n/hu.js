@@ -4,7 +4,6 @@ OC.L10N.register(
     "Search" : "Keresés",
     "Full text search" : "Teljes szöveges keresés",
     "Index not found" : "INdex nem található",
-    "Tick not found" : "Vonás nem található",
     "Search on %s" : "Keresés itt: %s",
     "General" : "Általános",
     "Search Platform" : "Keresési platform",
