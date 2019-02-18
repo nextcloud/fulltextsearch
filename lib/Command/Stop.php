@@ -59,7 +59,7 @@ class Stop extends ExtendedBase {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:stop')
-			 ->setDescription('stop all indexing');
+			 ->setDescription('Stop all indexing');
 	}
 
 

@@ -70,7 +70,7 @@ class Reset extends ExtendedBase {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:reset')
-			 ->setDescription('reset index')
+			 ->setDescription('Reset index')
 			 ->addArgument('provider', InputArgument::OPTIONAL, 'provider');
 	}
 
