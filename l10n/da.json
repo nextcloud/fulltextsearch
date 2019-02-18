@@ -1,7 +1,0 @@
-{ "translations": {
-    "Full text search" : "Fuld tekst søgning",
-    "Index not found" : "Index ikke fundet",
-    "Tick not found" : "Kryds ikke fundet",
-    "Search on %s" : "Søg på %s"
-},"pluralForm" :"nplurals=2; plural=(n != 1);"
-}
