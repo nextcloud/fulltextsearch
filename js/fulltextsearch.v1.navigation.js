@@ -244,7 +244,7 @@ var nav = {
 			}
 
 			if (entry.excerpts.length > 0) {
-				divResult.find('#extract').text(entry.excerpts[0]);
+				divResult.find('#extract').text(entry.excerpts[0]['excerpt']);
 			} else {
 				divResult.find('#extract').text('');
 			}

@@ -34,7 +34,7 @@ namespace OCA\FullTextSearch\Model;
 use JsonSerializable;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
-use OCP\FullTextSearch\Model\IndexDocument;
+use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
 
@@ -46,7 +46,7 @@ use OCP\FullTextSearch\Model\ISearchResult;
  */
 class SearchResult implements ISearchResult, JsonSerializable {
 
-	/** @var IndexDocument[] */
+	/** @var IIndexDocument[] */
 	private $documents = [];
 
 	/** @var string */
@@ -85,7 +85,7 @@ class SearchResult implements ISearchResult, JsonSerializable {
 
 
 	/**
-	 * @param IndexDocument[] $documents
+	 * @param IIndexDocument[] $documents
 	 *
 	 * @return ISearchResult
 	 */
@@ -96,18 +96,18 @@ class SearchResult implements ISearchResult, JsonSerializable {
 	}
 
 	/**
-	 * @return IndexDocument[]
+	 * @return IIndexDocument[]
 	 */
 	public function getDocuments(): array {
 		return $this->documents;
 	}
 
 	/**
-	 * @param IndexDocument $document
+	 * @param IIndexDocument $document
 	 *
 	 * @return ISearchResult
 	 */
-	public function addDocument(IndexDocument $document): ISearchResult {
+	public function addDocument(IIndexDocument $document): ISearchResult {
 		$this->documents[] = $document;
 
 		return $this;

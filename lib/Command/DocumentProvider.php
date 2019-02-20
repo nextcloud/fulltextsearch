@@ -36,7 +36,7 @@ use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\ProviderService;
-use OCP\FullTextSearch\Model\IndexDocument;
+use OCP\FullTextSearch\Model\IIndexDocument;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -119,11 +119,22 @@ class DocumentProvider extends Base {
 
 		$output->writeln('Content: ');
 		$content = $indexDocument->getContent();
-		if ($indexDocument->isContentEncoded() === IndexDocument::ENCODED_BASE64) {
+		if ($indexDocument->isContentEncoded() === IIndexDocument::ENCODED_BASE64) {
 			$content = base64_decode($content, true);
 		}
 
-		$output->writeln(substr($content, 0, 60));
+		$output->writeln(substr($content, 0, 80));
+
+		$parts = $indexDocument->getParts();
+		$output->writeln(sizeof($parts) . ' Part(s)');
+		foreach (array_keys($parts) as $part) {
+			$output->writeln(
+				"'" . $part . "' " . substr($parts[$part], 0, 80) . '   (size: ' . strlen(
+					$parts[$part]
+				) . ')'
+			);
+		}
+
 	}
 
 

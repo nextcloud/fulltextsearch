@@ -31,10 +31,11 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 
+use OC\FullTextSearch\Model\DocumentAccess;
+use OC\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Provider\TestProvider;
-use OCP\FullTextSearch\Model\DocumentAccess;
+use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IIndexOptions;
-use OCP\FullTextSearch\Model\IndexDocument;
 
 
 /**
@@ -78,9 +79,9 @@ class TestService {
 	/**
 	 * @param IIndexOptions $options
 	 *
-	 * @return IndexDocument
+	 * @return IIndexDocument
 	 */
-	public function generateIndexDocumentContentLicense(IIndexOptions $options): IndexDocument {
+	public function generateIndexDocumentContentLicense(IIndexOptions $options): IIndexDocument {
 		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TYPE_LICENSE);
 
 		$content = file_get_contents(__DIR__ . '/../../LICENSE');
@@ -105,9 +106,9 @@ class TestService {
 	/**
 	 * @param IIndexOptions $options
 	 *
-	 * @return IndexDocument
+	 * @return IIndexDocument
 	 */
-	public function generateIndexDocumentSimple(IIndexOptions $options): IndexDocument {
+	public function generateIndexDocumentSimple(IIndexOptions $options): IIndexDocument {
 
 		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TYPE_SIMPLE);
 		$indexDocument->setContent('document is a simple test');
@@ -117,12 +118,12 @@ class TestService {
 
 
 	/**
-	 * @param IndexDocument $origIndex
-	 * @param IndexDocument $compareIndex
+	 * @param IIndexDocument $origIndex
+	 * @param IIndexDocument $compareIndex
 	 *
 	 * @throws \Exception
 	 */
-	public function compareIndexDocument(IndexDocument $origIndex, IndexDocument $compareIndex) {
+	public function compareIndexDocument(IIndexDocument $origIndex, IIndexDocument $compareIndex) {
 		if ($origIndex->getAccess()
 					  ->getOwnerId() !== $compareIndex->getAccess()
 													  ->getOwnerId()) {
@@ -150,9 +151,9 @@ class TestService {
 	/**
 	 * @param string $documentType
 	 *
-	 * @return IndexDocument
+	 * @return IIndexDocument
 	 */
-	private function generateIndexDocument(string $documentType): IndexDocument {
+	private function generateIndexDocument(string $documentType): IIndexDocument {
 		$indexDocument = new IndexDocument(TestProvider::TEST_PROVIDER_ID, $documentType);
 
 		$access = new DocumentAccess(self::DOCUMENT_USER1);
