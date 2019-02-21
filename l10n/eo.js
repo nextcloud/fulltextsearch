@@ -4,6 +4,7 @@ OC.L10N.register(
     "Search" : "Serĉi",
     "Full text search" : "Plenteksta serĉo",
     "Index not found" : "Indekso ne trovita",
+    "Process timed out" : "Procezo eltempiĝis",
     "Core of the full-text search framework for Nextcloud" : "Baza framo por plenteksta serĉo en Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Baza aplikaĵo pri framo por plenteksta serĉo en Nextcloud",
     "Search on %s" : "Serĉi ĉe %s",
