@@ -215,6 +215,7 @@ class PlatformService {
 	private function loadPlatformsFromApp(string $appId) {
 		$appInfo = $this->appManager->getAppInfo($appId);
 		if (!is_array($appInfo) || !key_exists('fulltextsearch', $appInfo)
+			|| !is_array($appInfo['fulltextsearch'])
 			|| !key_exists('platform', $appInfo['fulltextsearch'])) {
 			return;
 		}
