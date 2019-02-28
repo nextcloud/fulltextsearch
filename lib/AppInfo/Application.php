@@ -107,7 +107,7 @@ class Application extends App {
 	private function fullTextSearchNavigation(): array {
 		$urlGen = \OC::$server->getURLGenerator();
 		$navName = \OC::$server->getL10N(self::APP_NAME)
-							   ->t('Full text search');
+							   ->t('Search');
 
 		return [
 			'id'    => self::APP_NAME,
