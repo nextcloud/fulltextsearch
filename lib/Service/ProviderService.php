@@ -265,7 +265,8 @@ class ProviderService implements IProviderService {
 	 */
 	private function loadProvidersFromApp(string $appId) {
 		$appInfo = $this->appManager->getAppInfo($appId);
-		if (!is_array($appInfo) || !key_exists('fulltextsearch', $appInfo)
+		if (!is_array($appInfo) || !array_key_exists('fulltextsearch', $appInfo)
+			|| !is_array($appInfo['fulltextsearch'])
 			|| !key_exists('provider', $appInfo['fulltextsearch'])) {
 			return;
 		}
@@ -288,11 +289,22 @@ class ProviderService implements IProviderService {
 	 * @throws QueryException
 	 */
 	private function loadProvidersFromList(string $appId, array $providers) {
-		if (!is_array($providers)) {
-			$providers = [$providers];
-		}
-
+		$version = $this->configService->getCloudVersion();
 		foreach ($providers AS $provider) {
+			if (is_array($provider)) {
+				$attributes = $provider['@attributes'];
+				if (array_key_exists('min-version', $attributes)
+					&& $version < (int)$attributes['min-version']) {
+					continue;
+				}
+				if (array_key_exists('max-version', $attributes)
+					&& $version > (int)$attributes['max-version']) {
+					continue;
+				}
+
+				$provider = $provider['@value'];
+			}
+
 			$this->loadProvider($appId, $provider);
 		}
 	}
