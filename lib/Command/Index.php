@@ -220,6 +220,7 @@ class Index extends ACommandBase {
 				}
 				);
 			} catch (Throwable $t) {
+				$this->miscService->log($t->getMessage() . ' -- ' . $t->getTraceAsString());
 				throw new Exception('Please install php-readline, or use --no-readline');
 			}
 		}
