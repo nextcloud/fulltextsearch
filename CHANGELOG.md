@@ -1,6 +1,12 @@
 # Changelog
 
 
+### 1.2.5
+
+- [UX] smoother display of info during index
+- [api] provider can set a min/max version of NC
+
+
 ### 1.2.4
 
 - adding some logs on cron Index
