@@ -2,9 +2,9 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "Search" : "Arama",
-    "Full text search" : "Tam metin arama",
     "Index not found" : "Dizin bulunamadı",
     "Process timed out" : "İşlem zaman aşımına uğradı",
+    "Full text search" : "Tam metin arama",
     "Core of the full-text search framework for Nextcloud" : "Nextcloud tam metin arama çatısının çekirdek uygulaması",
     "Core App of the full-text search framework for your Nextcloud." : "Nextcloud tam metin arama çatısının çekirdek uygulaması.",
     "Search on %s" : "%s üzerine arama",
