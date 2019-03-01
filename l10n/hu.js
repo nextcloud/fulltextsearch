@@ -2,8 +2,8 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "Search" : "Keresés",
-    "Full text search" : "Teljes szöveges keresés",
     "Index not found" : "INdex nem található",
+    "Full text search" : "Teljes szöveges keresés",
     "Search on %s" : "Keresés itt: %s",
     "General" : "Általános",
     "Search Platform" : "Keresési platform",
