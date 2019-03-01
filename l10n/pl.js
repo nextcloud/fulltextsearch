@@ -2,9 +2,9 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "Search" : "Wyszukaj",
-    "Full text search" : "Wyszukiwanie pełnotekstowe",
     "Index not found" : "Nie znaleziono indeksu",
     "Process timed out" : "Przekroczono czas procesu",
+    "Full text search" : "Wyszukiwanie pełnotekstowe",
     "Core of the full-text search framework for Nextcloud" : "Podstawa systemu wyszukiwania pełnotekstowego dla Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Podstawowa aplikacja systemu wyszukiwania pełnotekstowego dla Nextcloud",
     "Search on %s" : "Szukaj w %s",

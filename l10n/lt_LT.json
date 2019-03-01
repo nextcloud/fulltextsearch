@@ -1,7 +1,7 @@
 { "translations": {
-    "Full text search" : "Absoliučioji paieška",
     "Index not found" : "Indeksas nerastas",
     "Process timed out" : "Pasibaigė procesui skirtas laikas",
+    "Full text search" : "Absoliučioji paieška",
     "Core of the full-text search framework for Nextcloud" : "Nextcloud absoliučiosios paieškos karkaso branduolys",
     "Core App of the full-text search framework for your Nextcloud." : "Jūsų Nextcloud absoliučiosios paieškos karkaso pagrindinė programėlė.",
     "Search on %s" : "Ieškoti ties %s",
