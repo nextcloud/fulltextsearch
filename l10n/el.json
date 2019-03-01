@@ -1,6 +1,6 @@
 { "translations": {
-    "Full text search" : "Πλήρης αναζήτηση κειμένου",
     "Index not found" : "Δεν βρέθηκε ευρετήριο",
+    "Full text search" : "Πλήρης αναζήτηση κειμένου",
     "Search on %s" : "Αναζήτηση στο %s",
     "General" : "Γενικά"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

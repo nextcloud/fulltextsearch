@@ -2,9 +2,9 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "Search" : "Претрага",
-    "Full text search" : "Претраге свих текстова",
     "Index not found" : "Индекс није нађен",
     "Process timed out" : "Истекло време извршавања процеса",
+    "Full text search" : "Претраге свих текстова",
     "Core of the full-text search framework for Nextcloud" : "Језгро радног оквира претраге свих текстова за Некстклауд",
     "Core App of the full-text search framework for your Nextcloud." : "Основна апликација радног оквира претраге свих текстова за Некстклауд.",
     "Search on %s" : "Претражи %s",

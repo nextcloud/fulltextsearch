@@ -2,9 +2,9 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "Search" : "Hledat",
-    "Full text search" : "Plnotextové vyhledávání",
     "Index not found" : "Index nebyl nalezen",
     "Process timed out" : "Překročen časový limit zpracování",
+    "Full text search" : "Plnotextové vyhledávání",
     "Core of the full-text search framework for Nextcloud" : "Jádro aplikačního rámce pro plnotextové vyhledávání v Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Hlavní aplikace aplikačního rámce pro plnotextové hledání pro váš Nextcloud.",
     "Search on %s" : "Hledat v %s",

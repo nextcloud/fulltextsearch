@@ -1,8 +1,8 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "Full text search" : "Fulltekst søk",
     "Index not found" : "Indeks ble ikke funnet",
+    "Full text search" : "Fulltekst søk",
     "Search on %s" : "Søk etter %s",
     "General" : "Generelt"
 },
