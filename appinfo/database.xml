@@ -46,7 +46,7 @@
 			<field>
 				<name>document_id</name>
 				<type>text</type>
-				<length>31</length>
+				<length>127</length>
 				<notnull>true</notnull>
 			</field>
 
