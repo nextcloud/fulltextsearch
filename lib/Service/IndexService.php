@@ -43,8 +43,8 @@ use OCA\FullTextSearch\Model\Runner;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IIndex;
+use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IIndexOptions;
-use OCP\FullTextSearch\Model\IndexDocument;
 use OCP\FullTextSearch\Model\IRunner;
 use OCP\FullTextSearch\Service\IIndexService;
 
@@ -209,10 +209,10 @@ class IndexService implements IIndexService {
 
 	/**
 	 * @param IFullTextSearchProvider $provider
-	 * @param IndexDocument[] $documents
+	 * @param IIndexDocument[] $documents
 	 * @param IIndexOptions $options
 	 *
-	 * @return IndexDocument[]
+	 * @return IIndexDocument[]
 	 * @throws Exception
 	 */
 	private function updateDocumentsWithCurrIndex(
@@ -259,14 +259,13 @@ class IndexService implements IIndexService {
 
 	/**
 	 * @param IFullTextSearchProvider $provider
-	 * @param IndexDocument $document
+	 * @param IIndexDocument $document
 	 *
 	 * @return bool
 	 */
-	private function isDocumentUpToDate(IFullTextSearchProvider $provider, IndexDocument $document
+	private function isDocumentUpToDate(IFullTextSearchProvider $provider, IIndexDocument $document
 	): bool {
 		$index = $document->getIndex();
-
 		if (!$index->isStatus(Index::INDEX_OK)) {
 			return false;
 		}
@@ -294,7 +293,7 @@ class IndexService implements IIndexService {
 	/**
 	 * @param IFullTextSearchPlatform $platform
 	 * @param IFullTextSearchProvider $provider
-	 * @param IndexDocument[] $documents
+	 * @param IIndexDocument[] $documents
 	 * @param IndexOptions $options
 	 *
 	 * @throws Exception
@@ -345,11 +344,11 @@ class IndexService implements IIndexService {
 
 
 	/**
-	 * @param IndexDocument $document
+	 * @param IIndexDocument $document
 	 *
 	 * @throws NotIndexableDocumentException
 	 */
-	private function filterDocumentBeforeIndex(IndexDocument $document) {
+	private function filterDocumentBeforeIndex(IIndexDocument $document) {
 		// TODO - rework the index/not_index
 		$index = $document->getIndex();
 		$access = $document->getAccess();
@@ -365,12 +364,12 @@ class IndexService implements IIndexService {
 
 	/**
 	 * @param IFullTextSearchPlatform $platform
-	 * @param IndexDocument $document
+	 * @param IIndexDocument $document
 	 *
 	 * @return IIndex
 	 * @throws Exception
 	 */
-	public function indexDocument(IFullTextSearchPlatform $platform, IndexDocument $document
+	public function indexDocument(IFullTextSearchPlatform $platform, IIndexDocument $document
 	): IIndex {
 		$this->updateRunnerAction('indexDocument', true);
 		$this->updateRunnerInfoArray(
@@ -664,14 +663,22 @@ class IndexService implements IIndexService {
 	 * @param int $status
 	 *
 	 * @return IIndex
-	 * @throws Exception
 	 */
 	public function createIndex(string $providerId, string $documentId, string $userId, int $status
 	): IIndex {
+
+		try {
+			$known = $this->indexesRequest->getIndex($providerId, $documentId);
+			$known->setStatus($status);
+			$this->indexesRequest->updateStatus($providerId, $documentId, $status);
+
+			return $known;
+		} catch (IndexDoesNotExistException $e) {
+		}
+
 		$index = new Index($providerId, $documentId);
 		$index->setOwnerId($userId);
 		$index->setStatus($status);
-
 		$this->indexesRequest->create($index);
 
 		return $index;

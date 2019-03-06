@@ -48,28 +48,22 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param Index $index
 	 *
 	 * @return bool
-	 * @throws \Exception
 	 */
 	public function create(Index $index): bool {
+		$qb = $this->getIndexesInsertSql();
+		$qb->setValue('owner_id', $qb->createNamedParameter($index->getOwnerId()))
+		   ->setValue('provider_id', $qb->createNamedParameter($index->getProviderId()))
+		   ->setValue('document_id', $qb->createNamedParameter($index->getDocumentId()))
+		   ->setValue('source', $qb->createNamedParameter($index->getSource()))
+		   ->setValue('err', $qb->createNamedParameter($index->getErrorCount()))
+		   ->setValue('message', $qb->createNamedParameter(json_encode($index->getErrors())))
+		   ->setValue('status', $qb->createNamedParameter($index->getStatus()))
+		   ->setValue('options', $qb->createNamedParameter(json_encode($index->getOptions())))
+		   ->setValue('indexed', $qb->createNamedParameter($index->getLastIndex()));
 
-		try {
-			$qb = $this->getIndexesInsertSql();
-			$qb->setValue('owner_id', $qb->createNamedParameter($index->getOwnerId()))
-			   ->setValue('provider_id', $qb->createNamedParameter($index->getProviderId()))
-			   ->setValue('document_id', $qb->createNamedParameter($index->getDocumentId()))
-			   ->setValue('source', $qb->createNamedParameter($index->getSource()))
-			   ->setValue('err', $qb->createNamedParameter($index->getErrorCount()))
-			   ->setValue('message', $qb->createNamedParameter(json_encode($index->getErrors())))
-			   ->setValue('status', $qb->createNamedParameter($index->getStatus()))
-			   ->setValue('options', $qb->createNamedParameter(json_encode($index->getOptions())))
-			   ->setValue('indexed', $qb->createNamedParameter($index->getLastIndex()));
+		$qb->execute();
 
-			$qb->execute();
-
-			return true;
-		} catch (\Exception $e) {
-			throw $e;
-		}
+		return true;
 	}
 
 

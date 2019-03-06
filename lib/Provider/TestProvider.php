@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Provider;
 
 
+use OC\FullTextSearch\Model\SearchTemplate;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\ConfigService;
@@ -39,12 +40,12 @@ use OCA\FullTextSearch\Service\TestService;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IIndex;
+use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IIndexOptions;
-use OCP\FullTextSearch\Model\IndexDocument;
 use OCP\FullTextSearch\Model\IRunner;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
-use OCP\FullTextSearch\Model\SearchTemplate;
+use OCP\FullTextSearch\Model\ISearchTemplate;
 
 
 /**
@@ -127,9 +128,9 @@ class TestProvider implements IFullTextSearchProvider {
 
 
 	/**
-	 * @return SearchTemplate
+	 * @return ISearchTemplate
 	 */
-	public function getSearchTemplate(): SearchTemplate {
+	public function getSearchTemplate(): ISearchTemplate {
 		return new SearchTemplate();
 	}
 
@@ -157,7 +158,7 @@ class TestProvider implements IFullTextSearchProvider {
 	 * @param string $userId
 	 * @param string $chunk
 	 *
-	 * @return IndexDocument[]
+	 * @return IIndexDocument[]
 	 */
 	public function generateIndexableDocuments(string $userId, string $chunk): array {
 		$result = [];
@@ -172,18 +173,18 @@ class TestProvider implements IFullTextSearchProvider {
 	/**
 	 * generate documents prior to the indexing.
 	 *
-	 * @param IndexDocument $document
+	 * @param IIndexDocument $document
 	 */
-	public function fillIndexDocument(IndexDocument $document) {
+	public function fillIndexDocument(IIndexDocument $document) {
 	}
 
 
 	/**
-	 * @param IndexDocument $document
+	 * @param IIndexDocument $document
 	 *
 	 * @return bool
 	 */
-	public function isDocumentUpToDate(IndexDocument $document): bool {
+	public function isDocumentUpToDate(IIndexDocument $document): bool {
 		return false;
 	}
 
@@ -191,9 +192,9 @@ class TestProvider implements IFullTextSearchProvider {
 	/**
 	 * @param IIndex $index
 	 *
-	 * @return IndexDocument
+	 * @return IIndexDocument
 	 */
-	public function updateDocument(IIndex $index): IndexDocument {
+	public function updateDocument(IIndex $index): IIndexDocument {
 		return null;
 	}
 

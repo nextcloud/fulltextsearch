@@ -33,6 +33,7 @@ namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OC\App\AppManager;
+use OC\FullTextSearch\Model\DocumentAccess;
 use OC\User\NoUserException;
 use OCA\Circles\Api\v1\Circles;
 use OCA\FullTextSearch\Exceptions\EmptySearchException;
@@ -41,7 +42,7 @@ use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
-use OCP\FullTextSearch\Model\DocumentAccess;
+use OCP\FullTextSearch\Model\IDocumentAccess;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
 use OCP\FullTextSearch\Service\ISearchService;
@@ -182,14 +183,14 @@ class SearchService implements ISearchService {
 
 	/**
 	 * @param IFullTextSearchPlatform $platform
-	 * @param DocumentAccess $access
+	 * @param IDocumentAccess $access
 	 * @param IFullTextSearchProvider[] $providers
 	 * @param SearchRequest $request
 	 *
 	 * @return ISearchResult[]
 	 */
 	private function searchFromProviders(
-		IFullTextSearchPlatform $platform, array $providers, DocumentAccess $access,
+		IFullTextSearchPlatform $platform, array $providers, IDocumentAccess $access,
 		SearchRequest $request
 	): array {
 		$result = [];
@@ -213,9 +214,9 @@ class SearchService implements ISearchService {
 	/**
 	 * @param IUser $user
 	 *
-	 * @return DocumentAccess
+	 * @return IDocumentAccess
 	 */
-	private function getDocumentAccessFromUser(IUser $user): DocumentAccess {
+	private function getDocumentAccessFromUser(IUser $user): IDocumentAccess {
 		$rights = new DocumentAccess();
 
 		$rights->setViewerId($user->getUID());

@@ -37,7 +37,7 @@ use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
-use OCP\FullTextSearch\Model\IndexDocument;
+use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\ISearchResult;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -126,7 +126,7 @@ class Search extends Base {
 		echo '> ' . $searchResult->getProvider()
 								 ->getName() . "\n";
 
-		/** @var IndexDocument[] $result */
+		/** @var IIndexDocument[] $result */
 		$result = $searchResult->getDocuments();
 		foreach ($result as $document) {
 			echo ' - ' . $document->getId() . ' score:' . $document->getScore() . "\n";

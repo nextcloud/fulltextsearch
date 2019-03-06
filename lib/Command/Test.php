@@ -33,6 +33,7 @@ namespace OCA\FullTextSearch\Command;
 
 use Exception;
 use OC\Core\Command\InterruptedException;
+use OC\FullTextSearch\Model\DocumentAccess;
 use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
@@ -54,7 +55,7 @@ use OCA\FullTextSearch\Service\TestService;
 use OCP\AppFramework\QueryException;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
-use OCP\FullTextSearch\Model\DocumentAccess;
+use OCP\FullTextSearch\Model\IDocumentAccess;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -556,7 +557,7 @@ class Test extends ACommandBase {
 	 * @param OutputInterface $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
-	 * @param DocumentAccess $access
+	 * @param IDocumentAccess $access
 	 * @param string $search
 	 * @param array $expected
 	 * @param string $moreOutput
@@ -566,7 +567,7 @@ class Test extends ACommandBase {
 	private function search(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider,
-		DocumentAccess $access, string $search, array $expected, string $moreOutput = ''
+		IDocumentAccess $access, string $search, array $expected, string $moreOutput = ''
 	) {
 		$this->output(
 			$output,
