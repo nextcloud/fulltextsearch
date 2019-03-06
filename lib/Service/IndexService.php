@@ -266,7 +266,6 @@ class IndexService implements IIndexService {
 	private function isDocumentUpToDate(IFullTextSearchProvider $provider, IIndexDocument $document
 	): bool {
 		$index = $document->getIndex();
-
 		if (!$index->isStatus(Index::INDEX_OK)) {
 			return false;
 		}
@@ -664,14 +663,22 @@ class IndexService implements IIndexService {
 	 * @param int $status
 	 *
 	 * @return IIndex
-	 * @throws Exception
 	 */
 	public function createIndex(string $providerId, string $documentId, string $userId, int $status
 	): IIndex {
+
+		try {
+			$known = $this->indexesRequest->getIndex($providerId, $documentId);
+			$known->setStatus($status);
+			$this->indexesRequest->updateStatus($providerId, $documentId, $status);
+
+			return $known;
+		} catch (IndexDoesNotExistException $e) {
+		}
+
 		$index = new Index($providerId, $documentId);
 		$index->setOwnerId($userId);
 		$index->setStatus($status);
-
 		$this->indexesRequest->create($index);
 
 		return $index;
