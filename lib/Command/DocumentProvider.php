@@ -105,6 +105,10 @@ class DocumentProvider extends Base {
 		$index->setOwnerId($userId);
 		$index->setStatus(Index::INDEX_FULL);
 		$indexDocument = $provider->updateDocument($index);
+		if (!$indexDocument->hasIndex()) {
+			$indexDocument->setIndex($index);
+		}
+
 		if ($indexDocument->getIndex()
 						  ->isStatus(Index::INDEX_REMOVE)) {
 			throw new Exception('Unknown document');
