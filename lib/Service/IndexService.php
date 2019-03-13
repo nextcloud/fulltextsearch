@@ -190,7 +190,7 @@ class IndexService implements IIndexService {
 		foreach ($chunks as $chunk) {
 			$this->updateRunnerInfo('chunkCurrent', (string)++$curr);
 
-			$documents = $provider->generateIndexableDocuments($userId, $chunk);
+			$documents = $provider->generateIndexableDocuments($userId, (string)$chunk);
 			$this->currentTotalDocuments = sizeof($documents);
 			$this->updateRunnerInfoArray(
 				[
