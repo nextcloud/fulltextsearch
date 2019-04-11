@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Search" : "Leita",
     "Index not found" : "Atriðavísir fannst ekki",
+    "Process timed out" : "Ferlið féll á tíma",
     "Full text search" : "Leit í öllum textanum",
     "Core of the full-text search framework for Nextcloud" : "Kjarni kerfisins sem styður leit í öllum textanum í Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Kjarnaforrit kerfisins sem styður leit í öllum textanum í Nextcloud.",
