@@ -290,6 +290,9 @@ class ProviderService implements IProviderService {
 	 */
 	private function loadProvidersFromList(string $appId, array $providers) {
 		$version = $this->configService->getCloudVersion();
+		if (array_key_exists('@attributes', $providers)) {
+			$providers = [$providers];
+		}
 		foreach ($providers AS $provider) {
 			if (is_array($provider)) {
 				$attributes = $provider['@attributes'];
