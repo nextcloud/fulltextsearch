@@ -1,6 +1,15 @@
 # Changelog
 
 
+### 1.3.1
+
+- issue with some providers.
+
+
+### 1.3.0
+
+- Chunks (NC 16)
+
 ### 1.2.3
 
 - fixing issue with tests.
