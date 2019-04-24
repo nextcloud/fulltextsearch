@@ -38,7 +38,7 @@ clean:
 
 composer:
 	composer install --prefer-dist
-	composer update
+	composer update --prefer-dist
 
 test: SHELL:=/bin/bash
 test:
