@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.2.6
+
+- Issues with some providers.
+
 
 ### 1.2.5
 
