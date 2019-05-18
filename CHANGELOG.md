@@ -1,5 +1,12 @@
 # Changelog
 
+
+### 1.2.7
+
+- Do not crash on missing provider.
+- 
+
+
 ### 1.2.6
 
 - Issues with some providers.
