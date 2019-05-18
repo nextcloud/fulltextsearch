@@ -43,8 +43,8 @@ use OCA\FullTextSearch\Model\Runner;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IIndex;
-use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IIndexOptions;
+use OCP\FullTextSearch\Model\IndexDocument;
 use OCP\FullTextSearch\Model\IRunner;
 use OCP\FullTextSearch\Service\IIndexService;
 
@@ -197,10 +197,10 @@ class IndexService implements IIndexService {
 
 	/**
 	 * @param IFullTextSearchProvider $provider
-	 * @param IIndexDocument[] $documents
+	 * @param IndexDocument[] $documents
 	 * @param IIndexOptions $options
 	 *
-	 * @return IIndexDocument[]
+	 * @return IndexDocument[]
 	 * @throws Exception
 	 */
 	private function updateDocumentsWithCurrIndex(
@@ -247,11 +247,11 @@ class IndexService implements IIndexService {
 
 	/**
 	 * @param IFullTextSearchProvider $provider
-	 * @param IIndexDocument $document
+	 * @param IndexDocument $document
 	 *
 	 * @return bool
 	 */
-	private function isDocumentUpToDate(IFullTextSearchProvider $provider, IIndexDocument $document
+	private function isDocumentUpToDate(IFullTextSearchProvider $provider, IndexDocument $document
 	): bool {
 		$index = $document->getIndex();
 
@@ -282,7 +282,7 @@ class IndexService implements IIndexService {
 	/**
 	 * @param IFullTextSearchPlatform $platform
 	 * @param IFullTextSearchProvider $provider
-	 * @param IIndexDocument[] $documents
+	 * @param IndexDocument[] $documents
 	 * @param IndexOptions $options
 	 *
 	 * @throws Exception
@@ -333,11 +333,11 @@ class IndexService implements IIndexService {
 
 
 	/**
-	 * @param IIndexDocument $document
+	 * @param IndexDocument $document
 	 *
 	 * @throws NotIndexableDocumentException
 	 */
-	private function filterDocumentBeforeIndex(IIndexDocument $document) {
+	private function filterDocumentBeforeIndex(IndexDocument $document) {
 		// TODO - rework the index/not_index
 		$index = $document->getIndex();
 		$access = $document->getAccess();
@@ -353,12 +353,12 @@ class IndexService implements IIndexService {
 
 	/**
 	 * @param IFullTextSearchPlatform $platform
-	 * @param IIndexDocument $document
+	 * @param IndexDocument $document
 	 *
 	 * @return IIndex
 	 * @throws Exception
 	 */
-	public function indexDocument(IFullTextSearchPlatform $platform, IIndexDocument $document
+	public function indexDocument(IFullTextSearchPlatform $platform, IndexDocument $document
 	): IIndex {
 		$this->updateRunnerAction('indexDocument', true);
 		$this->updateRunnerInfoArray(
