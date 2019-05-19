@@ -1,6 +1,13 @@
 # Changelog
 
 
+### 1.3.2
+
+- adding a key to the list of indexes for old version of NC
+- no crash on missing provider 
+- --no-readline can be passed with empty options
+
+
 ### 1.3.1
 
 - issue with some providers.
