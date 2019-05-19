@@ -283,10 +283,6 @@ class ProviderService implements IProviderService {
 	/**
 	 * @param string $appId
 	 * @param array $providers
-	 *
-	 * @throws ProviderIsNotCompatibleException
-	 * @throws ProviderIsNotUniqueException
-	 * @throws QueryException
 	 */
 	private function loadProvidersFromList(string $appId, array $providers) {
 		$version = $this->configService->getCloudVersion();
@@ -308,7 +304,15 @@ class ProviderService implements IProviderService {
 				$provider = $provider['@value'];
 			}
 
-			$this->loadProvider($appId, $provider);
+			try {
+				$this->loadProvider($appId, $provider);
+			} catch (Exception $e) {
+				$this->miscService->log(
+					'Issue while loading Provider: ' . $appId . '/' . $provider . ' - ' . get_class(
+						$e
+					) . ' ' . $e->getMessage()
+				);
+			}
 		}
 	}
 
