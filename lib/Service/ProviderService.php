@@ -257,10 +257,6 @@ class ProviderService {
 	/**
 	 * @param string $appId
 	 * @param string|array $providers
-	 *
-	 * @throws ProviderIsNotCompatibleException
-	 * @throws ProviderIsNotUniqueException
-	 * @throws QueryException
 	 */
 	private function loadProvidersFromList($appId, $providers) {
 		if (!is_array($providers)) {
