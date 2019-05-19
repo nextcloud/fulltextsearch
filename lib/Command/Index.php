@@ -416,7 +416,11 @@ class Index extends ExtendedBase {
 	 */
 	private function generateIndexOptions(InputInterface $input) {
 		$jsonOptions = $input->getArgument('options');
-		$options = json_decode($jsonOptions, true);
+
+		$options = [];
+		if (is_string($jsonOptions)) {
+			$options = json_decode($jsonOptions, true);
+		}
 
 		if (!is_array($options)) {
 			$options = [];
