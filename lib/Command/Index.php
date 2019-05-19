@@ -425,11 +425,10 @@ class Index extends ACommandBase {
 	private function generateIndexOptions(InputInterface $input): IndexOptions {
 		$jsonOptions = $input->getArgument('options');
 
-		if (!is_string($jsonOptions)) {
-			return new IndexOptions([]);
+		$options = [];
+		if (is_string($jsonOptions)) {
+			$options = json_decode($jsonOptions, true);
 		}
-
-		$options = json_decode($jsonOptions, true);
 
 		if (!is_array($options)) {
 			$options = [];
