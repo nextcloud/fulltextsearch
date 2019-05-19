@@ -268,7 +268,15 @@ class ProviderService {
 		}
 
 		foreach ($providers AS $provider) {
-			$this->loadProvider($appId, $provider);
+			try {
+				$this->loadProvider($appId, $provider);
+			} catch (Exception $e) {
+				$this->miscService->log(
+					'Issue while loading Provider: ' . $appId . '/' . $provider . ' - ' . get_class(
+						$e
+					) . ' ' . $e->getMessage()
+				);
+			}
 		}
 	}
 
