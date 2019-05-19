@@ -295,7 +295,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$indexes = [];
 		$cursor = $qb->execute();
 		while ($data = $cursor->fetch()) {
-			$indexes[] = $this->parseIndexesSelectSql($data);
+			$index = $this->parseIndexesSelectSql($data);
+			$indexes[$index->getDocumentId()] = $index;
 		}
 		$cursor->closeCursor();
 

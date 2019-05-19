@@ -27,6 +27,8 @@
 
 namespace OCA\FullTextSearch\Model;
 
+use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
+
 class ProviderIndexes {
 
 	/** @var Index[] */
@@ -49,16 +51,15 @@ class ProviderIndexes {
 	/**
 	 * @param string $documentId
 	 *
-	 * @return null|Index
+	 * @return Index
+	 * @throws IndexDoesNotExistException
 	 */
-	public function getIndex($documentId) {
-		foreach ($this->indexes as $index) {
-			if ($index->getDocumentId() === (string)$documentId) {
-				return $index;
-			}
+	public function getIndex(string $documentId){
+		if (!array_key_exists($documentId, $this->indexes)) {
+			throw new IndexDoesNotExistException();
 		}
 
-		return null;
+		return $this->indexes[$documentId];
 	}
 
 
