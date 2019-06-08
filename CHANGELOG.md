@@ -1,6 +1,12 @@
 # Changelog
 
 
+
+### 1.3.4
+
+- some improvement in the index comparison
+
+
 ### 1.3.2
 
 - adding a key to the list of indexes for old version of NC
