@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.2.9
+
+- some improvement in the index comparison
+
 
 ### 1.2.7
 
