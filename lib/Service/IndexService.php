@@ -218,9 +218,7 @@ class IndexService implements IIndexService {
 	private function updateDocumentsWithCurrIndex(
 		IFullTextSearchProvider $provider, array $documents, IIndexOptions $options
 	): array {
-		if (!$options->getOptionBool('test_request', false)) {
-			$currIndex = $this->getProviderIndexFromProvider($provider->getId());
-		}
+
 		$result = [];
 		$count = 0;
 		foreach ($documents as $document) {
@@ -232,13 +230,8 @@ class IndexService implements IIndexService {
 			$count++;
 
 			try {
-				if ($options->getOptionBool('test_request', false)) {
-					$index = $this->indexesRequest->getIndex(
-						$document->getProviderId(), $document->getId()
-					);
-				} else {
-					$index = $currIndex->getIndex($document->getId());
-				}
+				$index =
+					$this->indexesRequest->getIndex($document->getProviderId(), $document->getId());
 			} catch (IndexDoesNotExistException $e) {
 				$index = new Index($document->getProviderId(), $document->getId());
 				$index->setStatus(Index::INDEX_FULL);
@@ -283,18 +276,6 @@ class IndexService implements IIndexService {
 		}
 
 		return $provider->isDocumentUpToDate($document);
-	}
-
-
-	/**
-	 * @param string $providerId
-	 *
-	 * @return ProviderIndexes
-	 */
-	private function getProviderIndexFromProvider(string $providerId): ProviderIndexes {
-		$indexes = $this->indexesRequest->getIndexesFromProvider($providerId);
-
-		return new ProviderIndexes($indexes);
 	}
 
 
