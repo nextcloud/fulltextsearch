@@ -34,6 +34,7 @@ namespace OCA\FullTextSearch\Cron;
 use Exception;
 use OC\BackgroundJob\TimedJob;
 use OCA\FullTextSearch\AppInfo\Application;
+use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
@@ -99,6 +100,7 @@ class Index extends TimedJob {
 			$this->runner->start();
 			$this->liveCycle();
 			$this->runner->stop();
+		} catch (RunnerAlreadyUpException $e) {
 		} catch (Exception $e) {
 			$this->miscService->log('Exception while cronIndex: ' . get_class($e) . ' - ' . $e->getMessage());
 			$this->runner->exception($e->getMessage(), true);
