@@ -200,8 +200,9 @@ class IndexService {
 			}
 			$count++;
 
-			$index = $currIndex->getIndex($document->getId());
-			if ($index === null) {
+			try {
+				$index = $currIndex->getIndex($document->getId());
+			} catch (IndexDoesNotExistException $e) {
 				$index = new Index($document->getProviderId(), $document->getId());
 				$index->setStatus(Index::INDEX_FULL);
 				$index->setLastIndex();
