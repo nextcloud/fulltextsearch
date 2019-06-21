@@ -1,6 +1,11 @@
 # Changelog
 
 
+### 1.1.3
+
+- issue on missing index.
+
+
 ### 1.1.2
 
 - adding a key to the list of indexes for old version of NC
