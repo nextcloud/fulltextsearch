@@ -250,7 +250,10 @@ class Live extends ExtendedBase {
 				$this->liveCycle();
 
 			} catch (Exception $e) {
-				$this->runner->exception($e->getMessage(), true);
+				$this->miscService->log(
+					'Exception while live index: ' . get_class($e) . ' - ' . $e->getMessage()
+				);
+
 				if (!$input->getOption('service')) {
 					throw $e;
 				}
