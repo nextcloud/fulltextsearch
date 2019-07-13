@@ -198,6 +198,10 @@ class Live extends ACommandBase {
 			 ->addOption(
 				 'no-readline', 'r', InputOption::VALUE_NONE,
 				 'disable readline - non interactive mode'
+			 )
+			 ->addOption(
+				 'service', 's', InputOption::VALUE_NONE,
+				 'disable interface'
 			 );
 	}
 
@@ -215,7 +219,8 @@ class Live extends ACommandBase {
 			throw new Exception('This feature is only available on Nextcloud 14 or newer');
 		}
 
-		if (!$input->getOption('no-readline')) {
+
+		if (!$input->getOption('service') && !$input->getOption('no-readline')) {
 			try {
 				/** do not get stuck while waiting interactive input */
 				readline_callback_handler_install(
@@ -235,31 +240,47 @@ class Live extends ACommandBase {
 			   ->setStyle('char', $outputStyle);
 
 		$this->runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
-		$this->runner->onKeyPress([$this, 'onKeyPressed']);
-		$this->runner->onNewIndexError([$this, 'onNewIndexError']);
-		$this->runner->onNewIndexResult([$this, 'onNewIndexResult']);
 
+		if (!$input->getOption('service')) {
+			$this->runner->onKeyPress([$this, 'onKeyPressed']);
+			$this->runner->onNewIndexError([$this, 'onNewIndexError']);
+			$this->runner->onNewIndexResult([$this, 'onNewIndexResult']);
+			$this->runner->sourceIsCommandLine($this, $output);
+
+			$this->generatePanels(!$input->getOption('no-readline'));
+		}
 
 		$this->indexService->setRunner($this->runner);
 		$this->cliService->setRunner($this->runner);
 
-		$this->generatePanels(!$input->getOption('no-readline'));
+		while (true) {
+			try {
+				$this->runner->start();
 
+				if (!$input->getOption('service')) {
+					$this->cliService->runDisplay($output);
+					$this->generateIndexErrors();
+					$this->displayError();
+					$this->displayResult();
+				}
 
-		try {
-			$this->runner->sourceIsCommandLine($this, $output);
-			$this->runner->start();
+				$this->liveCycle();
 
-			$this->cliService->runDisplay($output);
-			$this->generateIndexErrors();
-			$this->displayError();
-			$this->displayResult();
+			} catch (Exception $e) {
+				$this->miscService->log(
+					'Exception while live index: ' . get_class($e) . ' - ' . $e->getMessage()
+				);
 
-			$this->liveCycle();
+				if (!$input->getOption('service')) {
+					throw $e;
+				}
+			}
 
-		} catch (Exception $e) {
-			$this->runner->exception($e->getMessage(), true);
-			throw $e;
+			if (!$input->getOption('service')) {
+				break;
+			}
+
+			sleep(120);
 		}
 
 		$this->runner->stop();
