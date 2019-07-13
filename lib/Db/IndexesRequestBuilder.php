@@ -120,7 +120,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 			  ->setSource($this->get('source', $data, ''))
 			  ->setOwnerId($this->get('owner_id', $data, ''))
 			  ->setLastIndex($this->getInt('indexed', $data, 0));
-		$index->setOptions(json_decode($data['options'], true));
+		$index->setOptions($this->getArray('options', $data, []));
 		$index->setErrorCount($this->getInt('err', $data, 0));
 		$index->setErrors(json_decode($data['message'], true));
 
