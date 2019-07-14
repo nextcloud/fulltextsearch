@@ -34,6 +34,7 @@ namespace OCA\FullTextSearch\Model;
 use daita\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
 use OCP\FullTextSearch\Model\ISearchRequest;
+use OCP\FullTextSearch\Model\ISearchRequestSimpleQuery;
 
 
 /**
@@ -94,6 +95,9 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 
 	/** @var array */
 	private $regexFilters = [];
+
+	/** @var array */
+	private $simpleQueries = [];
 
 
 	/**
@@ -374,11 +378,11 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 
 
 	/**
-	 * @since 15.0.0
-	 *
 	 * @param array $parts
 	 *
 	 * @return ISearchRequest
+	 * @since 15.0.0
+	 *
 	 */
 	public function setParts(array $parts): ISearchRequest {
 		$this->parts = $parts;
@@ -658,6 +662,26 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 
 
 	/**
+	 * @param ISearchRequestSimpleQuery $query
+	 *
+	 * @return ISearchRequest
+	 */
+	public function addSimpleQuery(ISearchRequestSimpleQuery $query): ISearchRequest {
+		$this->simpleQueries[] = $query;
+
+		return $this;
+	}
+
+
+	/**
+	 * @return ISearchRequestSimpleQuery[]
+	 */
+	public function getSimpleQueries(): array {
+		return $this->simpleQueries;
+	}
+
+
+	/**
 	 * @return array
 	 */
 	public function jsonSerialize(): array {
@@ -668,6 +692,7 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 			'page'      => $this->getPage(),
 			'size'      => $this->getSize(),
 			'parts'     => $this->getParts(),
+			'queries'   => $this->getSimpleQueries(),
 			'options'   => $this->getOptions(),
 			'metatags'  => $this->getMetaTags(),
 			'subtags'   => $this->getSubTags(),
