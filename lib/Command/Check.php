@@ -98,7 +98,7 @@ class Check extends Base {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 
 		if ($input->getOption('json') === true) {
-			$output->writeln(json_encode($this->displayAsJson(), JSON_PRETTY_PRINT));
+			$output->writeln(json_encode($this->displayAsJson(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
 			return;
 		}
@@ -181,7 +181,7 @@ class Check extends Base {
 		$output->writeln('- Search Platform:');
 
 		$output->writeln($platform->getName() . ' ' . $wrapper->getVersion());
-		echo json_encode($platform->getConfiguration(), JSON_PRETTY_PRINT);
+		echo json_encode($platform->getConfiguration(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
 		$output->writeln(' ');
 		$output->writeln(' ');
@@ -207,7 +207,7 @@ class Check extends Base {
 		foreach ($providers as $providerWrapper) {
 			$provider = $providerWrapper->getProvider();
 			$output->writeln($provider->getName() . ' ' . $providerWrapper->getVersion());
-			echo json_encode($provider->getConfiguration(), JSON_PRETTY_PRINT);
+			echo json_encode($provider->getConfiguration(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 			$output->writeln('');
 		}
 
