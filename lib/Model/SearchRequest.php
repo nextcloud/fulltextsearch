@@ -163,6 +163,17 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 		return $this;
 	}
 
+	/**
+	 * @param string $search
+	 *
+	 * @return ISearchRequest
+	 */
+	public function addSearch(string $search): ISearchRequest {
+		$this->search .= ' ' . $search;
+
+		return $this;
+	}
+
 
 	/**
 	 *
@@ -192,7 +203,7 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	 * @return bool
 	 */
 	private function searchQueryOptions(string $word): bool {
-		if (($pos = strpos($word, ':')) === false) {
+		if (($pos = strpos($word, ':')) === false || $pos === 0) {
 			return false;
 		}
 

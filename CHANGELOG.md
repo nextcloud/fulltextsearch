@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.3.5
+
+- ignore live index on cron
+- live can be run as a service
+- simple queries
 
 
 ### 1.3.4

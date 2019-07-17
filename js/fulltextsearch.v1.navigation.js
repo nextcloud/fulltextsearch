@@ -68,8 +68,22 @@ var nav = {
 			divProviderNavigation.attr('data-total', meta.total);
 
 			var providerTitle = divProviderNavigation.attr('data-provider-title');
-			var left = "the search in " + providerTitle + " for '" + request.search + "' returned " +
-				meta.total + " results in " + meta.time + "ms";
+			var left = '';
+			var data =
+				{
+					title: providerTitle,
+					search: request.search,
+					total: meta.total,
+					time: meta.time
+				};
+
+			if (request.search === ':null') {
+				left = t('fulltextsearch', 'the search returned {total} results in {time} ms', data);
+			} else {
+				left = t('fulltextsearch',
+					"the search in {title} for '{search}' returned {total} results in {time} ms", data);
+			}
+
 			divProviderNavigation.find('.provider_navigation_left').text(left);
 
 			if (maxPage > 1) {
