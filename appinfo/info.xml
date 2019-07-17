@@ -34,6 +34,7 @@ Core App of the full-text search framework for your Nextcloud.
 		<command>OCA\FullTextSearch\Command\Check</command>
 		<command>OCA\FullTextSearch\Command\Configure</command>
 		<command>OCA\FullTextSearch\Command\DocumentPlatform</command>
+		<command>OCA\FullTextSearch\Command\DocumentIndex</command>
 		<command>OCA\FullTextSearch\Command\DocumentProvider</command>
 		<command>OCA\FullTextSearch\Command\Index</command>
 		<command>OCA\FullTextSearch\Command\Live</command>
