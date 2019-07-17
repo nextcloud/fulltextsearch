@@ -1,6 +1,12 @@
 # Changelog
 
 
+### 1.1.4
+
+- ignore live index on cron
+- live can be run as a service
+
+
 ### 1.1.3
 
 - issue on missing index.
