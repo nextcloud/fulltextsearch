@@ -1,6 +1,8 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "the search returned {total} results in {time} ms" : "wyszukiwanie zwróciło {total} wyników w {time} ms",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "wyszukiwanie w {title} dla '{search}' zwróciło {total} wyników w {time} ms",
     "Search" : "Wyszukaj",
     "Index not found" : "Nie znaleziono indeksu",
     "Process timed out" : "Przekroczono czas procesu",
