@@ -77,7 +77,7 @@ var nav = {
 					time: meta.time
 				};
 
-			if (request.search === ':null') {
+			if (request.search === ':null' || request.search === '') {
 				left = t('fulltextsearch', 'the search returned {total} results in {time} ms', data);
 			} else {
 				left = t('fulltextsearch',

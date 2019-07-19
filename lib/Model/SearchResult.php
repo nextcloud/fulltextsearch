@@ -274,13 +274,13 @@ class SearchResult implements ISearchResult, JsonSerializable {
 
 
 	/**
-	 * @since 15.0.0
-	 *
 	 * @param string $category
 	 * @param string $value
 	 * @param int $count
 	 *
 	 * @return ISearchResult
+	 * @since 15.0.0
+	 *
 	 */
 	public function addAggregation(string $category, string $value, int $count): ISearchResult {
 		// TODO: Implement addAggregation() method.
@@ -289,11 +289,11 @@ class SearchResult implements ISearchResult, JsonSerializable {
 	}
 
 	/**
-	 * @since 15.0.0
-	 *
 	 * @param string $category
 	 *
 	 * @return array
+	 * @since 15.0.0
+	 *
 	 */
 	public function getAggregations(string $category): array {
 		// TODO: Implement getAggregations() method.
@@ -329,6 +329,7 @@ class SearchResult implements ISearchResult, JsonSerializable {
 			'provider'  => $provider,
 			'platform'  => $platform,
 			'documents' => $this->getDocuments(),
+			'info'      => $this->getInfosAll(),
 			'meta'      =>
 				[
 					'timedOut' => $this->isTimedOut(),
@@ -340,5 +341,16 @@ class SearchResult implements ISearchResult, JsonSerializable {
 		];
 	}
 
+	public function addInfo(string $k, string $value): ISearchResult {
+		return $this;
+	}
+
+	public function getInfo(string $k): string {
+		return '';
+	}
+
+	public function getInfosAll(): array {
+		return [];
+	}
 }
 

@@ -137,7 +137,6 @@ class SearchService implements ISearchService {
 	 * @throws ProviderDoesNotExistException
 	 */
 	public function search(string $userId, ISearchRequest $request): array {
-
 		$this->searchRequestCannotBeEmpty($request);
 
 		if ($userId === '') {
