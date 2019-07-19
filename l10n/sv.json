@@ -1,4 +1,6 @@
 { "translations": {
+    "the search returned {total} results in {time} ms" : "sökningen gav {total} resultat på {time} ms",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "sökningen på {title} för '{search}' gav {total} resultat på {time} ms",
     "Search" : "Sök",
     "Index not found" : "Index hittades inte",
     "Process timed out" : "Processen tog för lång tid",
