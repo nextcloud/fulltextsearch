@@ -1,4 +1,6 @@
 { "translations": {
+    "the search returned {total} results in {time} ms" : "die Suche ergab {total} Treffer in {time} ms",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "die Suche in {title} nach '{search}' ergab {total} Treffer in {time} ms",
     "Search" : "Suchen",
     "Index not found" : "Index nicht gefunden",
     "Process timed out" : "Zeitüberschreitung bei der Verarbeitung",
