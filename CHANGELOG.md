@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.3.6
+
+- some compat nc17
+
+
 ### 1.3.5
 
 - ignore live index on cron
