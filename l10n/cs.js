@@ -1,6 +1,8 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "the search returned {total} results in {time} ms" : "Vyhledávání nalezlo {total} výsledků v čase {time} ms",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "Vyhledávání v {title} pro výraz '{search}' nalezlo {total} výsledků v čase {time} ms",
     "Search" : "Hledat",
     "Index not found" : "Index nebyl nalezen",
     "Process timed out" : "Překročen časový limit zpracování",
