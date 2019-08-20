@@ -1,6 +1,6 @@
 { "translations": {
     "the search returned {total} results in {time} ms" : "検索結果{total}件{time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "{title}で{search}を検索すると{time}msで{total}件の結果が返ってきます",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "{title}で「{search}」を検索すると{time}msで{total}件の結果が返ってきます",
     "Search" : "検索",
     "Index not found" : "インデックスが見つかりません",
     "Process timed out" : "プロセスがタイムアウトしました",
