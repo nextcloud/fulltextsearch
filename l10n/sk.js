@@ -1,6 +1,10 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "General" : "Všeobecné"
+    "Search" : "Hľadať",
+    "Full text search" : "Fulltextové vyhľadávanie",
+    "Search on %s" : "Hľadať v %s",
+    "General" : "Všeobecné",
+    "Navigation Icon" : "Ikona navigácie"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");
