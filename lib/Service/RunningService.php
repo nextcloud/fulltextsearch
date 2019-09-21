@@ -199,7 +199,7 @@ class RunningService {
 	 * @return bool
 	 */
 	public function isAlreadyRunning(): bool {
-		$ttl = $this->configService->getAppValue(ConfigService::TICK_TTL);
+		$ttl = (int) $this->configService->getAppValue(ConfigService::TICK_TTL);
 		$ticks = $this->tickRequest->getTicksByStatus('run');
 
 		$isAlreadyRunning = false;
