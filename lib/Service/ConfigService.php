@@ -50,14 +50,15 @@ class ConfigService {
 	const SEARCH_PLATFORM = 'search_platform';
 	const PROVIDER_INDEXED = 'provider_indexed';
 	const CRON_LAST_ERR_RESET = 'cron_err_reset';
-
+	const TICK_TTL = 'tick_ttl';
 
 	/** @var array */
 	public $defaults = [
 		self::SEARCH_PLATFORM     => '',
 		self::APP_NAVIGATION      => '0',
 		self::PROVIDER_INDEXED    => '',
-		self::CRON_LAST_ERR_RESET => '0'
+		self::CRON_LAST_ERR_RESET => '0',
+		self::TICK_TTL            => '1800'
 	];
 
 

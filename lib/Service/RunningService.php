@@ -36,7 +36,6 @@ use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullTextSearch\Model\Tick;
-use OCA\FullTextSearch\Model\Runner;
 
 
 /**
@@ -200,11 +199,12 @@ class RunningService {
 	 * @return bool
 	 */
 	public function isAlreadyRunning(): bool {
+		$ttl = (int) $this->configService->getAppValue(ConfigService::TICK_TTL);
 		$ticks = $this->tickRequest->getTicksByStatus('run');
 
 		$isAlreadyRunning = false;
 		foreach ($ticks as $tick) {
-			if ($tick->getTick() < (time() - Runner::TICK_TTL)) {
+			if ($tick->getTick() < (time() - $ttl)) {
 				$tick->setStatus('timeout');
 				$this->tickRequest->update($tick);
 			} else {

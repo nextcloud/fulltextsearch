@@ -53,8 +53,6 @@ class Runner implements IRunner {
 	use TArrayTools;
 
 
-	const TICK_TTL = 1800;
-
 	const TICK_MINIMUM = 2;
 	const TICK_UPDATE = 10;
 	const MEMORY_UPDATE = 5;
