@@ -1,6 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "Search" : "חיפוש",
     "Index not found" : "המפתח לא נמצא",
     "Full text search" : "חיפוש טקסט מלא",
     "Core of the full-text search framework for Nextcloud" : "ליבת סביבת עבודת חיפוש טקסט מלא עבור Nextcloud",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "Search" : "Ieškoti",
     "Index not found" : "Indeksas nerastas",
     "Process timed out" : "Pasibaigė procesui skirtas laikas",
     "Full text search" : "Absoliučioji paieška",

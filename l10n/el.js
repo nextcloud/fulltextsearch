@@ -1,6 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "Search" : "Αναζήτηση",
     "Index not found" : "Δεν βρέθηκε ευρετήριο",
     "Full text search" : "Πλήρης αναζήτηση κειμένου",
     "Search on %s" : "Αναζήτηση στο %s",
