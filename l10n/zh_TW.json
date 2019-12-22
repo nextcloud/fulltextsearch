@@ -1,6 +1,8 @@
 { "translations": {
+    "Search" : "搜尋",
     "Index not found" : "找不到索引",
     "Full text search" : "全文搜尋",
-    "Search on %s" : "在 %s 搜尋"
+    "Search on %s" : "在 %s 搜尋",
+    "General" : "一般"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

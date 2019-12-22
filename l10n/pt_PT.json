@@ -1,6 +1,8 @@
 { "translations": {
+    "Search" : "Pesquisar",
     "Index not found" : "Índice não encontrado",
     "Full text search" : "Pesquisa de texto completo ",
-    "Search on %s" : "Pesquisar em %s"
+    "Search on %s" : "Pesquisar em %s",
+    "General" : "Geral"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
