@@ -2,7 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "iskanje je vrnilo skupno {total} zadetkov v {time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "iskanje po {title} za »{search}« je vrnilo skupno {total} zadetkov v {time} ms",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "iskanje po predmetu {title} za »{search}« je vrnilo skupno {total} zadetkov v {time} ms",
     "Search" : "Poišči",
     "Index not found" : "Kazala ni mogoče najti",
     "Process timed out" : "Opravilo je časovno poteklo",
