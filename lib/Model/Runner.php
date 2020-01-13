@@ -32,6 +32,7 @@ namespace OCA\FullTextSearch\Model;
 
 
 use daita\MySmallPhpTools\Traits\TArrayTools;
+use Exception;
 use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
@@ -139,7 +140,7 @@ class Runner implements IRunner {
 	 * @param bool $force
 	 *
 	 * @return string
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function updateAction(string $action = '', bool $force = false): string {
 
@@ -398,7 +399,7 @@ class Runner implements IRunner {
 
 
 	/**
-	 * @deprecated - verifier l'interet !?
+	 * // TODO: finalize this exception handling about error logs.
 	 *
 	 * @param string $reason
 	 * @param bool $stop
@@ -407,8 +408,14 @@ class Runner implements IRunner {
 		if (!$stop) {
 			$this->output('Exception: ' . $reason);
 			// TODO: feed an array of exceptions for log;
+		} else {
+			try {
+				$this->runningService->stop($this->tickId, $reason);
+			} catch (TickDoesNotExistException $e) {
+				/** exception will be managed somewhere else */
+				// TODO: Check if above statement is correct.
+			}
 		}
-		$this->runningService->exception($this->tickId, $reason, $stop);
 	}
 
 

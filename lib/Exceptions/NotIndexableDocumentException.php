@@ -31,7 +31,10 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Exceptions;
 
 
-class NotIndexableDocumentException extends \Exception {
+use Exception;
+
+
+class NotIndexableDocumentException extends Exception {
 
 }
 

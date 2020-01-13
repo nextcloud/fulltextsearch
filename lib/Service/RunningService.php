@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 
+use Exception;
 use OCA\FullTextSearch\Db\TickRequest;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
@@ -77,7 +78,7 @@ class RunningService {
 	 *
 	 * @return int
 	 * @throws RunnerAlreadyUpException
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function start(string $source): int {
 
@@ -113,25 +114,6 @@ class RunningService {
 		}
 
 		$this->tickRequest->update($tick);
-	}
-
-
-	/**
-	 * @deprecated - verifier l'interet !
-	 *
-	 * @param int $runId
-	 * @param string $reason
-	 * @param bool $stop
-	 */
-	public function exception(int $runId, string $reason, bool $stop = false) {
-		if ($stop) {
-			try {
-				$this->stop($runId, $reason);
-			} catch (TickDoesNotExistException $e) {
-				/** exception will be managed somewhere else */
-				// TODO: Check if above statement is correct.
-			}
-		}
 	}
 
 

@@ -32,6 +32,7 @@ namespace OCA\FullTextSearch\Service;
 
 
 use Exception;
+use OC;
 use OC\App\AppManager;
 use OCA\FullTextSearch\Exceptions\PlatformDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\PlatformIsNotCompatibleException;
@@ -116,7 +117,7 @@ class PlatformService {
 		foreach ($this->platforms as $wrapper) {
 			$class = $wrapper->getClass();
 			try {
-				$platform = \OC::$server->query((string)$class);
+				$platform = OC::$server->query((string)$class);
 				if ($platform instanceof IFullTextSearchPlatform) {
 					$wrapper->setPlatform($platform);
 					$platforms[] = $wrapper;
@@ -169,7 +170,7 @@ class PlatformService {
 		$this->loadPlatforms();
 
 		$selected = $this->getSelectedPlatform();
-		$platform = \OC::$server->query((string)$selected->getClass());
+		$platform = OC::$server->query((string)$selected->getClass());
 		if (!($platform instanceof IFullTextSearchPlatform)) {
 			throw new PlatformIsNotCompatibleException(
 				$selected->getClass() . ' is not a compatible FullTextSearchPlatform'

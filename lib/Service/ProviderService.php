@@ -32,6 +32,7 @@ namespace OCA\FullTextSearch\Service;
 
 
 use Exception;
+use OC;
 use OC\App\AppManager;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
@@ -118,7 +119,7 @@ class ProviderService implements IProviderService {
 	 */
 	public function loadProvider(string $appId, string $providerId) {
 
-		$provider = \OC::$server->query((string)$providerId);
+		$provider = OC::$server->query((string)$providerId);
 		if (!($provider instanceof IFullTextSearchProvider)) {
 			throw new ProviderIsNotCompatibleException(
 				$providerId . ' is not a compatible IFullTextSearchProvider'
@@ -258,10 +259,6 @@ class ProviderService implements IProviderService {
 
 	/**
 	 * @param string $appId
-	 *
-	 * @throws ProviderIsNotCompatibleException
-	 * @throws ProviderIsNotUniqueException
-	 * @throws QueryException
 	 */
 	private function loadProvidersFromApp(string $appId) {
 		$appInfo = $this->appManager->getAppInfo($appId);

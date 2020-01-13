@@ -44,6 +44,7 @@ use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\AppFramework\QueryException;
 use OCP\IUserManager;
+use Throwable;
 
 
 class Index extends TimedJob {
@@ -131,8 +132,8 @@ class Index extends TimedJob {
 				}
 
 				$this->indexService->updateDocument($platform, $provider, $index);
-			} catch (Exception $e) {
-				$this->runner->exception($e->getMessage(), false);
+			} catch (Throwable | Exception $e) {
+				$this->runner->exception(get_class($e) . ' - ' . $e->getMessage(), false);
 				// TODO - upgrade error number - after too many errors, delete index
 				// TODO - do not count error if elasticsearch is down.
 			}
@@ -166,6 +167,6 @@ class Index extends TimedJob {
 	 *
 	 */
 	private function setLastErrReset() {
-		$this->configService->setAppValue(ConfigService::CRON_LAST_ERR_RESET, (string) time());
+		$this->configService->setAppValue(ConfigService::CRON_LAST_ERR_RESET, (string)time());
 	}
 }

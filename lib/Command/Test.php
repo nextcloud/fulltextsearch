@@ -649,12 +649,12 @@ class Test extends ACommandBase {
 	private function compareSearchResult(SearchResult $searchResult, array $entries) {
 		$documents = $searchResult->getDocuments();
 		if (sizeof($documents) !== sizeof($entries)) {
-			throw new \Exception('Unexpected SearchResult: ' . json_encode($searchResult));
+			throw new Exception('Unexpected SearchResult: ' . json_encode($searchResult));
 		}
 
 		foreach ($documents as $document) {
 			if (!in_array($document->getId(), $entries)) {
-				throw new \Exception('Unexpected Document: ' . json_encode($document));
+				throw new Exception('Unexpected Document: ' . json_encode($document));
 			}
 		}
 	}

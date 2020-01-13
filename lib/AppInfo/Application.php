@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\AppInfo;
 
 
+use OC;
 use OCA\FullTextSearch\Capabilities;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
@@ -105,8 +106,8 @@ class Application extends App {
 	 * @return array
 	 */
 	private function fullTextSearchNavigation(): array {
-		$urlGen = \OC::$server->getURLGenerator();
-		$navName = \OC::$server->getL10N(self::APP_NAME)
+		$urlGen = OC::$server->getURLGenerator();
+		$navName = OC::$server->getL10N(self::APP_NAME)
 							   ->t('Search');
 
 		return [

@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Db;
 
 
+use Exception;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\Tick;
 
@@ -47,7 +48,7 @@ class TickRequest extends TickRequestBuilder {
 	 * @param Tick $tick
 	 *
 	 * @return int
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function create(Tick $tick): int {
 
@@ -63,7 +64,7 @@ class TickRequest extends TickRequestBuilder {
 			$qb->execute();
 
 			return $qb->getLastInsertId();
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			throw $e;
 		}
 	}

@@ -31,7 +31,10 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Exceptions;
 
 
-class InterruptException extends \Exception {
+use Exception;
+
+
+class InterruptException extends Exception {
 
 }
 

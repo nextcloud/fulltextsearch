@@ -31,7 +31,10 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Exceptions;
 
 
-class IndexDoesNotExistException extends \Exception {
+use Exception;
+
+
+class IndexDoesNotExistException extends Exception {
 
 }
 

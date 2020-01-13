@@ -31,7 +31,10 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Exceptions;
 
 
-class EmptySearchException extends \Exception {
+use Exception;
+
+
+class EmptySearchException extends Exception {
 
 }
 

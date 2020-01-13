@@ -31,7 +31,10 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Exceptions;
 
 
-class PlatformMustBeSingleException extends \Exception {
+use Exception;
+
+
+class PlatformMustBeSingleException extends Exception {
 
 }
 

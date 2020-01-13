@@ -31,7 +31,10 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Exceptions;
 
 
-class ProviderIsNotCompatibleException extends \Exception {
+use Exception;
+
+
+class ProviderIsNotCompatibleException extends Exception {
 
 }
 

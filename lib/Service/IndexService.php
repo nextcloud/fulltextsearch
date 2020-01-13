@@ -38,7 +38,6 @@ use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\NotIndexableDocumentException;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Model\IndexOptions;
-use OCA\FullTextSearch\Model\ProviderIndexes;
 use OCA\FullTextSearch\Model\Runner;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
@@ -370,9 +369,7 @@ class IndexService implements IIndexService {
 		);
 
 		try {
-			$index = $platform->indexDocument($document);
-
-			return $index;
+			return $platform->indexDocument($document);
 		} catch (Exception $e) {
 			throw new IndexDoesNotExistException();
 		}

@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 
+use Exception;
 use OC\FullTextSearch\Model\DocumentAccess;
 use OC\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Provider\TestProvider;
@@ -121,13 +122,13 @@ class TestService {
 	 * @param IIndexDocument $origIndex
 	 * @param IIndexDocument $compareIndex
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function compareIndexDocument(IIndexDocument $origIndex, IIndexDocument $compareIndex) {
 		if ($origIndex->getAccess()
 					  ->getOwnerId() !== $compareIndex->getAccess()
 													  ->getOwnerId()) {
-			throw new \Exception('issue with AccessDocument');
+			throw new Exception('issue with AccessDocument');
 		}
 
 		$methods = [
@@ -141,9 +142,8 @@ class TestService {
 			$orig = call_user_func([$origIndex, $method]);
 			$compare = call_user_func([$compareIndex, $method]);
 			if ($orig !== $compare) {
-				throw new \Exception($method . '() orig:' . $orig . ' compare:' . $compare);
-
-			};
+				throw new Exception($method . '() orig:' . $orig . ' compare:' . $compare);
+			}
 		}
 	}
 

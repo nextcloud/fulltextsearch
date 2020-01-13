@@ -5,6 +5,11 @@
 - some compat nc17
 
 
+### 1.4.0 (nc18)
+
+- compat nc18
+
+
 ### 1.3.5
 
 - ignore live index on cron

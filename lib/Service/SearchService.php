@@ -157,14 +157,7 @@ class SearchService implements ISearchService {
 		$platform = $wrapper->getPlatform();
 
 		$access = $this->getDocumentAccessFromUser($user);
-		$result = $this->searchFromProviders($platform, $providers, $access, $request);
-
-//		foreach ($result as $searchResult) {
-//			$searchResult->setPlatform($platform);
-//			$searchResult->setRequest($request);
-//		}
-//
-		return $result;
+		return $this->searchFromProviders($platform, $providers, $access, $request);
 	}
 
 
