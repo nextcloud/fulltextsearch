@@ -122,7 +122,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 			  ->setLastIndex($this->getInt('indexed', $data, 0));
 		$index->setOptions($this->getArray('options', $data, []));
 		$index->setErrorCount($this->getInt('err', $data, 0));
-		$index->setErrors(json_decode($data['message'], true));
+		$index->setErrors($this->getArray('message', $data, []));
 
 		return $index;
 	}
