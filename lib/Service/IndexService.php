@@ -237,6 +237,10 @@ class IndexService implements IIndexService {
 				$index->setLastIndex();
 			}
 
+			if ($index->isStatus(IIndex::INDEX_IGNORE)) {
+				continue;
+			}
+
 			if ($options->getOption('errors', '') !== 'ignore' && $index->getErrorCount() > 0) {
 				continue;
 			}
@@ -341,7 +345,6 @@ class IndexService implements IIndexService {
 		$index = $document->getIndex();
 		$access = $document->getAccess();
 
-// INDEX_IGNORE is not used anymore, as we use addError()
 		if ($access === null || $index->isStatus(Index::INDEX_IGNORE)) {
 			throw new NotIndexableDocumentException();
 		}
