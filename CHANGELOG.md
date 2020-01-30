@@ -1,6 +1,12 @@
 # Changelog
 
 
+### 1.4.1
+
+- adding ./occ fulltextsearch:document:status
+- ability to set the index status to IGNORE
+
+
 ### 1.4.0 (nc18)
 
 - compat nc18
