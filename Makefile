@@ -8,9 +8,9 @@ sign_dir=$(build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
-branch=master
+branch=stable16
 codecov_token_dir=$(HOME)/.nextcloud/codecov_token
-version+=1.3.6
+version+=1.3.7
 
 all: appstore
 

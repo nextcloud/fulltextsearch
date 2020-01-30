@@ -10,7 +10,7 @@ Core App of the full-text search framework for your Nextcloud.
 
 ]]>
 	</description>
-	<version>1.3.6</version>
+	<version>1.3.7</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullTextSearch</namespace>
@@ -33,9 +33,10 @@ Core App of the full-text search framework for your Nextcloud.
 	<commands>
 		<command>OCA\FullTextSearch\Command\Check</command>
 		<command>OCA\FullTextSearch\Command\Configure</command>
-		<command>OCA\FullTextSearch\Command\DocumentPlatform</command>
 		<command>OCA\FullTextSearch\Command\DocumentIndex</command>
+		<command>OCA\FullTextSearch\Command\DocumentPlatform</command>
 		<command>OCA\FullTextSearch\Command\DocumentProvider</command>
+		<command>OCA\FullTextSearch\Command\DocumentStatus</command>
 		<command>OCA\FullTextSearch\Command\Index</command>
 		<command>OCA\FullTextSearch\Command\Live</command>
 		<command>OCA\FullTextSearch\Command\Reset</command>

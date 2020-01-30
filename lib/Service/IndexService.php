@@ -238,6 +238,10 @@ class IndexService implements IIndexService {
 				$index->setLastIndex();
 			}
 
+			if ($index->isStatus(Index::INDEX_IGNORE)) {
+				continue;
+			}
+
 			if ($options->getOption('errors', '') !== 'ignore' && $index->getErrorCount() > 0) {
 				continue;
 			}
@@ -398,6 +402,10 @@ class IndexService implements IIndexService {
 			]
 		);
 
+		if ($index->isStatus(IIndex::INDEX_IGNORE)) {
+			return;
+		}
+
 		if (!$index->isStatus(Index::INDEX_REMOVE)) {
 			try {
 				$document = $provider->updateDocument($index);
@@ -454,7 +462,7 @@ class IndexService implements IIndexService {
 	 *
 	 * @throws Exception
 	 */
-	private function updateIndex(IIndex $index) {
+	public function updateIndex(IIndex $index) {
 
 		/** @var Index $index */
 		$this->updateIndexError($index);
