@@ -68,7 +68,7 @@ class Live extends ACommandBase {
 
 	const INDEX_OPTION_NO_READLINE = '_no-readline';
 
-	const CYCLE_DELAY = 300000;
+	const CYCLE_DELAY = 3000000;
 
 	const PANEL_RUN = 'run';
 	const PANEL_RUN_LINE_MEMORY = 'Memory: %_memory%';
