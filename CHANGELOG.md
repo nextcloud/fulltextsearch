@@ -19,6 +19,11 @@
 - simple queries
 
 
+### 1.3.8
+
+- allow empty search
+
+
 ### 1.3.4
 
 - some improvement in the index comparison
