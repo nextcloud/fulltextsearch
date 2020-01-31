@@ -167,7 +167,7 @@ class SearchService implements ISearchService {
 	 * @throws EmptySearchException
 	 */
 	private function searchRequestCannotBeEmpty(ISearchRequest $request) {
-		if ($request === null || strlen($request->getSearch()) < 1) {
+		if ($request === null || (strlen($request->getSearch()) < 1 && !$request->isEmptySearch())) {
 			throw new EmptySearchException('search cannot be empty');
 		}
 	}
