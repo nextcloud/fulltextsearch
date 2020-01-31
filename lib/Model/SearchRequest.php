@@ -54,6 +54,9 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	/** @var string */
 	private $search;
 
+	/** @var bool */
+	private $emptySearch = false;
+
 	/** @var int */
 	private $page = 1;
 
@@ -170,6 +173,25 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	 */
 	public function addSearch(string $search): ISearchRequest {
 		$this->search .= ' ' . $search;
+
+		return $this;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isEmptySearch(): bool {
+		return $this->emptySearch;
+	}
+
+	/**
+	 * @param bool $emptySearch
+	 *
+	 * @return ISearchRequest
+	 */
+	public function setEmptySearch(bool $emptySearch): ISearchRequest {
+		$this->emptySearch = $emptySearch;
 
 		return $this;
 	}
@@ -698,16 +720,17 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	public function jsonSerialize(): array {
 		return [
 			'providers' => $this->getProviders(),
-			'author'    => $this->getAuthor(),
-			'search'    => $this->getSearch(),
-			'page'      => $this->getPage(),
-			'size'      => $this->getSize(),
-			'parts'     => $this->getParts(),
-			'queries'   => $this->getSimpleQueries(),
-			'options'   => $this->getOptions(),
-			'metatags'  => $this->getMetaTags(),
-			'subtags'   => $this->getSubTags(),
-			'tags'      => $this->getTags()
+			'author' => $this->getAuthor(),
+			'search' => $this->getSearch(),
+			'empty_search' => $this->isEmptySearch(),
+			'page' => $this->getPage(),
+			'size' => $this->getSize(),
+			'parts' => $this->getParts(),
+			'queries' => $this->getSimpleQueries(),
+			'options' => $this->getOptions(),
+			'metatags' => $this->getMetaTags(),
+			'subtags' => $this->getSubTags(),
+			'tags' => $this->getTags()
 		];
 	}
 
@@ -726,6 +749,16 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 		$this->setProviders($providers);
 		$this->setAuthor($this->get('author', $arr, ''));
 		$this->setSearch($this->get('search', $arr, ''));
+
+		// TODO: remove this in nc19:
+		if ($this->get('empty_search', $arr, '') === 'true') {
+			$this->setEmptySearch(true);
+		} else {
+			$this->setEmptySearch($this->getBool('empty_search', $arr, false));
+		}
+		// END TODO
+
+//		$this->setEmptySearch($this->getBool('empty_search', $arr, false));
 		$this->setPage($this->getInt('page', $arr, 0));
 		$this->setParts($this->getArray('parts', $arr, []));
 		$this->setSize($this->getInt('size', $arr, 10));

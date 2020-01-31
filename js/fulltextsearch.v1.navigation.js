@@ -63,6 +63,7 @@ var nav = {
 			divProviderNavigation.attr('data-page', request.page);
 			divProviderNavigation.attr('data-options', JSON.stringify(request.options));
 			divProviderNavigation.attr('data-search', request.search);
+			divProviderNavigation.attr('data-empty-search', request.empty_search);
 			divProviderNavigation.attr('data-max-page', maxPage);
 			divProviderNavigation.attr('data-size', request.size);
 			divProviderNavigation.attr('data-total', meta.total);
@@ -392,6 +393,7 @@ var nav = {
 					providers: providerId,
 					options: JSON.parse(divProviderNavigation.attr('data-options')),
 					search: divProviderNavigation.attr('data-search'),
+					empty_search: divProviderNavigation.attr('data-empty-search'),
 					page: prevPage,
 					size: divProviderNavigation.attr('data-size')
 				});
@@ -414,6 +416,7 @@ var nav = {
 					providers: providerId,
 					options: JSON.parse(divProviderNavigation.attr('data-options')),
 					search: divProviderNavigation.attr('data-search'),
+					empty_search: divProviderNavigation.attr('data-empty-search'),
 					page: nextPage,
 					size: divProviderNavigation.attr('data-size')
 				});
