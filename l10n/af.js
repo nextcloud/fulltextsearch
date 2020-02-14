@@ -4,6 +4,7 @@ OC.L10N.register(
     "Search" : "Soek",
     "Index not found" : "Indeks nie gevind nie",
     "Search on %s" : "Soek op %s",
-    "General" : "Algemeen"
+    "General" : "Algemeen",
+    "Navigation Icon" : "Navigasie-ikoon"
 },
 "nplurals=2; plural=(n != 1);");
