@@ -1,6 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "the search returned {total} results in {time} ms" : "haku palautti {total} tulosta ajassa {time} ms",
     "Search" : "Haku",
     "Index not found" : "Indeksiä ei löydy",
     "Process timed out" : "Toiminto aikakatkaistiin",
