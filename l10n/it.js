@@ -13,7 +13,7 @@ OC.L10N.register(
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Verifica la presenza nel wiki di documentazione relativa all'installazione e alla configurazione della ricerca di testo integrale nel tuo Nextcloud",
     "General" : "Generale",
     "Search Platform" : "Piattaforma di ricerca",
-    "Select the app to index content and answer search queries." : "Seleziona l'applicazione per indicizzare i contenuti e rispondere alle ricecrche.",
+    "Select the app to index content and answer search queries." : "Seleziona l'applicazione per indicizzare i contenuti e rispondere alle ricerche.",
     "Navigation Icon" : "Icona di navigazione",
     "Enable global search within all your content." : "Abilita la ricerca globale in tutti i tuoi contenuti."
 },
