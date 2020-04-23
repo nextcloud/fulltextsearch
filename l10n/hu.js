@@ -1,6 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "the search returned {total} results in {time} ms" : "a keresés {total} eredményt talált {time} ms alatt",
     "Search" : "Keresés",
     "Index not found" : "INdex nem található",
     "Full text search" : "Teljes szöveges keresés",
