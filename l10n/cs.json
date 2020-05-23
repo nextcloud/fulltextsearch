@@ -1,8 +1,8 @@
 { "translations": {
-    "the search returned {total} results in {time} ms" : "Vyhledávání nalezlo {total} výsledků v čase {time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "Vyhledávání v {title} pro výraz '{search}' nalezlo {total} výsledků v čase {time} ms",
+    "the search returned {total} results in {time} ms" : "vyhledávání nalezlo {total} výsledků v čase {time} ms",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "vyhledávání v {title} pro výraz „{search}“ nalezlo {total} výsledků v čase {time} ms",
     "Search" : "Hledat",
-    "Index not found" : "Index nebyl nalezen",
+    "Index not found" : "Nenalezen rejstřík",
     "Process timed out" : "Překročen časový limit zpracování",
     "Full text search" : "Plnotextové vyhledávání",
     "Core of the full-text search framework for Nextcloud" : "Jádro aplikačního rámce pro plnotextové vyhledávání v Nextcloud",
