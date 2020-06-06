@@ -1,5 +1,5 @@
 { "translations": {
     "Search" : "Search",
     "General" : "ئادەتتىكى"
-},"pluralForm" :"nplurals=1; plural=0;"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
