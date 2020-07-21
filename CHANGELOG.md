@@ -1,6 +1,12 @@
 # Changelog
 
 
+### 1.4.2
+
+- compat nc19
+- error logs on missing Provider Options
+
+
 ### 1.4.1
 
 - adding ./occ fulltextsearch:document:status
