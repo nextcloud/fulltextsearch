@@ -460,6 +460,26 @@ class Test extends ACommandBase {
 			$output, $testPlatform, $testProvider, $access, '-document is a simple test',
 			[]
 		);
+		$this->search(
+			$output, $testPlatform, $testProvider, $access, 'document is a simple +test +testing',
+			[TestService::DOCUMENT_TYPE_SIMPLE]
+		);
+		$this->search(
+			$output, $testPlatform, $testProvider, $access, 'document is a simple +test -testing',
+			[]
+		);
+		$this->search(
+			$output, $testPlatform, $testProvider, $access, 'document is a +simple -test -testing',
+			[]
+		);
+		$this->search(
+			$output, $testPlatform, $testProvider, $access, '+document is a simple -test -testing',
+			[TestService::DOCUMENT_TYPE_LICENSE]
+		);
+		$this->search(
+			$output, $testPlatform, $testProvider, $access, 'document is a +simple -license +testing',
+			[TestService::DOCUMENT_TYPE_SIMPLE]
+		);
 	}
 
 

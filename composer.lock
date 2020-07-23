@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "30bac8230c691b2aa3c666987235b4c9",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/daita/my-small-php-tools.git",
-                "reference": "688a627c2eed08042a09b50cab7171edde91de27"
+                "reference": "a253279a181ae6c09be80d786377fdb7afd37741"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/daita/my-small-php-tools/zipball/688a627c2eed08042a09b50cab7171edde91de27",
-                "reference": "688a627c2eed08042a09b50cab7171edde91de27",
+                "url": "https://api.github.com/repos/daita/my-small-php-tools/zipball/a253279a181ae6c09be80d786377fdb7afd37741",
+                "reference": "a253279a181ae6c09be80d786377fdb7afd37741",
                 "shasum": ""
             },
             "require": {
@@ -40,7 +40,7 @@
                 }
             ],
             "description": "My small PHP Tools",
-            "time": "2020-01-29T12:34:08+00:00"
+            "time": "2020-07-07T11:06:29+00:00"
         }
     ],
     "packages-dev": [],
@@ -52,5 +52,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

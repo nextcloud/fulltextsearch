@@ -49,10 +49,10 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 
 
 	/** @var array */
-	private $providers;
+	private $providers = [];
 
 	/** @var string */
-	private $search;
+	private $search = '';
 
 	/** @var bool */
 	private $emptySearch = false;
@@ -64,7 +64,7 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	private $size = 10;
 
 	/** @var string */
-	private $author;
+	private $author = '';
 
 	/** @var array */
 	private $tags = [];
@@ -76,7 +76,7 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	public $subTags = [];
 
 	/** @var array */
-	private $options;
+	private $options = [];
 
 	/** @var array */
 	private $parts = [];

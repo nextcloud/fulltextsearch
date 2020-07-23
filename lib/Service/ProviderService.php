@@ -226,11 +226,11 @@ class ProviderService implements IProviderService {
 				$providerId, ConfigService::PROVIDER_INDEXED
 			);
 		} catch (ProviderOptionsDoesNotExistException $e) {
-			$this->miscService->log('Could not determine if provider with id ' 
-			. $providerId 
-			. ' was properly indexed because the corresponding provider-option could not be found.'
+			$this->miscService->log('Could not determine if provider with id \''
+			. $providerId
+			. '\' was properly indexed because the corresponding provider-option could not be found.'
 			. ' Make sure the initial indexing process has been completed successfully.'
-			);
+			, 0);
 			return false;
 		}
 

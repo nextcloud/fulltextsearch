@@ -112,7 +112,7 @@ class TestService {
 	public function generateIndexDocumentSimple(IIndexOptions $options): IIndexDocument {
 
 		$indexDocument = $this->generateIndexDocument(self::DOCUMENT_TYPE_SIMPLE);
-		$indexDocument->setContent('document is a simple test');
+		$indexDocument->setContent('testing document is a simple test');
 
 		return $indexDocument;
 	}
