@@ -91,17 +91,13 @@ class NavigationController extends Controller {
 	 * @return TemplateResponse
 	 */
 	public function navigate(): TemplateResponse {
-
 		$themingName = $this->config->getAppValue('theming', 'name', 'Nextcloud');
-
-		$data = [
-			'themingName' => $themingName
-		];
+		$data = ['themingName' => $themingName];
 
 		$this->fullTextSearchManager->addJavascriptAPI();
 
 		return new TemplateResponse(Application::APP_NAME, 'navigate', $data);
 	}
 
-
 }
+
