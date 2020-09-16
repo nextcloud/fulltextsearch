@@ -39,6 +39,7 @@ use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
+use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\Search\IProvider;
@@ -60,6 +61,9 @@ class UnifiedSearchProvider implements IProvider {
 	use TArrayTools;
 
 
+	/** @var IL10N */
+	private $l10n;
+
 	/** @var IURLGenerator */
 	private $urlGenerator;
 
@@ -76,15 +80,17 @@ class UnifiedSearchProvider implements IProvider {
 	/**
 	 * UnifiedSearchProvider constructor.
 	 *
+	 * @param IL10N $l10n
 	 * @param IURLGenerator $urlGenerator
 	 * @param SearchService $searchService
 	 * @param ConfigService $configService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IURLGenerator $urlGenerator, SearchService $searchService, ConfigService $configService,
+		IL10N $l10n, IURLGenerator $urlGenerator, SearchService $searchService, ConfigService $configService,
 		MiscService $miscService
 	) {
+		$this->l10n = $l10n;
 		$this->urlGenerator = $urlGenerator;
 		$this->searchService = $searchService;
 		$this->configService = $configService;
@@ -104,7 +110,7 @@ class UnifiedSearchProvider implements IProvider {
 	 * @return string
 	 */
 	public function getName(): string {
-		return 'Full Text Search';
+		return $this->l10n->t('Full Text Search');
 	}
 
 
@@ -136,7 +142,7 @@ class UnifiedSearchProvider implements IProvider {
 		}
 
 		return SearchResult::paginated(
-			'Full Text Search', $result, ($query->getCursor() ?? 0) + $query->getLimit()
+			$this->l10n->t('Full Text Search'), $result, ($query->getCursor() ?? 0) + $query->getLimit()
 		);
 	}
 
