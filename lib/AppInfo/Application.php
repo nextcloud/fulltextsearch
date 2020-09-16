@@ -31,25 +31,28 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\AppInfo;
 
 
+use Closure;
 use OC;
 use OCA\FullTextSearch\Capabilities;
+use OCA\FullTextSearch\Search\UnifiedSearchProvider;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCP\AppFramework\App;
-use OCP\AppFramework\IAppContainer;
-use OCP\AppFramework\QueryException;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\FullTextSearch\IFullTextSearchManager;
+use OCP\INavigationManager;
+use OCP\IServerContainer;
+use Throwable;
 
 
-class Application extends App {
+class Application extends App implements IBootstrap {
 
 
 	const APP_NAME = 'fulltextsearch';
-
-	/** @var IAppContainer */
-	private $container;
 
 
 	/**
@@ -59,24 +62,40 @@ class Application extends App {
 	 */
 	public function __construct(array $params = []) {
 		parent::__construct(self::APP_NAME, $params);
+	}
 
-		$this->container = $this->getContainer();
-		$this->container->registerCapability(Capabilities::class);
+
+	/**
+	 * @param IRegistrationContext $context
+	 */
+	public function register(IRegistrationContext $context): void {
+		$context->registerCapability(Capabilities::class);
+		$context->registerSearchProvider(UnifiedSearchProvider::class);
+	}
+
+	/**
+	 * @param IBootContext $context
+	 *
+	 * @throws Throwable
+	 */
+	public function boot(IBootContext $context): void {
+		$context->injectFn(Closure::fromCallable([$this, 'registerServices']));
+		$context->injectFn(Closure::fromCallable([$this, 'registerNavigation']));
 	}
 
 
 	/**
 	 * Register Navigation Tab
 	 *
-	 * @throws QueryException
+	 * @param IServerContainer $container
 	 */
-	public function registerServices() {
+	protected function registerServices(IServerContainer $container) {
 		/** @var IFullTextSearchManager $fullTextSearchManager */
-		$fullTextSearchManager = $this->container->query(IFullTextSearchManager::class);
+		$fullTextSearchManager = $container->get(IFullTextSearchManager::class);
 
-		$providerService = $this->container->query(ProviderService::class);
-		$indexService = $this->container->query(IndexService::class);
-		$searchService = $this->container->query(SearchService::class);
+		$providerService = $container->get(ProviderService::class);
+		$indexService = $container->get(IndexService::class);
+		$searchService = $container->get(SearchService::class);
 
 		$fullTextSearchManager->registerProviderService($providerService);
 		$fullTextSearchManager->registerIndexService($indexService);
@@ -87,18 +106,17 @@ class Application extends App {
 	/**
 	 * Register Navigation Tab
 	 *
-	 * @throws QueryException
+	 * @param IServerContainer $container
 	 */
-	public function registerNavigation() {
+	protected function registerNavigation(IServerContainer $container) {
 		/** @var ConfigService $configService */
-		$configService = $this->container->query(ConfigService::class);
+		$configService = $container->get(ConfigService::class);
 		if ($configService->getAppValue(ConfigService::APP_NAVIGATION) !== '1') {
 			return;
 		}
 
-		$this->container->getServer()
-						->getNavigationManager()
-						->add($this->fullTextSearchNavigation());
+		$container->get(INavigationManager::class)
+				  ->add($this->fullTextSearchNavigation());
 	}
 
 
@@ -108,7 +126,7 @@ class Application extends App {
 	private function fullTextSearchNavigation(): array {
 		$urlGen = OC::$server->getURLGenerator();
 		$navName = OC::$server->getL10N(self::APP_NAME)
-							   ->t('Search');
+							  ->t('Search');
 
 		return [
 			'id'    => self::APP_NAME,
@@ -118,7 +136,6 @@ class Application extends App {
 			'name'  => $navName
 		];
 	}
-
 
 }
 

@@ -36,9 +36,9 @@ clean:
 	rm -rf $(build_dir)
 	rm -rf node_modules
 
-composer:
-	composer install --prefer-dist
-	composer update --prefer-dist
+composer-update:
+	composer install --prefer-dist --working-dir composer
+	composer update --prefer-dist --working-dir composer
 
 test: SHELL:=/bin/bash
 test:
@@ -47,7 +47,7 @@ test:
 		bash <(curl -s https://codecov.io/bash) -t @$(codecov_token_dir)/$(app_name) ; \
 	fi
 
-appstore: composer clean
+appstore: composer-update clean
 	mkdir -p $(sign_dir)
 	rsync -a \
 	--exclude=/build \
@@ -57,8 +57,8 @@ appstore: composer clean
 	--exclude=/tests \
 	--exclude=.git \
 	--exclude=/.github \
-	--exclude=/composer.json \
-	--exclude=/composer.lock \
+	--exclude=/composer/composer.json \
+	--exclude=/composer/composer.lock \
 	--exclude=/l10n/l10n.pl \
 	--exclude=/CONTRIBUTING.md \
 	--exclude=/issue_template.md \

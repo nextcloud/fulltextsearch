@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Provider;
 
 
+use OC\FullTextSearch\Model\IndexDocument;
 use OC\FullTextSearch\Model\SearchTemplate;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
@@ -57,6 +58,7 @@ class TestProvider implements IFullTextSearchProvider {
 
 
 	const TEST_PROVIDER_ID = 'test_provider';
+
 
 	/** @var ConfigService */
 	private $configService;
@@ -195,7 +197,7 @@ class TestProvider implements IFullTextSearchProvider {
 	 * @return IIndexDocument
 	 */
 	public function updateDocument(IIndex $index): IIndexDocument {
-		return null;
+		return new IndexDocument($index->getProviderId(), $index->getDocumentId());
 	}
 
 

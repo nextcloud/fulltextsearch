@@ -3,12 +3,23 @@
   "description": "Full text search framework for Nextcloud",
   "minimum-stability": "stable",
   "license": "agpl",
+  "config": {
+    "vendor-dir": ".",
+    "optimize-autoloader": true,
+    "classmap-authoritative": true,
+    "autoloader-suffix": "FullTextSearch"
+  },
   "authors": [
     {
       "name": "Maxence Lange",
       "email": "maxence@artificial-owl.com"
     }
   ],
+  "autoload": {
+    "psr-4": {
+      "OCA\\FullTextSearch\\": "../lib/"
+    }
+  },
   "require": {
     "daita/my-small-php-tools": "dev-master"
   }
