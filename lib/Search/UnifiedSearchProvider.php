@@ -175,12 +175,18 @@ class UnifiedSearchProvider implements IProvider {
 		foreach ($searchResult as $ftsSearch) {
 			foreach ($ftsSearch->getDocuments() as $document) {
 				$excerpts = $document->getExcerpts();
-				$subline = (sizeof($excerpts) > 0) ? $excerpts[0]['excerpt'] : '';
+				if (empty($excerpts)) {
+					$title = $document->getTitle();
+					$subline = '';
+				} else {
+					$title = (sizeof($excerpts) > 0) ? $excerpts[0]['excerpt'] : '';
+					$subline = $document->getTitle();
+				}
 
 				$unified = $document->getInfoArray('unified');
 				$result[] = new UnifiedSearchResult(
 					$this->get('thumbUrl', $unified, ''),
-					$this->get('title', $unified, $document->getTitle()),
+					$this->get('title', $unified, $title),
 					$this->get('subline', $unified, $subline),
 					$this->get('link', $unified, $document->getLink()),
 					$this->get('icon', $unified, '')

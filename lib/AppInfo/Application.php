@@ -43,7 +43,6 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\AppFramework\QueryException;
 use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\INavigationManager;
 use OCP\IServerContainer;
@@ -108,8 +107,6 @@ class Application extends App implements IBootstrap {
 	 * Register Navigation Tab
 	 *
 	 * @param IServerContainer $container
-	 *
-	 * @throws QueryException
 	 */
 	protected function registerNavigation(IServerContainer $container) {
 		/** @var ConfigService $configService */
