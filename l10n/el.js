@@ -6,6 +6,7 @@ OC.L10N.register(
     "Search" : "Αναζήτηση",
     "Index not found" : "Δεν βρέθηκε ευρετήριο",
     "Process timed out" : "Η επεξεργασία έληξε",
+    "Full Text Search" : "Αναζήτηση πλήρους κειμένου",
     "Full text search" : "Πλήρης αναζήτηση κειμένου",
     "Core of the full-text search framework for Nextcloud" : "Ο βάση του πλαισίου αναζήτησης πλήρους κειμένου για το Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Βασική Εφαρμογή του πλαισίου αναζήτησης πλήρους κειμένου για το Nextcloud σας.",
