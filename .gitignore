@@ -1,6 +1,5 @@
 
 \.idea/
 composer/*
-!composer/autoload.php
 !composer/composer.json
 !composer/composer.lock
