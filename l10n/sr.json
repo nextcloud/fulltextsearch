@@ -4,6 +4,7 @@
     "Search" : "Претрага",
     "Index not found" : "Индекс није нађен",
     "Process timed out" : "Истекло време извршавања процеса",
+    "Full Text Search" : "Претрага свих текстова",
     "Full text search" : "Претраге свих текстова",
     "Core of the full-text search framework for Nextcloud" : "Језгро радног оквира претраге свих текстова за Некстклауд",
     "Core App of the full-text search framework for your Nextcloud." : "Основна апликација радног оквира претраге свих текстова за Некстклауд.",
