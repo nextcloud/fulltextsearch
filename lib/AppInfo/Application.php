@@ -48,6 +48,8 @@ use OCP\INavigationManager;
 use OCP\IServerContainer;
 use Throwable;
 
+require_once __DIR__ . '/../../vendor/autoload.php';
+
 
 class Application extends App implements IBootstrap {
 

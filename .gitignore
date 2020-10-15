@@ -1,5 +1,4 @@
 
 \.idea/
-composer/*
-!composer/composer.json
-!composer/composer.lock
+build/
+vendor/

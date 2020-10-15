@@ -4,7 +4,6 @@
   "minimum-stability": "stable",
   "license": "agpl",
   "config": {
-    "vendor-dir": ".",
     "optimize-autoloader": true,
     "classmap-authoritative": true,
     "autoloader-suffix": "FullTextSearch"

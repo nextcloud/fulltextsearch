@@ -10,11 +10,13 @@ cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
 branch=master
 codecov_token_dir=$(HOME)/.nextcloud/codecov_token
-version+=1.4.2
+version+=2.0.0
 
 all: appstore
 
 release: appstore github-release github-upload
+
+dev-setup: clean composer
 
 github-release:
 	github-release release \
@@ -35,10 +37,11 @@ github-upload:
 clean:
 	rm -rf $(build_dir)
 	rm -rf node_modules
+	rm -rf vendor
 
-composer-update:
-	composer install --prefer-dist --working-dir composer
-	composer update --prefer-dist --working-dir composer
+composer:
+	composer install --prefer-dist
+	composer update --prefer-dist
 
 test: SHELL:=/bin/bash
 test:
@@ -47,7 +50,7 @@ test:
 		bash <(curl -s https://codecov.io/bash) -t @$(codecov_token_dir)/$(app_name) ; \
 	fi
 
-appstore: composer-update clean
+appstore: dev-setup
 	mkdir -p $(sign_dir)
 	rsync -a \
 	--exclude=/build \
@@ -57,8 +60,8 @@ appstore: composer-update clean
 	--exclude=/tests \
 	--exclude=.git \
 	--exclude=/.github \
-	--exclude=/composer/composer.json \
-	--exclude=/composer/composer.lock \
+	--exclude=/composer.json \
+	--exclude=/composer.lock \
 	--exclude=/l10n/l10n.pl \
 	--exclude=/CONTRIBUTING.md \
 	--exclude=/issue_template.md \
