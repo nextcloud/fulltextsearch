@@ -6,6 +6,7 @@ OC.L10N.register(
     "Search" : "Поиск",
     "Index not found" : "Индекс не найден",
     "Process timed out" : "Превышено время ожидания запроса",
+    "Full Text Search" : "Полнотекстовый поиск",
     "Full text search" : "Полнотекстовый поиск",
     "Core of the full-text search framework for Nextcloud" : "Ядро механизма полнотекстового поиска для Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Основное приложение полнотекстового поиска для Nextcloud.",
