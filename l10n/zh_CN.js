@@ -6,6 +6,7 @@ OC.L10N.register(
     "Search" : "搜索",
     "Index not found" : "未找到索引",
     "Process timed out" : "处理超时",
+    "Full Text Search" : "全文搜索",
     "Full text search" : "全文搜索",
     "Core of the full-text search framework for Nextcloud" : "Nextcloud 全文搜索框架内核",
     "Core App of the full-text search framework for your Nextcloud." : "Nextcloud 全文搜索框架核心应用",
