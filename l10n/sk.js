@@ -6,6 +6,7 @@ OC.L10N.register(
     "Search" : "Hľadať",
     "Index not found" : "Index nenájdený",
     "Process timed out" : "Spracovanie expirovalo",
+    "Full Text Search" : "Fulltextové vyhľadávanie",
     "Full text search" : "Fulltextové vyhľadávanie",
     "Core of the full-text search framework for Nextcloud" : "Základ pre fulltextové vyhľadávanie Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Základná aplikácia pre fulltextové vyhľadávanie Nextcloud",
