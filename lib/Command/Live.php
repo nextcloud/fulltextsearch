@@ -214,12 +214,6 @@ class Live extends ACommandBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-
-		if ($this->configService->getCloudVersion() < 14) {
-			throw new Exception('This feature is only available on Nextcloud 14 or newer');
-		}
-
-
 		if (!$input->getOption('service') && !$input->getOption('no-readline')) {
 			try {
 				/** do not get stuck while waiting interactive input */
@@ -284,6 +278,8 @@ class Live extends ACommandBase {
 		}
 
 		$this->runner->stop();
+
+		return 0;
 	}
 
 

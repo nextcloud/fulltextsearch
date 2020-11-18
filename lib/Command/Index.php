@@ -294,6 +294,7 @@ class Index extends ACommandBase {
 
 //		$output->writeLn('');
 
+		return 0;
 	}
 
 

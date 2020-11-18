@@ -80,11 +80,15 @@ class Stop extends Base {
 	/**
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
+	 *
+	 * @return int
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$output->writeln('stopping all running indexes');
 
 		$this->runningService->forceStop();
+
+		return 0;
 	}
 
 

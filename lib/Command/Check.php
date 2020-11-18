@@ -93,14 +93,15 @@ class Check extends Base {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
+	 * @return int
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 
 		if ($input->getOption('json') === true) {
 			$output->writeln(json_encode($this->displayAsJson(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-			return;
+			return 0;
 		}
 
 		$output->writeln(
@@ -110,6 +111,8 @@ class Check extends Base {
 
 		$this->displayPlatform($output);
 		$this->displayProviders($output);
+
+		return 0;
 	}
 
 
@@ -169,22 +172,30 @@ class Check extends Base {
 	 * @throws Exception
 	 */
 	private function displayPlatform(OutputInterface $output) {
-		try {
-			$wrapper = $this->platformService->getPlatform();
-			$platform = $wrapper->getPlatform();
-		} catch (Exception $e) {
-			$output->writeln('No search platform available');
+		$platforms = $this->platformService->getPlatforms();
+
+		if (empty($platforms)) {
+			$output->writeln('No Search Platform available');
 
 			return;
 		}
 
-		$output->writeln('- Search Platform:');
+		$select = $this->configService->getAppValue(ConfigService::SEARCH_PLATFORM);
+		$output->writeln('- Search Platform:' . (($select === '') ? ' (none selected)' : ''));
 
-		$output->writeln($platform->getName() . ' ' . $wrapper->getVersion());
-		echo json_encode($platform->getConfiguration(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+		foreach ($platforms as $platformWrapper) {
+			$platform = $platformWrapper->getPlatform();
+			$selected = ($platformWrapper->getClass() === $select) ? '(Selected)' : '';
+			$output->writeln($platform->getName() . ' ' . $platformWrapper->getVersion() . ' ' . $selected);
+			try {
+				echo json_encode($platform->getConfiguration(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+			} catch (Exception $e) {
+				echo '(not configured)';
+			}
+			$output->writeln(' ');
+		}
 
-		$output->writeln(' ');
-		$output->writeln(' ');
+		$output->writeln('');
 	}
 
 
@@ -210,10 +221,7 @@ class Check extends Base {
 			echo json_encode($provider->getConfiguration(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 			$output->writeln('');
 		}
-
-
 	}
-
 
 }
 

@@ -118,7 +118,7 @@ class DocumentProvider extends Base {
 		$output->writeln(json_encode($indexDocument, JSON_PRETTY_PRINT));
 
 		if ($input->getOption('content') !== true) {
-			return;
+			return 0;
 		}
 
 		$output->writeln('Content: ');
@@ -139,6 +139,7 @@ class DocumentProvider extends Base {
 			);
 		}
 
+		return 0;
 	}
 
 

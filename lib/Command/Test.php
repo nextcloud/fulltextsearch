@@ -141,6 +141,7 @@ class Test extends ACommandBase {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
+	 * @return int
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
@@ -186,6 +187,8 @@ class Test extends ACommandBase {
 		}
 
 		$this->output($output, '', true);
+
+		return 0;
 	}
 
 

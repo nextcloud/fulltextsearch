@@ -95,9 +95,10 @@ class DocumentIndex extends Base {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
+	 * @return int
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$providerId = $input->getArgument('providerId');
 		$documentId = $input->getArgument('documentId');
 		$userId = $input->getArgument('userId');
@@ -124,6 +125,8 @@ class DocumentIndex extends Base {
 		$indexDocument->getIndex()
 					  ->setStatus(Index::INDEX_FULL);
 		$platform->indexDocument($indexDocument);
+
+		return 0;
 	}
 
 

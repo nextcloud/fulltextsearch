@@ -100,6 +100,8 @@ class DocumentPlatform extends Base {
 		}
 
 		$output->writeln(json_encode($result, JSON_PRETTY_PRINT));
+
+		return 0;
 	}
 
 

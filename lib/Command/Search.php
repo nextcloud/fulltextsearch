@@ -92,6 +92,7 @@ class Search extends Base {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
+	 * @return int
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
@@ -115,6 +116,8 @@ class Search extends Base {
 		} catch (Exception $e) {
 			throw $e;
 		}
+
+		return 0;
 	}
 
 

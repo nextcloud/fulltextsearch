@@ -130,12 +130,14 @@ class DocumentStatus extends Base {
 		if ($json) {
 			echo json_encode($index, JSON_PRETTY_PRINT) . "\n";
 
-			return;
+			return 0;
 		}
 
 		$status = $this->statusConvertToString($index->getStatus());
 		$desc = $this->statusAvailable[$status];
 		$output->writeln('current status: <info>' . $status . '</info> (' . $desc . ')');
+
+		return 0;
 	}
 
 

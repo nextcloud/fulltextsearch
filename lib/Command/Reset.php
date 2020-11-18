@@ -118,6 +118,8 @@ class Reset extends ACommandBase {
 		} finally {
 			$this->runner->stop();
 		}
+
+		return 0;
 	}
 
 
