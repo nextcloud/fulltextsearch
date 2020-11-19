@@ -4,6 +4,7 @@
     "Search" : "Poišči",
     "Index not found" : "Kazala ni mogoče najti",
     "Process timed out" : "Opravilo je časovno poteklo",
+    "Full Text Search" : "Iskanje po polnem besedilu",
     "Full text search" : "Iskanje po polnem besedilu",
     "Core of the full-text search framework for Nextcloud" : "Jedro iskalnika po polnem besedilu za Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Program za iskanje po polnem besedilu za Nextcloud.",
