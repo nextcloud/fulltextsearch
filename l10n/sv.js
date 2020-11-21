@@ -6,6 +6,7 @@ OC.L10N.register(
     "Search" : "Sök",
     "Index not found" : "Index hittades inte",
     "Process timed out" : "Processen tog för lång tid",
+    "Full Text Search" : "Fulltextsökning",
     "Full text search" : "Fulltextsökning",
     "Core of the full-text search framework for Nextcloud" : "Central del i ramverket fulltext-sökning för Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Central app i ramverket fulltext-sökning för Nextcloud",
