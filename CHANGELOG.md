@@ -1,5 +1,12 @@
 # Changelog
 
+
+### 20.0.0
+
+- database migration
+- upgrade deps
+
+
 ### 2.0.0
 
 - compat nc20
