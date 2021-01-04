@@ -4,6 +4,7 @@
     "Search" : "Bilatu",
     "Index not found" : "Indizea ez da aurkitu",
     "Process timed out" : "Prozesua denboraz kanpo",
+    "Full Text Search" : "Testu osoko bilaketa",
     "Full text search" : "Testu osoko bilaketa",
     "Core of the full-text search framework for Nextcloud" : "Nextcloudentzat testu bilaketa ingurunearen bihotza",
     "Core App of the full-text search framework for your Nextcloud." : "Zure Nextcloudentzat testu bilaketa ingurunearen aplikazioa",
