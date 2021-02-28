@@ -5,6 +5,7 @@ OC.L10N.register(
     "Search" : "Haku",
     "Index not found" : "Indeksiä ei löydy",
     "Process timed out" : "Toiminto aikakatkaistiin",
+    "Full Text Search" : "Kokotekstihaku",
     "Full text search" : "Kokotekstihaku",
     "Search on %s" : "Etsi kohteesta %s",
     "General" : "Yleiset",
