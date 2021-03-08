@@ -8,7 +8,7 @@ sign_dir=$(build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
-branch=master
+branch=stable21
 codecov_token_dir=$(HOME)/.nextcloud/codecov_token
 version+=21.0.0
 
