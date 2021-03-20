@@ -14,7 +14,7 @@ OC.L10N.register(
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "請檢視關於在您 Nextcloud 中安裝與設定全文搜尋的 wiki 文件",
     "General" : "一般",
     "Search Platform" : "搜尋平台",
-    "Select the app to index content and answer search queries." : "選取應用以索引內容並回應搜尋查詢。",
+    "Select the app to index content and answer search queries." : "選擇應用以索引內容並回應搜尋查詢。",
     "Navigation Icon" : "導覽圖示",
     "Enable global search within all your content." : "在您所有的內容中啟用全域搜尋。"
 },
