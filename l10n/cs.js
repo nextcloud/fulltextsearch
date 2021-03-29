@@ -5,7 +5,7 @@ OC.L10N.register(
     "the search in {title} for '{search}' returned {total} results in {time} ms" : "vyhledávání v {title} pro výraz „{search}“ nalezlo {total} výsledků v čase {time} ms",
     "Search" : "Hledat",
     "Index not found" : "Nenalezen rejstřík",
-    "Process timed out" : "Překročen časový limit zpracování",
+    "Process timed out" : "Překročen časový limit pro zpracování",
     "Full Text Search" : "Plnotextové vyhledávání",
     "Full text search" : "Plnotextové vyhledávání",
     "Core of the full-text search framework for Nextcloud" : "Jádro aplikačního rámce pro plnotextové vyhledávání v Nextcloud",
