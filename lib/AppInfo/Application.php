@@ -48,6 +48,7 @@ use OCP\INavigationManager;
 use OCP\IServerContainer;
 use OCP\IURLGenerator;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Psr\Container\ContainerInterface;
 use Throwable;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -76,6 +77,7 @@ class Application extends App implements IBootstrap {
 	public function register(IRegistrationContext $context): void {
 		$context->registerCapability(Capabilities::class);
 		$context->registerSearchProvider(UnifiedSearchProvider::class);
+		$this->registerServices($this->getContainer());
 	}
 
 	/**
@@ -84,7 +86,6 @@ class Application extends App implements IBootstrap {
 	 * @throws Throwable
 	 */
 	public function boot(IBootContext $context): void {
-		$context->injectFn(Closure::fromCallable([$this, 'registerServices']));
 		$context->injectFn(Closure::fromCallable([$this, 'registerNavigation']));
 	}
 
@@ -92,9 +93,9 @@ class Application extends App implements IBootstrap {
 	/**
 	 * Register Navigation Tab
 	 *
-	 * @param IServerContainer $container
+	 * @param ContainerInterface $container
 	 */
-	protected function registerServices(IServerContainer $container) {
+	protected function registerServices(ContainerInterface $container) {
 		/** @var IFullTextSearchManager $fullTextSearchManager */
 		$fullTextSearchManager = $container->get(IFullTextSearchManager::class);
 
