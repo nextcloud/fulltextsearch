@@ -6,6 +6,7 @@ OC.L10N.register(
     "Search" : "検索",
     "Index not found" : "インデックスが見つかりません",
     "Process timed out" : "プロセスがタイムアウトしました",
+    "Full Text Search" : "全文検索",
     "Full text search" : "全文検索",
     "Core of the full-text search framework for Nextcloud" : "NextCloudの全文検索フレームワークのコア",
     "Core App of the full-text search framework for your Nextcloud." : "NextCloudの全文検索フレームワークのコアアプリケーション",
