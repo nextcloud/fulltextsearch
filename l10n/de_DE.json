@@ -6,14 +6,14 @@
     "Process timed out" : "Zeitüberschreitung bei der Verarbeitung",
     "Full Text Search" : "Volltextsuche",
     "Full text search" : "Volltextsuche",
-    "Core of the full-text search framework for Nextcloud" : "Kernstück des Volltextsuche-Frameworks für Nextcloud",
-    "Core App of the full-text search framework for your Nextcloud." : "Haupt-App des Volltextsuche-Frameworks für Nextcloud",
+    "Core of the full-text search framework for Nextcloud" : "Kern des Sytems für die Volltextsuche in Nextcloud",
+    "Core App of the full-text search framework for your Nextcloud." : "Haupt-App für die Volltextsuche in Nextcloud",
     "Search on %s" : "Suche in %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Informationen zur Installation und Konfiguration der Volltextsuche unter Nextcloud finden Sie im Wiki",
     "General" : "Allgemein",
     "Search Platform" : "Suchplattform",
-    "Select the app to index content and answer search queries." : "Wählen Sie die App, die Inhalte indizieren und Such-Anfragen beantworten soll.",
+    "Select the app to index content and answer search queries." : "Wählen Sie die App, die Inhalte indizieren und Suchanfragen beantworten soll.",
     "Navigation Icon" : "Navigations-Symbol",
-    "Enable global search within all your content." : "Globale Suche über alle Inhalte aktivieren."
+    "Enable global search within all your content." : "Globale Suche für alle Inhalte aktivieren."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
