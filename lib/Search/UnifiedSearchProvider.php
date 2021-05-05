@@ -155,7 +155,10 @@ class UnifiedSearchProvider implements IProvider {
 	private function generateSearchRequest(ISearchQuery $query): ISearchRequest {
 		$searchRequest = new SearchRequest();
 
-		list($app, $controller, $method) = explode('.', $query->getRoute());
+		$app = 'abc';
+		if (($pos = strpos($app, '.')) !== false) {
+			$app = substr($app, 0, $pos);
+		}
 
 		$searchRequest->setProviders([$app]);
 		$searchRequest->setSearch($query->getTerm());
