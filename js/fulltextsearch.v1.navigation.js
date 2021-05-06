@@ -82,7 +82,7 @@ var nav = {
 				left = t('fulltextsearch', 'the search returned {total} results in {time} ms', data);
 			} else {
 				left = t('fulltextsearch',
-					"the search in {title} for '{search}' returned {total} results in {time} ms", data);
+					"the search in {title} for \"{search}\" returned {total} results in {time} ms", data);
 			}
 
 			divProviderNavigation.find('.provider_navigation_left').text(left);
