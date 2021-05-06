@@ -155,12 +155,12 @@ class UnifiedSearchProvider implements IProvider {
 	private function generateSearchRequest(ISearchQuery $query): ISearchRequest {
 		$searchRequest = new SearchRequest();
 
-		$app = 'abc';
-		if (($pos = strpos($app, '.')) !== false) {
-			$app = substr($app, 0, $pos);
-		}
+//		$app = 'abc';
+//		if (($pos = strpos($app, '.')) !== false) {
+//			$app = substr($app, 0, $pos);
+//		}
 
-		$searchRequest->setProviders([$app]);
+		$searchRequest->setProviders(['all']);
 		$searchRequest->setSearch($query->getTerm());
 		$searchRequest->setPage((int)floor(($query->getCursor() ?? 0) / $query->getLimit()) + 1);
 		$searchRequest->setParts([]);
