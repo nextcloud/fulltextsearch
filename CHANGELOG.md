@@ -1,5 +1,10 @@
 # Changelog
 
+### 20.0.1
+
+- fix lib dependencies
+- search not based on current app
+
 
 ### 20.0.0
 
