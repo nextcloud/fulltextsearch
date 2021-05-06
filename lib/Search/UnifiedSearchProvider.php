@@ -184,11 +184,12 @@ class UnifiedSearchProvider implements IProvider {
 		foreach ($searchResult as $ftsSearch) {
 			foreach ($ftsSearch->getDocuments() as $document) {
 				$excerpts = $document->getExcerpts();
+				$title = '(' . $document->getProviderId() . ') ';
 				if (empty($excerpts)) {
-					$title = $document->getTitle();
+					$title .= $document->getTitle();
 					$subline = '';
 				} else {
-					$title = (sizeof($excerpts) > 0) ? $excerpts[0]['excerpt'] : '';
+					$title .= (sizeof($excerpts) > 0) ? $excerpts[0]['excerpt'] : '';
 					$subline = $document->getTitle();
 				}
 
