@@ -10,7 +10,7 @@ cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
 branch=stable21
 codecov_token_dir=$(HOME)/.nextcloud/codecov_token
-version+=21.0.0
+version+=21.0.1
 
 all: appstore
 

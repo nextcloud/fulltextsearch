@@ -20,6 +20,6 @@
     }
   },
   "require": {
-    "daita/my-small-php-tools": "dev-master"
+    "daita/my-small-php-tools": "~21"
   }
 }

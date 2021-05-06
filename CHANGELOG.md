@@ -1,5 +1,11 @@
 # Changelog
 
+### 21.0.1
+
+- fix lib dependencies
+- search not based on current app
+
+
 ### 21.0.0
 
 - compat nc21
