@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "η αναζήτηση επέστρεψε {total} αποτελέσματα σε {time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "η αναζήτηση στο {title} για '{search}' επέστρεψε {total} αποτελέσματα σε {time} ms",
     "Search" : "Αναζήτηση",
     "Index not found" : "Δεν βρέθηκε ευρετήριο",
     "Process timed out" : "Η επεξεργασία έληξε",
@@ -16,6 +15,7 @@ OC.L10N.register(
     "Search Platform" : "Πλατφόρμα αναζήτησης",
     "Select the app to index content and answer search queries." : "Επιλέξτε την εφαρμογή για την ευρετηρίοποίηση περιεχομένου και απαντήστε σε ερωτήματα αναζήτησης.",
     "Navigation Icon" : "Εικονίδιο Πλοήγησης",
-    "Enable global search within all your content." : "Ενεργοποιήστε την γενική αναζήτηση σε όλο το περιεχόμενό σας."
+    "Enable global search within all your content." : "Ενεργοποιήστε την γενική αναζήτηση σε όλο το περιεχόμενό σας.",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "η αναζήτηση στο {title} για '{search}' επέστρεψε {total} αποτελέσματα σε {time} ms"
 },
 "nplurals=2; plural=(n != 1);");

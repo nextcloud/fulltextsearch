@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "bilaketak {total} emaitza itzuli ditu {time} ms-tan",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "{title} eremuan '{search}' bilatzeak {total} emaitza itzuli ditu {time} ms-tan",
     "Search" : "Bilatu",
     "Index not found" : "Indizea ez da aurkitu",
     "Process timed out" : "Prozesua denboraz kanpo",
@@ -16,6 +15,7 @@ OC.L10N.register(
     "Search Platform" : "Bilaketa plataforma",
     "Select the app to index content and answer search queries." : "Aukeratu zein aplikaziok indexatu eta erantzungo dituen duen zure edukiaren inguruko bilaketak.",
     "Navigation Icon" : "Nabigazioaren ikonoa",
-    "Enable global search within all your content." : "Aktibatu zure eduki guztian bilatzea."
+    "Enable global search within all your content." : "Aktibatu zure eduki guztian bilatzea.",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "{title} eremuan '{search}' bilatzeak {total} emaitza itzuli ditu {time} ms-tan"
 },
 "nplurals=2; plural=(n != 1);");

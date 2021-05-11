@@ -1,6 +1,5 @@
 { "translations": {
     "the search returned {total} results in {time} ms" : "Die Suche ergab {total} Treffer in {time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "Die Suche in {title} nach '{search}' ergab {total} Treffer in {time} ms",
     "Search" : "Suchen",
     "Index not found" : "Index nicht gefunden",
     "Process timed out" : "Zeitüberschreitung bei der Verarbeitung",
@@ -14,6 +13,7 @@
     "Search Platform" : "Suchplattform",
     "Select the app to index content and answer search queries." : "Wählen Sie die App, die Inhalte indizieren und Suchanfragen beantworten soll.",
     "Navigation Icon" : "Navigations-Symbol",
-    "Enable global search within all your content." : "Globale Suche für alle Inhalte aktivieren."
+    "Enable global search within all your content." : "Globale Suche für alle Inhalte aktivieren.",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "Die Suche in {title} nach '{search}' ergab {total} Treffer in {time} ms"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

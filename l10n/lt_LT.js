@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "paieška pateikė {total} rezultatus per {time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "ieškant „{title}“ žodžių „{search}“ pateikti {total} rezultatai per {laikas} ms",
     "Search" : "Ieškoti",
     "Index not found" : "Indeksas nerastas",
     "Process timed out" : "Pasibaigė procesui skirtas laikas",
@@ -15,6 +14,7 @@ OC.L10N.register(
     "Search Platform" : "Paieškos platforma",
     "Select the app to index content and answer search queries." : "Pasirinkite programą, norėdami indeksuoti turinį ir atsakyti į paieškos užklausas.",
     "Navigation Icon" : "Naršymo piktograma",
-    "Enable global search within all your content." : "Įjunkite visuotinę paiešką visame savo turinyje."
+    "Enable global search within all your content." : "Įjunkite visuotinę paiešką visame savo turinyje.",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "ieškant „{title}“ žodžių „{search}“ pateikti {total} rezultatai per {laikas} ms"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

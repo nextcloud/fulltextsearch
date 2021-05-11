@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "iskanje je vrnilo skupno {total} zadetkov v {time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "iskanje po predmetu {title} za »{search}« je vrnilo skupno {total} zadetkov v {time} ms",
     "Search" : "Poišči",
     "Index not found" : "Kazala ni mogoče najti",
     "Process timed out" : "Opravilo je časovno poteklo",
@@ -16,6 +15,7 @@ OC.L10N.register(
     "Search Platform" : "Iskalno orodje",
     "Select the app to index content and answer search queries." : "Izbor programa za indeksiranje vsebine in izvajanje iskalnih poizvedb.",
     "Navigation Icon" : "Navigacijska ikona",
-    "Enable global search within all your content." : "Omogoči splošno iskanje med vso vsebino oblaka."
+    "Enable global search within all your content." : "Omogoči splošno iskanje med vso vsebino oblaka.",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "iskanje po predmetu {title} za »{search}« je vrnilo skupno {total} zadetkov v {time} ms"
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");

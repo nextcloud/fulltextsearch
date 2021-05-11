@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "sökningen gav {total} resultat på {time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "sökningen på {title} för '{search}' gav {total} resultat på {time} ms",
     "Search" : "Sök",
     "Index not found" : "Index hittades inte",
     "Process timed out" : "Processen tog för lång tid",
@@ -16,6 +15,7 @@ OC.L10N.register(
     "Search Platform" : "Sökplattform",
     "Select the app to index content and answer search queries." : "Välj app för att indexera innehåll och svara på sökfrågor.",
     "Navigation Icon" : "Navigations-ikon",
-    "Enable global search within all your content." : "Aktivera global sökning i allt ditt innehåll."
+    "Enable global search within all your content." : "Aktivera global sökning i allt ditt innehåll.",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "sökningen på {title} för '{search}' gav {total} resultat på {time} ms"
 },
 "nplurals=2; plural=(n != 1);");
