@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "la búsqueda encontró {total} resultados en {time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "la búsqueda en {title} con '{search}' encontró {total} resultados en {time} ms",
     "Search" : "Buscar",
     "Index not found" : "Índice no encontrado",
     "Process timed out" : "Tiempo de proceso agotado",
@@ -16,6 +15,7 @@ OC.L10N.register(
     "Search Platform" : "Plataforma de búsqueda",
     "Select the app to index content and answer search queries." : "Selecciona la app para indexar contenido y responder a peticiones de búsqueda",
     "Navigation Icon" : "Icono de navegación",
-    "Enable global search within all your content." : "Activa la búsqueda global en todo tu contenido."
+    "Enable global search within all your content." : "Activa la búsqueda global en todo tu contenido.",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "la búsqueda en {title} con '{search}' encontró {total} resultados en {time} ms"
 },
 "nplurals=2; plural=(n != 1);");
