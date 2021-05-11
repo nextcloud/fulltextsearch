@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "leitin skilaði {total} niðurstöðum á {time} ms",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "leitin í {title} eftir '{search}' skilaði {total} niðurstöðum á {time} ms",
     "Search" : "Leita",
     "Index not found" : "Atriðavísir fannst ekki",
     "Process timed out" : "Ferlið féll á tíma",
@@ -15,6 +14,7 @@ OC.L10N.register(
     "Search Platform" : "Leita á kerfi",
     "Select the app to index content and answer search queries." : "Veldu forrit til að atriðaskrá efni og svara leitarbeiðnum.",
     "Navigation Icon" : "Táknmynd flakks",
-    "Enable global search within all your content." : "Virkja víðværa leit inna alls efnisins þíns."
+    "Enable global search within all your content." : "Virkja víðværa leit inna alls efnisins þíns.",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "leitin í {title} eftir '{search}' skilaði {total} niðurstöðum á {time} ms"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

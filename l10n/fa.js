@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "بازگشت جست‌‌‌وجو‌ {کل} نتایج در {زمان}",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "جستجو در {عنوان} برای '{جستجو}' بازگشت {مجموع} نتیجه در {زمان} ",
     "Search" : "جستجو",
     "Index not found" : "نمایه یافت نشد",
     "Process timed out" : "زمان فرآیند به پایان رسیده ",
@@ -15,6 +14,7 @@ OC.L10N.register(
     "Search Platform" : "پلتفرم جستجو",
     "Select the app to index content and answer search queries." : "برنامه را برای فهرست بندی محتوا و پاسخ به سؤالات جستجو انتخاب کنید",
     "Navigation Icon" : "نماد ناوبری",
-    "Enable global search within all your content." : "جستجوی جهانی را در تمام محتوای خود فعال کن"
+    "Enable global search within all your content." : "جستجوی جهانی را در تمام محتوای خود فعال کن",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "جستجو در {عنوان} برای '{جستجو}' بازگشت {مجموع} نتیجه در {زمان} "
 },
 "nplurals=2; plural=(n > 1);");

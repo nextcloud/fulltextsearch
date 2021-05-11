@@ -2,7 +2,6 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "aramada {time} ms sürede {total} sonuç bulundu",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "{title} başlığındaki '{search}' aramasında {time} ms sürede {total} sonuç bulundu",
     "Search" : "Arama",
     "Index not found" : "Dizin bulunamadı",
     "Process timed out" : "İşlem zaman aşımına uğradı",
@@ -16,6 +15,7 @@ OC.L10N.register(
     "Search Platform" : "Arama Platformu",
     "Select the app to index content and answer search queries." : "İçeriği dizine ekleyecek ve arama sorgularını yanıtlayacak uygulamayı seçin",
     "Navigation Icon" : "Gezinme Simgesi",
-    "Enable global search within all your content." : "Tüm içeriğiniz üzerinde genel aramayı etkinleştirin."
+    "Enable global search within all your content." : "Tüm içeriğiniz üzerinde genel aramayı etkinleştirin.",
+    "the search in {title} for '{search}' returned {total} results in {time} ms" : "{title} başlığındaki '{search}' aramasında {time} ms sürede {total} sonuç bulundu"
 },
 "nplurals=2; plural=(n > 1);");
