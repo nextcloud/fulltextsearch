@@ -1,5 +1,6 @@
 { "translations": {
     "the search returned {total} results in {time} ms" : "搜尋在 {time} 毫秒內回傳了 {total} 個結果",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "對「{search}」中的 {title} 搜尋於 {time} 毫秒內回傳了 {total} 個結果",
     "Search" : "搜尋",
     "Index not found" : "找不到索引",
     "Process timed out" : "處理程序逾時",
