@@ -2,6 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "搜索在 {time} ms内返回 {total} 个结果",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "在 {title} 中搜索 \"{search}\" 返回了 {total} 个结果，执行时间 {time} ms",
     "Search" : "搜索",
     "Index not found" : "未找到索引",
     "Process timed out" : "处理超时",
