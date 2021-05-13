@@ -2,6 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "a procura encontrou {total} resultados em {time} ms",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "a pesquisa em {title} por \"{search}\" retornou {total} resultados em {time} ms ",
     "Search" : "Pesquisar",
     "Index not found" : "Índice não encontrado",
     "Process timed out" : "Tempo esgotado",
