@@ -2,6 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "aramada {time} ms sürede {total} sonuç bulundu",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "{title} başlığındaki \"{search}\" aramasında {time} ms sürede {total} sonuç bulundu",
     "Search" : "Arama",
     "Index not found" : "Dizin bulunamadı",
     "Process timed out" : "İşlem zaman aşımına uğradı",
