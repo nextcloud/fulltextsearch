@@ -2,6 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "bilaketak {total} emaitza itzuli ditu {time} ms-tan",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "{title}-n bilaketak \"{search}\" bilaketarako {total} emaitza eman ditu {time} ms-tan",
     "Search" : "Bilatu",
     "Index not found" : "Indizea ez da aurkitu",
     "Process timed out" : "Prozesua denboraz kanpo",
