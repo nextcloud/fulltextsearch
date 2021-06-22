@@ -11,7 +11,7 @@ OC.L10N.register(
     "Core of the full-text search framework for Nextcloud" : "Jádro aplikačního rámce pro plnotextové vyhledávání v Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Hlavní aplikace aplikačního rámce pro plnotextové hledání pro váš Nextcloud.",
     "Search on %s" : "Hledat v %s",
-    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Nahlédněte do dokumentace (wiki) ohledně instalace a nastavení plnotextového vyhledávání v Nextcloud",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Ohledně instalace a nastavení plnotextového vyhledávání v Nextcloud nahlédněte do dokumentace (na wiki)",
     "General" : "Obecné",
     "Search Platform" : "Vyhledávací platforma",
     "Select the app to index content and answer search queries." : "Vyberte aplikaci kterou indexovat obsah a zodpovídat dotazy vyhledávání.",
