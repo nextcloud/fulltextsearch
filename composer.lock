@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "30bac8230c691b2aa3c666987235b4c9",
+    "content-hash": "31aaff23229c917098634bc03c9e8d71",
     "packages": [
         {
             "name": "daita/my-small-php-tools",
-            "version": "dev-master",
+            "version": "v20.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/daita/my-small-php-tools.git",
-                "reference": "844b10da6abf50044ae9c40120cb5b927352bd95"
+                "reference": "313ce2a22dd034f14da42f8f8cd00ee0b99f41b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/daita/my-small-php-tools/zipball/844b10da6abf50044ae9c40120cb5b927352bd95",
-                "reference": "844b10da6abf50044ae9c40120cb5b927352bd95",
+                "url": "https://api.github.com/repos/daita/my-small-php-tools/zipball/313ce2a22dd034f14da42f8f8cd00ee0b99f41b1",
+                "reference": "313ce2a22dd034f14da42f8f8cd00ee0b99f41b1",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.0"
+                "php": ">=7.0"
             },
             "type": "library",
             "autoload": {
@@ -40,18 +40,20 @@
                 }
             ],
             "description": "My small PHP Tools",
-            "time": "2020-12-02T14:37:02+00:00"
+            "support": {
+                "issues": "https://github.com/daita/my-small-php-tools/issues",
+                "source": "https://github.com/daita/my-small-php-tools/tree/v20.0.1"
+            },
+            "time": "2021-04-26T12:46:18+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "daita/my-small-php-tools": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }
