@@ -1,5 +1,11 @@
 # Changelog
 
+
+### 20.0.2
+
+- better load of the libs
+
+
 ### 20.0.1
 
 - fix lib dependencies

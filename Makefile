@@ -1,6 +1,5 @@
-app_name=fulltextsearch
+app_name=FullTextSearch
 
-project_dir=$(CURDIR)
 build_dir=$(CURDIR)/build/artifacts
 appstore_dir=$(build_dir)/appstore
 source_dir=$(build_dir)/source
@@ -8,49 +7,74 @@ sign_dir=$(build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
-branch=master
-codecov_token_dir=$(HOME)/.nextcloud/codecov_token
-version+=20.0.1
+release_account=nextcloud-releases
+branch=stable20
+version=20.0.2
+since_tag=
 
 all: appstore
 
 release: appstore github-release github-upload
 
-dev-setup: clean composer
-
 github-release:
+	if [ -z "$(release_account)" ]; then \
+		release_account=$(github_account); \
+		release_branch=$(branch); \
+	else \
+		release_account=$(release_account); \
+		release_branch=master; \
+	fi; \
+	if [ -z "$(since_tag)" ]; then \
+		latest_tag=$$(git describe --tags `git rev-list --tags --max-count=1`); \
+	else \
+		latest_tag=$(since_tag); \
+	fi; \
+	comparison="$$latest_tag..HEAD"; \
+	if [ -z "$$latest_tag" ]; then comparison=""; fi; \
+	changelog=$$(git log $$comparison --oneline --no-merges | sed -e 's/^/$(github_account)\/$(app_name)@/'); \
 	github-release release \
-		--user $(github_account) \
+		--user $$release_account \
 		--repo $(app_name) \
-		--target $(branch) \
-		--tag v$(version) \
-		--name "$(app_name) v$(version)"
+		--target $$release_branch \
+		--tag $(version) \
+		--description "**Changelog**<br/>$$changelog" \
+		--name "$(app_name) v$(version)"; \
+	if [ $(github_account) != $$release_account ]; then \
+	        link="https://github.com/$$release_account/$(app_name)/releases/download/$(version)/$(app_name)-$(version).tar.gz";\
+		github-release release \
+			--user $(github_account) \
+			--repo $(app_name) \
+			--target $(branch) \
+			--tag $(version) \
+			--description "**Download**<br />$$link<br /><br />**Changelog**<br/>$$changelog<br />" \
+			--name "$(app_name) v$(version)"; \
+	fi; \
+
 
 github-upload:
+	if [ -z "$(release_account)" ]; then \
+		release_account=$(github_account); \
+	else \
+		release_account=$(release_account); \
+	fi; \
 	github-release upload \
-		--user $(github_account) \
+		--user $$release_account \
 		--repo $(app_name) \
-		--tag v$(version) \
+		--tag $(version) \
 		--name "$(app_name)-$(version).tar.gz" \
 		--file $(build_dir)/$(app_name)-$(version).tar.gz
+
 
 clean:
 	rm -rf $(build_dir)
 	rm -rf node_modules
-	rm -rf vendor
 
+# composer packages
 composer:
 	composer install --prefer-dist
-	composer update --prefer-dist
+	composer upgrade --prefer-dist
 
-test: SHELL:=/bin/bash
-test:
-	phpunit --coverage-clover=coverage.xml --configuration=tests/phpunit.xml tests
-	@if [ -f $(codecov_token_dir)/$(app_name) ]; then \
-		bash <(curl -s https://codecov.io/bash) -t @$(codecov_token_dir)/$(app_name) ; \
-	fi
-
-appstore: dev-setup
+appstore: clean composer
 	mkdir -p $(sign_dir)
 	rsync -a \
 	--exclude=/build \
@@ -60,18 +84,19 @@ appstore: dev-setup
 	--exclude=/tests \
 	--exclude=.git \
 	--exclude=/.github \
-	--exclude=/composer.json \
-	--exclude=/composer.lock \
 	--exclude=/l10n/l10n.pl \
 	--exclude=/CONTRIBUTING.md \
 	--exclude=/issue_template.md \
 	--exclude=/README.md \
+	--exclude=/composer.json \
+	--exclude=/testConfiguration.json \
+	--exclude=/composer.lock \
 	--exclude=/.gitattributes \
 	--exclude=/.gitignore \
 	--exclude=/.scrutinizer.yml \
 	--exclude=/.travis.yml \
 	--exclude=/Makefile \
-	$(project_dir)/ $(sign_dir)/$(app_name)
+	./ $(sign_dir)/$(app_name)
 	tar -czf $(build_dir)/$(app_name)-$(version).tar.gz \
 		-C $(sign_dir) $(app_name)
 	@if [ -f $(cert_dir)/$(app_name).key ]; then \
