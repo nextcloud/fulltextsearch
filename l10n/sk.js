@@ -2,6 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "Vyhľadávanie našlo {total} výsledkov za {time} ms",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "Vyhľadávanie \"{search}\" v {title} našlo {total} výsledkov za {time} ms",
     "Search" : "Hľadať",
     "Index not found" : "Index nenájdený",
     "Process timed out" : "Spracovanie expirovalo",
