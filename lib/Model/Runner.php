@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Model;
 
 
-use daita\MySmallPhpTools\Traits\TArrayTools;
+use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use Exception;
 use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
