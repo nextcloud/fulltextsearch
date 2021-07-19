@@ -75,7 +75,7 @@ class NavigationController extends Controller {
 		IRequest $request, IConfig $config, IFullTextSearchManager $fullTextSearchManager,
 		ConfigService $configService, MiscService $miscService
 	) {
-		parent::__construct(Application::APP_NAME, $request);
+		parent::__construct(Application::APP_ID, $request);
 		$this->config = $config;
 		$this->fullTextSearchManager = $fullTextSearchManager;
 		$this->configService = $configService;
@@ -96,7 +96,7 @@ class NavigationController extends Controller {
 
 		$this->fullTextSearchManager->addJavascriptAPI();
 
-		return new TemplateResponse(Application::APP_NAME, 'navigate', $data);
+		return new TemplateResponse(Application::APP_ID, 'navigate', $data);
 	}
 
 }

@@ -71,7 +71,7 @@ class SettingsController extends Controller {
 		IRequest $request, ConfigService $configService, SettingsService $settingsService,
 		MiscService $miscService
 	) {
-		parent::__construct(Application::APP_NAME, $request);
+		parent::__construct(Application::APP_ID, $request);
 		$this->configService = $configService;
 		$this->settingsService = $settingsService;
 		$this->miscService = $miscService;

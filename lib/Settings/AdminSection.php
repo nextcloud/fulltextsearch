@@ -65,7 +65,7 @@ class AdminSection implements IIconSection {
 	 * {@inheritdoc}
 	 */
 	public function getID(): string {
-		return Application::APP_NAME;
+		return Application::APP_ID;
 	}
 
 	/**
@@ -86,6 +86,6 @@ class AdminSection implements IIconSection {
 	 * {@inheritdoc}
 	 */
 	public function getIcon(): string {
-		return $this->urlGenerator->imagePath(Application::APP_NAME, 'fulltextsearch_black.svg');
+		return $this->urlGenerator->imagePath(Application::APP_ID, 'fulltextsearch_black.svg');
 	}
 }
