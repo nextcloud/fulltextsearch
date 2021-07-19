@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Model;
 
 
-use daita\MySmallPhpTools\Traits\TArrayTools;
+use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchRequestSimpleQuery;

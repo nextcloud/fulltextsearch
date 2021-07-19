@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Db;
 
 
-use daita\MySmallPhpTools\Traits\TArrayTools;
+use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use OCA\FullTextSearch\Model\Tick;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
