@@ -31,8 +31,8 @@ declare(strict_types=1);
 use OCA\FullTextSearch\AppInfo\Application;
 use OCP\Util;
 
-Util::addScript(Application::APP_NAME, 'navigate');
-Util::addStyle(Application::APP_NAME, 'navigate');
+Util::addScript(Application::APP_ID, 'navigate');
+Util::addStyle(Application::APP_ID, 'navigate');
 
 ?>
 

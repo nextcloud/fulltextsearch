@@ -46,6 +46,8 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\INavigationManager;
 use OCP\IServerContainer;
+use OCP\IURLGenerator;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Throwable;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -54,7 +56,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 class Application extends App implements IBootstrap {
 
 
-	const APP_NAME = 'fulltextsearch';
+	const APP_ID = 'fulltextsearch';
+	const APP_NAME = 'FullTextSearch';
 
 
 	/**
@@ -63,7 +66,7 @@ class Application extends App implements IBootstrap {
 	 * @param array $params
 	 */
 	public function __construct(array $params = []) {
-		parent::__construct(self::APP_NAME, $params);
+		parent::__construct(self::APP_ID, $params);
 	}
 
 
@@ -117,8 +120,11 @@ class Application extends App implements IBootstrap {
 			return;
 		}
 
-		$container->get(INavigationManager::class)
-				  ->add($this->fullTextSearchNavigation());
+		try {
+			$container->get(INavigationManager::class)
+					  ->add($this->fullTextSearchNavigation());
+		} catch (RouteNotFoundException $e) {
+		}
 	}
 
 
@@ -126,16 +132,15 @@ class Application extends App implements IBootstrap {
 	 * @return array
 	 */
 	private function fullTextSearchNavigation(): array {
-		$urlGen = OC::$server->getURLGenerator();
-		$navName = OC::$server->getL10N(self::APP_NAME)
-							  ->t('Search');
+		/** @var IURLGenerator $urlGen */
+		$urlGen = OC::$server->get(IURLGenerator::class);
 
 		return [
-			'id'    => self::APP_NAME,
+			'id'    => self::APP_ID,
 			'order' => 5,
-			'href'  => $urlGen->linkToRoute('fulltextsearch.Navigation.navigate'),
-			'icon'  => $urlGen->imagePath(self::APP_NAME, 'fulltextsearch.svg'),
-			'name'  => $navName
+			'href'  => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
+			'icon'  => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),
+			'name'  => 'Search'
 		];
 	}
 
