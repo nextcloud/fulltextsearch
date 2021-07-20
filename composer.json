@@ -20,6 +20,6 @@
     }
   },
   "require": {
-    "daita/my-small-php-tools": "~21"
+    "artificial-owl/my-small-php-tools": "~21"
   }
 }

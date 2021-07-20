@@ -4,26 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "30bac8230c691b2aa3c666987235b4c9",
+    "content-hash": "32f78d13ac8baf9a7823c20871de9319",
     "packages": [
         {
-            "name": "daita/my-small-php-tools",
-            "version": "dev-master",
+            "name": "artificial-owl/my-small-php-tools",
+            "version": "v21.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/daita/my-small-php-tools.git",
-                "reference": "1d8f7ce23dfa417e6564a8042f7c513b79f8ee3e"
+                "url": "https://github.com/ArtificialOwl/my-small-php-tools.git",
+                "reference": "a1dad07490d32ba772f78e767197fb20bf2fe0b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/daita/my-small-php-tools/zipball/1d8f7ce23dfa417e6564a8042f7c513b79f8ee3e",
-                "reference": "1d8f7ce23dfa417e6564a8042f7c513b79f8ee3e",
+                "url": "https://api.github.com/repos/ArtificialOwl/my-small-php-tools/zipball/a1dad07490d32ba772f78e767197fb20bf2fe0b6",
+                "reference": "a1dad07490d32ba772f78e767197fb20bf2fe0b6",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.0"
+                "php": ">=7.0"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -42,18 +41,16 @@
             ],
             "description": "My small PHP Tools",
             "support": {
-                "issues": "https://github.com/daita/my-small-php-tools/issues",
-                "source": "https://github.com/daita/my-small-php-tools/tree/master"
+                "issues": "https://github.com/ArtificialOwl/my-small-php-tools/issues",
+                "source": "https://github.com/ArtificialOwl/my-small-php-tools/tree/v21.0.1"
             },
-            "time": "2021-03-04T19:21:16+00:00"
+            "time": "2021-04-26T12:51:38+00:00"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "daita/my-small-php-tools": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
