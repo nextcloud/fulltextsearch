@@ -76,7 +76,7 @@ class ApiController extends Controller {
 		IRequest $request, ConfigService $configService, SearchService $searchService,
 		MiscService $miscService
 	) {
-		parent::__construct(Application::APP_NAME, $request);
+		parent::__construct(Application::APP_ID, $request);
 		$this->searchService = $searchService;
 		$this->configService = $configService;
 		$this->miscService = $miscService;

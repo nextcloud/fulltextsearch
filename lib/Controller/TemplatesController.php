@@ -79,7 +79,7 @@ class TemplatesController extends Controller {
 		IRequest $request, IConfig $config, ConfigService $configService,
 		ProviderService $providerService, MiscService $miscService
 	) {
-		parent::__construct(Application::APP_NAME, $request);
+		parent::__construct(Application::APP_ID, $request);
 		$this->config = $config;
 		$this->configService = $configService;
 		$this->providerService = $providerService;
