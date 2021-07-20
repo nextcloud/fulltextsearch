@@ -4,7 +4,7 @@ build_dir=$(CURDIR)/build/artifacts
 appstore_dir=$(build_dir)/appstore
 source_dir=$(build_dir)/source
 sign_dir=$(build_dir)/sign
-package_name=$(app_name)
+package_name=$(shell echo $(app_name) | tr '[:upper:]' '[:lower:]')
 cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
 release_account=nextcloud-releases
@@ -31,19 +31,19 @@ github-release:
 	fi; \
 	comparison="$$latest_tag..HEAD"; \
 	if [ -z "$$latest_tag" ]; then comparison=""; fi; \
-	changelog=$$(git log $$comparison --oneline --no-merges | sed -e 's/^/$(github_account)\/$(app_name)@/'); \
+	changelog=$$(git log $$comparison --oneline --no-merges | sed -e 's/^/$(github_account)\/$(package_name)@/'); \
 	github-release release \
 		--user $$release_account \
-		--repo $(app_name) \
+		--repo $(package_name) \
 		--target $$release_branch \
 		--tag $(version) \
 		--description "**Changelog**<br/>$$changelog" \
 		--name "$(app_name) v$(version)"; \
 	if [ $(github_account) != $$release_account ]; then \
-	        link="https://github.com/$$release_account/$(app_name)/releases/download/$(version)/$(app_name)-$(version).tar.gz";\
+	        link="https://github.com/$$release_account/$(package_name)/releases/download/$(version)/$(package_name)-$(version).tar.gz";\
 		github-release release \
 			--user $(github_account) \
-			--repo $(app_name) \
+			--repo $(package_name) \
 			--target $(branch) \
 			--tag $(version) \
 			--description "**Download**<br />$$link<br /><br />**Changelog**<br/>$$changelog<br />" \
@@ -59,10 +59,10 @@ github-upload:
 	fi; \
 	github-release upload \
 		--user $$release_account \
-		--repo $(app_name) \
+		--repo $(package_name) \
 		--tag $(version) \
-		--name "$(app_name)-$(version).tar.gz" \
-		--file $(build_dir)/$(app_name)-$(version).tar.gz
+		--name "$(package_name)-$(version).tar.gz" \
+		--file $(build_dir)/$(package_name)-$(version).tar.gz
 
 
 clean:
@@ -96,10 +96,10 @@ appstore: clean composer
 	--exclude=/.scrutinizer.yml \
 	--exclude=/.travis.yml \
 	--exclude=/Makefile \
-	./ $(sign_dir)/$(app_name)
-	tar -czf $(build_dir)/$(app_name)-$(version).tar.gz \
-		-C $(sign_dir) $(app_name)
-	@if [ -f $(cert_dir)/$(app_name).key ]; then \
+	./ $(sign_dir)/$(package_name)
+	tar -czf $(build_dir)/$(package_name)-$(version).tar.gz \
+		-C $(sign_dir) $(package_name)
+	@if [ -f $(cert_dir)/$(package_name).key ]; then \
 		echo "Signing package…"; \
-		openssl dgst -sha512 -sign $(cert_dir)/$(app_name).key $(build_dir)/$(app_name)-$(version).tar.gz | openssl base64; \
+		openssl dgst -sha512 -sign $(cert_dir)/$(package_name).key $(build_dir)/$(package_name)-$(version).tar.gz | openssl base64; \
 	fi
