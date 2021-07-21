@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "32f78d13ac8baf9a7823c20871de9319",
+    "content-hash": "02ed291dbd5005023241632e185aec46",
     "packages": [
         {
             "name": "artificial-owl/my-small-php-tools",
-            "version": "v21.0.1",
+            "version": "v22.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ArtificialOwl/my-small-php-tools.git",
-                "reference": "a1dad07490d32ba772f78e767197fb20bf2fe0b6"
+                "reference": "6e64e7de01c4eac474016267d15ab8fc4d847b17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ArtificialOwl/my-small-php-tools/zipball/a1dad07490d32ba772f78e767197fb20bf2fe0b6",
-                "reference": "a1dad07490d32ba772f78e767197fb20bf2fe0b6",
+                "url": "https://api.github.com/repos/ArtificialOwl/my-small-php-tools/zipball/6e64e7de01c4eac474016267d15ab8fc4d847b17",
+                "reference": "6e64e7de01c4eac474016267d15ab8fc4d847b17",
                 "shasum": ""
             },
             "require": {
@@ -26,7 +26,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "daita\\MySmallPhpTools\\": "lib/"
+                    "ArtificialOwl\\MySmallPhpTools\\": "lib/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -42,9 +42,9 @@
             "description": "My small PHP Tools",
             "support": {
                 "issues": "https://github.com/ArtificialOwl/my-small-php-tools/issues",
-                "source": "https://github.com/ArtificialOwl/my-small-php-tools/tree/v21.0.1"
+                "source": "https://github.com/ArtificialOwl/my-small-php-tools/tree/v22.1.6"
             },
-            "time": "2021-04-26T12:51:38+00:00"
+            "time": "2021-07-05T18:30:34+00:00"
         }
     ],
     "packages-dev": [],
