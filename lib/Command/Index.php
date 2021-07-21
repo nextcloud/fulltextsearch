@@ -108,14 +108,14 @@ class Index extends ACommandBase {
 	const PANEL_ERRORS_LINE_FOOTER = '└──';
 
 	const PANEL_COMMANDS_ROOT = 'root';
-	const PANEL_COMMANDS_ROOT_LINE = '## <char>q</char>:quit ## <char>p</char>:pause ';
+	const PANEL_COMMANDS_ROOT_LINE = '## q:quit ## p:pause ';
 	const PANEL_COMMANDS_PAUSED = 'paused';
-	const PANEL_COMMANDS_PAUSED_LINE = '## <char>q</char>:quit ## <char>u</char>:unpause ## <char>n</char>:next step';
+	const PANEL_COMMANDS_PAUSED_LINE = '## q:quit ## u:unpause ## n:next step';
 	const PANEL_COMMANDS_DONE = 'done';
-	const PANEL_COMMANDS_DONE_LINE = '## <char>q</char>:quit';
+	const PANEL_COMMANDS_DONE_LINE = '## q:quit';
 	const PANEL_COMMANDS_NAVIGATION = 'navigation';
-	const PANEL_COMMANDS_ERRORS_LINE = '## <char>f</char>:first error ## <char>h</char>/<char>j</char>:prec/next error ## <char>d</char>:delete error ## <char>l</char>:last error';
-	const PANEL_COMMANDS_RESULTS_LINE = '## <char>x</char>:first result ## <char>c</char>/<char>v</char>:prec/next result ## <char>b</char>:last result';
+	const PANEL_COMMANDS_ERRORS_LINE = '## f:first error ## h/j:prec/next error ## d:delete error ## l:last error';
+	const PANEL_COMMANDS_RESULTS_LINE = '## x:first result ## c/v:prec/next result ## b:last result';
 
 	/** @var IUserManager */
 	private $userManager;
@@ -230,9 +230,9 @@ class Index extends ACommandBase {
 
 		$this->terminal = new Terminal();
 
-		$outputStyle = new OutputFormatterStyle('white', 'black', ['bold']);
-		$output->getFormatter()
-			   ->setStyle('char', $outputStyle);
+//		$outputStyle = new OutputFormatterStyle('white', 'black', ['bold']);
+//		$output->getFormatter()
+//			   ->setStyle('char', $outputStyle);
 
 		$this->runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
 		$this->runner->onKeyPress([$this, 'onKeyPressed']);
