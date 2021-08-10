@@ -1,5 +1,11 @@
 # Changelog
 
+### 22.0.1
+
+- fixing navigation page
+- upgrading Circles API
+- registering Service during the boot
+
 
 ### 22.0.0
 
