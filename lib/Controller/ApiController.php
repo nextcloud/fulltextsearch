@@ -41,6 +41,7 @@ use OCA\FullTextSearch\Service\SearchService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
+use OCP\IUserSession;
 
 
 /**
@@ -53,6 +54,9 @@ class ApiController extends Controller {
 
 	use TNCDataResponse;
 
+
+	/** @var IUserSession */
+	private $userSession;
 
 	/** @var SearchService */
 	private $searchService;
@@ -68,15 +72,19 @@ class ApiController extends Controller {
 	 * NavigationController constructor.
 	 *
 	 * @param IRequest $request
+	 * @param IUserSession $userSession
 	 * @param ConfigService $configService
 	 * @param SearchService $searchService
 	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IRequest $request, ConfigService $configService, SearchService $searchService,
+		IRequest $request, IUserSession $userSession, ConfigService $configService,
+		SearchService $searchService,
 		MiscService $miscService
 	) {
 		parent::__construct(Application::APP_ID, $request);
+
+		$this->userSession = $userSession;
 		$this->searchService = $searchService;
 		$this->configService = $configService;
 		$this->miscService = $miscService;
@@ -117,7 +125,8 @@ class ApiController extends Controller {
 	 */
 	private function searchDocuments(SearchRequest $request): DataResponse {
 		try {
-			$result = $this->searchService->search('', $request);
+			$user = $this->userSession->getUser();
+			$result = $this->searchService->search($user->getUID(), $request);
 
 			return $this->success(
 				$result,
