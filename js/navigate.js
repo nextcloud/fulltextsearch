@@ -133,7 +133,7 @@ Navigate.prototype = {
 				href: '#',
 				class: (icon !== undefined) ? icon : 'search_icon'
 			});
-			aIcon.text(title);
+			aIcon.addClass('icon-fts').text(title);
 
 			var ul = $('<ul>');
 			// if (nav.options !== undefined) {
