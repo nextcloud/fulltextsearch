@@ -1,5 +1,10 @@
 # Changelog
 
+### 21.0.3
+
+- fixing navigation page
+- registering Service during the boot
+
 
 ### 21.0.2
 
