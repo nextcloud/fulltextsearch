@@ -139,10 +139,6 @@ class SearchService implements ISearchService {
 	public function search(string $userId, ISearchRequest $request): array {
 		$this->searchRequestCannotBeEmpty($request);
 
-		if ($userId === '') {
-			$userId = $this->userId;
-		}
-
 		$user = $this->userManager->get($userId);
 		if ($user === null) {
 			throw new NoUserException('User does not exist');
