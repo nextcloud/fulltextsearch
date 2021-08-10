@@ -49,6 +49,10 @@
 	background-image: url('/apps/fulltextsearch/img/fulltextsearch_black.svg');
 }
 
+A.icon-fts {
+	text-indent: 25px;
+}
+
 a.ulsub {
 	padding: 0px 12px 0 12px !important;
 }
