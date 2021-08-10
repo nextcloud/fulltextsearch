@@ -31,11 +31,15 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 
+use ArtificialOwl\MySmallPhpTools\Traits\Nextcloud\nc22\TNC22Logger;
 use Exception;
+use OC;
 use OC\App\AppManager;
 use OC\FullTextSearch\Model\DocumentAccess;
 use OC\User\NoUserException;
-use OCA\Circles\Api\v1\Circles;
+use OCA\Circles\CirclesManager;
+use OCA\Circles\Model\Circle;
+use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\EmptySearchException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Model\SearchRequest;
@@ -57,6 +61,9 @@ use OCP\IUserManager;
  * @package OCA\FullTextSearch\Service
  */
 class SearchService implements ISearchService {
+
+
+	use TNC22Logger;
 
 
 	/** @var string */
@@ -111,6 +118,8 @@ class SearchService implements ISearchService {
 		$this->providerService = $providerService;
 		$this->platformService = $platformService;
 		$this->miscService = $miscService;
+
+		$this->setup('app', Application::APP_ID);
 	}
 
 
@@ -215,16 +224,19 @@ class SearchService implements ISearchService {
 		$rights->setViewerId($user->getUID());
 		$rights->setGroups($this->groupManager->getUserGroupIds($user));
 
-		if ($this->appManager->isEnabledForUser('circles', $user)) {
-			try {
-				$rights->setCircles(Circles::joinedCircleIds($user->getUID()));
-			} catch (Exception $e) {
-				$this->miscService->log('Circles is set as enabled but: ' . $e->getMessage());
-			}
+		try {
+			/** @var CirclesManager $circleManager */
+			$circleManager = OC::$server->get(CirclesManager::class);
+			$circleManager->startsession();
+			$circleIds = array_map(
+				function (Circle $circle): string {
+					return $circle->getSingleId();
+				}, $circleManager->getCircles()
+			);
+			$rights->setCircles($circleIds);
+		} catch (Exception $e) {
 		}
 
 		return $rights;
 	}
-
-
 }
