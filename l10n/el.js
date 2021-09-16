@@ -2,6 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "η αναζήτηση επέστρεψε {total} αποτελέσματα σε {time} ms",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "η αναζήτηση στο {title} για \"{search}\" επέστρεψε {total} αποτελέσματα σε {time} ms",
     "Search" : "Αναζήτηση",
     "Index not found" : "Δεν βρέθηκε ευρετήριο",
     "Process timed out" : "Η επεξεργασία έληξε",
