@@ -2,6 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "поиск вернул {total} результатов за {time} мс",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "поиск в {title} по запросу «{search}» вернул {total} результатов за {time} мс",
     "Search" : "Поиск",
     "Index not found" : "Индекс не найден",
     "Process timed out" : "Превышено время ожидания запроса",
