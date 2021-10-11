@@ -2,9 +2,11 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "leitin skilaði {total} niðurstöðum á {time} ms",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "leitin í {title} eftir \"{search}\" skilaði {total} niðurstöðum á {time} ms",
     "Search" : "Leita",
     "Index not found" : "Atriðavísir fannst ekki",
     "Process timed out" : "Ferlið féll á tíma",
+    "Full Text Search" : "Leit í öllum textanum",
     "Full text search" : "Leit í öllum textanum",
     "Core of the full-text search framework for Nextcloud" : "Kjarni kerfisins sem styður leit í öllum textanum í Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Kjarnaforrit kerfisins sem styður leit í öllum textanum í Nextcloud.",
