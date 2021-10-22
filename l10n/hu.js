@@ -2,6 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "a keresés {total} eredményt talált {time} ms alatt",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "a(z) {title} kifejezés keresése a(z) \"{search}\" kifejezésre {total} találatot adott vissza {time} ms alatt",
     "Search" : "Keresés",
     "Index not found" : "INdex nem található",
     "Process timed out" : "Folyamat időtúllépés",
