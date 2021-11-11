@@ -1,5 +1,6 @@
 { "translations": {
     "the search returned {total} results in {time} ms" : "søgningen retunerede {total} resultater og det tog kun {time} ms",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "søgningen i {title} efter \"{search}\" gav {total} resultater på {time} ms",
     "Search" : "Søg",
     "Index not found" : "Index ikke fundet",
     "Process timed out" : "Processen timede ud",
