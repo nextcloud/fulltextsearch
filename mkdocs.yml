@@ -18,7 +18,7 @@ markdown_extensions:
 nav:
   - 'Nextcloud FullTextSearch': 'index.md'
   - 'Installation': 'installation.md'
-  - 'Configuration': 'configuration.mnd'
+  - 'Configuration': 'configuration.md'
   - Commands: 'commands.md'
   - 'API documentation':
       - 'Collections': 'api/collections.md'
