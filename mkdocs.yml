@@ -1,0 +1,24 @@
+site_name: Nextcloud FullTextSearch
+
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - php
+    - js
+    - bash
+
+markdown_extensions:
+  - admonition
+  - def_list
+  - toc:
+      permalink: "#"
+      baselevel: 2
+
+nav:
+  - 'Nextcloud FullTextSearch': 'index.md'
+  - 'Installation': 'installation.md'
+  - 'Configuration': 'configuration.mnd'
+  - Commands: 'commands.md'
+  - 'API documentation':
+      - 'Collections': 'api/collections.md'
