@@ -19,4 +19,4 @@ OC.L10N.register(
     "Enable global search within all your content." : "Activer la recherche dans tous votre contenu.",
     "the search in {title} for '{search}' returned {total} results in {time} ms" : "la recherche dans {title} pour '{search}' a retourné {total} résultats en {time} ms"
 },
-"nplurals=2; plural=(n > 1);");
+"nplurals=3; plural=(n==0 || n==1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
