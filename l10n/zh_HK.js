@@ -16,7 +16,6 @@ OC.L10N.register(
     "Search Platform" : "搜尋平台",
     "Select the app to index content and answer search queries." : "選擇應用以索引內容並回應搜尋查詢。",
     "Navigation Icon" : "導覽圖示",
-    "Enable global search within all your content." : "在您所有的內容中啟用全域搜尋。",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "對 '{search}' 中的 {title} 搜尋於 {time} ms 內回傳了 {total} 個結果"
+    "Enable global search within all your content." : "在您所有的內容中啟用全域搜尋。"
 },
 "nplurals=1; plural=0;");
