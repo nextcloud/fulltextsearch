@@ -16,7 +16,6 @@ OC.L10N.register(
     "Search Platform" : "Vyhľadávacia platforma",
     "Select the app to index content and answer search queries." : "Vyber aplikáciu pre indexovanie obsahu a odpoveď na dotazy.",
     "Navigation Icon" : "Ikona navigácie",
-    "Enable global search within all your content." : "Povoliť globálne vyhľadávanie v celom obsahu.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "Vyhľadávanie '{search}' v  {title} našlo {total} výsledkov za {time} ms"
+    "Enable global search within all your content." : "Povoliť globálne vyhľadávanie v celom obsahu."
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

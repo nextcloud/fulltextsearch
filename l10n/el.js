@@ -16,7 +16,6 @@ OC.L10N.register(
     "Search Platform" : "Πλατφόρμα αναζήτησης",
     "Select the app to index content and answer search queries." : "Επιλέξτε την εφαρμογή για την ευρετηρίοποίηση περιεχομένου και απαντήσεων σε ερωτήματα αναζήτησης.",
     "Navigation Icon" : "Εικονίδιο Πλοήγησης",
-    "Enable global search within all your content." : "Ενεργοποιήστε την γενική αναζήτηση σε όλο το περιεχόμενό σας.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "η αναζήτηση στο {title} για '{search}' επέστρεψε {total} αποτελέσματα σε {time} ms"
+    "Enable global search within all your content." : "Ενεργοποιήστε την γενική αναζήτηση σε όλο το περιεχόμενό σας."
 },
 "nplurals=2; plural=(n != 1);");

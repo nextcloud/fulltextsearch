@@ -16,7 +16,6 @@ OC.L10N.register(
     "Search Platform" : "Leita á kerfi",
     "Select the app to index content and answer search queries." : "Veldu forrit til að atriðaskrá efni og svara leitarbeiðnum.",
     "Navigation Icon" : "Táknmynd flakks",
-    "Enable global search within all your content." : "Virkja víðværa leit inna alls efnisins þíns.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "leitin í {title} eftir '{search}' skilaði {total} niðurstöðum á {time} ms"
+    "Enable global search within all your content." : "Virkja víðværa leit inna alls efnisins þíns."
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

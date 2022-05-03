@@ -15,7 +15,6 @@ OC.L10N.register(
     "Search Platform" : "検索プラットフォーム",
     "Select the app to index content and answer search queries." : "コンテンツをインデックス化して検索クエリに答えるアプリを選択します。",
     "Navigation Icon" : "ナビゲーションアイコン",
-    "Enable global search within all your content." : "すべてのコンテンツ内でグローバル検索を有効にする。",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "{title}で「{search}」を検索すると{time}msで{total}件の結果が返ってきます"
+    "Enable global search within all your content." : "すべてのコンテンツ内でグローバル検索を有効にする。"
 },
 "nplurals=1; plural=0;");
