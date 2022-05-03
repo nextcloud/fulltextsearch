@@ -15,7 +15,6 @@ OC.L10N.register(
     "Search Platform" : "Plataforma de buscas",
     "Select the app to index content and answer search queries." : "Seleccionar a aplicación para indexar o contido e responder a peticións de buscas",
     "Navigation Icon" : "Icona de navegación",
-    "Enable global search within all your content." : "Activa a busca global en todo o seu contido.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "a busca en {title} de «{search}»  devolveu {total} resultados en {time} ms."
+    "Enable global search within all your content." : "Activa a busca global en todo o seu contido."
 },
 "nplurals=2; plural=(n != 1);");

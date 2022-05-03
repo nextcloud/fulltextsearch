@@ -16,7 +16,6 @@ OC.L10N.register(
     "Search Platform" : "Keresési platform",
     "Select the app to index content and answer search queries." : "Válassza ki az alkalmazást, amely indexeli a tartalmat és válaszol a keresési kérésekre.",
     "Navigation Icon" : "Navigációs ikon",
-    "Enable global search within all your content." : "Globális keresés engedélyezése az összes tartalomban.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "a(z) {title} elemben, a(z) „{search}” keresés {total} találatot adott vissza {time} ms alatt"
+    "Enable global search within all your content." : "Globális keresés engedélyezése az összes tartalomban."
 },
 "nplurals=2; plural=(n != 1);");

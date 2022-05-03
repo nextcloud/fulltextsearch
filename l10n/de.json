@@ -14,7 +14,6 @@
     "Search Platform" : "Suchplattform",
     "Select the app to index content and answer search queries." : "Wähle die App, die Inhalte indizieren und Such-Anfragen beantworten soll.",
     "Navigation Icon" : "Navigations-Symbol",
-    "Enable global search within all your content." : "Globale Suche über alle Inhalte aktivieren.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "Die Suche in {title} nach '{search}' ergab {total} Treffer in {time} ms"
+    "Enable global search within all your content." : "Globale Suche über alle Inhalte aktivieren."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

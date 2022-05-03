@@ -16,7 +16,6 @@ OC.L10N.register(
     "Search Platform" : "Prataforma de chirca",
     "Select the app to index content and answer search queries." : "Sèbera s'aplicatzione pro inditzizare is cuntenutos e rispòndere a is chircas.",
     "Navigation Icon" : "Icona de navigatzione",
-    "Enable global search within all your content." : "Ativa sa chirca globale in totu su cuntenutu tuo.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "sa chirca in {title} pro '{search}' at torradu {total} resurtados in {time} ms"
+    "Enable global search within all your content." : "Ativa sa chirca globale in totu su cuntenutu tuo."
 },
 "nplurals=2; plural=(n != 1);");
