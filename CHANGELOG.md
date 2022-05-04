@@ -1,5 +1,9 @@
 # Changelog
 
+### 24.0.0
+
+- Collections
+- fix varchar(4000) on message
 
 ### 23.0.0
 
