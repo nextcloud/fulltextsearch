@@ -14,7 +14,6 @@ OC.L10N.register(
     "Search Platform" : "Serĉa platformo",
     "Select the app to index content and answer search queries." : "Elekti la aplikaĵon, kiu indeksos la enhavon kaj respondos serĉopetojn.",
     "Navigation Icon" : "Navigada piktogramo",
-    "Enable global search within all your content." : "Ebligi serĉon ene de ĉiuj viaj enhavoj.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "la serĉo en {title} pri „{search}“  liveris {total} rezultojn en {time} ms"
+    "Enable global search within all your content." : "Ebligi serĉon ene de ĉiuj viaj enhavoj."
 },
 "nplurals=2; plural=(n != 1);");

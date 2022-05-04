@@ -28,10 +28,14 @@ Core App of the full-text search framework for your Nextcloud.
 
 	<background-jobs>
 		<job>OCA\FullTextSearch\Cron\Index</job>
+		<job>OCA\FullTextSearch\Cron\Maintenance</job>
 	</background-jobs>
 
 	<commands>
 		<command>OCA\FullTextSearch\Command\Check</command>
+		<command>OCA\FullTextSearch\Command\CollectionInit</command>
+		<command>OCA\FullTextSearch\Command\CollectionDelete</command>
+		<command>OCA\FullTextSearch\Command\CollectionList</command>
 		<command>OCA\FullTextSearch\Command\Configure</command>
 		<command>OCA\FullTextSearch\Command\DocumentIndex</command>
 		<command>OCA\FullTextSearch\Command\DocumentPlatform</command>
@@ -39,6 +43,7 @@ Core App of the full-text search framework for your Nextcloud.
 		<command>OCA\FullTextSearch\Command\DocumentStatus</command>
 		<command>OCA\FullTextSearch\Command\Index</command>
 		<command>OCA\FullTextSearch\Command\Live</command>
+		<command>OCA\FullTextSearch\Command\Migration24</command>
 		<command>OCA\FullTextSearch\Command\Reset</command>
 		<command>OCA\FullTextSearch\Command\Search</command>
 		<command>OCA\FullTextSearch\Command\Stop</command>

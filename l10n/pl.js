@@ -16,7 +16,6 @@ OC.L10N.register(
     "Search Platform" : "Platforma wyszukiwania",
     "Select the app to index content and answer search queries." : "Wybierz aplikację, aby indeksować treść i odpowiadać na wyszukiwane hasła.",
     "Navigation Icon" : "Ikona nawigacji",
-    "Enable global search within all your content." : "Włącz globalne wyszukiwanie we wszystkich swoich treściach.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "wyszukiwanie dla '{search}' w {title} zwróciło {total} wyników w {time} ms"
+    "Enable global search within all your content." : "Włącz globalne wyszukiwanie we wszystkich swoich treściach."
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

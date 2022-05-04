@@ -87,7 +87,8 @@ class Reset extends ACommandBase {
 		parent::configure();
 		$this->setName('fulltextsearch:reset')
 			 ->setDescription('Reset index')
-			 ->addArgument('provider', InputArgument::OPTIONAL, 'provider');
+			 ->addArgument('provider', InputArgument::OPTIONAL, 'provider id', '')
+			 ->addArgument('collection', InputArgument::OPTIONAL, 'name of the collection', '');
 	}
 
 
@@ -111,7 +112,10 @@ class Reset extends ACommandBase {
 
 		$this->indexService->setRunner($this->runner);
 		try {
-			$this->indexService->resetIndex($this->getProviderIdFromArgument($input));
+			$this->indexService->resetIndex(
+				$input->getArgument('provider'),
+				$input->getArgument('collection')
+			);
 
 		} catch (Exception $e) {
 			throw $e;
@@ -120,21 +124,6 @@ class Reset extends ACommandBase {
 		}
 
 		return 0;
-	}
-
-
-	/**
-	 * @param InputInterface $input
-	 *
-	 * @return string
-	 */
-	private function getProviderIdFromArgument(InputInterface $input): string {
-		$providerId = $input->getArgument('provider');
-		if ($providerId === null) {
-			$providerId = '';
-		}
-
-		return $providerId;
 	}
 
 

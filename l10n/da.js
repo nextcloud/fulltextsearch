@@ -16,7 +16,6 @@ OC.L10N.register(
     "Search Platform" : "Søge Platform",
     "Select the app to index content and answer search queries." : "Vælg app for at indeksere indholdt og besvare søge forespørgsler.",
     "Navigation Icon" : "Navigations Ikon",
-    "Enable global search within all your content." : "Aktivere globale søgninger i alt dit indhold.",
-    "the search in {title} for '{search}' returned {total} results in {time} ms" : "søgning i {title} for '{search}' returnerede {total} resultater på bare {time} ms"
+    "Enable global search within all your content." : "Aktivere globale søgninger i alt dit indhold."
 },
 "nplurals=2; plural=(n != 1);");
