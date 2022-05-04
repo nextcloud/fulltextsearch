@@ -83,8 +83,8 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 
 		/** @noinspection PhpMethodParametersCountMismatchInspection */
 		$qb->select(
-			'li.owner_id', 'li.provider_id', 'li.document_id', 'li.source', 'li.status',
-			'li.options', 'li.err', 'li.message', 'li.indexed'
+			'li.owner_id', 'li.provider_id', 'li.document_id', 'li.collection', 'li.source',
+			'li.status', 'li.options', 'li.err', 'li.message', 'li.indexed'
 		)
 		   ->from(self::TABLE_INDEXES, 'li');
 
@@ -119,7 +119,8 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 		$index->setStatus($this->getInt('status', $data))
 			  ->setSource($this->get('source', $data, ''))
 			  ->setOwnerId($this->get('owner_id', $data, ''))
-			  ->setLastIndex($this->getInt('indexed', $data, 0));
+			  ->setLastIndex($this->getInt('indexed', $data, 0))
+			  ->setCollection($this->get('collection', $data));
 		$index->setOptions($this->getArray('options', $data, []));
 		$index->setErrorCount($this->getInt('err', $data, 0));
 		$index->setErrors($this->getArray('message', $data, []));

@@ -34,6 +34,7 @@ namespace OCA\FullTextSearch\Model;
 use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
 use OCP\FullTextSearch\Model\IIndex;
+use OCP\IURLGenerator;
 
 
 /**
@@ -52,6 +53,9 @@ class Index implements IIndex, JsonSerializable {
 
 	/** @var string */
 	private $documentId;
+
+	/** @var string */
+	private $collection;
 
 	/** @var string */
 	private $source = '';
@@ -80,10 +84,12 @@ class Index implements IIndex, JsonSerializable {
 	 *
 	 * @param string $providerId
 	 * @param string $documentId
+	 * @param string $collection
 	 */
-	public function __construct(string $providerId, string $documentId) {
+	public function __construct(string $providerId, string $documentId, string $collection = '') {
 		$this->providerId = $providerId;
 		$this->documentId = $documentId;
+		$this->collection = $collection;
 	}
 
 
@@ -137,6 +143,25 @@ class Index implements IIndex, JsonSerializable {
 	 */
 	public function getOwnerId(): string {
 		return $this->ownerId;
+	}
+
+
+	/**
+	 * @param string $collection
+	 *
+	 * @return Index
+	 */
+	public function setCollection(string $collection): self {
+		$this->collection = $collection;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCollection(): string {
+		return $this->collection;
 	}
 
 
@@ -318,9 +343,9 @@ class Index implements IIndex, JsonSerializable {
 	public function addError(string $message, string $exception = '', int $sev = IIndex::ERROR_SEV_3
 	): IIndex {
 		$this->errors[] = [
-			'message'   => substr($message, 0, 1800),
+			'message' => substr($message, 0, 1800),
 			'exception' => $exception,
-			'severity'  => $sev
+			'severity' => $sev
 		];
 
 		$this->err++;
@@ -353,19 +378,38 @@ class Index implements IIndex, JsonSerializable {
 
 
 	/**
+	 * @param IURLGenerator $urlGenerator
+	 *
+	 * @return array{url: string, status: int}
+	 */
+	public function asSitemap(IURLGenerator $urlGenerator): array {
+		return  [
+			'url' => $urlGenerator->linkToOCSRouteAbsolute('fulltextsearch.Collection.indexDocument',
+														   [
+															   'collection' => $this->getCollection(),
+															   'providerId' => $this->getProviderId(),
+															   'documentId' => $this->getDocumentId()
+														   ]
+			),
+			'status' => $this->getStatus()
+		];
+	}
+
+	/**
 	 * @return array
 	 */
 	public function jsonSerialize(): array {
 		return [
-			'ownerId'    => $this->getOwnerId(),
+			'ownerId' => $this->getOwnerId(),
 			'providerId' => $this->getProviderId(),
-			'source'     => $this->getSource(),
+			'collection' => $this->getCollection(),
+			'source' => $this->getSource(),
 			'documentId' => $this->getDocumentId(),
-			'lastIndex'  => $this->getLastIndex(),
-			'errors'     => $this->getErrors(),
+			'lastIndex' => $this->getLastIndex(),
+			'errors' => $this->getErrors(),
 			'errorCount' => $this->getErrorCount(),
-			'status'     => (int)$this->getStatus(),
-			'options'    => $this->getOptions()
+			'status' => (int)$this->getStatus(),
+			'options' => $this->getOptions()
 		];
 	}
 
