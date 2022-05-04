@@ -47,7 +47,7 @@ use OCP\IL10N;
  */
 class CoreRequestBuilder {
 
-	const TABLE_INDEXES = 'fulltextsearch_indexes';
+	const TABLE_INDEXES = 'fulltextsearch_index';
 	const TABLE_TICKS = 'fulltextsearch_ticks';
 
 	/** @var IDBConnection */
@@ -126,6 +126,17 @@ class CoreRequestBuilder {
 	 */
 	protected function limitToDocumentId(IQueryBuilder &$qb, string $documentId) {
 		$this->limitToDBField($qb, 'document_id', $documentId);
+	}
+
+
+	/**
+	 * Limit to the documentId
+	 *
+	 * @param IQueryBuilder $qb
+	 * @param string $collection
+	 */
+	protected function limitToCollection(IQueryBuilder &$qb, string $collection) {
+		$this->limitToDBField($qb, 'collection', $collection);
 	}
 
 

@@ -32,6 +32,7 @@ namespace OCA\FullTextSearch\Service;
 
 
 use OCA\FullTextSearch\AppInfo\Application;
+use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCP\IConfig;
 use OCP\PreConditionNotMetException;
@@ -51,14 +52,21 @@ class ConfigService {
 	const PROVIDER_INDEXED = 'provider_indexed';
 	const CRON_LAST_ERR_RESET = 'cron_err_reset';
 	const TICK_TTL = 'tick_ttl';
+	const COLLECTION_INDEXING_LIST = 'collection_indexing_list';
+
+
+	// Temp. can be removed after few major releases
+	const MIGRATION_24 = 'migration_24';
 
 	/** @var array */
 	public $defaults = [
-		self::SEARCH_PLATFORM     => '',
-		self::APP_NAVIGATION      => '0',
-		self::PROVIDER_INDEXED    => '',
+		self::SEARCH_PLATFORM => '',
+		self::APP_NAVIGATION => '0',
+		self::PROVIDER_INDEXED => '',
 		self::CRON_LAST_ERR_RESET => '0',
-		self::TICK_TTL            => '1800'
+		self::TICK_TTL => '1800',
+		self::COLLECTION_INDEXING_LIST => 50,
+		self::MIGRATION_24 => 1
 	];
 
 
@@ -135,13 +143,23 @@ class ConfigService {
 	 * @return string
 	 */
 	public function getAppValue(string $key): string {
-		$defaultValue = null;
+		$defaultValue = '';
 		if (array_key_exists($key, $this->defaults)) {
 			$defaultValue = $this->defaults[$key];
 		}
 
-		return $this->config->getAppValue(Application::APP_ID, $key, $defaultValue);
+		return (string)$this->config->getAppValue(Application::APP_ID, $key, $defaultValue);
 	}
+
+	/**
+	 * @param string $config
+	 *
+	 * @return int
+	 */
+	public function getAppValueInt(string $config): int {
+		return (int)$this->getAppValue($config);
+	}
+
 
 	/**
 	 * Set a value by key
@@ -273,5 +291,17 @@ class ConfigService {
 		$ver = Util::getVersion();
 
 		return $ver[0];
+	}
+
+
+	/**
+	 * @throws DatabaseException
+	 */
+	public function requireMigration24(): void {
+		if ($this->getAppValueInt(self::MIGRATION_24) === 1) {
+			return;
+		}
+
+		throw new DatabaseException('please run ./occ fulltextsearch:migration:24');
 	}
 }

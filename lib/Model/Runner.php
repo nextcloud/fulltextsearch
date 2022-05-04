@@ -211,6 +211,15 @@ class Runner implements IRunner {
 	}
 
 	/**
+	 * @param string $info
+	 * @param int $value
+	 */
+	public function setInfoInt(string $info, int $value): void {
+		$this->info[$info] = $value;
+		$this->infoUpdated();
+	}
+
+	/**
 	 * @param array $data
 	 */
 	public function setInfoArray(array $data) {
@@ -271,6 +280,14 @@ class Runner implements IRunner {
 		return $this->get($info, $this->info, '');
 	}
 
+	/**
+	 * @param string $info
+	 *
+	 * @return int
+	 */
+	public function getInfoInt(string $info): int {
+		return $this->getInt($info, $this->info);
+	}
 
 	/**
 	 * @param array $method
@@ -323,10 +340,10 @@ class Runner implements IRunner {
 	public function newIndexError(IIndex $index, string $message, string $class = '', int $sev = 3
 	) {
 		$error = [
-			'index'     => $index,
-			'message'   => $message,
+			'index' => $index,
+			'message' => $message,
 			'exception' => $class,
-			'severity'  => $sev
+			'severity' => $sev
 		];
 
 		foreach ($this->methodOnIndexError as $method) {
@@ -351,10 +368,10 @@ class Runner implements IRunner {
 	 */
 	public function newIndexResult(IIndex $index, string $message, string $status, int $type) {
 		$result = [
-			'index'   => $index,
+			'index' => $index,
 			'message' => $message,
-			'status'  => $status,
-			'type'    => $type
+			'status' => $status,
+			'type' => $type
 		];
 
 		foreach ($this->methodOnIndexResult as $method) {

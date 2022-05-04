@@ -170,7 +170,7 @@ class CliService {
 		$initVar = $this->runner->getInfoAll();
 		$keys = array_keys($initVar);
 		foreach ($keys as $key) {
-			$this->display->setMessage($initVar[$key], $key);
+			$this->display->setMessage((string)$initVar[$key], (string)$key);
 		}
 
 		$this->display->clear();
@@ -225,7 +225,7 @@ class CliService {
 
 		$keys = array_keys($info);
 		foreach ($keys as $k) {
-			$this->display->setMessage((string)$info[$k], $k);
+			$this->display->setMessage((string)$info[$k], (string)$k);
 		}
 		$this->refreshInfo();
 

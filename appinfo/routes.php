@@ -29,6 +29,21 @@ declare(strict_types=1);
 
 
 return [
+	'ocs' => [
+		/** @see OCA\FullTextSearch\Controller\CollectionController */
+		['name' => 'Collection#getQueue', 'url' => '/collection/{collection}/index', 'verb' => 'GET'],
+		[
+			'name' => 'Collection#indexDocument',
+			'url' => '/collection/{collection}/document/{providerId}/{documentId}',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'Collection#updateStatusDone',
+			'url' => '/collection/{collection}/document/{providerId}/{documentId}/done',
+			'verb' => 'POST'
+		]
+	],
+
 	'routes' => [
 		['name' => 'Navigation#navigate', 'url' => '/', 'verb' => 'GET'],
 		['name' => 'Settings#getSettingsAdmin', 'url' => '/admin/settings', 'verb' => 'GET'],
