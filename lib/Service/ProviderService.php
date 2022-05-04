@@ -244,12 +244,13 @@ class ProviderService implements IProviderService {
 
 
 	/**
-	 * @param IFullTextSearchProvider $provider
+	 * @param string $providerId
 	 * @param bool $boolean
 	 */
-	public function setProviderAsIndexed(IFullTextSearchProvider $provider, bool $boolean) {
+	public function setProviderAsIndexed(string $providerId, bool $boolean) {
 		$this->configService->setProviderOptions(
-			$provider->getId(), ConfigService::PROVIDER_INDEXED, (($boolean) ? '1' : '0')
+			$providerId,
+			ConfigService::PROVIDER_INDEXED, (($boolean) ? '1' : '0')
 		);
 	}
 
@@ -291,7 +292,7 @@ class ProviderService implements IProviderService {
 		if (array_key_exists('@attributes', $providers)) {
 			$providers = [$providers];
 		}
-		foreach ($providers AS $provider) {
+		foreach ($providers as $provider) {
 			if (is_array($provider)) {
 				$attributes = $provider['@attributes'];
 				if (array_key_exists('min-version', $attributes)
@@ -326,7 +327,7 @@ class ProviderService implements IProviderService {
 	 * @throws Exception
 	 */
 	private function providerIdMustBeUnique(IFullTextSearchProvider $provider) {
-		foreach ($this->providers AS $providerWrapper) {
+		foreach ($this->providers as $providerWrapper) {
 			$knownProvider = $providerWrapper->getProvider();
 			if ($knownProvider->getId() === $provider->getId()) {
 				throw new ProviderIsNotUniqueException(
@@ -346,7 +347,7 @@ class ProviderService implements IProviderService {
 		$arr = [];
 		foreach ($providers as $provider) {
 			$arr[] = [
-				'id'   => $provider->getId(),
+				'id' => $provider->getId(),
 				'name' => $provider->getName()
 			];
 		}
