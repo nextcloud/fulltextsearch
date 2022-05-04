@@ -62,9 +62,8 @@ class Version2000Date20201208130255 extends SimpleMigrationStep {
 				'notnull' => true,
 				'length' => 1,
 			]);
-			$table->addColumn('message', 'string', [
+			$table->addColumn('message', 'text', [
 				'notnull' => false,
-				'length' => 8000,
 			]);
 			$table->addColumn('indexed', 'bigint', [
 				'notnull' => false,
