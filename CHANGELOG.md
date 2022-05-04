@@ -1,5 +1,9 @@
 # Changelog
 
+### 24.0.0
+
+- collections
+
 
 ### 23.0.0
 
