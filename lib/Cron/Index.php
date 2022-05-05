@@ -119,7 +119,7 @@ class Index extends TimedJob {
 		$platform = $wrapper->getPlatform();
 
 		$all = $this->shouldWeGetAllIndex();
-		$indexes = $this->indexService->getQueuedIndexes($all);
+		$indexes = $this->indexService->getQueuedIndexes('', $all);
 
 		foreach ($indexes as $index) {
 			$this->runner->updateAction('indexing');

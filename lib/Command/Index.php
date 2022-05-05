@@ -40,6 +40,7 @@ use OCA\FullTextSearch\Model\Index as ModelIndex;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\CliService;
+use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
@@ -48,7 +49,6 @@ use OCA\FullTextSearch\Service\RunningService;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\IUserManager;
 use OutOfBoundsException;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -138,6 +138,8 @@ class Index extends ACommandBase {
 	/** @var MiscService */
 	private $miscService;
 
+	/** @var ConfigService */
+	private $configService;
 
 	/** @var Runner */
 	private $runner;
@@ -168,11 +170,13 @@ class Index extends ACommandBase {
 	 * @param PlatformService $platformService
 	 * @param ProviderService $providerService
 	 * @param MiscService $miscService
+	 * @param ConfigService $configService
 	 */
 	public function __construct(
 		IUserManager $userManager, RunningService $runningService, CliService $cliService,
 		IndexService $indexService, PlatformService $platformService,
-		ProviderService $providerService, MiscService $miscService
+		ProviderService $providerService, MiscService $miscService,
+		ConfigService $configService
 	) {
 		parent::__construct();
 		$this->userManager = $userManager;
@@ -184,6 +188,7 @@ class Index extends ACommandBase {
 		$this->platformService = $platformService;
 		$this->providerService = $providerService;
 		$this->miscService = $miscService;
+		$this->configService = $configService;
 	}
 
 
@@ -210,6 +215,7 @@ class Index extends ACommandBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
+		$this->configService->requireMigration24();
 
 		$options = $this->generateIndexOptions($input);
 
@@ -217,7 +223,7 @@ class Index extends ACommandBase {
 			/** do not get stuck while waiting interactive input */
 			try {
 				readline_callback_handler_install(
-					'', function() {
+					'', function () {
 				}
 				);
 			} catch (Throwable $t) {
@@ -414,7 +420,7 @@ class Index extends ACommandBase {
 			}
 		}
 
-		$this->providerService->setProviderAsIndexed($provider, true);
+		$this->providerService->setProviderAsIndexed($provider->getId(), true);
 	}
 
 
@@ -572,37 +578,37 @@ class Index extends ACommandBase {
 		// full list of info that can be edited
 		$this->runner->setInfoArray(
 			[
-				'userId'       => '',
+				'userId' => '',
 				'providerName' => '',
-				'_memory'      => '',
-				'documentId'   => '',
-				'action'       => '',
-				'info'         => '',
-				'title'        => '',
-				'_paused'      => '',
+				'_memory' => '',
+				'documentId' => '',
+				'action' => '',
+				'info' => '',
+				'title' => '',
+				'_paused' => '',
 
-				'resultIndex'         => '',
-				'resultCurrent'       => '',
-				'resultTotal'         => '',
-				'resultMessageA'      => '',
-				'resultMessageB'      => '',
-				'resultMessageC'      => '',
-				'resultStatus'        => '',
+				'resultIndex' => '',
+				'resultCurrent' => '',
+				'resultTotal' => '',
+				'resultMessageA' => '',
+				'resultMessageB' => '',
+				'resultMessageC' => '',
+				'resultStatus' => '',
 				'resultStatusColored' => '',
-				'content'             => '',
-				'statusColored'       => '',
-				'chunkCurrent'        => '',
-				'chunkTotal'          => '',
-				'documentCurrent'     => '',
-				'documentTotal'       => '',
-				'progressStatus'      => '',
-				'errorCurrent'        => '0',
-				'errorTotal'          => '0',
-				'errorMessageA'       => '',
-				'errorMessageB'       => '',
-				'errorMessageC'       => '',
-				'errorException'      => '',
-				'errorIndex'          => ''
+				'content' => '',
+				'statusColored' => '',
+				'chunkCurrent' => '',
+				'chunkTotal' => '',
+				'documentCurrent' => '',
+				'documentTotal' => '',
+				'progressStatus' => '',
+				'errorCurrent' => '0',
+				'errorTotal' => '0',
+				'errorMessageA' => '',
+				'errorMessageB' => '',
+				'errorMessageC' => '',
+				'errorException' => '',
+				'errorIndex' => ''
 			]
 		);
 	}
@@ -618,7 +624,7 @@ class Index extends ACommandBase {
 			$this->runner->setInfoArray(
 				[
 					'errorCurrent' => 0,
-					'errorTotal'   => 0,
+					'errorTotal' => 0,
 				]
 			);
 
@@ -648,13 +654,13 @@ class Index extends ACommandBase {
 
 		$this->runner->setInfoArray(
 			[
-				'errorCurrent'   => $current,
-				'errorTotal'     => $total,
-				'errorMessageA'  => trim($err1),
-				'errorMessageB'  => trim($err2),
-				'errorMessageC'  => trim($err3),
+				'errorCurrent' => $current,
+				'errorTotal' => $total,
+				'errorMessageA' => trim($err1),
+				'errorMessageB' => trim($err2),
+				'errorMessageC' => trim($err3),
 				'errorException' => $this->get('exception', $error, ''),
-				'errorIndex'     => $errorIndex
+				'errorIndex' => $errorIndex
 			]
 		);
 	}
@@ -670,7 +676,7 @@ class Index extends ACommandBase {
 			$this->runner->setInfoArray(
 				[
 					'resultCurrent' => 0,
-					'resultTotal'   => 0,
+					'resultTotal' => 0,
 				]
 			);
 
@@ -704,13 +710,13 @@ class Index extends ACommandBase {
 
 		$this->runner->setInfoArray(
 			[
-				'resultCurrent'  => $current,
-				'resultTotal'    => $total,
+				'resultCurrent' => $current,
+				'resultTotal' => $total,
 				'resultMessageA' => trim($msg1),
 				'resultMessageB' => trim($msg2),
 				'resultMessageC' => trim($msg3),
-				'resultStatus'   => $status,
-				'resultIndex'    => $resultIndex
+				'resultStatus' => $status,
+				'resultIndex' => $resultIndex
 			]
 		);
 		$this->runner->setInfoColored('resultStatus', $type);
@@ -808,10 +814,10 @@ class Index extends ACommandBase {
 		foreach ($indexes as $index) {
 			foreach ($index->getErrors() as $error) {
 				$this->errors[] = [
-					'index'     => $index,
-					'message'   => $error['message'],
+					'index' => $index,
+					'message' => $error['message'],
 					'exception' => $error['exception'],
-					'severity'  => $error['severity']
+					'severity' => $error['severity']
 				];
 			}
 
@@ -830,11 +836,11 @@ class Index extends ACommandBase {
 
 		$this->runner->setInfoArray(
 			[
-				'errorMessageA'  => '',
-				'errorMessageB'  => '',
-				'errorMessageC'  => '',
+				'errorMessageA' => '',
+				'errorMessageB' => '',
+				'errorMessageC' => '',
 				'errorException' => '',
-				'errorIndex'     => ''
+				'errorIndex' => ''
 			]
 		);
 
