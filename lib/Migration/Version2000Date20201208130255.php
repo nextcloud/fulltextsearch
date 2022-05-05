@@ -6,6 +6,7 @@ namespace OCA\FullTextSearch\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
+use OCP\DB\Types;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
@@ -26,6 +27,7 @@ class Version2000Date20201208130255 extends SimpleMigrationStep {
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
 	 * @param array $options
+	 *
 	 * @return null|ISchemaWrapper
 	 */
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options) {
@@ -44,9 +46,8 @@ class Version2000Date20201208130255 extends SimpleMigrationStep {
 				'notnull' => false,
 				'length' => 128,
 			]);
-			$table->addColumn('data', 'string', [
-				'notnull' => false,
-				'length' => 6000,
+			$table->addColumn('data', Types::TEXT, [
+				'notnull' => false
 			]);
 			$table->addColumn('status', 'string', [
 				'notnull' => false,
@@ -66,6 +67,7 @@ class Version2000Date20201208130255 extends SimpleMigrationStep {
 			]);
 			$table->setPrimaryKey(['id']);
 		}
+
 		return $schema;
 	}
 
