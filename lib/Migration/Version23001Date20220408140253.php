@@ -38,11 +38,16 @@ class Version23001Date20220408140253 extends SimpleMigrationStep {
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
 	 * @param array $options
+	 *
 	 * @return null|ISchemaWrapper
 	 */
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
+
+		if (!$schema->hasTable('fulltextsearch_indexes')) {
+			return null;
+		}
 
 		$table = $schema->getTable('fulltextsearch_indexes');
 		$column = $table->getColumn('message');
@@ -52,6 +57,7 @@ class Version23001Date20220408140253 extends SimpleMigrationStep {
 		}
 
 		$column->setType(Type::getType(Types::TEXT));
+
 		return $schema;
 	}
 }
