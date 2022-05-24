@@ -18,4 +18,4 @@ OC.L10N.register(
     "Navigation Icon" : "Ícone de Navegação",
     "Enable global search within all your content." : "Ativar a pesquisa global em todo o seu conteúdo."
 },
-"nplurals=2; plural=(n > 1);");
+"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
