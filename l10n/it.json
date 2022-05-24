@@ -15,5 +15,5 @@
     "Select the app to index content and answer search queries." : "Seleziona l'applicazione per indicizzare i contenuti e rispondere alle ricerche.",
     "Navigation Icon" : "Icona di navigazione",
     "Enable global search within all your content." : "Abilita la ricerca globale in tutti i tuoi contenuti."
-},"pluralForm" :"nplurals=2; plural=(n != 1);"
+},"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
