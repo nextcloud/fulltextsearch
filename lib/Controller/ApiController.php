@@ -31,13 +31,14 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Controller;
 
 
-use ArtificialOwl\MySmallPhpTools\Traits\Nextcloud\TNCDataResponse;
 use Exception;
+use OC\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
+use OCA\FullTextSearch\Tools\Traits\TDeserialize;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
@@ -50,10 +51,7 @@ use OCP\IUserSession;
  * @package OCA\FullTextSearch\Controller
  */
 class ApiController extends Controller {
-
-
-	use TNCDataResponse;
-
+	use TDeserialize;
 
 	/** @var IUserSession */
 	private $userSession;
@@ -128,23 +126,25 @@ class ApiController extends Controller {
 			$user = $this->userSession->getUser();
 			$result = $this->searchService->search($user->getUID(), $request);
 
-			return $this->success(
-				$result,
+			return new DataResponse(
 				[
 					'request' => $request,
-					'version' => $this->configService->getAppValue('installed_version')
+					'version' => $this->configService->getAppValue('installed_version'),
+					'result' => $result,
+					'status' => 1
 				]
 			);
 		} catch (Exception $e) {
-			return $this->fail(
-				$e,
+			return new DataResponse(
 				[
 					'request' => $request,
-					'version' => $this->configService->getAppValue('installed_version')
-				]
+					'version' => $this->configService->getAppValue('installed_version'),
+					'status' => -1,
+					'exception' => get_class($e),
+					'message' => $e->getMessage()
+				], Http::STATUS_INTERNAL_SERVER_ERROR
 			);
 		}
 	}
-
 }
 

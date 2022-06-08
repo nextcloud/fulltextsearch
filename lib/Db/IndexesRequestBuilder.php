@@ -31,8 +31,8 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Db;
 
 
-use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use OCA\FullTextSearch\Model\Index;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
 
@@ -43,7 +43,6 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
  */
 class IndexesRequestBuilder extends CoreRequestBuilder {
 
-
 	use TArrayTools;
 
 
@@ -53,7 +52,7 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	 * @return IQueryBuilder
 	 */
 	protected function getIndexesInsertSql(): IQueryBuilder {
-		$qb = $this->dbConnection->getQueryBuilder();
+		$qb = $this->getQueryBuilder();
 		$qb->insert(self::TABLE_INDEXES);
 
 		return $qb;

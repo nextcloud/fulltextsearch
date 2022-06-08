@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 
-use ArtificialOwl\MySmallPhpTools\Traits\Nextcloud\nc22\TNC22Logger;
+use OCA\FullTextSearch\Tools\Traits\Nextcloud\nc22\TNC22Logger;
 use Exception;
 use OC;
 use OC\App\AppManager;
@@ -44,6 +44,7 @@ use OCA\FullTextSearch\Exceptions\EmptySearchException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
+use OCA\FullTextSearch\Tools\Traits\TNCLogger;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IDocumentAccess;
@@ -63,7 +64,7 @@ use OCP\IUserManager;
 class SearchService implements ISearchService {
 
 
-	use TNC22Logger;
+	use TNCLogger;
 
 
 	/** @var string */

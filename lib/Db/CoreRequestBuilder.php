@@ -85,6 +85,11 @@ class CoreRequestBuilder {
 	}
 
 
+	public function getQueryBuilder(): CoreQueryBuilder {
+		return new CoreQueryBuilder();
+	}
+
+
 	/**
 	 * Limit the request to the Id
 	 *
