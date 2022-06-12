@@ -2,6 +2,7 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "検索結果{total}件{time} ms",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "\"{search}\" を 「{title}」 で検索すると、{time} ms で {total} 件返却されます",
     "Search" : "検索",
     "Index not found" : "インデックスが見つかりません",
     "Process timed out" : "プロセスがタイムアウトしました",
