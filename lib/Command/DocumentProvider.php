@@ -105,6 +105,9 @@ class DocumentProvider extends Base {
 		$index->setOwnerId($userId);
 		$index->setStatus(Index::INDEX_FULL);
 		$indexDocument = $provider->updateDocument($index);
+
+		$index->setOwnerId($indexDocument->getAccess()->getOwnerId());
+
 		if (!$indexDocument->hasIndex()) {
 			$indexDocument->setIndex($index);
 		}
