@@ -1,7 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "Search" : "Qidirmoq",
-    "General" : "Umumiy"
+    "Search" : "Search",
+    "General" : "General"
 },
 "nplurals=1; plural=0;");
