@@ -15,7 +15,7 @@ OC.L10N.register(
     "General" : "Obecné",
     "Search Platform" : "Vyhledávací platforma",
     "Select the app to index content and answer search queries." : "Vyberte aplikaci kterou indexovat obsah a zodpovídat dotazy vyhledávání.",
-    "Navigation Icon" : "Navigační ikona",
+    "Navigation Icon" : "Ikona navigace",
     "Enable global search within all your content." : "Zapnout globální vyhledávání ve veškerém vašem obsahu."
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");
