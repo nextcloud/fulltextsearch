@@ -8,6 +8,8 @@ OC.L10N.register(
     "Process timed out" : "Час на обробку вичерпано",
     "Full Text Search" : "Повнотекстовий пошук",
     "Full text search" : "Повнотекстовий пошук",
+    "Core of the full-text search framework for Nextcloud" : "Ядро рушія повнотекстового пошуку для Nextcloud",
+    "Core App of the full-text search framework for your Nextcloud." : "Основний застосунок рушія повнотекстового пошуку для Nextcloud.",
     "Search on %s" : "Шукати у %s",
     "General" : "Загальна",
     "Search Platform" : "Пошукова платформа",
