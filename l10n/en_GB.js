@@ -1,8 +1,12 @@
 OC.L10N.register(
     "fulltextsearch",
     {
+    "the search returned {total} results in {time} ms" : "the search returned {total} results in {time} ms",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "the search in {title} for \"{search}\" returned {total} results in {time} ms",
     "Search" : "Search",
     "Index not found" : "Index not found",
+    "Process timed out" : "Process timed out",
+    "Full Text Search" : "Full Text Search",
     "Full text search" : "Full text search",
     "Core of the full-text search framework for Nextcloud" : "Core of the full-text search framework for Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Core App of the full-text search framework for your Nextcloud.",
