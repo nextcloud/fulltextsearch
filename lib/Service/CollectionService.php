@@ -45,6 +45,7 @@ use OCP\IURLGenerator;
 
 
 class CollectionService {
+	public const LOCAL = 'local';
 
 
 	/** @var IURLGenerator */
@@ -121,7 +122,7 @@ class CollectionService {
 	 * @return string[]
 	 */
 	public function getCollections(): array {
-		return array_filter($this->indexesRequest->getCollections());
+		return $this->indexesRequest->getCollections(false);
 	}
 
 
@@ -221,7 +222,9 @@ class CollectionService {
 	 * @throws CollectionArgumentException
 	 */
 	public function confirmCollectionString(string $collection): void {
-//		throw new CollectionArgumentException();
+		if (strtolower($collection) === self::LOCAL) {
+			throw new CollectionArgumentException('invalid name');
+		}
 	}
 
 	/**

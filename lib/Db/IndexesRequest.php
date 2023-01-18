@@ -34,6 +34,7 @@ namespace OCA\FullTextSearch\Db;
 use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
+use OCA\FullTextSearch\Service\CollectionService;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\IDBConnection;
 
@@ -182,6 +183,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param int $status
 	 */
 	public function updateStatuses(string $collection, string $providerId, array $indexes, int $status) {
+		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('status', $qb->createNamedParameter($status));
 
@@ -210,6 +213,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param string $collection \
 	 */
 	public function deleteCollection(string $collection): void {
+		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToCollection($qb, $collection);
 
@@ -232,6 +237,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 *
 	 */
 	public function reset(string $collection = ''): void {
+		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToCollection($qb, $collection);
 
@@ -249,6 +256,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @throws IndexDoesNotExistException
 	 */
 	public function getIndex(string $providerId, string $documentId, string $collection = ''): Index {
+		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToProviderId($qb, $providerId);
 		$this->limitToDocumentId($qb, $documentId);
@@ -296,6 +305,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @return Index[]
 	 */
 	public function getQueuedIndexes(string $collection = '', bool $all = false, int $length = 0): array {
+		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToQueuedIndexes($qb);
 		if ($all === false) {
@@ -344,7 +355,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	/**
 	 * @return string[]
 	 */
-	public function getCollections(): array {
+	public function getCollections(bool $local = true): array {
 		$qb = $this->dbConnection->getQueryBuilder();
 
 		$qb->select('li.collection')
@@ -359,7 +370,11 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 		$cursor->closeCursor();
 
-		return array_merge([''], $collections);
+		if (!$local) {
+			return $collections;
+		}
+
+		return array_merge([CollectionService::LOCAL], $collections);
 	}
 
 
