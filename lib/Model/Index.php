@@ -33,6 +33,7 @@ namespace OCA\FullTextSearch\Model;
 
 use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
+use OCA\FullTextSearch\Service\CollectionService;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\IURLGenerator;
 
@@ -54,8 +55,7 @@ class Index implements IIndex, JsonSerializable {
 	/** @var string */
 	private $documentId;
 
-	/** @var string */
-	private $collection;
+	private string $collection = CollectionService::LOCAL;
 
 	/** @var string */
 	private $source = '';
