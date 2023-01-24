@@ -1,7 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "Search" : "Search",
+    "Search" : "ค้นหา",
     "General" : "ทั่วไป"
 },
 "nplurals=1; plural=0;");
