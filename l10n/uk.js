@@ -11,7 +11,7 @@ OC.L10N.register(
     "Core of the full-text search framework for Nextcloud" : "Ядро рушія контекстного пошуку для Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Основний застосунок рушія контекстного пошуку для Nextcloud.",
     "Search on %s" : "Шукати у %s",
-    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Будь ласка, ознайомтеся з докуентацією щодо встановлення та налаштування контекстного пошуку у Nextcloud.",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Будь ласка, ознайомтеся з документацією щодо встановлення та налаштування контекстного пошуку у Nextcloud.",
     "General" : "Загальне",
     "Search Platform" : "Пошукова платформа",
     "Select the app to index content and answer search queries." : "Виберіть застосунок для індексування вмісту та відповіді на пошукові запити",
