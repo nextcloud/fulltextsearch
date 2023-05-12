@@ -1,8 +1,0 @@
-{ "translations": {
-    "Search" : "Search",
-    "Index not found" : "Nun s'alcontró l'índiz",
-    "Full text search" : "Gueta de testos completos",
-    "Search on %s" : "Guetar en %s",
-    "General" : "Xeneral"
-},"pluralForm" :"nplurals=2; plural=(n != 1);"
-}
