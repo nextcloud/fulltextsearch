@@ -38,9 +38,8 @@ use OCA\FullTextSearch\Exceptions\PlatformDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\PlatformIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\PlatformNotSelectedException;
 use OCA\FullTextSearch\Model\PlatformWrapper;
-use OCP\AppFramework\QueryException;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
-
+use Psr\Container\ContainerExceptionInterface;
 
 /**
  * Class PlatformService
@@ -117,13 +116,17 @@ class PlatformService {
 		foreach ($this->platforms as $wrapper) {
 			$class = $wrapper->getClass();
 			try {
-				$platform = OC::$server->query((string)$class);
-				if ($platform instanceof IFullTextSearchPlatform) {
-					$wrapper->setPlatform($platform);
-					$platforms[] = $wrapper;
+				$platform = OC::$server->get((string)$class);
+				if (!($platform instanceof IFullTextSearchPlatform)) {
+					$this->miscService->log($class . ' does not implement ' . IFullTextSearchPlatform::class);
+					continue;
 				}
-			} catch (QueryException $e) {
+				
+				$wrapper->setPlatform($platform);
+				$platforms[] = $wrapper;
+			} catch (ContainerExceptionInterface $e) {
 				/** we cycle */
+				$this->miscService->log($e->getMessage());
 			}
 
 		}
