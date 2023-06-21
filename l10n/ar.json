@@ -1,9 +1,19 @@
 { "translations": {
-    "Search" : "البحث",
-    "Index not found" : "الفِهرِسُ غائب",
-    "Full text search" : "البحث الكامل عن النص",
+    "the search returned {total} results in {time} ms" : "عاد البحث بـ {total} نتيجة؛ في {time} مللي ثانية",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "البحث في {title} عن \"{search}\" عاد بـ {total} نتيجة؛ في {time} مللي ثانية",
+    "Search" : "بحث",
+    "Index not found" : "الفهرس غير موجود",
+    "Process timed out" : "إنتهي زمن الإجرائية",
+    "Full Text Search" : "بحث نصي شامل",
+    "Full text search" : "بحث نصي شامل",
+    "Core of the full-text search framework for Nextcloud" : "أساس core إطار عمل نكست كلاود للبحث النصي الشامل ",
+    "Core App of the full-text search framework for your Nextcloud." : "التطبيق الأساسي لإطار عمل نكست كلاود للبحث النصي الش",
     "Search on %s" : "البحث في %s",
-    "General" : "العامة",
-    "Search Platform" : "منصة البحث"
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "من فضلك، إبحث في الويكي عن وثائق متعلقة بالتنصيب و التهيئة للبحث النصي الشامل داخل خادومك لنكست كلاود",
+    "General" : "عام",
+    "Search Platform" : "منصة البحث",
+    "Select the app to index content and answer search queries." : "إختر التطبيق لفهرسة المحتويات و الاستجابة لاستعلامات البحث.",
+    "Navigation Icon" : "أيقونه التصفُّح",
+    "Enable global search within all your content." : "فعّل البحث الشامل داخل كل محتوياتك."
 },"pluralForm" :"nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;"
 }
