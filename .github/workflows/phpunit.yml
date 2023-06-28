@@ -8,7 +8,7 @@ on:
       - stable*
 
 env:
-  APP_NAME: globalsiteselector
+  APP_NAME: fulltextsearch
 
 jobs:
   php:
