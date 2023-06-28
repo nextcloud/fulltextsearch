@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,9 +31,7 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use Exception;
-
 
 /**
  * Class SettingsService
@@ -87,9 +86,9 @@ class SettingsService {
 	public function completeSettings(array &$data) {
 		$data = array_merge(
 			$data, [
-					 'platforms_all' => $this->completeSettingsPlatforms(),
-					 'providers_all' => $this->completeSettingsProviders()
-				 ]
+				'platforms_all' => $this->completeSettingsPlatforms(),
+				'providers_all' => $this->completeSettingsProviders()
+			]
 		);
 
 	}
@@ -105,7 +104,7 @@ class SettingsService {
 		foreach ($platforms as $wrapper) {
 			$platform = $wrapper->getPlatform();
 			$list[$wrapper->getClass()] = [
-				'id'   => $platform->getId(),
+				'id' => $platform->getId(),
 				'name' => $platform->getName()
 			];
 		}

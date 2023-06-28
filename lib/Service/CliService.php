@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,11 +31,9 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use OCA\FullTextSearch\Model\Runner;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 /**
  * Class CliService
@@ -111,7 +110,7 @@ class CliService {
 	public function displayPanel(string $panelSlot, string $panelId) {
 		$this->displayedPanel[] = [
 			'slot' => $panelSlot,
-			'id'   => $panelId
+			'id' => $panelId
 		];
 	}
 
@@ -138,7 +137,7 @@ class CliService {
 	 */
 	public function switchPanel(string $panelSlot, string $panelId) {
 		$this->displayedPanel = array_map(
-			function($item) use ($panelId, $panelSlot) {
+			function ($item) use ($panelId, $panelSlot) {
 				if ($item['slot'] === $panelSlot) {
 					$item['id'] = $panelId;
 				}
@@ -233,4 +232,3 @@ class CliService {
 	}
 
 }
-

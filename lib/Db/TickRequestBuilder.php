@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,11 +31,9 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Db;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use OCA\FullTextSearch\Model\Tick;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-
 
 /**
  * Class TickRequestBuilder

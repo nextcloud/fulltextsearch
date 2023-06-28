@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,13 +31,12 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Search;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use Exception;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
 use OCP\IL10N;
@@ -54,8 +54,8 @@ use OCP\Search\SearchResult;
 class UnifiedSearchProvider implements IProvider {
 
 
-	const PROVIDER_ID = 'fulltextsearch';
-	const ORDER = 1;
+	public const PROVIDER_ID = 'fulltextsearch';
+	public const ORDER = 1;
 
 
 	use TArrayTools;
@@ -155,10 +155,10 @@ class UnifiedSearchProvider implements IProvider {
 	private function generateSearchRequest(ISearchQuery $query): ISearchRequest {
 		$searchRequest = new SearchRequest();
 
-//		$app = 'abc';
-//		if (($pos = strpos($app, '.')) !== false) {
-//			$app = substr($app, 0, $pos);
-//		}
+		//		$app = 'abc';
+		//		if (($pos = strpos($app, '.')) !== false) {
+		//			$app = substr($app, 0, $pos);
+		//		}
 
 		$searchRequest->setProviders(['all']);
 		$searchRequest->setSearch($query->getTerm());
@@ -208,4 +208,3 @@ class UnifiedSearchProvider implements IProvider {
 	}
 
 }
-

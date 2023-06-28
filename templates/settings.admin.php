@@ -31,7 +31,6 @@ declare(strict_types=1);
 use OCA\FullTextSearch\AppInfo\Application;
 use OCP\Util;
 
-
 Util::addScript(Application::APP_ID, 'admin.elements');
 Util::addScript(Application::APP_ID, 'admin.settings');
 Util::addScript(Application::APP_ID, 'admin');
@@ -61,8 +60,8 @@ Util::addStyle(Application::APP_ID, 'admin');
 				<span class="leftcol"><?php p($l->t('Search Platform')); ?>:</span>
 				<br/>
 				<em><?php p(
-						$l->t('Select the app to index content and answer search queries.')
-					); ?></em>
+					$l->t('Select the app to index content and answer search queries.')
+				); ?></em>
 			</div>
 			<div class="div-table-col">
 				<select id="fts_platforms">

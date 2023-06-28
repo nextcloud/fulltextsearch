@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,13 +31,11 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use OCP\DB\Exception;
 use OCP\DB\IResult;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use Symfony\Component\Console\Helper\ProgressBar;
-
 
 class MigrationService {
 
@@ -129,18 +128,18 @@ class MigrationService {
 		$create = $this->dbConnection->getQueryBuilder();
 		$create->insert('fulltextsearch_index')
 			   ->values(
-				   [
-					   'owner_id' => $create->createParameter('owner_id'),
-					   'provider_id' => $create->createParameter('provider_id'),
-					   'collection' => $create->createParameter('collection'),
-					   'document_id' => $create->createParameter('document_id'),
-					   'source' => $create->createParameter('source'),
-					   'err' => $create->createParameter('err'),
-					   'message' => $create->createParameter('message'),
-					   'status' => $create->createParameter('status'),
-					   'options' => $create->createParameter('options'),
-					   'indexed' => $create->createParameter('indexed')
-				   ]
+			   	[
+			   		'owner_id' => $create->createParameter('owner_id'),
+			   		'provider_id' => $create->createParameter('provider_id'),
+			   		'collection' => $create->createParameter('collection'),
+			   		'document_id' => $create->createParameter('document_id'),
+			   		'source' => $create->createParameter('source'),
+			   		'err' => $create->createParameter('err'),
+			   		'message' => $create->createParameter('message'),
+			   		'status' => $create->createParameter('status'),
+			   		'options' => $create->createParameter('options'),
+			   		'indexed' => $create->createParameter('indexed')
+			   	]
 			   );
 
 		while ($row = $oldData->fetch()) {

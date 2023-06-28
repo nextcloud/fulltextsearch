@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,9 +31,7 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch;
 
-
 use OC\Core\Command\Base;
-
 
 /**
  * Abstract class ICommandBase
@@ -42,4 +41,3 @@ abstract class ACommandBase extends Base {
 	abstract public function abort();
 
 }
-

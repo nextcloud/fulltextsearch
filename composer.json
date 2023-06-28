@@ -6,7 +6,10 @@
   "config": {
     "optimize-autoloader": true,
     "classmap-authoritative": true,
-    "autoloader-suffix": "FullTextSearch"
+    "autoloader-suffix": "FullTextSearch",
+    "platform": {
+      "php": "8.0"
+    }
   },
   "authors": [
     {
@@ -19,7 +22,28 @@
       "OCA\\FullTextSearch\\": "lib/"
     }
   },
-  "require": {
-    "artificial-owl/my-small-php-tools": "~23"
+  "scripts": {
+    "cs:check": "php-cs-fixer fix --dry-run --diff",
+    "cs:fix": "php-cs-fixer fix",
+    "psalm": "psalm",
+    "psalm:update-baseline": "psalm --threads=1 --update-baseline",
+    "psalm:clear": "psalm --clear-cache && psalm --clear-global-cache",
+    "psalm:fix": "psalm --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingParamType,InvalidFalsableReturnType",
+    "test": [
+      "@test:unit"
+    ],
+    "test:unit": "vendor/bin/phpunit -c tests/unit/phpunit.xml",
+    "lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6.9",
+    "vimeo/psalm": "^4.22",
+    "nextcloud/coding-standard": "^1.1",
+    "nextcloud/ocp": "dev-master"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "OCP\\": "vendor/nextcloud/ocp/OCP"
+    }
   }
 }

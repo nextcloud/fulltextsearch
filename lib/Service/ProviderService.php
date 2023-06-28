@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use Exception;
 use OC;
 use OC\App\AppManager;
@@ -44,7 +44,6 @@ use OCP\AppFramework\QueryException;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Service\IProviderService;
 use OCP\Util;
-
 
 /**
  * Class ProviderService
@@ -229,8 +228,7 @@ class ProviderService implements IProviderService {
 			$this->miscService->log('Could not determine if provider with id \''
 			. $providerId
 			. '\' was properly indexed because the corresponding provider-option could not be found.'
-			. ' Make sure the initial indexing process has been completed successfully.'
-			, 0);
+			. ' Make sure the initial indexing process has been completed successfully.', 0);
 			return false;
 		}
 

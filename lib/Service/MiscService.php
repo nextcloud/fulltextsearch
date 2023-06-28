@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,10 +31,8 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use OCA\FullTextSearch\AppInfo\Application;
 use OCP\ILogger;
-
 
 /**
  * Class MiscService
@@ -62,7 +61,7 @@ class MiscService {
 	 */
 	public function log(string $message, int $level = 2) {
 		$data = array(
-			'app'   => Application::APP_ID,
+			'app' => Application::APP_ID,
 			'level' => $level
 		);
 
@@ -70,4 +69,3 @@ class MiscService {
 	}
 
 }
-

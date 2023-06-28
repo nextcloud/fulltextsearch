@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Controller;
 
-
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
@@ -39,7 +39,6 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\IConfig;
 use OCP\IRequest;
-
 
 /**
  * Class NavigationController
@@ -100,4 +99,3 @@ class NavigationController extends Controller {
 	}
 
 }
-

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,13 +31,11 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Model;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
 use OCA\FullTextSearch\Service\CollectionService;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\IURLGenerator;
-
 
 /**
  * Class Index
@@ -174,7 +173,7 @@ class Index implements IIndex, JsonSerializable {
 	public function setStatus(int $status, bool $reset = false): IIndex {
 		if ($reset === true) {
 			$this->status = $status;
-		} else if (!$this->isStatus($status)) {
+		} elseif (!$this->isStatus($status)) {
 			$this->status += $status;
 		}
 
@@ -385,11 +384,11 @@ class Index implements IIndex, JsonSerializable {
 	public function asSitemap(IURLGenerator $urlGenerator): array {
 		return  [
 			'url' => $urlGenerator->linkToOCSRouteAbsolute('fulltextsearch.Collection.indexDocument',
-														   [
-															   'collection' => $this->getCollection(),
-															   'providerId' => $this->getProviderId(),
-															   'documentId' => $this->getDocumentId()
-														   ]
+				[
+					'collection' => $this->getCollection(),
+					'providerId' => $this->getProviderId(),
+					'documentId' => $this->getDocumentId()
+				]
 			),
 			'status' => $this->getStatus()
 		];

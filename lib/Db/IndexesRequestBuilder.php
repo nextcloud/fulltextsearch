@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,11 +31,9 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Db;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use OCA\FullTextSearch\Model\Index;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-
 
 /**
  * Class IndexesRequestBuilder
@@ -42,8 +41,6 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
  * @package OCA\FullTextSearch\Db
  */
 class IndexesRequestBuilder extends CoreRequestBuilder {
-
-
 	use TArrayTools;
 
 
@@ -129,4 +126,3 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 	}
 
 }
-

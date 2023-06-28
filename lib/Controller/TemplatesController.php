@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Controller;
 
-
 use Exception;
 use OC\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
@@ -43,7 +43,6 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\IRequest;
-
 
 /**
  * Class TemplatesController
@@ -114,7 +113,7 @@ class TemplatesController extends Controller {
 
 		$ret[$providerId] =
 			[
-				'options'  => $searchTemplate->getPanelOptions(),
+				'options' => $searchTemplate->getPanelOptions(),
 				'template' => $template
 			];
 
@@ -141,10 +140,10 @@ class TemplatesController extends Controller {
 			$ret[$providerAppId] =
 				[
 					'provider' => $provider->getId(),
-					'title'    => $provider->getName(),
-					'options'  => $searchTemplate->getNavigationOptions(),
-					'css'      => $searchTemplate->getCss(),
-					'icon'     => $searchTemplate->getIcon()
+					'title' => $provider->getName(),
+					'options' => $searchTemplate->getNavigationOptions(),
+					'css' => $searchTemplate->getCss(),
+					'icon' => $searchTemplate->getIcon()
 				];
 		}
 

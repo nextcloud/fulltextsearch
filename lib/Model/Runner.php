@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,18 +31,16 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Model;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use Exception;
 use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullTextSearch\Service\RunningService;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\FullTextSearch\Model\IRunner;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 /**
  * Class Runner
@@ -54,9 +53,9 @@ class Runner implements IRunner {
 	use TArrayTools;
 
 
-	const TICK_MINIMUM = 2;
-	const TICK_UPDATE = 10;
-	const MEMORY_UPDATE = 5;
+	public const TICK_MINIMUM = 2;
+	public const TICK_UPDATE = 10;
+	public const MEMORY_UPDATE = 5;
 
 	/** @var RunningService */
 	private $runningService;

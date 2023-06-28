@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,12 +31,10 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Model;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use JsonSerializable;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchRequestSimpleQuery;
-
 
 /**
  * Class SearchRequest
@@ -90,8 +89,8 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	/** @var array */
 	private $wildcardFields = [];
 
-//	/** @var array */
-//	private $wildcardQueries = [];
+	//	/** @var array */
+	//	private $wildcardQueries = [];
 
 	/** @var array */
 	private $wildcardFilters = [];
@@ -603,35 +602,35 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 		return $this->wildcardFields;
 	}
 
-//
-//	/**
-//	 * @param array $query
-//	 *
-//	 * @return ISearchRequest
-//	 */
-//	public function addWildcardQuery($query) {
-//		$this->addWildcardQueries([$query]);
-//
-//		return $this;
-//	}
-//
-//	/**
-//	 * @param array $query
-//	 *
-//	 * @return ISearchRequest
-//	 */
-//	public function addWildcardQueries($query) {
-//		array_push($this->wildcardQueries, $query);
-//
-//		return $this;
-//	}
-//
-//	/**
-//	 * @return array
-//	 */
-//	public function getWildcardQueries() {
-//		return $this->wildcardQueries;
-//	}
+	//
+	//	/**
+	//	 * @param array $query
+	//	 *
+	//	 * @return ISearchRequest
+	//	 */
+	//	public function addWildcardQuery($query) {
+	//		$this->addWildcardQueries([$query]);
+	//
+	//		return $this;
+	//	}
+	//
+	//	/**
+	//	 * @param array $query
+	//	 *
+	//	 * @return ISearchRequest
+	//	 */
+	//	public function addWildcardQueries($query) {
+	//		array_push($this->wildcardQueries, $query);
+	//
+	//		return $this;
+	//	}
+	//
+	//	/**
+	//	 * @return array
+	//	 */
+	//	public function getWildcardQueries() {
+	//		return $this->wildcardQueries;
+	//	}
 
 
 	/**
@@ -758,7 +757,7 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 		}
 		// END TODO
 
-//		$this->setEmptySearch($this->getBool('empty_search', $arr, false));
+		//		$this->setEmptySearch($this->getBool('empty_search', $arr, false));
 		$this->setPage($this->getInt('page', $arr, 0));
 		$this->setParts($this->getArray('parts', $arr, []));
 		$this->setSize($this->getInt('size', $arr, 10));

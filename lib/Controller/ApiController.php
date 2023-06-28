@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 /**
  * FullTextSearch - Full text search framework for Nextcloud
@@ -30,64 +30,26 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Controller;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\Nextcloud\TNCDataResponse;
 use Exception;
+use OC\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Model\SearchRequest;
-use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 use OCP\IUserSession;
+use Psr\Log\LoggerInterface;
 
-
-/**
- * Class ApiController
- *
- * @package OCA\FullTextSearch\Controller
- */
 class ApiController extends Controller {
 
-
-	use TNCDataResponse;
-
-
-	/** @var IUserSession */
-	private $userSession;
-
-	/** @var SearchService */
-	private $searchService;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * NavigationController constructor.
-	 *
-	 * @param IRequest $request
-	 * @param IUserSession $userSession
-	 * @param ConfigService $configService
-	 * @param SearchService $searchService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		IRequest $request, IUserSession $userSession, ConfigService $configService,
-		SearchService $searchService,
-		MiscService $miscService
+		IRequest $request,
+		private IUserSession $userSession,
+		private SearchService $searchService,
+		private LoggerInterface $logger
 	) {
 		parent::__construct(Application::APP_ID, $request);
-
-		$this->userSession = $userSession;
-		$this->searchService = $searchService;
-		$this->configService = $configService;
-		$this->miscService = $miscService;
 	}
 
 
@@ -103,7 +65,6 @@ class ApiController extends Controller {
 		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
-
 	/**
 	 * @NoAdminRequired
 	 * @NoSubAdminRequired
@@ -117,7 +78,6 @@ class ApiController extends Controller {
 		return $this->searchDocuments(SearchRequest::fromJSON($request));
 	}
 
-
 	/**
 	 * @param SearchRequest $request
 	 *
@@ -126,25 +86,17 @@ class ApiController extends Controller {
 	private function searchDocuments(SearchRequest $request): DataResponse {
 		try {
 			$user = $this->userSession->getUser();
-			$result = $this->searchService->search($user->getUID(), $request);
+			$data = [
+				'result' => $this->searchService->search($user->getUID(), $request),
+				'status' => 1
+			];
 
-			return $this->success(
-				$result,
-				[
-					'request' => $request,
-					'version' => $this->configService->getAppValue('installed_version')
-				]
-			);
+			return new DataResponse($data, Http::STATUS_OK);
 		} catch (Exception $e) {
-			return $this->fail(
-				$e,
-				[
-					'request' => $request,
-					'version' => $this->configService->getAppValue('installed_version')
-				]
-			);
+			$data = ['status' => -1, 'message' => $e->getMessage()];
+			$this->logger->warning('issue while searchDocuments', ['exception' => $e, 'request' => $request]);
+
+			return new DataResponse($data, Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
-
 }
-

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\IndexOptions;
@@ -44,7 +44,6 @@ use OCP\IUserManager;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 class CollectionInit extends Base {
 
@@ -112,33 +111,33 @@ class CollectionInit extends Base {
 		$this->collectionService->confirmCollectionString($collection);
 
 		$runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
-//		$runner->sourceIsCommandLine($this, $output);
+		//		$runner->sourceIsCommandLine($this, $output);
 		$this->collectionService->setRunner($runner);
 		$this->cliService->setRunner($runner);
 
 		$this->cliService->createPanel(
 			'collection', [
-							'┌─ Collection ' . $collection . ' ────',
-							'│ ProviderId, UserId: <info>%providerId%</info> / <info>%userId%</info>',
-							'│ Chunk: <info>%chunkCurr:3s%</info>/<info>%chunkTotal%</info>',
-							'│ Document: <info>%documentCurr:6s%</info>/<info>%documentChunk%</info>',
-							'│',
-							'│ Total Document: <info>%documentTotal%</info>',
-							'│ Index initiated: <info>%indexCount%</info>',
-							'└──'
-						]
+				'┌─ Collection ' . $collection . ' ────',
+				'│ ProviderId, UserId: <info>%providerId%</info> / <info>%userId%</info>',
+				'│ Chunk: <info>%chunkCurr:3s%</info>/<info>%chunkTotal%</info>',
+				'│ Document: <info>%documentCurr:6s%</info>/<info>%documentChunk%</info>',
+				'│',
+				'│ Total Document: <info>%documentTotal%</info>',
+				'│ Index initiated: <info>%indexCount%</info>',
+				'└──'
+			]
 		);
 
 		$runner->setInfoArray([
-								  'providerId' => '',
-								  'userId' => '',
-								  'chunkCurr' => '',
-								  'chunkTotal' => '',
-								  'documentCurr' => '',
-								  'documentChunk' => '',
-								  'documentTotal' => '',
-								  'indexCount' => 0
-							  ]);
+			'providerId' => '',
+			'userId' => '',
+			'chunkCurr' => '',
+			'chunkTotal' => '',
+			'documentCurr' => '',
+			'documentChunk' => '',
+			'documentTotal' => '',
+			'indexCount' => 0
+		]);
 
 		$this->cliService->initDisplay();
 		$this->cliService->displayPanel('run', 'collection');

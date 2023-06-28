@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use Exception;
 use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
@@ -46,7 +46,6 @@ use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IIndexOptions;
 use OCP\FullTextSearch\Model\IRunner;
 use OCP\FullTextSearch\Service\IIndexService;
-
 
 /**
  * Class IndexService
@@ -611,7 +610,7 @@ class IndexService implements IIndexService {
 		foreach ($providers as $provider) {
 			// TODO: need to specify the map to remove
 			// TODO: need to remove entries with type=providerId
-//			$provider->onResettingIndex($platform);
+			//			$provider->onResettingIndex($platform);
 
 			$platform->resetIndex($provider->getId());
 			$this->providerService->setProviderAsIndexed($provider->getId(), false);

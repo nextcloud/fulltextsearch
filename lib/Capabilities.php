@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,11 +31,9 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch;
 
-
 use Exception;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCP\Capabilities\ICapability;
-
 
 /**
  * Class Capabilities
@@ -81,7 +80,7 @@ class Capabilities implements ICapability {
 
 		return [
 			'fulltextsearch' => [
-				'remote'    => true,
+				'remote' => true,
 				'providers' => $this->providerService->serialize($providers)
 			]
 		];
@@ -89,7 +88,3 @@ class Capabilities implements ICapability {
 
 
 }
-
-
-
-

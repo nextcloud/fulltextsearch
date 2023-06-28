@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Db;
 
-
 use Doctrine\DBAL\Query\QueryBuilder;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\ConfigService;
@@ -39,7 +39,6 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\IL10N;
 
-
 /**
  * Class CoreRequestBuilder
  *
@@ -47,8 +46,8 @@ use OCP\IL10N;
  */
 class CoreRequestBuilder {
 
-	const TABLE_INDEXES = 'fulltextsearch_index';
-	const TABLE_TICKS = 'fulltextsearch_ticks';
+	public const TABLE_INDEXES = 'fulltextsearch_index';
+	public const TABLE_TICKS = 'fulltextsearch_ticks';
 
 	/** @var IDBConnection */
 	protected $dbConnection;
@@ -255,6 +254,3 @@ class CoreRequestBuilder {
 	}
 
 }
-
-
-
