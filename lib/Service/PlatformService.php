@@ -40,6 +40,7 @@ use OCA\FullTextSearch\Exceptions\PlatformNotSelectedException;
 use OCA\FullTextSearch\Model\PlatformWrapper;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use Psr\Container\ContainerExceptionInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class PlatformService
@@ -55,8 +56,8 @@ class PlatformService {
 	/** @var ConfigService */
 	private $configService;
 
-	/** @var MiscService */
-	private $miscService;
+	/** @var LoggerInterface */
+	private $logger;
 
 	/** @var PlatformWrapper[] */
 	private $platforms = [];
@@ -67,21 +68,19 @@ class PlatformService {
 	/** @var bool */
 	private $platformsLoaded = false;
 
-
 	/**
 	 * ProviderService constructor.
 	 *
 	 * @param AppManager $appManager
 	 * @param ConfigService $configService
-	 * @param MiscService $miscService
+	 * @param LoggerInterface $logger
 	 */
 	public function __construct(
-		AppManager $appManager, ConfigService $configService, MiscService $miscService
+		AppManager $appManager, ConfigService $configService, LoggerInterface $logger
 	) {
 		$this->appManager = $appManager;
-
 		$this->configService = $configService;
-		$this->miscService = $miscService;
+		$this->logger = $logger;
 	}
 
 
@@ -96,7 +95,7 @@ class PlatformService {
 			$this->loadPlatform();
 		} catch (Exception $e) {
 			if (!$silent) {
-				$this->miscService->log($e->getMessage());
+				$this->logger->warning($e->getMessage());
 			}
 			throw $e;
 		}
@@ -116,9 +115,9 @@ class PlatformService {
 		foreach ($this->platforms as $wrapper) {
 			$class = $wrapper->getClass();
 			try {
-				$platform = OC::$server->get((string)$class);
+				$platform = \OCP\Server::get((string)$class);
 				if (!($platform instanceof IFullTextSearchPlatform)) {
-					$this->miscService->log($class . ' does not implement ' . IFullTextSearchPlatform::class);
+					$this->logger->warning($class . ' does not implement ' . IFullTextSearchPlatform::class);
 					continue;
 				}
 				
@@ -126,7 +125,7 @@ class PlatformService {
 				$platforms[] = $wrapper;
 			} catch (ContainerExceptionInterface $e) {
 				/** we cycle */
-				$this->miscService->log($e->getMessage());
+				$this->logger->warning($e->getMessage());
 			}
 
 		}
@@ -151,7 +150,7 @@ class PlatformService {
 
 			$this->platformsLoaded = true;
 		} catch (Exception $e) {
-			$this->miscService->log($e->getMessage());
+			$this->logger->warning($e->getMessage());
 			throw $e;
 		}
 
