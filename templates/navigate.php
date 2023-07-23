@@ -43,7 +43,7 @@ Util::addStyle(Application::APP_ID, 'navigate');
 				<div>
 					<input id="search_input"
 						   placeholder="<?php p(
-							   $l->t('Search on %s', [$_['themingName']])
+						   	$l->t('Search on %s', [$_['themingName']])
 						   ); ?>">
 				</div>
 			</div>

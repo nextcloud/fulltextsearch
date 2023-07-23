@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Service\ConfigService;
@@ -40,7 +40,6 @@ use OCP\IDBConnection;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 class Migration24 extends Base {
 

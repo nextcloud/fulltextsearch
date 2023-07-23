@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-
 use Exception;
 use OC\Core\Command\InterruptedException;
 use OC\FullTextSearch\Model\DocumentAccess;
@@ -60,7 +60,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 /**
  * Class Test
  *
@@ -68,7 +67,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Test extends ACommandBase {
 
-	const DELAY_STABILIZE_PLATFORM = 3;
+	public const DELAY_STABILIZE_PLATFORM = 3;
 
 	/** @var RunningService */
 	private $runningService;
@@ -131,8 +130,8 @@ class Test extends ACommandBase {
 			 ->setDescription('Testing the platform setup')
 			 ->addOption('json', 'j', InputOption::VALUE_NONE, 'return result as JSON')
 			 ->addOption(
-				 'platform_delay', 'd', InputOption::VALUE_REQUIRED,
-				 'change DELAY_STABILIZE_PLATFORM'
+			 	'platform_delay', 'd', InputOption::VALUE_REQUIRED,
+			 	'change DELAY_STABILIZE_PLATFORM'
 			 );
 	}
 
@@ -301,7 +300,7 @@ class Test extends ACommandBase {
 
 		$this->output($output, 'Testing search platform.');
 		if (!$testPlatform->testPlatform()) {
-			throw new Exception ('Search platform (' . $testPlatform->getName() . ') down ?');
+			throw new Exception('Search platform (' . $testPlatform->getName() . ') down ?');
 		}
 		$this->outputResult($output, true);
 
@@ -440,7 +439,7 @@ class Test extends ACommandBase {
 		);
 		$this->search(
 			$output, $testPlatform, $testProvider, $access, 'document is a simple test',
-//			[TestService::DOCUMENT_TYPE_SIMPLE]
+			//			[TestService::DOCUMENT_TYPE_SIMPLE]
 			[TestService::DOCUMENT_TYPE_SIMPLE, TestService::DOCUMENT_TYPE_LICENSE]
 		);
 		$this->search(
@@ -500,7 +499,7 @@ class Test extends ACommandBase {
 		$this->output($output, 'Updating documents access.');
 		$options = new IndexOptions(
 			[
-				'provider'                            => TestProvider::TEST_PROVIDER_ID,
+				'provider' => TestProvider::TEST_PROVIDER_ID,
 				TestService::DOCUMENT_INDEXING_OPTION => TestService::DOCUMENT_INDEXING_ACCESS
 			]
 		);
@@ -717,4 +716,3 @@ class Test extends ACommandBase {
 	}
 
 }
-

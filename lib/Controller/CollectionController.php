@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Controller;
 
-
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Service\CollectionService;
 use OCP\AppFramework\Http\DataResponse;
@@ -38,7 +38,6 @@ use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCSController;
 use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\IRequest;
-
 
 class CollectionController extends OCSController {
 
@@ -74,7 +73,7 @@ class CollectionController extends OCSController {
 
 			return new DataResponse($this->collectionService->getQueue($collection, $length));
 		} catch (\Exception $e) {
-//			$this->e($e, ['circleId' => $circleId]);
+			//			$this->e($e, ['circleId' => $circleId]);
 			throw new OCSException($e->getMessage(), $e->getCode());
 		}
 	}
@@ -161,4 +160,3 @@ class CollectionController extends OCSController {
 	}
 
 }
-

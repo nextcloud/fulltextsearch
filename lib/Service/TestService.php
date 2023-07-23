@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,14 +31,12 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use Exception;
 use OC\FullTextSearch\Model\DocumentAccess;
 use OC\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Provider\TestProvider;
 use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IIndexOptions;
-
 
 /**
  * Class TestService
@@ -46,22 +45,22 @@ use OCP\FullTextSearch\Model\IIndexOptions;
  */
 class TestService {
 
-	const DOCUMENT_USER1 = 'user1';
-	const DOCUMENT_USER2 = 'user2';
-	const DOCUMENT_USER3 = 'user3';
-	const DOCUMENT_NOTUSER = 'notuser';
+	public const DOCUMENT_USER1 = 'user1';
+	public const DOCUMENT_USER2 = 'user2';
+	public const DOCUMENT_USER3 = 'user3';
+	public const DOCUMENT_NOTUSER = 'notuser';
 
-	const DOCUMENT_GROUP1 = 'group_1';
-	const DOCUMENT_GROUP2 = 'group_2';
-	const DOCUMENT_NOTGROUP = 'group_3';
+	public const DOCUMENT_GROUP1 = 'group_1';
+	public const DOCUMENT_GROUP2 = 'group_2';
+	public const DOCUMENT_NOTGROUP = 'group_3';
 
-	const DOCUMENT_TYPE_LICENSE = 'license';
-	const DOCUMENT_TYPE_SIMPLE = 'simple';
+	public const DOCUMENT_TYPE_LICENSE = 'license';
+	public const DOCUMENT_TYPE_SIMPLE = 'simple';
 
-	const DOCUMENT_INDEXING_OPTION = 'indexing';
-	const DOCUMENT_INDEXING_ACCESS = 'access';
+	public const DOCUMENT_INDEXING_OPTION = 'indexing';
+	public const DOCUMENT_INDEXING_ACCESS = 'access';
 
-	const LICENSE_HASH = '108322602bb857915803a84e23a2cc2f';
+	public const LICENSE_HASH = '108322602bb857915803a84e23a2cc2f';
 
 	/** @var MiscService */
 	private $miscService;

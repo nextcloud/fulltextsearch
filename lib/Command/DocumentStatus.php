@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 
 /**
@@ -29,7 +31,6 @@
 
 namespace OCA\FullTextSearch\Command;
 
-
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
@@ -40,7 +41,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 /**
  * Class DocumentStatus
@@ -59,8 +59,8 @@ class DocumentStatus extends Base {
 	/** @var array */
 	private $statusAvailable = [
 		'IGNORE' => 'document will never be indexed',
-		'INDEX'  => 'document will be indexed',
-		'DONE'   => 'document is well indexed',
+		'INDEX' => 'document will be indexed',
+		'DONE' => 'document is well indexed',
 		'REMOVE' => 'document will be removed',
 		'FAILED' => 'index had fail'
 	];
@@ -157,11 +157,11 @@ class DocumentStatus extends Base {
 
 			case IIndex::INDEX_META:
 			case IIndex::INDEX_CONTENT:
-			case IIndex:: INDEX_PARTS:
-			case IIndex:: INDEX_FULL:
+			case IIndex::INDEX_PARTS:
+			case IIndex::INDEX_FULL:
 				return 'INDEX';
 
-			case IIndex:: INDEX_REMOVE:
+			case IIndex::INDEX_REMOVE:
 				return 'REMOVE';
 
 			case IIndex::INDEX_FAILED:
@@ -187,10 +187,10 @@ class DocumentStatus extends Base {
 				return IIndex::INDEX_IGNORE;
 
 			case 'INDEX':
-				return IIndex:: INDEX_FULL;
+				return IIndex::INDEX_FULL;
 
 			case 'REMOVE':
-				return IIndex:: INDEX_REMOVE;
+				return IIndex::INDEX_REMOVE;
 
 			case 'FAILED':
 				return IIndex::INDEX_FAILED;
@@ -200,4 +200,3 @@ class DocumentStatus extends Base {
 	}
 
 }
-

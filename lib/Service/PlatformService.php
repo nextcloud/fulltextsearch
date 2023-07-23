@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use Exception;
 use OC;
 use OC\App\AppManager;
@@ -40,7 +40,6 @@ use OCA\FullTextSearch\Exceptions\PlatformNotSelectedException;
 use OCA\FullTextSearch\Model\PlatformWrapper;
 use OCP\AppFramework\QueryException;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
-
 
 /**
  * Class PlatformService

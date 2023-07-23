@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,14 +31,12 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCP\IConfig;
 use OCP\PreConditionNotMetException;
 use OCP\Util;
-
 
 /**
  * Class ConfigService
@@ -47,16 +46,16 @@ use OCP\Util;
 class ConfigService {
 
 
-	const APP_NAVIGATION = 'app_navigation';
-	const SEARCH_PLATFORM = 'search_platform';
-	const PROVIDER_INDEXED = 'provider_indexed';
-	const CRON_LAST_ERR_RESET = 'cron_err_reset';
-	const TICK_TTL = 'tick_ttl';
-	const COLLECTION_INDEXING_LIST = 'collection_indexing_list';
+	public const APP_NAVIGATION = 'app_navigation';
+	public const SEARCH_PLATFORM = 'search_platform';
+	public const PROVIDER_INDEXED = 'provider_indexed';
+	public const CRON_LAST_ERR_RESET = 'cron_err_reset';
+	public const TICK_TTL = 'tick_ttl';
+	public const COLLECTION_INDEXING_LIST = 'collection_indexing_list';
 
 
 	// Temp. can be removed after few major releases
-	const MIGRATION_24 = 'migration_24';
+	public const MIGRATION_24 = 'migration_24';
 
 	/** @var array */
 	public $defaults = [

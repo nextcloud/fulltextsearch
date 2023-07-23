@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,11 +31,8 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Exceptions;
 
-
 use Exception;
-
 
 class PlatformMustBeSingleException extends Exception {
 
 }
-

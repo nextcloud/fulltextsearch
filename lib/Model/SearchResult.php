@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,14 +31,12 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Model;
 
-
 use JsonSerializable;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
-
 
 /**
  * Class SearchResult
@@ -311,7 +310,7 @@ class SearchResult implements ISearchResult, JsonSerializable {
 		$provider = [];
 		if ($providerObj !== null) {
 			$provider = [
-				'id'   => $providerObj->getId(),
+				'id' => $providerObj->getId(),
 				'name' => $providerObj->getName()
 			];
 		}
@@ -320,22 +319,22 @@ class SearchResult implements ISearchResult, JsonSerializable {
 		$platform = [];
 		if ($platformObj !== null) {
 			$platform = [
-				'id'   => $platformObj->getId(),
+				'id' => $platformObj->getId(),
 				'name' => $platformObj->getName()
 			];
 		}
 
 		return [
-			'provider'  => $provider,
-			'platform'  => $platform,
+			'provider' => $provider,
+			'platform' => $platform,
 			'documents' => $this->getDocuments(),
-			'info'      => $this->getInfosAll(),
-			'meta'      =>
+			'info' => $this->getInfosAll(),
+			'meta' =>
 				[
 					'timedOut' => $this->isTimedOut(),
-					'time'     => $this->getTime(),
-					'count'    => $this->getCount(),
-					'total'    => $this->getTotal(),
+					'time' => $this->getTime(),
+					'count' => $this->getCount(),
+					'total' => $this->getTotal(),
 					'maxScore' => $this->getMaxScore()
 				]
 		];
@@ -353,4 +352,3 @@ class SearchResult implements ISearchResult, JsonSerializable {
 		return [];
 	}
 }
-

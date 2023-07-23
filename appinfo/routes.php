@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -54,5 +55,3 @@ return [
 		['name' => 'Templates#getNavigationPanels', 'url' => '/navigation/panels', 'verb' => 'GET']
 	]
 ];
-
-

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,11 +31,9 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Cron;
 
-
 use OC\BackgroundJob\TimedJob;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MigrationService;
-
 
 class Maintenance extends TimedJob {
 

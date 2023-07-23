@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\ConfigService;
@@ -40,7 +40,6 @@ use OCA\FullTextSearch\Service\ProviderService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 class Check extends Base {
 
@@ -129,9 +128,9 @@ class Check extends Base {
 				$platform = $platformWrapper->getPlatform();
 				$platform->loadPlatform();
 				$resultPlatform[] = [
-					'class'   => $platformWrapper->getClass(),
+					'class' => $platformWrapper->getClass(),
 					'version' => $platformWrapper->getVersion(),
-					'config'  => $platform->getConfiguration()
+					'config' => $platform->getConfiguration()
 				];
 			}
 
@@ -146,7 +145,7 @@ class Check extends Base {
 				$provider = $providerWrapper->getProvider();
 				$resultProviders[$provider->getId()] = [
 					'version' => $providerWrapper->getVersion(),
-					'config'  => $provider->getConfiguration()
+					'config' => $provider->getConfiguration()
 				];
 			}
 		} catch (Exception $e) {
@@ -156,10 +155,10 @@ class Check extends Base {
 		return [
 			'fulltextsearch' => [
 				'version' => $this->configService->getAppValue('installed_version'),
-				'config'  => $this->configService->getConfig()
+				'config' => $this->configService->getConfig()
 			],
 
-			'platform'  => $resultPlatform,
+			'platform' => $resultPlatform,
 			'providers' => $resultProviders
 		];
 
@@ -224,4 +223,3 @@ class Check extends Base {
 	}
 
 }
-

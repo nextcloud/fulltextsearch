@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,8 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
 use Exception;
 use OC\Core\Command\InterruptedException;
 use OCA\FullTextSearch\ACommandBase;
@@ -45,6 +44,7 @@ use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\IUserManager;
 use OutOfBoundsException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -53,7 +53,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 use Throwable;
-
 
 /**
  * Class Live
@@ -66,52 +65,52 @@ class Live extends ACommandBase {
 	use TArrayTools;
 
 
-	const INDEX_OPTION_NO_READLINE = '_no-readline';
+	public const INDEX_OPTION_NO_READLINE = '_no-readline';
 
-	const CYCLE_DELAY = 3000000;
+	public const CYCLE_DELAY = 3000000;
 
-	const PANEL_RUN = 'run';
-	const PANEL_RUN_LINE_MEMORY = 'Memory: %_memory%';
+	public const PANEL_RUN = 'run';
+	public const PANEL_RUN_LINE_MEMORY = 'Memory: %_memory%';
 
-	const PANEL_INDEX = 'indexing';
-	const PANEL_INDEX_LINE_HEADER = '┌─ Indexing %_paused% ────';
-	const PANEL_INDEX_LINE_ACCOUNT = '│ Provider: <info>%providerName:-20s%</info> Account: <info>%userId%</info>';
-	const PANEL_INDEX_LINE_ACTION = '│ Action: <info>%action%</info>';
-	const PANEL_INDEX_LINE_DOCUMENT = '│ Document: <info>%documentId%</info>';
-	const PANEL_INDEX_LINE_INFO = '│ Info: <info>%info%</info>';
-	const PANEL_INDEX_LINE_TITLE = '│ Title: <info>%title%</info>';
-	const PANEL_INDEX_LINE_CONTENT = '│ Content size: <info>%content%</info>';
-	const PANEL_INDEX_LINE_FOOTER = '└──';
+	public const PANEL_INDEX = 'indexing';
+	public const PANEL_INDEX_LINE_HEADER = '┌─ Indexing %_paused% ────';
+	public const PANEL_INDEX_LINE_ACCOUNT = '│ Provider: <info>%providerName:-20s%</info> Account: <info>%userId%</info>';
+	public const PANEL_INDEX_LINE_ACTION = '│ Action: <info>%action%</info>';
+	public const PANEL_INDEX_LINE_DOCUMENT = '│ Document: <info>%documentId%</info>';
+	public const PANEL_INDEX_LINE_INFO = '│ Info: <info>%info%</info>';
+	public const PANEL_INDEX_LINE_TITLE = '│ Title: <info>%title%</info>';
+	public const PANEL_INDEX_LINE_CONTENT = '│ Content size: <info>%content%</info>';
+	public const PANEL_INDEX_LINE_FOOTER = '└──';
 
-	const PANEL_RESULT = 'result';
-	const PANEL_RESULT_LINE_HEADER = '┌─ Results ────';
-	const PANEL_RESULT_LINE_RESULT = '│ Result: <info>%resultCurrent:6s%</info>/<info>%resultTotal%</info>';
-	const PANEL_RESULT_LINE_INDEX = '│ Index: <info>%resultIndex%</info>';
-	const PANEL_RESULT_LINE_STATUS = '│ Status: %resultStatusColored%';
-	const PANEL_RESULT_LINE_MESSAGE1 = '│ Message: <info>%resultMessageA%</info>';
-	const PANEL_RESULT_LINE_MESSAGE2 = '│ <info>%resultMessageB%</info>';
-	const PANEL_RESULT_LINE_MESSAGE3 = '│ <info>%resultMessageC%</info>';
-	const PANEL_RESULT_LINE_FOOTER = '└──';
+	public const PANEL_RESULT = 'result';
+	public const PANEL_RESULT_LINE_HEADER = '┌─ Results ────';
+	public const PANEL_RESULT_LINE_RESULT = '│ Result: <info>%resultCurrent:6s%</info>/<info>%resultTotal%</info>';
+	public const PANEL_RESULT_LINE_INDEX = '│ Index: <info>%resultIndex%</info>';
+	public const PANEL_RESULT_LINE_STATUS = '│ Status: %resultStatusColored%';
+	public const PANEL_RESULT_LINE_MESSAGE1 = '│ Message: <info>%resultMessageA%</info>';
+	public const PANEL_RESULT_LINE_MESSAGE2 = '│ <info>%resultMessageB%</info>';
+	public const PANEL_RESULT_LINE_MESSAGE3 = '│ <info>%resultMessageC%</info>';
+	public const PANEL_RESULT_LINE_FOOTER = '└──';
 
-	const PANEL_ERRORS = 'errors';
-	const PANEL_ERRORS_LINE_HEADER = '┌─ Errors ────';
-	const PANEL_ERRORS_LINE_ERRORS = '│ Error: <comment>%errorCurrent:6s%</comment>/<comment>%errorTotal%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_INDEX = '│ Index: <comment>%errorIndex%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_EXCEPTION = '│ Exception: <comment>%errorException%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_MESSAGE1 = '│ Message: <comment>%errorMessageA%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_MESSAGE2 = '│ <comment>%errorMessageB%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_MESSAGE3 = '│ <comment>%errorMessageC%</comment>';
-	const PANEL_ERRORS_LINE_FOOTER = '└──';
+	public const PANEL_ERRORS = 'errors';
+	public const PANEL_ERRORS_LINE_HEADER = '┌─ Errors ────';
+	public const PANEL_ERRORS_LINE_ERRORS = '│ Error: <comment>%errorCurrent:6s%</comment>/<comment>%errorTotal%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_INDEX = '│ Index: <comment>%errorIndex%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_EXCEPTION = '│ Exception: <comment>%errorException%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_MESSAGE1 = '│ Message: <comment>%errorMessageA%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_MESSAGE2 = '│ <comment>%errorMessageB%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_MESSAGE3 = '│ <comment>%errorMessageC%</comment>';
+	public const PANEL_ERRORS_LINE_FOOTER = '└──';
 
-	const PANEL_COMMANDS_ROOT = 'root';
-	const PANEL_COMMANDS_ROOT_LINE = '## q:quit ## p:pause ';
-	const PANEL_COMMANDS_PAUSED = 'paused';
-	const PANEL_COMMANDS_PAUSED_LINE = '## q:quit ## u:unpause ## n:next step';
-	const PANEL_COMMANDS_DONE = 'done';
-	const PANEL_COMMANDS_DONE_LINE = '## q:quit';
-	const PANEL_COMMANDS_NAVIGATION = 'navigation';
-	const PANEL_COMMANDS_ERRORS_LINE = '## f:first error ## h/j:prec/next error ## d:delete error ## l:last error';
-	const PANEL_COMMANDS_RESULTS_LINE = '## x:first result ## c/v:prec/next result ## b:last result';
+	public const PANEL_COMMANDS_ROOT = 'root';
+	public const PANEL_COMMANDS_ROOT_LINE = '## q:quit ## p:pause ';
+	public const PANEL_COMMANDS_PAUSED = 'paused';
+	public const PANEL_COMMANDS_PAUSED_LINE = '## q:quit ## u:unpause ## n:next step';
+	public const PANEL_COMMANDS_DONE = 'done';
+	public const PANEL_COMMANDS_DONE_LINE = '## q:quit';
+	public const PANEL_COMMANDS_NAVIGATION = 'navigation';
+	public const PANEL_COMMANDS_ERRORS_LINE = '## f:first error ## h/j:prec/next error ## d:delete error ## l:last error';
+	public const PANEL_COMMANDS_RESULTS_LINE = '## x:first result ## c/v:prec/next result ## b:last result';
 
 
 	/** @var IUserManager */
@@ -196,12 +195,12 @@ class Live extends ACommandBase {
 		$this->setName('fulltextsearch:live')
 			 ->setDescription('Index files')
 			 ->addOption(
-				 'no-readline', 'r', InputOption::VALUE_NONE,
-				 'disable readline - non interactive mode'
+			 	'no-readline', 'r', InputOption::VALUE_NONE,
+			 	'disable readline - non interactive mode'
 			 )
 			 ->addOption(
-				 'service', 's', InputOption::VALUE_NONE,
-				 'disable interface'
+			 	'service', 's', InputOption::VALUE_NONE,
+			 	'disable interface'
 			 );
 	}
 
@@ -218,8 +217,8 @@ class Live extends ACommandBase {
 			try {
 				/** do not get stuck while waiting interactive input */
 				readline_callback_handler_install(
-					'', function() {
-				}
+					'', function () {
+					}
 				);
 			} catch (Throwable $t) {
 				throw new Exception('Please install php-readline, or use --no-readline');
@@ -409,60 +408,60 @@ class Live extends ACommandBase {
 
 		$this->cliService->createPanel(
 			self::PANEL_INDEX, [
-								 self::PANEL_INDEX_LINE_HEADER,
-								 self::PANEL_INDEX_LINE_ACTION,
-								 self::PANEL_INDEX_LINE_ACCOUNT,
-								 self::PANEL_INDEX_LINE_DOCUMENT,
-								 self::PANEL_INDEX_LINE_INFO,
-								 self::PANEL_INDEX_LINE_TITLE,
-								 self::PANEL_INDEX_LINE_CONTENT,
-								 self::PANEL_INDEX_LINE_FOOTER,
-							 ]
+				self::PANEL_INDEX_LINE_HEADER,
+				self::PANEL_INDEX_LINE_ACTION,
+				self::PANEL_INDEX_LINE_ACCOUNT,
+				self::PANEL_INDEX_LINE_DOCUMENT,
+				self::PANEL_INDEX_LINE_INFO,
+				self::PANEL_INDEX_LINE_TITLE,
+				self::PANEL_INDEX_LINE_CONTENT,
+				self::PANEL_INDEX_LINE_FOOTER,
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_RESULT, [
-								  self::PANEL_RESULT_LINE_HEADER,
-								  self::PANEL_RESULT_LINE_RESULT,
-								  self::PANEL_RESULT_LINE_INDEX,
-								  self::PANEL_RESULT_LINE_STATUS,
-								  self::PANEL_RESULT_LINE_MESSAGE1,
-								  self::PANEL_RESULT_LINE_MESSAGE2,
-								  self::PANEL_RESULT_LINE_MESSAGE3,
-								  self::PANEL_RESULT_LINE_FOOTER,
-							  ]
+				self::PANEL_RESULT_LINE_HEADER,
+				self::PANEL_RESULT_LINE_RESULT,
+				self::PANEL_RESULT_LINE_INDEX,
+				self::PANEL_RESULT_LINE_STATUS,
+				self::PANEL_RESULT_LINE_MESSAGE1,
+				self::PANEL_RESULT_LINE_MESSAGE2,
+				self::PANEL_RESULT_LINE_MESSAGE3,
+				self::PANEL_RESULT_LINE_FOOTER,
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_ERRORS, [
-								  self::PANEL_ERRORS_LINE_HEADER,
-								  self::PANEL_ERRORS_LINE_ERRORS,
-								  self::PANEL_ERRORS_LINE_ERROR_INDEX,
-								  self::PANEL_ERRORS_LINE_ERROR_EXCEPTION,
-								  self::PANEL_ERRORS_LINE_ERROR_MESSAGE1,
-								  self::PANEL_ERRORS_LINE_ERROR_MESSAGE2,
-								  self::PANEL_ERRORS_LINE_ERROR_MESSAGE3,
-								  self::PANEL_ERRORS_LINE_FOOTER,
-							  ]
+				self::PANEL_ERRORS_LINE_HEADER,
+				self::PANEL_ERRORS_LINE_ERRORS,
+				self::PANEL_ERRORS_LINE_ERROR_INDEX,
+				self::PANEL_ERRORS_LINE_ERROR_EXCEPTION,
+				self::PANEL_ERRORS_LINE_ERROR_MESSAGE1,
+				self::PANEL_ERRORS_LINE_ERROR_MESSAGE2,
+				self::PANEL_ERRORS_LINE_ERROR_MESSAGE3,
+				self::PANEL_ERRORS_LINE_FOOTER,
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_COMMANDS_ROOT, [
-										 self::PANEL_COMMANDS_ROOT_LINE
-									 ]
+				self::PANEL_COMMANDS_ROOT_LINE
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_COMMANDS_PAUSED, [
-										   self::PANEL_COMMANDS_PAUSED_LINE
-									   ]
+				self::PANEL_COMMANDS_PAUSED_LINE
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_COMMANDS_NAVIGATION, [
-											   self::PANEL_COMMANDS_RESULTS_LINE,
-											   self::PANEL_COMMANDS_ERRORS_LINE
-										   ]
+				self::PANEL_COMMANDS_RESULTS_LINE,
+				self::PANEL_COMMANDS_ERRORS_LINE
+			]
 		);
 
 		$this->cliService->initDisplay();
@@ -482,32 +481,32 @@ class Live extends ACommandBase {
 
 		$this->runner->setInfoArray(
 			[
-				'userId'              => '',
-				'providerName'        => '',
-				'_memory'             => '',
-				'documentId'          => '',
-				'action'              => '',
-				'info'                => '',
-				'title'               => '',
-				'_paused'             => '',
-				'resultIndex'         => '',
-				'resultCurrent'       => '',
-				'resultTotal'         => '',
-				'resultMessageA'      => '',
-				'resultMessageB'      => '',
-				'resultMessageC'      => '',
-				'resultStatus'        => '',
+				'userId' => '',
+				'providerName' => '',
+				'_memory' => '',
+				'documentId' => '',
+				'action' => '',
+				'info' => '',
+				'title' => '',
+				'_paused' => '',
+				'resultIndex' => '',
+				'resultCurrent' => '',
+				'resultTotal' => '',
+				'resultMessageA' => '',
+				'resultMessageB' => '',
+				'resultMessageC' => '',
+				'resultStatus' => '',
 				'resultStatusColored' => '',
-				'content'             => '',
-				'statusColored'       => '',
-				'progressStatus'      => '',
-				'errorCurrent'        => '0',
-				'errorTotal'          => '0',
-				'errorMessageA'       => '',
-				'errorMessageB'       => '',
-				'errorMessageC'       => '',
-				'errorException'      => '',
-				'errorIndex'          => ''
+				'content' => '',
+				'statusColored' => '',
+				'progressStatus' => '',
+				'errorCurrent' => '0',
+				'errorTotal' => '0',
+				'errorMessageA' => '',
+				'errorMessageB' => '',
+				'errorMessageC' => '',
+				'errorException' => '',
+				'errorIndex' => ''
 			]
 		);
 	}
@@ -522,10 +521,10 @@ class Live extends ACommandBase {
 		foreach ($indexes as $index) {
 			foreach ($index->getErrors() as $error) {
 				$this->errors[] = [
-					'index'     => $index,
-					'message'   => $error['message'],
+					'index' => $index,
+					'message' => $error['message'],
 					'exception' => $error['exception'],
-					'severity'  => $error['severity']
+					'severity' => $error['severity']
 				];
 			}
 
@@ -544,7 +543,7 @@ class Live extends ACommandBase {
 			$this->runner->setInfoArray(
 				[
 					'resultCurrent' => 0,
-					'resultTotal'   => 0,
+					'resultTotal' => 0,
 				]
 			);
 
@@ -580,13 +579,13 @@ class Live extends ACommandBase {
 
 		$this->runner->setInfoArray(
 			[
-				'resultCurrent'  => $current,
-				'resultTotal'    => $total,
+				'resultCurrent' => $current,
+				'resultTotal' => $total,
 				'resultMessageA' => trim($msg1),
 				'resultMessageB' => trim($msg2),
 				'resultMessageC' => trim($msg3),
-				'resultStatus'   => $status,
-				'resultIndex'    => $resultIndex
+				'resultStatus' => $status,
+				'resultIndex' => $resultIndex
 			]
 		);
 		$this->runner->setInfoColored('resultStatus', $type);
@@ -602,7 +601,7 @@ class Live extends ACommandBase {
 			$this->runner->setInfoArray(
 				[
 					'errorCurrent' => 0,
-					'errorTotal'   => 0,
+					'errorTotal' => 0,
 				]
 			);
 
@@ -632,13 +631,13 @@ class Live extends ACommandBase {
 
 		$this->runner->setInfoArray(
 			[
-				'errorCurrent'   => $current,
-				'errorTotal'     => $total,
-				'errorMessageA'  => trim($err1),
-				'errorMessageB'  => trim($err2),
-				'errorMessageC'  => trim($err3),
+				'errorCurrent' => $current,
+				'errorTotal' => $total,
+				'errorMessageA' => trim($err1),
+				'errorMessageB' => trim($err2),
+				'errorMessageC' => trim($err3),
 				'errorException' => $this->get('exception', $error, ''),
-				'errorIndex'     => $errorIndex
+				'errorIndex' => $errorIndex
 			]
 		);
 	}
@@ -736,11 +735,11 @@ class Live extends ACommandBase {
 
 		$this->runner->setInfoArray(
 			[
-				'errorMessageA'  => '',
-				'errorMessageB'  => '',
-				'errorMessageC'  => '',
+				'errorMessageA' => '',
+				'errorMessageB' => '',
+				'errorMessageC' => '',
 				'errorException' => '',
-				'errorIndex'     => ''
+				'errorIndex' => ''
 			]
 		);
 
@@ -788,4 +787,3 @@ class Live extends ACommandBase {
 
 
 }
-

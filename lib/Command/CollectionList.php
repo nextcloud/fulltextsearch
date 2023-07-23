@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,12 +31,10 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\CollectionService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 class CollectionList extends Base {
 

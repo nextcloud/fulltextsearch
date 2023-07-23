@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Cron;
 
-
 use Exception;
 use OC\BackgroundJob\TimedJob;
 use OCA\FullTextSearch\AppInfo\Application;
@@ -46,10 +46,9 @@ use OCP\AppFramework\QueryException;
 use OCP\IUserManager;
 use Throwable;
 
-
 class Index extends TimedJob {
 
-	const HOUR_ERR_RESET = 240;
+	public const HOUR_ERR_RESET = 240;
 
 
 	/** @var IUserManager */

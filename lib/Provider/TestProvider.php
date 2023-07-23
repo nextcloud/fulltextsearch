@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,7 +31,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Provider;
 
-
 use OC\FullTextSearch\Model\IndexDocument;
 use OC\FullTextSearch\Model\SearchTemplate;
 use OCA\FullTextSearch\Model\IndexOptions;
@@ -48,7 +48,6 @@ use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
 use OCP\FullTextSearch\Model\ISearchTemplate;
 
-
 /**
  * Class TestProvider
  *
@@ -57,7 +56,7 @@ use OCP\FullTextSearch\Model\ISearchTemplate;
 class TestProvider implements IFullTextSearchProvider {
 
 
-	const TEST_PROVIDER_ID = 'test_provider';
+	public const TEST_PROVIDER_ID = 'test_provider';
 
 
 	/** @var ConfigService */
@@ -240,4 +239,3 @@ class TestProvider implements IFullTextSearchProvider {
 	}
 
 }
-

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 
@@ -30,14 +31,12 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Db;
 
-
 use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\CollectionService;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\IDBConnection;
-
 
 /**
  * Class IndexesRequest
