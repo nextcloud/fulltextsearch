@@ -8,8 +8,8 @@ package_name=$(shell echo $(app_name) | tr '[:upper:]' '[:lower:]')
 cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
 release_account=nextcloud-releases
-branch=master
-version=25.0.0-alpha1
+branch=stable25
+version=25.0.1
 since_tag=
 
 all: appstore
