@@ -1,5 +1,9 @@
 # Changelog
 
+### 27.0.1
+
+- default collection is local
+
 ### 27.0.0
 
 - compat nc27
