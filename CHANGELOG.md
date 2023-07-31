@@ -1,5 +1,9 @@
 # Changelog
 
+### 25.0.1
+
+- default collection is local
+
 ### 24.0.0
 
 - collections
