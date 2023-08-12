@@ -2,9 +2,11 @@ OC.L10N.register(
     "fulltextsearch",
     {
     "the search returned {total} results in {time} ms" : "بازگشت جست‌‌‌وجو‌ {کل} نتایج در {زمان}",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "the search in {title} for \"{search}\" returned {total} results in {time} ms",
     "Search" : "جستجو",
     "Index not found" : "نمایه یافت نشد",
     "Process timed out" : "زمان فرآیند به پایان رسیده ",
+    "Full Text Search" : "Full Text Search",
     "Full text search" : "جستجوی کامل متن",
     "Core of the full-text search framework for Nextcloud" : "هسته‌ی چهارچوب جست‌وجوی متن کامل برای نکست کلود",
     "Core App of the full-text search framework for your Nextcloud." : "برنامه‌ی اصلی چارچوبِ جستجوی متن کامل برای نکست کلود شما",
