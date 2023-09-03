@@ -69,12 +69,8 @@ clean:
 	rm -rf $(build_dir)
 	rm -rf node_modules
 
-# composer packages
-composer:
-	composer install --prefer-dist
-	composer upgrade --prefer-dist
 
-appstore: clean composer
+appstore: clean
 	mkdir -p $(sign_dir)
 	rsync -a \
 	--exclude=/build \

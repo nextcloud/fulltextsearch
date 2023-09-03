@@ -47,11 +47,9 @@ use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\INavigationManager;
 use OCP\IServerContainer;
 use OCP\IURLGenerator;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Throwable;
-
-require_once __DIR__ . '/../../vendor/autoload.php';
 
 
 class Application extends App implements IBootstrap {
@@ -137,11 +135,11 @@ class Application extends App implements IBootstrap {
 		$urlGen = OC::$server->get(IURLGenerator::class);
 
 		return [
-			'id'    => self::APP_ID,
+			'id' => self::APP_ID,
 			'order' => 5,
-			'href'  => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
-			'icon'  => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),
-			'name'  => 'Search'
+			'href' => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
+			'icon' => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),
+			'name' => 'Search'
 		];
 	}
 

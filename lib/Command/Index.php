@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 
-use ArtificialOwl\MySmallPhpTools\Traits\TArrayTools;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use Exception;
 use OC\Core\Command\InterruptedException;
 use OCA\FullTextSearch\ACommandBase;
