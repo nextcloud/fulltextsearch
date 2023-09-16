@@ -48,11 +48,11 @@ class TestService {
 
 	const DOCUMENT_USER1 = 'user1';
 	const DOCUMENT_USER2 = 'user2';
-	const DOCUMENT_USER3 = 'user3';
+	const DOCUMENT_USER3 = 'User3';
 	const DOCUMENT_NOTUSER = 'notuser';
 
 	const DOCUMENT_GROUP1 = 'group_1';
-	const DOCUMENT_GROUP2 = 'group_2';
+	const DOCUMENT_GROUP2 = 'Group_2';
 	const DOCUMENT_NOTGROUP = 'group_3';
 
 	const DOCUMENT_TYPE_LICENSE = 'license';
