@@ -45,8 +45,6 @@ use OCP\IURLGenerator;
 
 
 class CollectionService {
-	public const LOCAL = 'local';
-
 
 	/** @var IURLGenerator */
 	private $urlGenerator;
@@ -222,7 +220,7 @@ class CollectionService {
 	 * @throws CollectionArgumentException
 	 */
 	public function confirmCollectionString(string $collection): void {
-		if (strtolower($collection) === self::LOCAL) {
+		if (strtolower($collection) === $this->configService->getInternalCollection()) {
 			throw new CollectionArgumentException('invalid name');
 		}
 	}
