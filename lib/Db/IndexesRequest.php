@@ -53,6 +53,10 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @return bool
 	 */
 	public function create(Index $index): bool {
+		if (empty($index->getCollection())) {
+			$index->setCollection($this->configService->getInternalCollection());
+		}
+
 		$qb = $this->getIndexesInsertSql();
 		$qb->setValue('owner_id', $qb->createNamedParameter($index->getOwnerId()))
 		   ->setValue('provider_id', $qb->createNamedParameter($index->getProviderId()))
@@ -183,7 +187,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param int $status
 	 */
 	public function updateStatuses(string $collection, string $providerId, array $indexes, int $status) {
-		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('status', $qb->createNamedParameter($status));
@@ -213,7 +217,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param string $collection \
 	 */
 	public function deleteCollection(string $collection): void {
-		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToCollection($qb, $collection);
@@ -237,7 +241,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 *
 	 */
 	public function reset(string $collection = ''): void {
-		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToCollection($qb, $collection);
@@ -256,7 +260,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @throws IndexDoesNotExistException
 	 */
 	public function getIndex(string $providerId, string $documentId, string $collection = ''): Index {
-		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToProviderId($qb, $providerId);
@@ -305,7 +309,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @return Index[]
 	 */
 	public function getQueuedIndexes(string $collection = '', bool $all = false, int $length = 0): array {
-		$collection = ($collection === '') ? CollectionService::LOCAL : $collection;
+		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesSelectSql();
 		$this->limitToQueuedIndexes($qb);
@@ -374,7 +378,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 			return $collections;
 		}
 
-		return array_merge([CollectionService::LOCAL], $collections);
+		return array_merge([$this->configService->getInternalCollection()], $collections);
 	}
 
 

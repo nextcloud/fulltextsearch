@@ -53,7 +53,7 @@ class ConfigService {
 	const CRON_LAST_ERR_RESET = 'cron_err_reset';
 	const TICK_TTL = 'tick_ttl';
 	const COLLECTION_INDEXING_LIST = 'collection_indexing_list';
-
+	const COLLECTION_INTERNAL = 'collection_internal';
 
 	// Temp. can be removed after few major releases
 	const MIGRATION_24 = 'migration_24';
@@ -66,7 +66,8 @@ class ConfigService {
 		self::CRON_LAST_ERR_RESET => '0',
 		self::TICK_TTL => '1800',
 		self::COLLECTION_INDEXING_LIST => 50,
-		self::MIGRATION_24 => 1
+		self::MIGRATION_24 => 1,
+		self::COLLECTION_INTERNAL => 'local'
 	];
 
 
@@ -143,12 +144,12 @@ class ConfigService {
 	 * @return string
 	 */
 	public function getAppValue(string $key): string {
-		$defaultValue = '';
-		if (array_key_exists($key, $this->defaults)) {
-			$defaultValue = $this->defaults[$key];
-		}
-
-		return (string)$this->config->getAppValue(Application::APP_ID, $key, $defaultValue);
+		return $this->config->getSystemValueString(
+			Application::APP_ID . '.' . $key,
+			(string)$this->config->getAppValue(Application::APP_ID,
+				$key,
+				$this->defaults[$key] ?? '')
+		);
 	}
 
 	/**
@@ -303,5 +304,9 @@ class ConfigService {
 		}
 
 		throw new DatabaseException('please run ./occ fulltextsearch:migration:24');
+	}
+
+	public function getInternalCollection(): string {
+		return $this->getAppValue(self::COLLECTION_INTERNAL);
 	}
 }
