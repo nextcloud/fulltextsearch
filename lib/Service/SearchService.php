@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 /**
  * FullTextSearch - Full text search framework for Nextcloud
@@ -27,19 +27,14 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Service;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\Nextcloud\nc22\TNC22Logger;
 use Exception;
 use OC;
-use OC\App\AppManager;
 use OC\FullTextSearch\Model\DocumentAccess;
 use OC\User\NoUserException;
 use OCA\Circles\CirclesManager;
 use OCA\Circles\Model\Circle;
-use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\EmptySearchException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Model\SearchRequest;
@@ -53,73 +48,16 @@ use OCP\FullTextSearch\Service\ISearchService;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
+use Psr\Log\LoggerInterface;
 
-
-/**
- * Class SearchService
- *
- * @package OCA\FullTextSearch\Service
- */
 class SearchService implements ISearchService {
 
-
-	use TNC22Logger;
-
-
-	/** @var string */
-	private $userId;
-
-	/** @var AppManager */
-	private $appManager;
-
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var IGroupManager */
-	private $groupManager;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var PlatformService */
-	private $platformService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * SearchService constructor.
-	 *
-	 * @param string $userId
-	 * @param AppManager $appManager
-	 * @param IUserManager $userManager
-	 * @param IGroupManager $groupManager
-	 * @param ConfigService $configService
-	 * @param ProviderService $providerService
-	 * @param PlatformService $platformService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		$userId, AppManager $appManager, IUserManager $userManager,
-		IGroupManager $groupManager,
-		ConfigService $configService, ProviderService $providerService,
-		PlatformService $platformService,
-		MiscService $miscService
+		private IUserManager $userManager,
+		private IGroupManager $groupManager,
+		private ProviderService $providerService,
+		private PlatformService $platformService,
 	) {
-		$this->userId = $userId;
-		$this->appManager = $appManager;
-		$this->userManager = $userManager;
-		$this->groupManager = $groupManager;
-		$this->configService = $configService;
-		$this->providerService = $providerService;
-		$this->platformService = $platformService;
-		$this->miscService = $miscService;
-
-		$this->setup('app', Application::APP_ID);
 	}
 
 
@@ -188,7 +126,9 @@ class SearchService implements ISearchService {
 	 * @return ISearchResult[]
 	 */
 	private function searchFromProviders(
-		IFullTextSearchPlatform $platform, array $providers, IDocumentAccess $access,
+		IFullTextSearchPlatform $platform,
+		array $providers,
+		IDocumentAccess $access,
 		SearchRequest $request
 	): array {
 		$result = [];

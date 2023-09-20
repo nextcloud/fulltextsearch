@@ -4,49 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b52d6a5c9fb9be09368e44333c380806",
-    "packages": [
-        {
-            "name": "artificial-owl/my-small-php-tools",
-            "version": "v23.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ArtificialOwl/my-small-php-tools.git",
-                "reference": "0246b20ebffabcb1e929c71d3b0f221086f72db1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ArtificialOwl/my-small-php-tools/zipball/0246b20ebffabcb1e929c71d3b0f221086f72db1",
-                "reference": "0246b20ebffabcb1e929c71d3b0f221086f72db1",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ArtificialOwl\\MySmallPhpTools\\": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "AGPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Maxence Lange",
-                    "email": "maxence@artificial-owl.com"
-                }
-            ],
-            "description": "My small PHP Tools",
-            "support": {
-                "issues": "https://github.com/ArtificialOwl/my-small-php-tools/issues",
-                "source": "https://github.com/ArtificialOwl/my-small-php-tools/tree/v23.0.2"
-            },
-            "time": "2021-07-26T12:32:51+00:00"
-        }
-    ],
+    "content-hash": "4644f546b1ca332f473a7784221c9324",
+    "packages": [],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
@@ -55,5 +14,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.3.0"
 }

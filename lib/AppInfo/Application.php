@@ -51,7 +51,9 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Psr\Container\ContainerInterface;
 use Throwable;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+if (file_exists($autoLoad = __DIR__ . '/../../vendor/autoload.php')) {
+	include_once $autoLoad;
+}
 
 
 class Application extends App implements IBootstrap {
