@@ -1,5 +1,12 @@
 # Changelog
 
+### 26.0.2
+
+- prioritize system configuration (config.php) over app configuration (database),
+- customize internal collection name using the config `collection_internal`
+- test now includes different type of userIds
+- fix an issue with empty collection name during index, and fix empty entries from database with a migration script,
+
 ### 26.0.1
 
 - default collection is local
