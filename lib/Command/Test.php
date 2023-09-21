@@ -561,6 +561,7 @@ class Test extends ACommandBase {
 		$this->searchUsers($output, $platform, $provider, TestService::DOCUMENT_NOTUSER, []);
 		$this->searchUsers($output, $platform, $provider, TestService::DOCUMENT_USER2, ['license']);
 		$this->searchUsers($output, $platform, $provider, TestService::DOCUMENT_USER3, ['license']);
+		$this->searchUsers($output, $platform, $provider, TestService::DOCUMENT_USER4, ['license']);
 	}
 
 
