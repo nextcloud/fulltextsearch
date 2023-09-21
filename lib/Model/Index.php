@@ -55,7 +55,7 @@ class Index implements IIndex, JsonSerializable {
 	/** @var string */
 	private $documentId;
 
-	private string $collection = CollectionService::LOCAL;
+	private string $collection = '';
 
 	/** @var string */
 	private $source = '';
