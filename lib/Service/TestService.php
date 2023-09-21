@@ -47,8 +47,9 @@ use OCP\FullTextSearch\Model\IIndexOptions;
 class TestService {
 
 	const DOCUMENT_USER1 = 'user1';
-	const DOCUMENT_USER2 = 'user2';
+	const DOCUMENT_USER2 = 'User number_2';
 	const DOCUMENT_USER3 = 'User3';
+	const DOCUMENT_USER4 = 'User@4';
 	const DOCUMENT_NOTUSER = 'notuser';
 
 	const DOCUMENT_GROUP1 = 'group_1';
@@ -97,7 +98,7 @@ class TestService {
 			$indexDocument->getAccess()
 						  ->setGroups([self::DOCUMENT_GROUP1, self::DOCUMENT_GROUP2]);
 			$indexDocument->getAccess()
-						  ->setUsers([self::DOCUMENT_USER2, self::DOCUMENT_USER3]);
+						  ->setUsers([self::DOCUMENT_USER2, self::DOCUMENT_USER3, self::DOCUMENT_USER4]);
 		}
 
 		return $indexDocument;
