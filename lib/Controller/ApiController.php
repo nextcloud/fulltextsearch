@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 /**
  * FullTextSearch - Full text search framework for Nextcloud
@@ -27,67 +27,28 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Controller;
 
-
-use ArtificialOwl\MySmallPhpTools\Traits\Nextcloud\TNCDataResponse;
 use Exception;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 use OCP\IUserSession;
 
-
-/**
- * Class ApiController
- *
- * @package OCA\FullTextSearch\Controller
- */
 class ApiController extends Controller {
 
-
-	use TNCDataResponse;
-
-
-	/** @var IUserSession */
-	private $userSession;
-
-	/** @var SearchService */
-	private $searchService;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * NavigationController constructor.
-	 *
-	 * @param IRequest $request
-	 * @param IUserSession $userSession
-	 * @param ConfigService $configService
-	 * @param SearchService $searchService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		IRequest $request, IUserSession $userSession, ConfigService $configService,
-		SearchService $searchService,
-		MiscService $miscService
+		IRequest $request,
+		private IUserSession $userSession,
+		private ConfigService $configService,
+		private SearchService $searchService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
-
-		$this->userSession = $userSession;
-		$this->searchService = $searchService;
-		$this->configService = $configService;
-		$this->miscService = $miscService;
 	}
 
 
@@ -126,25 +87,25 @@ class ApiController extends Controller {
 	private function searchDocuments(SearchRequest $request): DataResponse {
 		try {
 			$user = $this->userSession->getUser();
-			$result = $this->searchService->search($user->getUID(), $request);
 
-			return $this->success(
-				$result,
-				[
-					'request' => $request,
-					'version' => $this->configService->getAppValue('installed_version')
-				]
-			);
+			return new DataResponse([
+				'result' => $this->searchService->search($user->getUID(), $request),
+				'status' => 1,
+				'request' => $request,
+				'version' => $this->configService->getAppValue('installed_version')
+			], Http::STATUS_OK);
 		} catch (Exception $e) {
-			return $this->fail(
-				$e,
+			return new DataResponse(
 				[
+					'status' => -1,
+					'exception' => get_class($e),
+					'message' => $e->getMessage(),
 					'request' => $request,
 					'version' => $this->configService->getAppValue('installed_version')
-				]
+				],
+				Http::STATUS_INTERNAL_SERVER_ERROR
 			);
 		}
 	}
-
 }
 
