@@ -419,8 +419,6 @@ class Index extends ACommandBase {
 				continue;
 			}
 		}
-
-		$this->providerService->setProviderAsIndexed($provider->getId(), true);
 	}
 
 
