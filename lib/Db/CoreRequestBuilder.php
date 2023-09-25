@@ -91,7 +91,7 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param int $id
 	 */
-	protected function limitToId(IQueryBuilder &$qb, int $id) {
+	protected function limitToId(IQueryBuilder $qb, int $id) {
 		$this->limitToDBFieldInt($qb, 'id', $id);
 	}
 
@@ -102,7 +102,7 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param string $userId
 	 */
-	protected function limitToOwnerId(IQueryBuilder &$qb, string $userId) {
+	protected function limitToOwnerId(IQueryBuilder $qb, string $userId) {
 		$this->limitToDBField($qb, 'owner_id', $userId);
 	}
 
@@ -113,7 +113,7 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param string $providerId
 	 */
-	protected function limitToProviderId(IQueryBuilder &$qb, string $providerId) {
+	protected function limitToProviderId(IQueryBuilder $qb, string $providerId) {
 		$this->limitToDBField($qb, 'provider_id', $providerId);
 	}
 
@@ -124,7 +124,7 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param string $documentId
 	 */
-	protected function limitToDocumentId(IQueryBuilder &$qb, string $documentId) {
+	protected function limitToDocumentId(IQueryBuilder $qb, string $documentId) {
 		$this->limitToDBField($qb, 'document_id', $documentId);
 	}
 
@@ -135,7 +135,7 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param string $collection
 	 */
-	protected function limitToCollection(IQueryBuilder &$qb, string $collection) {
+	protected function limitToCollection(IQueryBuilder $qb, string $collection) {
 		$this->limitToDBField($qb, 'collection', $collection);
 	}
 
@@ -145,7 +145,7 @@ class CoreRequestBuilder {
 	 *
 	 * @param IQueryBuilder $qb
 	 */
-	protected function limitToErr(IQueryBuilder &$qb) {
+	protected function limitToErr(IQueryBuilder $qb) {
 		$expr = $qb->expr();
 		$qb->andWhere($expr->gte('err', $qb->createNamedParameter(1)));
 	}
@@ -156,7 +156,7 @@ class CoreRequestBuilder {
 	 *
 	 * @param IQueryBuilder $qb
 	 */
-	protected function limitToNoErr(IQueryBuilder &$qb) {
+	protected function limitToNoErr(IQueryBuilder $qb) {
 		$expr = $qb->expr();
 		$qb->andWhere($expr->eq('err', $qb->createNamedParameter(0)));
 	}
@@ -168,7 +168,7 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param array $documentIds
 	 */
-	protected function limitToDocumentIds(IQueryBuilder &$qb, array $documentIds) {
+	protected function limitToDocumentIds(IQueryBuilder $qb, array $documentIds) {
 		$this->limitToDBFieldArray($qb, 'document_id', $documentIds);
 	}
 
@@ -179,7 +179,7 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param string $source
 	 */
-	protected function limitToSource(IQueryBuilder &$qb, string $source) {
+	protected function limitToSource(IQueryBuilder $qb, string $source) {
 		$this->limitToDBField($qb, 'id', $source);
 	}
 
@@ -190,7 +190,7 @@ class CoreRequestBuilder {
 	 * @param IQueryBuilder $qb
 	 * @param string $status
 	 */
-	protected function limitToStatus(IQueryBuilder &$qb, string $status) {
+	protected function limitToStatus(IQueryBuilder $qb, string $status) {
 		$this->limitToDBField($qb, 'status', $status);
 	}
 
@@ -200,7 +200,7 @@ class CoreRequestBuilder {
 	 * @param string $field
 	 * @param string $value
 	 */
-	private function limitToDBField(IQueryBuilder &$qb, string $field, string $value) {
+	private function limitToDBField(IQueryBuilder $qb, string $field, string $value) {
 		$expr = $qb->expr();
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
 		$field = $pf . $field;
@@ -213,7 +213,7 @@ class CoreRequestBuilder {
 	 * @param string $field
 	 * @param int $value
 	 */
-	private function limitToDBFieldInt(IQueryBuilder &$qb, string $field, int $value) {
+	private function limitToDBFieldInt(IQueryBuilder $qb, string $field, int $value) {
 		$expr = $qb->expr();
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
 		$field = $pf . $field;
@@ -227,7 +227,7 @@ class CoreRequestBuilder {
 	 * @param string $field
 	 * @param string|integer|array $values
 	 */
-	private function limitToDBFieldArray(IQueryBuilder &$qb, string $field, array $values) {
+	private function limitToDBFieldArray(IQueryBuilder $qb, string $field, array $values) {
 		$expr = $qb->expr();
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
 		$field = $pf . $field;
@@ -248,7 +248,7 @@ class CoreRequestBuilder {
 	/**
 	 * @param IQueryBuilder $qb
 	 */
-	protected function limitToQueuedIndexes(IQueryBuilder &$qb) {
+	protected function limitToQueuedIndexes(IQueryBuilder $qb) {
 		$expr = $qb->expr();
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
 		$qb->andWhere($expr->neq($pf . 'status', $qb->createNamedParameter(Index::INDEX_OK)));
