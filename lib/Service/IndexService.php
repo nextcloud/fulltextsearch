@@ -35,6 +35,7 @@ use Exception;
 use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\NotIndexableDocumentException;
+use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Model\IndexOptions;
@@ -323,7 +324,8 @@ class IndexService implements IIndexService {
 
 				$index = $this->indexDocument($platform, $document);
 				$this->updateIndex($index);
-
+			} catch (PlatformTemporaryException $e) {
+				throw $e;
 			} catch (Exception $e) {
 			}
 
@@ -371,10 +373,11 @@ class IndexService implements IIndexService {
 
 		try {
 			return $platform->indexDocument($document);
+		} catch (PlatformTemporaryException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			throw new IndexDoesNotExistException();
 		}
-
 	}
 
 
@@ -383,6 +386,7 @@ class IndexService implements IIndexService {
 	 * @param IFullTextSearchProvider $provider
 	 * @param Index $index
 	 *
+	 * @throws PlatformTemporaryException
 	 * @throws Exception
 	 */
 	public function updateDocument(

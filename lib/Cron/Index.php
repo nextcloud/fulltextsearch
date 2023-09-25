@@ -34,44 +34,30 @@ namespace OCA\FullTextSearch\Cron;
 use Exception;
 use OC\BackgroundJob\TimedJob;
 use OCA\FullTextSearch\AppInfo\Application;
+use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\AppFramework\QueryException;
 use OCP\IUserManager;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 
 class Index extends TimedJob {
-
 	const HOUR_ERR_RESET = 240;
 
-
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var IndexService */
-	private $indexService;
-
-	/** @var PlatformService */
-	private $platformService;
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var MiscService */
-	private $miscService;
-
-	/** @var Runner */
-	private $runner;
+	private IUserManager $userManager;
+	private ConfigService $configService;
+	private IndexService $indexService;
+	private PlatformService $platformService;
+	private ProviderService $providerService;
+	private Runner $runner;
+	private LoggerInterface $logger;
 
 	public function __construct() {
 		$this->setInterval(12 * 60); // 12 minutes
@@ -95,7 +81,7 @@ class Index extends TimedJob {
 		$this->indexService = $c->query(IndexService::class);
 		$this->platformService = $c->query(PlatformService::class);
 		$this->providerService = $c->query(ProviderService::class);
-		$this->miscService = $c->query(MiscService::class);
+		$this->logger = $c->query(LoggerInterface::class);
 
 		try {
 			$this->runner->start();
@@ -103,7 +89,10 @@ class Index extends TimedJob {
 			$this->runner->stop();
 		} catch (RunnerAlreadyUpException $e) {
 		} catch (Exception $e) {
-			$this->miscService->log('Exception while cronIndex: ' . get_class($e) . ' - ' . $e->getMessage());
+			$this->logger->notice(
+				'exception encountered while running fulltextsearch/lib/Cron/Index.php',
+				['exception' => $e]
+			);
 			$this->runner->exception($e->getMessage(), true);
 		}
 
@@ -132,8 +121,15 @@ class Index extends TimedJob {
 				}
 
 				$this->indexService->updateDocument($platform, $provider, $index);
-			} catch (Throwable | Exception $e) {
+			} catch (PlatformTemporaryException $e) {
+				$this->logger->warning('platform seems down. we will update index next cron tick');
+				return;
+			} catch (Throwable|Exception $e) {
 				$this->runner->exception(get_class($e) . ' - ' . $e->getMessage(), false);
+				$this->logger->notice(
+					'exception encountered while running fulltextsearch/lib/Cron/Index.php',
+					['exception' => $e]
+				);
 				// TODO - upgrade error number - after too many errors, delete index
 				// TODO - do not count error if elasticsearch is down.
 			}

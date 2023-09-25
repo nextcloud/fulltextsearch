@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 
+use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use Exception;
 use OC\Core\Command\InterruptedException;
@@ -288,12 +289,16 @@ class Live extends ACommandBase {
 	 * @throws TickDoesNotExistException
 	 */
 	private function liveCycle() {
-
 		$wrapper = $this->platformService->getPlatform();
 		$platform = $wrapper->getPlatform();
 		$platform->setRunner($this->runner);
+		$connected = true;
 
 		while (true) {
+
+			if (!$connected) {
+				$platform->loadPlatform();
+			}
 
 			$indexes = $this->indexService->getQueuedIndexes();
 
@@ -306,6 +311,9 @@ class Live extends ACommandBase {
 
 					$provider->setRunner($this->runner);
 					$this->indexService->updateDocument($platform, $provider, $index);
+				} catch (PlatformTemporaryException $e) {
+					$connected = false; // assuming we're not connected anymore
+					break; // we'll connect and try again next tick
 				} catch (Exception $e) {
 					$this->runner->exception($e->getMessage(), false);
 					// TODO - upgrade error number - after too many errors, delete index
