@@ -35,6 +35,7 @@ use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use Exception;
 use OC\Core\Command\InterruptedException;
 use OCA\FullTextSearch\ACommandBase;
+use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\Index as ModelIndex;
 use OCA\FullTextSearch\Model\IndexOptions;
@@ -287,19 +288,6 @@ class Index extends ACommandBase {
 		$this->runner->setInfo('documentCurrent', 'all');
 		$this->runner->stop();
 
-//		while (true) {
-//			$this->runner->updateAction('_indexOver', true);
-//			$pressed = strtolower($this->updateAction(''));
-//			if ($pressed === $this->keys['nextStep']) {
-//				$this->pauseRunning(false);
-//				break;
-//			}
-//			usleep(300000);
-//		}
-
-
-//		$output->writeLn('');
-
 		return 0;
 	}
 
@@ -412,9 +400,9 @@ class Index extends ACommandBase {
 			}
 
 			try {
-				$this->indexService->indexProviderContentFromUser(
-					$platform, $provider, $user->getUID(), $options
-				);
+				$this->indexService->indexProviderContentFromUser($platform, $provider, $user->getUID(), $options);
+			} catch (PlatformTemporaryException $e) {
+				throw $e;
 			} catch (Exception $e) {
 				continue;
 			}
