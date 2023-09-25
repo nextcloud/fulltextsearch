@@ -38,7 +38,6 @@ use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotUniqueException;
-use OCA\FullTextSearch\Exceptions\ProviderOptionsDoesNotExistException;
 use OCA\FullTextSearch\Model\ProviderWrapper;
 use OCP\AppFramework\QueryException;
 use OCP\FullTextSearch\IFullTextSearchProvider;
@@ -157,10 +156,7 @@ class ProviderService implements IProviderService {
 
 		$providers = [];
 		foreach ($this->providers as $providerWrapper) {
-			$provider = $providerWrapper->getProvider();
-			if ($this->isProviderIndexed($provider->getId())) {
-				$providers[] = $provider;
-			}
+			$providers[] = $providerWrapper->getProvider();
 		}
 
 		return $providers;
@@ -184,10 +180,8 @@ class ProviderService implements IProviderService {
 
 		$ret = [];
 		foreach ($providerList as $providerId) {
-			if ($this->isProviderIndexed($providerId)) {
-				$providerWrapper = $this->getProvider($providerId);
-				$ret[] = $providerWrapper->getProvider();
-			}
+			$providerWrapper = $this->getProvider($providerId);
+			$ret[] = $providerWrapper->getProvider();
 		}
 
 		return $ret;
@@ -202,7 +196,6 @@ class ProviderService implements IProviderService {
 	 * @throws ProviderDoesNotExistException
 	 */
 	public function getProvider(string $providerId): ProviderWrapper {
-
 		$providers = $this->getProviders();
 		foreach ($providers as $providerWrapper) {
 			$provider = $providerWrapper->getProvider();
@@ -219,47 +212,10 @@ class ProviderService implements IProviderService {
 	 * @param string $providerId
 	 *
 	 * @return bool
+	 * @deprecated will always return true to fit OC\FullTextSearch\FullTextSearchManager
 	 */
 	public function isProviderIndexed(string $providerId): bool {
-		try {
-			$indexed = $this->configService->getProviderOptions(
-				$providerId, ConfigService::PROVIDER_INDEXED
-			);
-		} catch (ProviderOptionsDoesNotExistException $e) {
-			$this->miscService->log('Could not determine if provider with id \''
-			. $providerId
-			. '\' was properly indexed because the corresponding provider-option could not be found.'
-			. ' Make sure the initial indexing process has been completed successfully.'
-			, 0);
-			return false;
-		}
-
-		if ($indexed === '1') {
-			return true;
-		}
-
-		return false;
-
-	}
-
-
-	/**
-	 * @param string $providerId
-	 * @param bool $boolean
-	 */
-	public function setProviderAsIndexed(string $providerId, bool $boolean) {
-		$this->configService->setProviderOptions(
-			$providerId,
-			ConfigService::PROVIDER_INDEXED, (($boolean) ? '1' : '0')
-		);
-	}
-
-
-	/**
-	 *
-	 */
-	public function setProvidersAsNotIndexed() {
-		$this->configService->resetProviderOptions(ConfigService::PROVIDER_INDEXED);
+		return true;
 	}
 
 

@@ -602,7 +602,6 @@ class IndexService implements IIndexService {
 		$platform = $wrapper->getPlatform();
 		if ($providerId === '') {
 			$platform->resetIndex('all');
-			$this->providerService->setProvidersAsNotIndexed();
 			$this->indexesRequest->reset($collection);
 
 			return;
