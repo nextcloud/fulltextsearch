@@ -596,26 +596,19 @@ class IndexService implements IIndexService {
 	public function resetIndex(string $providerId = '', string $collection = '') {
 		$wrapper = $this->platformService->getPlatform();
 		$platform = $wrapper->getPlatform();
-
 		if ($providerId === '') {
 			$platform->resetIndex('all');
 			$this->indexesRequest->reset($collection);
 
 			return;
-		} else {
-			$providerWrapper = $this->providerService->getProvider($providerId);
-			$providers = [$providerWrapper->getProvider()];
 		}
 
-		foreach ($providers as $provider) {
-			// TODO: need to specify the map to remove
-			// TODO: need to remove entries with type=providerId
+		$providerWrapper = $this->providerService->getProvider($providerId);
+		$provider = $providerWrapper->getProvider();
 //			$provider->onResettingIndex($platform);
 
-			$platform->resetIndex($provider->getId());
-			$this->providerService->setProviderAsIndexed($provider->getId(), false);
-			$this->indexesRequest->deleteFromProviderId($provider->getId());
-		}
+		$platform->resetIndex($provider->getId());
+		$this->indexesRequest->deleteFromProviderId($provider->getId(), $collection);
 	}
 
 
