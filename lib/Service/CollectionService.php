@@ -119,8 +119,8 @@ class CollectionService {
 	/**
 	 * @return string[]
 	 */
-	public function getCollections(): array {
-		return $this->indexesRequest->getCollections(false);
+	public function getCollections(bool $local = true): array {
+		return $this->indexesRequest->getCollections($local);
 	}
 
 
