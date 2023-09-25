@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 /**
  * FullTextSearch - Full text search framework for Nextcloud
@@ -27,30 +27,20 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
-
 
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\CollectionService;
+use OCA\FullTextSearch\Service\ConfigService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 class CollectionList extends Base {
-
-
-	/** @var CollectionService */
-	private $collectionService;
-
-
-	/**
-	 * @param CollectionService $collectionService
-	 */
-	public function __construct(CollectionService $collectionService) {
+	public function __construct(
+		private CollectionService $collectionService,
+		private ConfigService $configService
+	) {
 		parent::__construct();
-
-		$this->collectionService = $collectionService;
 	}
 
 
@@ -60,7 +50,7 @@ class CollectionList extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:collection:list')
-			 ->setDescription('List collections');
+			->setDescription('List collections');
 	}
 
 
@@ -75,7 +65,7 @@ class CollectionList extends Base {
 		$output->writeln('found ' . sizeof($collections) . ' collection(s)');
 
 		foreach ($this->collectionService->getCollections() as $collection) {
-			$output->writeln('- ' . $collection);
+			$output->writeln('- ' . (($collection === $this->configService->getInternalCollection()) ? '*' : '') . $collection);
 		}
 
 		return 0;

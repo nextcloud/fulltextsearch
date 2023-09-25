@@ -35,6 +35,7 @@ use OCA\FullTextSearch\Exceptions\DatabaseException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\CollectionService;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\IDBConnection;
 
@@ -217,8 +218,6 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param string $collection \
 	 */
 	public function deleteCollection(string $collection): void {
-		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
-
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToCollection($qb, $collection);
 
@@ -229,7 +228,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	/**
 	 * @param string $providerId
 	 */
-	public function deleteFromProviderId(string $providerId) {
+	public function deleteFromProviderId(string $providerId, string $collection = '') {
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToProviderId($qb, $providerId);
 
@@ -241,10 +240,10 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 *
 	 */
 	public function reset(string $collection = ''): void {
-		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
-
 		$qb = $this->getIndexesDeleteSql();
-		$this->limitToCollection($qb, $collection);
+		if ($collection !== '') {
+			$this->limitToCollection($qb, $collection);
+		}
 
 		$qb->executeStatement();
 	}
@@ -360,11 +359,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @return string[]
 	 */
 	public function getCollections(bool $local = true): array {
+		$internal = $this->configService->getInternalCollection();
 		$qb = $this->dbConnection->getQueryBuilder();
 
 		$qb->select('li.collection')
 		   ->from(self::TABLE_INDEXES, 'li');
 		$qb->andWhere($qb->expr()->nonEmptyString('li.collection'));
+		$qb->andWhere($qb->expr()->neq('li.collection', $qb->createNamedParameter($internal, IQueryBuilder::PARAM_STR)));
 		$qb->groupBy('li.collection');
 
 		$collections = [];
@@ -378,7 +379,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 			return $collections;
 		}
 
-		return array_merge([$this->configService->getInternalCollection()], $collections);
+		return array_merge([$internal], $collections);
 	}
 
 
