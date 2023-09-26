@@ -1,5 +1,16 @@
 # Changelog
 
+### 27.0.2
+
+- better management of temporary issues from search platform,
+- prioritize system configuration (config.php) over app configuration (database),
+- customize internal collection name using the config `collection_internal`,
+- reset now requires confirmation,
+- collection can now be reset using the fulltextsearch:reset command,
+- test now includes different type of userIds,
+- fix an issue with empty collection name during index, and fix empty entries from database with a migration script,
+- content provider are now always indexed, even during first index,
+
 ### 27.0.1
 
 - default collection is local
