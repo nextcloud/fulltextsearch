@@ -107,7 +107,8 @@ class Check extends Base {
 		$output->writeln(
 			'Full text search ' . $this->configService->getAppValue('installed_version')
 		);
-		$output->writeln(' ');
+		$output->writeln(json_encode($this->configService->getConfig(), JSON_PRETTY_PRINT));
+		$output->writeln('');
 
 		$this->displayPlatform($output);
 		$this->displayProviders($output);
