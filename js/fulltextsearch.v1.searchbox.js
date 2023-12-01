@@ -49,11 +49,31 @@ var searchbox = {
 
 		var self = this;
 
-		// we remove old search
-		var search_form = $('FORM.searchbox');
-		if (search_form.length > 0) {
-			search_form.remove();
-		}
+        var testquery={
+        	providers: settings.searchProviderId,
+            search: "testsearch",
+            page: curr.page,
+            options: null,
+            size: 20
+        };
+
+         $.ajax({
+             method: 'GET',
+             url: OC.generateUrl('/apps/fulltextsearch/v1/search'),
+             data: {
+                 request: JSON.stringify(testquery)
+             }
+         }).done(function (res) {
+             if (_.has(res, 'error')) {
+                 console.log("there was an error with the search! Contact admin.");
+                 self.removeNewSearchbox();
+                 return;
+             }
+             self.removeOldSearchbox();
+         }).fail(function () {
+             console.log("the searchrequest failed! Reload page.");
+             self.removeNewSearchbox();
+         });
 
 		var divHeaderRight = $('DIV.header-right');
 		var divFullTextSearch = $('<div>', {id: 'fulltextsearch'});
@@ -85,6 +105,21 @@ var searchbox = {
 		});
 
 	},
+
+	removeOldSearchbox: function () {
+        // we remove old search
+        var search_form = $('FORM.searchbox');
+        if (search_form.length > 0) {
+            search_form.remove();
+        }
+    },
+
+    removeNewSearchbox: function () {
+        $('#fulltextsearch').remove();
+        var search_form = $('FORM.searchbox');
+        console.log(search_form);
+        search_form[0].title="There is an error with the fulltextsearch! Using normal search";
+    },
 
 
 	generateFullTextSearchIcon: function () {
