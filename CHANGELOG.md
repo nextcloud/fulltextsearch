@@ -1,5 +1,17 @@
 # Changelog
 
+### 29.0.0
+
+- compat nc29
+
+### 28.0.0
+
+- compat nc28
+
+### 27.0.1
+
+- fix a database migration issue
+
 ### 27.0.0
 
 - compat nc27
