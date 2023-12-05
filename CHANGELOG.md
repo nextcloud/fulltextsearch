@@ -1,5 +1,9 @@
 # Changelog
 
+### 27.0.3
+
+- fix an issue with migration
+
 ### 27.0.2
 
 - better management of temporary issues from search platform,
