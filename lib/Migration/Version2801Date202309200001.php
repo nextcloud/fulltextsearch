@@ -86,8 +86,10 @@ class Version2801Date202309200001 extends SimpleMigrationStep {
 					$delete->executeStatement();
 				}
 			}
+			if ($result !== null) {
+				$result->closeCursor();
+			}
 		}
 
-		$result->closeCursor();
 	}
 }
