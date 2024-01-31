@@ -48,6 +48,14 @@ Util::addStyle(Application::APP_ID, 'navigate');
 				</div>
 			</div>
 		</li>
+		<li style="height: 50px; ">
+                        <div id="search_header" style="display: flex;justify-content: space-evenly;">
+                                <div style="display: flex; align-items: baseline;">
+                                        <div> Results: </div>
+                                        <div> <input id="search_size" type="number" min="0" max="500" value="10"> </div>
+                                </div>
+                        </div>
+                </li>
 	</ul>
 </div>
 
