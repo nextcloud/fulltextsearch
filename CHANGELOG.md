@@ -1,5 +1,9 @@
 # Changelog
 
+### 28.0.1
+
+- fix migration issue
+
 ### 28.0.0
 
 - compat nc28
