@@ -31,9 +31,10 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Cron;
 
 
-use OC\BackgroundJob\TimedJob;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MigrationService;
+use OCP\BackgroundJob\TimedJob;
+use OCP\AppFramework\Utility\ITimeFactory;
 
 
 class Maintenance extends TimedJob {
@@ -49,11 +50,12 @@ class Maintenance extends TimedJob {
 	/**
 	 *
 	 */
-	public function __construct(MigrationService $migrationService, ConfigService $configService) {
-		$this->setInterval(3600);
-
+	public function __construct(ITimeFactory $time, MigrationService $migrationService, ConfigService $configService) {
+		parent::__construct($time);
 		$this->migrationService = $migrationService;
 		$this->configService = $configService;
+
+		$this->setInterval(3600);
 	}
 
 
