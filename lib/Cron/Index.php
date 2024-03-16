@@ -32,7 +32,6 @@ namespace OCA\FullTextSearch\Cron;
 
 
 use Exception;
-use OC\BackgroundJob\TimedJob;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
@@ -43,6 +42,8 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\AppFramework\QueryException;
+use OCP\BackgroundJob\TimedJob;
+use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -59,7 +60,16 @@ class Index extends TimedJob {
 	private Runner $runner;
 	private LoggerInterface $logger;
 
-	public function __construct() {
+	public function __construct(
+		ITimeFactory $time,
+		IUserManager $userManager,
+		ConfigService $configService,
+		IndexService $indexService,
+		PlatformService $platformService,
+		Runner $runner,
+		LoggerInterface $logger
+	) {
+		parent::__construct($time);
 		$this->setInterval(12 * 60); // 12 minutes
 	}
 
