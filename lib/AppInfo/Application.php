@@ -55,10 +55,7 @@ if (file_exists($autoLoad = __DIR__ . '/../../vendor/autoload.php')) {
 	include_once $autoLoad;
 }
 
-
 class Application extends App implements IBootstrap {
-
-
 	const APP_ID = 'fulltextsearch';
 	const APP_NAME = 'FullTextSearch';
 
