@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,13 +26,9 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Cron;
 
-
 use Exception;
-use OC\BackgroundJob\TimedJob;
-use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Model\Runner;
@@ -43,24 +38,29 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\AppFramework\QueryException;
-use OCP\IUserManager;
+use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\BackgroundJob\IJob;
+use OCP\BackgroundJob\TimedJob;
 use Psr\Log\LoggerInterface;
 use Throwable;
-
 
 class Index extends TimedJob {
 	const HOUR_ERR_RESET = 240;
 
-	private IUserManager $userManager;
-	private ConfigService $configService;
-	private IndexService $indexService;
-	private PlatformService $platformService;
-	private ProviderService $providerService;
 	private Runner $runner;
-	private LoggerInterface $logger;
 
-	public function __construct() {
+	public function __construct(
+		ITimeFactory $timeFactory,
+		private RunningService $runningService,
+		private IndexService $indexService,
+		private PlatformService $platformService,
+		private ProviderService $providerService,
+		private ConfigService $configService,
+		private LoggerInterface $logger,
+	) {
+		parent::__construct($timeFactory);
 		$this->setInterval(12 * 60); // 12 minutes
+		$this->setTimeSensitivity(IJob::TIME_SENSITIVE);
 	}
 
 
@@ -70,18 +70,7 @@ class Index extends TimedJob {
 	 * @throws QueryException
 	 */
 	protected function run($argument) {
-		$app = new Application();
-		$c = $app->getContainer();
-
-		$this->userManager = $c->query(IUserManager::class);
-		$runningService = $c->query(RunningService::class);
-		$this->runner = new Runner($runningService, 'cronIndex');
-
-		$this->configService = $c->query(ConfigService::class);
-		$this->indexService = $c->query(IndexService::class);
-		$this->platformService = $c->query(PlatformService::class);
-		$this->providerService = $c->query(ProviderService::class);
-		$this->logger = $c->query(LoggerInterface::class);
+		$this->runner = new Runner($this->runningService, 'cronIndex');
 
 		try {
 			$this->runner->start();
