@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 
-use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use Exception;
 use OC\Core\Command\InterruptedException;
 use OCA\FullTextSearch\ACommandBase;
@@ -47,6 +46,7 @@ use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\IUserManager;
 use OutOfBoundsException;
@@ -56,7 +56,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 use Throwable;
-
 
 /**
  * Class Index
@@ -118,29 +117,6 @@ class Index extends ACommandBase {
 	const PANEL_COMMANDS_ERRORS_LINE = '## f:first error ## h/j:prec/next error ## d:delete error ## l:last error';
 	const PANEL_COMMANDS_RESULTS_LINE = '## x:first result ## c/v:prec/next result ## b:last result';
 
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var RunningService */
-	private $runningService;
-
-	/** @var CliService */
-	private $cliService;
-
-	/** @var IndexService */
-	private $indexService;
-
-	/** @var PlatformService */
-	private $platformService;
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var MiscService */
-	private $miscService;
-
-	/** @var ConfigService */
-	private $configService;
 
 	/** @var Runner */
 	private $runner;
@@ -174,22 +150,17 @@ class Index extends ACommandBase {
 	 * @param ConfigService $configService
 	 */
 	public function __construct(
-		IUserManager $userManager, RunningService $runningService, CliService $cliService,
-		IndexService $indexService, PlatformService $platformService,
-		ProviderService $providerService, MiscService $miscService,
-		ConfigService $configService
+		private IUserManager $userManager,
+		private RunningService $runningService,
+		private CliService $cliService,
+		private IndexService $indexService,
+		private PlatformService $platformService,
+		private ProviderService $providerService,
+		private MiscService $miscService,
+		private ConfigService $configService
 	) {
 		parent::__construct();
-		$this->userManager = $userManager;
 
-		$this->runningService = $runningService;
-		$this->cliService = $cliService;
-		$this->indexService = $indexService;
-
-		$this->platformService = $platformService;
-		$this->providerService = $providerService;
-		$this->miscService = $miscService;
-		$this->configService = $configService;
 	}
 
 

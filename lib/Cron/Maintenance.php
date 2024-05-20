@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,33 +26,23 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Cron;
 
-
-use OC\BackgroundJob\TimedJob;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MigrationService;
-
+use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\BackgroundJob\IJob;
+use OCP\BackgroundJob\TimedJob;
 
 class Maintenance extends TimedJob {
-
-
-	/** @var MigrationService */
-	private $migrationService;
-
-	/** @var ConfigService */
-	private $configService;
-
-
-	/**
-	 *
-	 */
-	public function __construct(MigrationService $migrationService, ConfigService $configService) {
+	public function __construct(
+		ITimeFactory $timeFactory,
+		private MigrationService $migrationService,
+		private ConfigService $configService,
+	) {
+		parent::__construct($timeFactory);
 		$this->setInterval(3600);
-
-		$this->migrationService = $migrationService;
-		$this->configService = $configService;
+		$this->setTimeSensitivity(IJob::TIME_INSENSITIVE);
 	}
 
 
