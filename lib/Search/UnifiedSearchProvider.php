@@ -165,7 +165,11 @@ class UnifiedSearchProvider implements IProvider {
 		$searchRequest->setPage((int)floor(($query->getCursor() ?? 0) / $query->getLimit()) + 1);
 		$searchRequest->setParts([]);
 		$searchRequest->setSize($query->getLimit());
-		$searchRequest->setOptions([]);
+
+		if (method_exists($query, 'getSearchOptions')) { // NC25
+			$searchRequest->setOptions($query->getSearchOptions()->getOptions());
+		}
+
 		$searchRequest->setTags([]);
 		$searchRequest->setSubTags([]);
 		$searchRequest->setSize($query->getLimit());
