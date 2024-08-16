@@ -1,5 +1,10 @@
 # Changelog
 
+
+### 30.0.0
+
+- compatibility with Nextcloud 30
+
 ### 29.0.0
 
 - compat nc29
