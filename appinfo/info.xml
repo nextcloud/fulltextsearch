@@ -10,7 +10,7 @@ Core App of the full-text search framework for your Nextcloud.
 
 ]]>
 	</description>
-	<version>28.0.1</version>
+	<version>28.0.2</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullTextSearch</namespace>
