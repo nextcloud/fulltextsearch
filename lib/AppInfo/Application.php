@@ -125,7 +125,7 @@ class Application extends App implements IBootstrap {
 
 		try {
 			$container->get(INavigationManager::class)
-					  ->add($this->fullTextSearchNavigation());
+					  ->add(fn () => $this->fullTextSearchNavigation());
 		} catch (RouteNotFoundException $e) {
 		}
 	}
