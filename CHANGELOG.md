@@ -1,5 +1,9 @@
 # Changelog
 
+### 28.0.2
+
+- fix an issue with navigation bar
+
 ### 28.0.1
 
 - fix migration issue
