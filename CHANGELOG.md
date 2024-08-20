@@ -1,5 +1,9 @@
 # Changelog
 
+### 29.0.1
+
+- fix an issue with navigation bar
+
 ### 29.0.0
 
 - compat nc29
