@@ -35,6 +35,7 @@ Core App of the full-text search framework for your Nextcloud.
 		<command>OCA\FullTextSearch\Command\Check</command>
 		<command>OCA\FullTextSearch\Command\CollectionInit</command>
 		<command>OCA\FullTextSearch\Command\CollectionDelete</command>
+		<command>OCA\FullTextSearch\Command\CollectionLink</command>
 		<command>OCA\FullTextSearch\Command\CollectionList</command>
 		<command>OCA\FullTextSearch\Command\Configure</command>
 		<command>OCA\FullTextSearch\Command\DocumentIndex</command>
