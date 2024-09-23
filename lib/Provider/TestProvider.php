@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,16 +26,13 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Provider;
-
 
 use OC\FullTextSearch\Model\IndexDocument;
 use OC\FullTextSearch\Model\SearchTemplate;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\TestService;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
@@ -55,25 +51,10 @@ use OCP\FullTextSearch\Model\ISearchTemplate;
  * @package OCA\FullTextSearch\Provider
  */
 class TestProvider implements IFullTextSearchProvider {
-
-
 	const TEST_PROVIDER_ID = 'test_provider';
 
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var TestService */
-	private $testService;
-
-	/** @var MiscService */
-	private $miscService;
-
-	/** @var Runner */
-	private $runner;
-
-	/** @var IndexOptions */
-	private $indexOptions;
+	private IRunner $runner;
+	private IndexOptions $indexOptions;
 
 
 	/**
@@ -81,14 +62,11 @@ class TestProvider implements IFullTextSearchProvider {
 	 *
 	 * @param ConfigService $configService
 	 * @param TestService $testService
-	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		ConfigService $configService, TestService $testService, MiscService $miscService
+		private ConfigService $configService,
+		private TestService $testService
 	) {
-		$this->configService = $configService;
-		$this->testService = $testService;
-		$this->miscService = $miscService;
 	}
 
 

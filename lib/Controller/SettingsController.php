@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,54 +26,24 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Controller;
-
 
 use Exception;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 
-
-/**
- * Class SettingsController
- *
- * @package OCA\FullTextSearch\Controller
- */
 class SettingsController extends Controller {
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var SettingsService */
-	private $settingsService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * NavigationController constructor.
-	 *
-	 * @param IRequest $request
-	 * @param ConfigService $configService
-	 * @param SettingsService $settingsService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		IRequest $request, ConfigService $configService, SettingsService $settingsService,
-		MiscService $miscService
+		IRequest $request,
+		private ConfigService $configService,
+		private SettingsService $settingsService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->configService = $configService;
-		$this->settingsService = $settingsService;
-		$this->miscService = $miscService;
 	}
 
 

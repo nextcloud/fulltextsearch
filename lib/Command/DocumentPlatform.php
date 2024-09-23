@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,41 +26,21 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
-
 
 use Exception;
 use OC\Core\Command\Base;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 class DocumentPlatform extends Base {
-
-
-	/** @var PlatformService */
-	private $platformService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * Index constructor.
-	 *
-	 * @param PlatformService $providerService
-	 * @param MiscService $miscService
-	 */
-	public function __construct(PlatformService $providerService, MiscService $miscService) {
+	public function __construct(
+		private PlatformService $providerService
+	) {
 		parent::__construct();
-
-		$this->platformService = $providerService;
-		$this->miscService = $miscService;
 	}
 
 

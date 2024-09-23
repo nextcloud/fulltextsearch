@@ -70,28 +70,10 @@ class ConfigService {
 		self::COLLECTION_INTERNAL => 'local'
 	];
 
-
-	/** @var IConfig */
-	private $config;
-
-	/** @var string */
-	private $userId;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * ConfigService constructor.
-	 *
-	 * @param IConfig $config
-	 * @param string $userId
-	 * @param MiscService $miscService
-	 */
-	public function __construct(IConfig $config, $userId, MiscService $miscService) {
-		$this->config = $config;
-		$this->userId = $userId;
-		$this->miscService = $miscService;
+	public function __construct(
+		private IConfig $config,
+		private ?string $userId
+	) {
 	}
 
 

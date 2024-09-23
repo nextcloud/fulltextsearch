@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 /**
  * FullTextSearch - Full text search framework for Nextcloud
@@ -27,59 +27,23 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Controller;
-
 
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\IConfig;
 use OCP\IRequest;
 
-
-/**
- * Class NavigationController
- *
- * @package OCA\FullTextSearch\Controller
- */
 class NavigationController extends Controller {
-
-
-	/** @var IConfig */
-	private $config;
-
-	/** @var IFullTextSearchManager */
-	private $fullTextSearchManager;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * NavigationController constructor.
-	 *
-	 * @param IRequest $request
-	 * @param IConfig $config
-	 * @param IFullTextSearchManager $fullTextSearchManager
-	 * @param ConfigService $configService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		IRequest $request, IConfig $config, IFullTextSearchManager $fullTextSearchManager,
-		ConfigService $configService, MiscService $miscService
+		IRequest $request,
+		private IConfig $config,
+		private IFullTextSearchManager $fullTextSearchManager,
 	) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->config = $config;
-		$this->fullTextSearchManager = $fullTextSearchManager;
-		$this->configService = $configService;
-		$this->miscService = $miscService;
 	}
 
 

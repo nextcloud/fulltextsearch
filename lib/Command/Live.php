@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,9 +26,7 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
-
 
 use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Tools\Traits\TArrayTools;
@@ -42,12 +39,12 @@ use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\CliService;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\IUserManager;
 use OutOfBoundsException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -55,12 +52,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 use Throwable;
 
-
-/**
- * Class Live
- *
- * @package OCA\FullTextSearch\Command
- */
 class Live extends ACommandBase {
 
 
@@ -114,32 +105,6 @@ class Live extends ACommandBase {
 	const PANEL_COMMANDS_ERRORS_LINE = '## f:first error ## h/j:prec/next error ## d:delete error ## l:last error';
 	const PANEL_COMMANDS_RESULTS_LINE = '## x:first result ## c/v:prec/next result ## b:last result';
 
-
-	/** @var IUserManager */
-	private $userManager;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var CliService */
-	private $cliService;
-
-	/** @var RunningService */
-	private $runningService;
-
-	/** @var IndexService */
-	private $indexService;
-
-	/** @var PlatformService */
-	private $platformService;
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
 	/** @var Runner */
 	private $runner;
 
@@ -168,24 +133,19 @@ class Live extends ACommandBase {
 	 * @param IndexService $indexService
 	 * @param PlatformService $platformService
 	 * @param ProviderService $providerService
-	 * @param MiscService $miscService
 	 */
 	public function __construct(
-		IUserManager $userManager, RunningService $runningService, ConfigService $configService,
-		CliService $cliService, IndexService $indexService, PlatformService $platformService,
-		ProviderService $providerService, MiscService $miscService
+		private IUserManager $userManager,
+		private RunningService $runningService,
+		private ConfigService $configService,
+		private CliService $cliService,
+		private IndexService $indexService,
+		private PlatformService $platformService,
+		private ProviderService $providerService,
+		private LoggerInterface $logger,
 	) {
 		parent::__construct();
-		$this->userManager = $userManager;
-
 		$this->runner = new Runner($runningService, 'commandLive');
-		$this->configService = $configService;
-		$this->cliService = $cliService;
-		$this->runningService = $runningService;
-		$this->indexService = $indexService;
-		$this->platformService = $platformService;
-		$this->providerService = $providerService;
-		$this->miscService = $miscService;
 	}
 
 
@@ -262,10 +222,7 @@ class Live extends ACommandBase {
 				$this->liveCycle();
 
 			} catch (Exception $e) {
-				$this->miscService->log(
-					'Exception while live index: ' . get_class($e) . ' - ' . $e->getMessage()
-				);
-
+				$this->logger->warning('Exception while live index', ['exception' => $e]);
 				if (!$input->getOption('service')) {
 					throw $e;
 				}

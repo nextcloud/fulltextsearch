@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,43 +26,18 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
 
-
 use OC\Core\Command\Base;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\RunningService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
-/**
- * Class Stop
- *
- * @package OCA\FullTextSearch\Command
- */
 class Stop extends Base {
-
-
-	/** @var RunningService */
-	private $runningService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * Index constructor.
-	 *
-	 * @param RunningService $runningService
-	 * @param MiscService $miscService
-	 */
-	public function __construct(RunningService $runningService, MiscService $miscService) {
+	public function __construct(
+		private RunningService $runningService
+	) {
 		parent::__construct();
-		$this->runningService = $runningService;
-
-		$this->miscService = $miscService;
 	}
 
 

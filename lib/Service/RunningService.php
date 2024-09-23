@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,9 +26,7 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Service;
-
 
 use Exception;
 use OCA\FullTextSearch\Db\TickRequest;
@@ -38,40 +35,12 @@ use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullTextSearch\Model\Tick;
 
-
-/**
- * Class RunningService
- *
- * @package OCA\FullTextSearch\Service
- */
 class RunningService {
-
-
-	/** @var TickRequest */
-	private $tickRequest;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * RunningService constructor.
-	 *
-	 * @param TickRequest $tickRequest
-	 * @param ConfigService $configService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		TickRequest $tickRequest, ConfigService $configService, MiscService $miscService
+		private TickRequest $tickRequest,
+		private ConfigService $configService
 	) {
-		$this->tickRequest = $tickRequest;
-		$this->configService = $configService;
-		$this->miscService = $miscService;
 	}
-
 
 	/**
 	 * @param string $source

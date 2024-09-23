@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,15 +26,12 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Search;
-
 
 use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use Exception;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
@@ -52,49 +48,17 @@ use OCP\Search\SearchResult;
  * @package OCA\FullTextSearch\Search
  */
 class UnifiedSearchProvider implements IProvider {
-
-
 	const PROVIDER_ID = 'fulltextsearch';
 	const ORDER = 1;
 
-
 	use TArrayTools;
 
-
-	/** @var IL10N */
-	private $l10n;
-
-	/** @var IURLGenerator */
-	private $urlGenerator;
-
-	/** @var SearchService */
-	private $searchService;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * UnifiedSearchProvider constructor.
-	 *
-	 * @param IL10N $l10n
-	 * @param IURLGenerator $urlGenerator
-	 * @param SearchService $searchService
-	 * @param ConfigService $configService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		IL10N $l10n, IURLGenerator $urlGenerator, SearchService $searchService, ConfigService $configService,
-		MiscService $miscService
+		private IL10N $l10n,
+		private IURLGenerator $urlGenerator,
+		private SearchService $searchService,
+		private ConfigService $configService
 	) {
-		$this->l10n = $l10n;
-		$this->urlGenerator = $urlGenerator;
-		$this->searchService = $searchService;
-		$this->configService = $configService;
-		$this->miscService = $miscService;
 	}
 
 

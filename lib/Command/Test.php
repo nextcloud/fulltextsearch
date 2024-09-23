@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,9 +26,7 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
-
 
 use Exception;
 use OC\Core\Command\InterruptedException;
@@ -47,7 +44,6 @@ use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
 use OCA\FullTextSearch\Provider\TestProvider;
 use OCA\FullTextSearch\Service\IndexService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
@@ -60,65 +56,22 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
-/**
- * Class Test
- *
- * @package OCA\FullTextSearch\Command
- */
 class Test extends ACommandBase {
 
 	const DELAY_STABILIZE_PLATFORM = 3;
 
-	/** @var RunningService */
-	private $runningService;
-
-	/** @var PlatformService */
-	private $platformService;
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var IndexService */
-	private $indexService;
-
-	/** @var TestService */
-	private $testService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/** @var Runner */
-	private $runner;
+	private Runner $runner;
 
 	/** @var boolean */
 	private $isJson = false;
-
-
-	/**
-	 * Index constructor.
-	 *
-	 * @param RunningService $runningService
-	 * @param ProviderService $providerService
-	 * @param IndexService $indexService
-	 * @param PlatformService $platformService
-	 * @param TestService $testService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		RunningService $runningService, PlatformService $platformService,
-		ProviderService $providerService, IndexService $indexService, TestService $testService,
-		MiscService $miscService
+		private RunningService $runningService,
+		private PlatformService $platformService,
+		private ProviderService $providerService,
+		private IndexService $indexService,
+		private TestService $testService,
 	) {
 		parent::__construct();
-
-		$this->runningService = $runningService;
-		$this->platformService = $platformService;
-		$this->providerService = $providerService;
-		$this->indexService = $indexService;
-		$this->testService = $testService;
-		$this->miscService = $miscService;
 	}
 
 

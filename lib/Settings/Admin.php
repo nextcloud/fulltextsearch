@@ -34,12 +34,10 @@ namespace OCA\FullTextSearch\Settings;
 use Exception;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\Settings\ISettings;
-
 
 /**
  * Class Admin
@@ -47,34 +45,8 @@ use OCP\Settings\ISettings;
  * @package OCA\FullTextSearch\Settings
  */
 class Admin implements ISettings {
-
-	/** @var IL10N */
-	private $l10n;
-
-	/** @var IURLGenerator */
-	private $urlGenerator;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * @param IL10N $l10n
-	 * @param IURLGenerator $urlGenerator
-	 * @param ConfigService $configService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		IL10N $l10n, IURLGenerator $urlGenerator, ConfigService $configService,
-		MiscService $miscService
 	) {
-		$this->l10n = $l10n;
-		$this->urlGenerator = $urlGenerator;
-		$this->configService = $configService;
-		$this->miscService = $miscService;
 	}
 
 

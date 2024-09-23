@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,54 +26,24 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
-
 
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 class Check extends Base {
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var PlatformService */
-	private $platformService;
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * Index constructor.
-	 *
-	 * @param ConfigService $configService
-	 * @param PlatformService $platformService
-	 * @param ProviderService $providerService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		ConfigService $configService, PlatformService $platformService,
-		ProviderService $providerService, MiscService $miscService
+		private ConfigService $configService,
+		private PlatformService $platformService,
+		private ProviderService $providerService
 	) {
 		parent::__construct();
-
-		$this->configService = $configService;
-		$this->platformService = $platformService;
-		$this->providerService = $providerService;
-		$this->miscService = $miscService;
 	}
 
 
@@ -97,7 +66,6 @@ class Check extends Base {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-
 		if ($input->getOption('json') === true) {
 			$output->writeln(json_encode($this->displayAsJson(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
