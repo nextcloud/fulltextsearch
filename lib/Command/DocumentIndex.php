@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,54 +26,23 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
-
 
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\Index;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
-/**
- * Class DocumentIndex
- *
- * @package OCA\FullTextSearch\Command
- */
 class DocumentIndex extends Base {
-
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var PlatformService */
-	private $platformService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * DocumentIndex constructor.
-	 *
-	 * @param ProviderService $providerService
-	 * @param PlatformService $platformService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		ProviderService $providerService, PlatformService $platformService, MiscService $miscService
+		private ProviderService $providerService,
+		private PlatformService $platformService
 	) {
 		parent::__construct();
-
-		$this->providerService = $providerService;
-		$this->platformService = $platformService;
-		$this->miscService = $miscService;
 	}
 
 
@@ -89,7 +57,6 @@ class DocumentIndex extends Base {
 			 ->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
 			 ->addArgument('documentId', InputArgument::REQUIRED, 'documentId');
 	}
-
 
 	/**
 	 * @param InputInterface $input

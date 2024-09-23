@@ -64,19 +64,8 @@ class TestService {
 
 	const LICENSE_HASH = '108322602bb857915803a84e23a2cc2f';
 
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * TestService constructor.
-	 *
-	 * @param MiscService $miscService
-	 */
-	public function __construct(MiscService $miscService) {
-		$this->miscService = $miscService;
+	public function __construct() {
 	}
-
 
 	/**
 	 * @param IIndexOptions $options

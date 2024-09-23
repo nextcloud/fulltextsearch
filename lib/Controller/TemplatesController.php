@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,21 +26,16 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Controller;
-
 
 use Exception;
 use OC\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
-use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\IConfig;
 use OCP\IRequest;
 
 
@@ -51,41 +45,12 @@ use OCP\IRequest;
  * @package OCA\FullTextSearch\Controller
  */
 class TemplatesController extends Controller {
-
-
-	/** @var IConfig */
-	private $config;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * TemplatesController constructor.
-	 *
-	 * @param IRequest $request
-	 * @param IConfig $config
-	 * @param ConfigService $configService
-	 * @param ProviderService $providerService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		IRequest $request, IConfig $config, ConfigService $configService,
-		ProviderService $providerService, MiscService $miscService
+		IRequest $request,
+		private ProviderService $providerService
 	) {
 		parent::__construct(Application::APP_ID, $request);
-		$this->config = $config;
-		$this->configService = $configService;
-		$this->providerService = $providerService;
-		$this->miscService = $miscService;
 	}
-
 
 	/**
 	 * @NoAdminRequired

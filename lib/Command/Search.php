@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,15 +26,12 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
-
 
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Model\SearchResult;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\ISearchResult;
@@ -43,34 +39,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
-/**
- * Class Search
- *
- * @package OCA\FullTextSearch\Command
- */
 class Search extends Base {
-
-	/** @var SearchService */
-	private $searchService;
-
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * Index constructor.
-	 *
-	 * @param SearchService $searchService
-	 * @param MiscService $miscService
-	 *
-	 * @internal param IndexService $indexService
-	 */
-	public function __construct(SearchService $searchService, MiscService $miscService) {
+	public function __construct(
+		private SearchService $searchService
+	) {
 		parent::__construct();
-		$this->searchService = $searchService;
-
-		$this->miscService = $miscService;
 	}
 
 

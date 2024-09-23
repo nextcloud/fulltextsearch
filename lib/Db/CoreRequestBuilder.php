@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,61 +26,26 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Db;
-
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\IL10N;
 
-
-/**
- * Class CoreRequestBuilder
- *
- * @package OCA\FullTextSearch\Db
- */
 class CoreRequestBuilder {
-
 	const TABLE_INDEXES = 'fulltextsearch_index';
 	const TABLE_TICKS = 'fulltextsearch_ticks';
 
-	/** @var IDBConnection */
-	protected $dbConnection;
+	protected string $defaultSelectAlias;
 
-	/** @var IL10N */
-	protected $l10n;
-
-	/** @var ConfigService */
-	protected $configService;
-
-	/** @var MiscService */
-	protected $miscService;
-
-	/** @var string */
-	protected $defaultSelectAlias;
-
-
-	/**
-	 * CoreRequestBuilder constructor.
-	 *
-	 * @param IL10N $l10n
-	 * @param IDBConnection $connection
-	 * @param ConfigService $configService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		IL10N $l10n, IDBConnection $connection, ConfigService $configService,
-		MiscService $miscService
+		protected IL10N $l10n,
+		protected IDBConnection $dbConnection,
+		protected ConfigService $configService
 	) {
-		$this->l10n = $l10n;
-		$this->dbConnection = $connection;
-		$this->configService = $configService;
-		$this->miscService = $miscService;
 	}
 
 

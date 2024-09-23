@@ -1,6 +1,6 @@
-<?php declare(strict_types=1);
+<?php
 
-
+declare(strict_types=1);
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -26,38 +26,20 @@
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
-
 
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Service\IndexService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCP\FullTextSearch\Model\IIndex;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
-/**
- * Class DocumentStatus
- *
- * @package OCA\FullTextSearch\Command
- */
 class DocumentStatus extends Base {
-
-
-	/** @var IndexService */
-	private $indexService;
-
-	/** @var MiscService */
-	private $miscService;
-
-	/** @var array */
-	private $statusAvailable = [
+	private array $statusAvailable = [
 		'IGNORE' => 'document will never be indexed',
 		'INDEX'  => 'document will be indexed',
 		'DONE'   => 'document is well indexed',
@@ -65,18 +47,10 @@ class DocumentStatus extends Base {
 		'FAILED' => 'index had fail'
 	];
 
-
-	/**
-	 * DocumentStatus constructor.
-	 *
-	 * @param IndexService $indexService
-	 * @param MiscService $miscService
-	 */
-	public function __construct(IndexService $indexService, MiscService $miscService) {
+	public function __construct(
+		private IndexService $indexService
+	) {
 		parent::__construct();
-
-		$this->indexService = $indexService;
-		$this->miscService = $miscService;
 	}
 
 

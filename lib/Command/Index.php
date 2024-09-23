@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,9 +26,7 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Command;
-
 
 use Exception;
 use OC\Core\Command\InterruptedException;
@@ -42,7 +39,6 @@ use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\CliService;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
-use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
@@ -57,16 +53,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 use Throwable;
 
-/**
- * Class Index
- *
- * @package OCA\FullTextSearch\Command
- */
 class Index extends ACommandBase {
-
-
 	use TArrayTools;
-
 
 	const INDEX_OPTION_NO_READLINE = '_no-readline';
 
@@ -136,19 +124,6 @@ class Index extends ACommandBase {
 	/** @var bool */
 	private $navigateLastError = true;
 
-
-	/**
-	 * Index constructor.
-	 *
-	 * @param IUserManager $userManager
-	 * @param RunningService $runningService
-	 * @param CliService $cliService
-	 * @param IndexService $indexService
-	 * @param PlatformService $platformService
-	 * @param ProviderService $providerService
-	 * @param MiscService $miscService
-	 * @param ConfigService $configService
-	 */
 	public function __construct(
 		private IUserManager $userManager,
 		private RunningService $runningService,
@@ -156,11 +131,9 @@ class Index extends ACommandBase {
 		private IndexService $indexService,
 		private PlatformService $platformService,
 		private ProviderService $providerService,
-		private MiscService $miscService,
 		private ConfigService $configService
 	) {
 		parent::__construct();
-
 	}
 
 
@@ -199,7 +172,6 @@ class Index extends ACommandBase {
 				}
 				);
 			} catch (Throwable $t) {
-				$this->miscService->log($t->getMessage() . ' -- ' . $t->getTraceAsString());
 				throw new Exception('Please install php-readline, or use --no-readline');
 			}
 		}

@@ -42,11 +42,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @package OCA\FullTextSearch\Service
  */
 class CliService {
-
-
-	/** @var MiscService */
-	private $miscService;
-
 	/** @var Runner */
 	private $runner;
 
@@ -62,14 +57,7 @@ class CliService {
 	/** @var OutputInterface */
 	private $output = null;
 
-
-	/**
-	 * CliService constructor.
-	 *
-	 * @param MiscService $miscService
-	 */
-	public function __construct(MiscService $miscService) {
-		$this->miscService = $miscService;
+	public function __construct() {
 	}
 
 

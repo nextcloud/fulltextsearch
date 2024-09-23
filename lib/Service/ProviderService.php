@@ -1,7 +1,6 @@
 <?php
+
 declare(strict_types=1);
-
-
 /**
  * FullTextSearch - Full text search framework for Nextcloud
  *
@@ -27,9 +26,7 @@ declare(strict_types=1);
  *
  */
 
-
 namespace OCA\FullTextSearch\Service;
-
 
 use Exception;
 use OC;
@@ -43,45 +40,18 @@ use OCP\AppFramework\QueryException;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Service\IProviderService;
 use OCP\Util;
+use Psr\Log\LoggerInterface;
 
-
-/**
- * Class ProviderService
- *
- * @package OCA\FullTextSearch\Service
- */
 class ProviderService implements IProviderService {
-
-
-	/** @var AppManager */
-	private $appManager;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var MiscService */
-	private $miscService;
-
 	/** @var ProviderWrapper[] */
-	private $providers = [];
+	private array $providers = [];
+	private bool $providersLoaded = false;
 
-	/** @var bool */
-	private $providersLoaded = false;
-
-
-	/**
-	 * ProviderService constructor.
-	 *
-	 * @param AppManager $appManager
-	 * @param ConfigService $configService
-	 * @param MiscService $miscService
-	 */
 	public function __construct(
-		AppManager $appManager, ConfigService $configService, MiscService $miscService
+		private AppManager $appManager,
+		private ConfigService $configService,
+		private LoggerInterface $logger
 	) {
-		$this->appManager = $appManager;
-		$this->configService = $configService;
-		$this->miscService = $miscService;
 	}
 
 
@@ -101,7 +71,7 @@ class ProviderService implements IProviderService {
 				$this->loadProvidersFromApp($appId);
 			}
 		} catch (Exception $e) {
-			$this->miscService->log($e->getMessage());
+			$this->logger->warning('could not load providers', ['exception' => $e]);
 		}
 
 		$this->providersLoaded = true;
@@ -266,11 +236,7 @@ class ProviderService implements IProviderService {
 			try {
 				$this->loadProvider($appId, $provider);
 			} catch (Exception $e) {
-				$this->miscService->log(
-					'Issue while loading Provider: ' . $appId . '/' . $provider . ' - ' . get_class(
-						$e
-					) . ' ' . $e->getMessage()
-				);
+				$this->logger->warning('Issue while loading Provider: ' . $appId . '/' . $provider, ['exception' => $e]);
 			}
 		}
 	}
