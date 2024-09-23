@@ -31,37 +31,31 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Controller;
 
 
+use OC\ForbiddenException;
 use OCA\FullTextSearch\AppInfo\Application;
+use OCA\FullTextSearch\Exceptions\CollectionArgumentException;
 use OCA\FullTextSearch\Service\CollectionService;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCSController;
 use OCP\FullTextSearch\Model\IIndexDocument;
+use OCP\IGroupManager;
 use OCP\IRequest;
-
+use OCP\IUserSession;
 
 class CollectionController extends OCSController {
-
-
-	/** @var CollectionService */
-	private $collectionService;
-
-
-	/**
-	 * @param IRequest $request
-	 * @param CollectionService $collectionService
-	 */
 	public function __construct(
 		IRequest $request,
-		CollectionService $collectionService
+		private IUserSession $userSession,
+		private IGroupManager $groupManager,
+		private CollectionService $collectionService
 	) {
 		parent::__construct(Application::APP_ID, $request);
-
-		$this->collectionService = $collectionService;
 	}
 
-
 	/**
+	 * @NoAdminRequired
+	 *
 	 * @param string $collection
 	 * @param int $length
 	 *
@@ -71,6 +65,7 @@ class CollectionController extends OCSController {
 	public function getQueue(string $collection, int $length = 0): DataResponse {
 		try {
 			$this->collectionService->confirmCollection($collection);
+			$this->confirmAccess($collection);
 
 			return new DataResponse($this->collectionService->getQueue($collection, $length));
 		} catch (\Exception $e) {
@@ -81,6 +76,8 @@ class CollectionController extends OCSController {
 
 
 	/**
+	 * @NoAdminRequired
+	 *
 	 * @param string $collection
 	 * @param string $providerId
 	 * @param string $documentId
@@ -91,6 +88,8 @@ class CollectionController extends OCSController {
 	public function indexDocument(string $collection, string $providerId, string $documentId): DataResponse {
 		try {
 			$this->collectionService->confirmCollection($collection);
+			$this->confirmAccess($collection);
+
 			$document = $this->collectionService->getDocument(
 				$collection,
 				$providerId,
@@ -105,6 +104,8 @@ class CollectionController extends OCSController {
 
 
 	/**
+	 * @NoAdminRequired
+	 *
 	 * @param string $collection
 	 * @param string $providerId
 	 * @param string $documentId
@@ -119,6 +120,8 @@ class CollectionController extends OCSController {
 	): DataResponse {
 		try {
 			$this->collectionService->confirmCollection($collection);
+			$this->confirmAccess($collection);
+
 			$this->collectionService->setAsDone($collection, $providerId, $documentId);
 
 			return new DataResponse([]);
@@ -127,6 +130,29 @@ class CollectionController extends OCSController {
 		}
 	}
 
+	/**
+	 * confirm that current session have access to collection
+	 *
+	 * @param string $collection
+	 *
+	 * @return void
+	 * @throws ForbiddenException
+	 */
+	private function confirmAccess(string $collection): void {
+		$currentUserId = $this->userSession->getUser()->getUID();
+		if ($this->groupManager->isAdmin($currentUserId)) {
+			return;
+		}
+
+		try {
+			if ($this->collectionService->getLinkedAccount($collection) === $currentUserId) {
+				return;
+			}
+		} catch (CollectionArgumentException) {
+		}
+
+		throw new ForbiddenException('API access not allowed');
+	}
 
 	/**
 	 * @param IIndexDocument $document

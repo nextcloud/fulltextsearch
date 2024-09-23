@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 
+use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\CollectionArgumentException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
@@ -41,8 +42,8 @@ use OCA\FullTextSearch\Model\Runner;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\FullTextSearch\Model\IIndexDocument;
+use OCP\IAppConfig;
 use OCP\IURLGenerator;
-
 
 class CollectionService {
 
@@ -74,6 +75,7 @@ class CollectionService {
 	 * @param ConfigService $configService
 	 */
 	public function __construct(
+		private IAppConfig $appConfig,
 		IURLGenerator $urlGenerator,
 		IndexesRequest $indexesRequest,
 		ProviderService $providerService,
@@ -258,6 +260,58 @@ class CollectionService {
 		return $provider->updateDocument($index);
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getLinks(): array {
+		return $this->appConfig->getValueArray(Application::APP_ID, ConfigService::COLLECTION_LINKS, lazy: true);
+	}
+
+	/**
+	 * @param array $links
+	 */
+	public function saveLinks(array $links): void {
+		$this->appConfig->setValueArray(Application::APP_ID, ConfigService::COLLECTION_LINKS, $links, lazy: true);
+	}
+
+	/**
+	 * @param string $collection
+	 * @param string $userId
+	 */
+	public function addLink(string $collection, string $userId): void {
+		$links = $this->getLinks();
+		$links[$collection] = $userId;
+		$this->saveLinks($links);
+	}
+
+	/**
+	 * @param string $collection
+	 */
+	public function removeLink(string $collection): void {
+		$links = $this->getLinks();
+		unset($links[$collection]);
+		$this->saveLinks($links);
+	}
+
+	/**
+	 * @param string $collection
+	 *
+	 * @return string
+	 * @throws CollectionArgumentException
+	 */
+	public function getLinkedAccount(string $collection): string {
+		if (!$this->hasCollection($collection)) {
+			throw new CollectionArgumentException('unknown collection');
+		}
+
+		$links = $this->getLinks();
+		$userId = $links[$collection] ?? '';
+		if ($userId === '') {
+			throw new CollectionArgumentException('no linked account');
+		}
+
+		return $userId;
+	}
 
 	/**
 	 * @param string $info
