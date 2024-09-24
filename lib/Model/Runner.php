@@ -393,12 +393,18 @@ class Runner implements IRunner {
 
 		try {
 			$this->runningService->update($this->tickId, $action);
+			$this->tickUpdate = $tick;
 		} catch (TickIsNotAliveException $e) {
-			$this->output('Force Quit');
-			exit();
+			$this->output('No Force Quit');
+			/**
+                         * ToDo: we must collect all errors and publish the error messages once the job finishes 
+			 * to allow the admin or the user to fix the problems or accept that not all files are indexed.
+   			 * Obviously there are probably many more files not indexed if the "Force Quit" cause can not be fixed for some reason.
+                         * exit();
+                        */
 		}
 
-		$this->tickUpdate = $tick;
+		
 	}
 
 
