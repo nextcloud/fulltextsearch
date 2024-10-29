@@ -54,6 +54,7 @@ class ConfigService {
 	const TICK_TTL = 'tick_ttl';
 	const COLLECTION_INDEXING_LIST = 'collection_indexing_list';
 	const COLLECTION_INTERNAL = 'collection_internal';
+	const COLLECTION_LINKS = 'collection_links';
 
 	// Temp. can be removed after few major releases
 	const MIGRATION_24 = 'migration_24';
@@ -67,7 +68,8 @@ class ConfigService {
 		self::TICK_TTL => '1800',
 		self::COLLECTION_INDEXING_LIST => 50,
 		self::MIGRATION_24 => 1,
-		self::COLLECTION_INTERNAL => 'local'
+		self::COLLECTION_INTERNAL => 'local',
+		self::COLLECTION_LINKS => '[]'
 	];
 
 	public function __construct(
