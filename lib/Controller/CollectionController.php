@@ -69,11 +69,32 @@ class CollectionController extends OCSController {
 
 			return new DataResponse($this->collectionService->getQueue($collection, $length));
 		} catch (\Exception $e) {
-//			$this->e($e, ['circleId' => $circleId]);
 			throw new OCSException($e->getMessage(), $e->getCode());
 		}
 	}
 
+
+	/**
+	 * @NoAdminRequired
+	 *
+	 * @param string $collection
+	 * @param int $length
+	 *
+	 * @return DataResponse
+	 * @throws OCSException
+	 */
+	public function resetCollection(string $collection): DataResponse {
+		try {
+			$this->collectionService->confirmCollection($collection);
+			$this->confirmAccess($collection);
+
+			$this->collectionService->resetCollection($collection);
+
+			return new DataResponse(['done']);
+		} catch (\Exception $e) {
+			throw new OCSException($e->getMessage(), $e->getCode());
+		}
+	}
 
 	/**
 	 * @NoAdminRequired
