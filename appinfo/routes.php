@@ -31,6 +31,7 @@ declare(strict_types=1);
 return [
 	'ocs' => [
 		/** @see OCA\FullTextSearch\Controller\CollectionController */
+		['name' => 'Collection#resetCollection', 'url' => '/collection/{collection}/index', 'verb' => 'DELETE'],
 		['name' => 'Collection#getQueue', 'url' => '/collection/{collection}/index', 'verb' => 'GET'],
 		[
 			'name' => 'Collection#indexDocument',
