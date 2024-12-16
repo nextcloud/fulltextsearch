@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DocumentPlatform extends Base {
 	public function __construct(
-		private PlatformService $providerService
+		private PlatformService $platformService
 	) {
 		parent::__construct();
 	}
