@@ -1,6 +1,6 @@
 { "translations": {
-    "the search returned {total} results in {time} ms" : "ئىزدەش {ۋاقىت} ms دىكى {ئومۇمىي} نەتىجىنى قايتۇردى",
-    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "{title} دىكى ئىزدەش {{ئىزدەش} \"{ۋاقىت} ms دىكى {ئومۇمىي} نەتىجىگە قايتتى",
+    "the search returned {total} results in {time} ms" : "ئىزدەش {total} ms دىكى {time} نەتىجىنى قايتۇردى",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "{title} دىكى ئىزدەش {search} \"{total} ms دىكى {time} نەتىجىگە قايتتى",
     "Search" : "Search",
     "Index not found" : "كۆرسەتكۈچ تېپىلمىدى",
     "Process timed out" : "جەريان ۋاقتى ئۆتتى",
