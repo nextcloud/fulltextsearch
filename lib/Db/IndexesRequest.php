@@ -136,7 +136,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 *
 	 * @return bool
 	 */
-	public function update(Index $index, bool $statusOnly = false): bool {
+	public function update(Index $index, bool $statusOnly = false): void {
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('status', $qb->createNamedParameter($index->getStatus()));
 
@@ -161,7 +161,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToDocumentId($qb, $index->getDocumentId());
 		$this->limitToCollection($qb, $index->getCollection());
 
-		return ($qb->executeStatement() === 1);
+		$qb->executeStatement();
 	}
 
 
