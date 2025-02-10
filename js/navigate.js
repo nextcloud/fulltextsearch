@@ -13,6 +13,7 @@ var fullTextSearch = OCA.FullTextSearch.api;
 var elements = {
 	searchTimeout: null,
 	search_input: null,
+	search_size: null,
 	search_submit: null,
 	search_result: null,
 	search_json: null
@@ -31,6 +32,7 @@ Navigate.prototype = {
 		var self = this;
 
 		elements.search_input = $('#search_input');
+		elements.search_size = $('#search_size');
 		elements.search_submit = $('#search_submit');
 		elements.search_result = $('#search_result');
 		elements.search_panels = $('#search_navigation');
@@ -58,7 +60,17 @@ Navigate.prototype = {
 		// 		self.initSearch(true);
 		// 	}
 		// });
-
+		
+		if (typeof (Storage) !== "undefined") {
+			elements.search_size.on('input', function(){
+			localStorage.search_size = elements.search_size.val();
+				self.navigateTimedSearch();
+			});
+			if (localStorage.search_size) {
+				elements.search_size.val(localStorage.search_size);
+			}
+		}
+		
 		self.initPanels();
 	},
 
@@ -79,7 +91,6 @@ Navigate.prototype = {
 			}, settings.searchRequestTimer);
 		}
 	},
-
 
 	initPanels: function () {
 		var self = this;
@@ -400,6 +411,7 @@ Navigate.prototype = {
 
 		var providers = this.getProviders();
 		var options = this.getOptions();
+		var size = elements.search_size.val();
 
 		this.displayProviderResults(providers);
 
@@ -407,7 +419,8 @@ Navigate.prototype = {
 			providers: providers,
 			options: options,
 			search: search,
-			page: curr.page
+			page: curr.page,
+			size: size
 		};
 
 		fullTextSearch.search(request, this.searchResult);
