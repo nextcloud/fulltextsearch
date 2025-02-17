@@ -111,8 +111,6 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 	/**
 	 * @param Index $index
-	 *
-	 * @return bool
 	 */
 	public function update(Index $index, bool $statusOnly = false): void {
 		$qb = $this->getIndexesUpdateSql();
