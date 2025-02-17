@@ -145,6 +145,9 @@ class CollectionService {
 		);
 	}
 
+	public function resetCollection(string $collection): void {
+		$this->indexesRequest->resetCollection($collection);
+	}
 
 	/**
 	 * @param string $collection
