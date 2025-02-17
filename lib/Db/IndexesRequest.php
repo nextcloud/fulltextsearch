@@ -200,6 +200,21 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$qb->execute();
 	}
 
+	/**
+	 * @param string $collection
+	 * @param string $providerId
+	 * @param array $indexes
+	 * @param int $status
+	 */
+	public function resetCollection(string $collection) {
+		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
+
+		$qb = $this->getIndexesUpdateSql();
+		$qb->set('status', $qb->createNamedParameter(IIndex::INDEX_FULL));
+		$this->limitToCollection($qb, $collection);
+
+		$qb->execute();
+	}
 
 	/**
 	 * @param IIndex $index
@@ -215,7 +230,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 
 	/**
-	 * @param string $collection \
+	 * @param string $collection
 	 */
 	public function deleteCollection(string $collection): void {
 		$qb = $this->getIndexesDeleteSql();
