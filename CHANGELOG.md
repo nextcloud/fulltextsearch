@@ -4,6 +4,17 @@
 -->
 # Changelog
 
+### 31.0.0
+
+- improved index on live index
+- improved code logic on index update
+- reset collection endpoint
+- compat nc31
+
+### 30.0.0
+
+- compat nc30
+
 ### 29.0.0
 
 - compat nc29
