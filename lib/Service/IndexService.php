@@ -472,7 +472,10 @@ class IndexService implements IIndexService {
 			$index->setStatus(IIndex::INDEX_OK, true);
 		}
 
-		if (!$this->indexesRequest->update($index)) {
+		try {
+			$this->indexesRequest->getIndex($index->getProviderId(), $index->getDocumentId(), $index->getCollection());
+			$this->indexesRequest->update($index);
+		} catch (IndexDoesNotExistException $e) {
 			$this->indexesRequest->create($index);
 		}
 	}
