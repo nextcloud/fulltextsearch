@@ -1,5 +1,12 @@
 # Changelog
 
+
+### 27.0.5
+
+- improved index on live index
+- improved code logic on index update
+- reset collection endpoint
+
 ### 27.0.4
 
 - fix an issue with navigation bar
