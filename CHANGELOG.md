@@ -1,5 +1,11 @@
 # Changelog
 
+### 29.0.2
+
+- improved index on live index
+- improved code logic on index update
+- reset collection endpoint
+
 ### 29.0.1
 
 - fix an issue with navigation bar
