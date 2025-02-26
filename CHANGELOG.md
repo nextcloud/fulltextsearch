@@ -1,5 +1,10 @@
 # Changelog
 
+### 30.0.1
+
+- improved index on live index
+- improved code logic on index update
+- reset collection endpoint
 
 ### 30.0.0
 
