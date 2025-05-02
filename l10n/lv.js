@@ -4,7 +4,7 @@ OC.L10N.register(
     "Search" : "Meklēt",
     "Index not found" : "Indekss netika atrasts",
     "Full text search" : "Pilna teksta meklēšana",
-    "Core of the full-text search framework for Nextcloud" : "Kodols pilna teksta meklēšanas satvars priekš Nextcloud",
+    "Core of the full-text search framework for Nextcloud" : "Nextcloud pilna teksta meklēšanas satvara kodols",
     "Core App of the full-text search framework for your Nextcloud." : "Pilna teksta meklēšanas satvara kodola lietotne Tavam Nextcloud.",
     "Search on %s" : "Meklēt %s",
     "General" : "Vispārīgs"
