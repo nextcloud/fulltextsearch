@@ -78,7 +78,7 @@ class TickRequestBuilder extends CoreRequestBuilder {
 	 */
 	protected function getTickDeleteSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
-		$qb->delete(self::TABLE_INDEXES);
+		$qb->delete(self::TABLE_TICKS);
 
 		return $qb;
 	}
