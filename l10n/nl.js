@@ -15,7 +15,7 @@ OC.L10N.register(
     "General" : "Algemeen",
     "Search Platform" : "Zoekplatform",
     "Select the app to index content and answer search queries." : "Selecteer de app om inhoud te indexeren en zoekvragen te beantwoorden.",
-    "Navigation Icon" : "Navigatiepictogram",
+    "Navigation Icon" : "Navigatie-pictogram",
     "Enable global search within all your content." : "Inschakelen globaal al je inhoud indexeren."
 },
 "nplurals=2; plural=(n != 1);");
