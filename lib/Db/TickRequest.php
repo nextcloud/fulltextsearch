@@ -74,29 +74,6 @@ class TickRequest extends TickRequestBuilder {
 		return true;
 	}
 
-
-	/**
-	 * @param Tick $tick
-	 */
-	public function deleteIndex(Tick $tick) {
-		$qb = $this->getTickDeleteSql();
-		$this->limitToId($qb, $tick->getId());
-		$this->limitToSource($qb, $tick->getSource());
-
-		$qb->execute();
-	}
-
-
-	/**
-	 *
-	 */
-	public function reset() {
-		$qb = $this->getTickDeleteSql();
-
-		$qb->execute();
-	}
-
-
 	/**
 	 * return tick.
 	 *
