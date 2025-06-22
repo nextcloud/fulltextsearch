@@ -1,6 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "Search" : "Tafuta"
+    "Search" : "Tafuta",
+    "General" : "Kuu"
 },
 "nplurals=2; plural=(n != 1);");
