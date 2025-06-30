@@ -16,6 +16,6 @@ OC.L10N.register(
     "Search Platform" : "Arama platformu",
     "Select the app to index content and answer search queries." : "İçeriği dizine ekleyecek ve arama sorgularını yanıtlayacak uygulamayı seçin",
     "Navigation Icon" : "Gezinme simgesi",
-    "Enable global search within all your content." : "Tüm içeriğiniz üzerinde genel aramayı etkinleştirin."
+    "Enable global search within all your content." : "Tüm içeriğiniz üzerinde genel aramayı açın."
 },
 "nplurals=2; plural=(n > 1);");
