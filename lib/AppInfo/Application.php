@@ -119,7 +119,7 @@ class Application extends App implements IBootstrap {
 			'order' => 5,
 			'href'  => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
 			'icon'  => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),
-			'name'  => 'Search'
+			'name'  => \OC::$server->getL10NFactory()->get('fulltextsearch')->t('Search')
 		];
 	}
 
