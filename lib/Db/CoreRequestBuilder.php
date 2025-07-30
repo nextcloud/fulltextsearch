@@ -9,18 +9,22 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Db;
 
+use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\IL10N;
+use OCP\Server;
+use Psr\Log\LoggerInterface;
 
 class CoreRequestBuilder {
 	const TABLE_INDEXES = 'fulltextsearch_index';
 	const TABLE_TICKS = 'fulltextsearch_ticks';
 
 	protected string $defaultSelectAlias;
+	private int $lastReconnect = 0;
 
 	public function __construct(
 		protected IL10N $l10n,
@@ -29,6 +33,30 @@ class CoreRequestBuilder {
 	) {
 	}
 
+	protected function reconnect(ConnectionException $ex): void {
+		if ($this->lastReconnect > time() - 2) {
+			// in case we just reconnected a second ago
+			throw $ex;
+		}
+
+		try {
+			$this->dbConnection->getInner()->close();
+		} catch (\Exception) {
+		}
+
+		for ($i = 0; $i < 30; $i++) {
+			sleep(10);
+			try {
+				$this->dbConnection->getInner()->connect();
+				$this->lastReconnect = time();
+				return;
+			} catch (\Exception $e) {
+				Server::get(LoggerInterface::class)->warning('failed to reconnect', ['exception' => $e, 'i' => $i]);
+			}
+		}
+
+		throw $ex;
+	}
 
 	/**
 	 * Limit the request to the Id
