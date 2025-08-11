@@ -8,11 +8,11 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Db;
 
-
 use Exception;
+use Doctrine\DBAL\Exception\ConnectionException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\Tick;
-
+use OCP\Server;
 
 /**
  * Class TickRequest
@@ -21,7 +21,6 @@ use OCA\FullTextSearch\Model\Tick;
  */
 class TickRequest extends TickRequestBuilder {
 
-
 	/**
 	 * @param Tick $tick
 	 *
@@ -29,7 +28,6 @@ class TickRequest extends TickRequestBuilder {
 	 * @throws Exception
 	 */
 	public function create(Tick $tick): int {
-
 		try {
 			$qb = $this->getTickInsertSql();
 			$qb->setValue('source', $qb->createNamedParameter($tick->getSource()))
@@ -39,7 +37,12 @@ class TickRequest extends TickRequestBuilder {
 			   ->setValue('tick', $qb->createNamedParameter($tick->getTick()))
 			   ->setValue('status', $qb->createNamedParameter($tick->getStatus()));
 
-			$qb->execute();
+			try {
+				$qb->execute();
+			} catch (ConnectionException $e) {
+				$this->reconnect($e);
+				return $this->create($tick);
+			}
 
 			return $qb->getLastInsertId();
 		} catch (Exception $e) {
@@ -47,14 +50,12 @@ class TickRequest extends TickRequestBuilder {
 		}
 	}
 
-
 	/**
 	 * @param Tick $tick
 	 *
 	 * @return bool
 	 */
 	public function update(Tick $tick): bool {
-
 		try {
 			$this->getTickById($tick->getId());
 		} catch (TickDoesNotExistException $e) {
@@ -69,11 +70,15 @@ class TickRequest extends TickRequestBuilder {
 
 		$this->limitToId($qb, $tick->getId());
 
-		$qb->execute();
+		try {
+			$qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->update($tick);
+		}
 
 		return true;
 	}
-
 
 	/**
 	 * @param Tick $tick
@@ -83,9 +88,13 @@ class TickRequest extends TickRequestBuilder {
 		$this->limitToId($qb, $tick->getId());
 		$this->limitToSource($qb, $tick->getSource());
 
-		$qb->execute();
+		try {
+			$qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			$this->deleteIndex($tick);
+		}
 	}
-
 
 	/**
 	 *
@@ -95,7 +104,6 @@ class TickRequest extends TickRequestBuilder {
 
 		$qb->execute();
 	}
-
 
 	/**
 	 * return tick.
@@ -109,7 +117,13 @@ class TickRequest extends TickRequestBuilder {
 		$qb = $this->getTickSelectSql();
 		$this->limitToId($qb, $id);
 
-		$cursor = $qb->execute();
+		try {
+			$cursor = $qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->getTickById($id);
+		}
+
 		$data = $cursor->fetch();
 		$cursor->closeCursor();
 
@@ -120,7 +134,6 @@ class TickRequest extends TickRequestBuilder {
 		return $this->parseTickSelectSql($data);
 	}
 
-
 	/**
 	 * return ticks.
 	 *
@@ -129,13 +142,18 @@ class TickRequest extends TickRequestBuilder {
 	 * @return Tick[]
 	 */
 	public function getTicksByStatus(string $status): array {
-
 		$ticks = [];
 
 		$qb = $this->getTickSelectSql();
 		$this->limitToStatus($qb, $status);
 
-		$cursor = $qb->execute();
+		try {
+			$cursor = $qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->getTicksByStatus($status);
+		}
+
 		while ($data = $cursor->fetch()) {
 			$ticks[] = $this->parseTickSelectSql($data);
 		}
@@ -143,26 +161,4 @@ class TickRequest extends TickRequestBuilder {
 
 		return $ticks;
 	}
-
-
-	/**
-	 * @param string $source
-	 *
-	 * @return Tick[]
-	 */
-	public function getTicksBySource(string $source): array {
-		$qb = $this->getTickSelectSql();
-		$this->limitToSource($qb, $source);
-
-		$ticks = [];
-		$cursor = $qb->execute();
-		while ($data = $cursor->fetch()) {
-			$ticks[] = $this->parseTickSelectSql($data);
-		}
-		$cursor->closeCursor();
-
-		return $ticks;
-	}
-
-
 }

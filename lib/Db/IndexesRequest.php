@@ -10,9 +10,9 @@ namespace OCA\FullTextSearch\Db;
 
 
 use OCA\FullTextSearch\Exceptions\DatabaseException;
+use Doctrine\DBAL\Exception\ConnectionException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
-use OCA\FullTextSearch\Service\CollectionService;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\IDBConnection;
@@ -24,7 +24,6 @@ use OCP\IDBConnection;
  * @package OCA\FullTextSearch\Db
  */
 class IndexesRequest extends IndexesRequestBuilder {
-
 
 	/**
 	 * @param Index $index
@@ -48,7 +47,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 		   ->setValue('options', $qb->createNamedParameter(json_encode($index->getOptions())))
 		   ->setValue('indexed', $qb->createNamedParameter($index->getLastIndex()));
 
-		$qb->execute();
+		try {
+			 $qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->create($index);
+		}
 
 		return true;
 	}
@@ -99,7 +103,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToErr($qb);
 
 		$indexes = [];
-		$cursor = $qb->execute();
+		try {
+			$cursor = $qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->getErrorIndexes();
+		}
+
 		while ($data = $cursor->fetch()) {
 			$indexes[] = $this->parseIndexesSelectSql($data);
 		}
@@ -137,7 +147,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToDocumentId($qb, $index->getDocumentId());
 		$this->limitToCollection($qb, $index->getCollection());
 
-		$qb->executeStatement();
+		try {
+			$qb->executeStatement();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			$this->update($index, $statusOnly);
+		}
 	}
 
 
@@ -154,7 +169,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToDocumentId($qb, $documentId);
 		$this->limitToCollection($qb, $collection);
 
-		$qb->execute();
+		try {
+			$qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			$this->updateStatus($collection, $providerId, $documentId, $status);
+		}
 	}
 
 	/**
@@ -173,7 +193,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToDocumentIds($qb, $indexes);
 		$this->limitToCollection($qb, $collection);
 
-		$qb->execute();
+		try {
+			$qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			$this->updateStatuses($collection, $providerId, $indexes, $status);
+		}
 	}
 
 	/**
@@ -201,7 +226,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToDocumentId($qb, $index->getDocumentId());
 		$this->limitToCollection($qb, $index->getCollection());
 
-		$qb->executeStatement();
+		try {
+			$qb->executeStatement();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->deleteIndex($index);
+		}
 	}
 
 
@@ -257,7 +287,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToDocumentId($qb, $documentId);
 		$this->limitToCollection($qb, $collection);
 
-		$cursor = $qb->execute();
+		try {
+			$cursor = $qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->getIndex($providerId, $documentId, $collection);
+		}
+
 		$data = $cursor->fetch();
 		$cursor->closeCursor();
 
@@ -283,7 +319,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToDocumentId($qb, $documentId);
 
 		$indexes = [];
-		$cursor = $qb->execute();
+		try {
+			$cursor = $qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->getIndexes($providerId, $documentId);
+		}
+
 		while ($data = $cursor->fetch()) {
 			$indexes[] = $this->parseIndexesSelectSql($data);
 		}
@@ -313,7 +355,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 
 		$indexes = [];
-		$cursor = $qb->execute();
+		try {
+			$cursor = $qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->getQueuedIndexes($collection, $all, $length);
+		}
+
 		while ($data = $cursor->fetch()) {
 			$indexes[] = $this->parseIndexesSelectSql($data);
 		}
@@ -335,7 +383,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToProviderId($qb, $providerId);
 
 		$indexes = [];
-		$cursor = $qb->execute();
+		try {
+			$cursor = $qb->execute();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->getIndexesFromProvider($providerId);
+		}
+
 		while ($data = $cursor->fetch()) {
 			$index = $this->parseIndexesSelectSql($data);
 			$indexes[$index->getDocumentId()] = $index;
@@ -360,7 +414,14 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$qb->groupBy('li.collection');
 
 		$collections = [];
-		$cursor = $qb->executeQuery();
+
+		try {
+			$cursor = $qb->executeQuery();
+		} catch (ConnectionException $e) {
+			$this->reconnect($e);
+			return $this->getCollections(true);
+		}
+
 		while ($data = $cursor->fetch()) {
 			$collections[] = $this->get('collection', $data);
 		}
