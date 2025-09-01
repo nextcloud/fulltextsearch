@@ -12,10 +12,12 @@ namespace OCA\FullTextSearch\Service;
 use Exception;
 use OC;
 use OC\App\AppManager;
+use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Exceptions\PlatformDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\PlatformIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\PlatformNotSelectedException;
 use OCA\FullTextSearch\Model\PlatformWrapper;
+use OCP\AppFramework\Services\IAppConfig;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -26,39 +28,16 @@ use Psr\Log\LoggerInterface;
  * @package OCA\FullTextSearch\Service
  */
 class PlatformService {
-
-
-	/** @var AppManager */
-	private $appManager;
-
-	/** @var ConfigService */
-	private $configService;
-
-	/** @var LoggerInterface */
-	private $logger;
-
 	/** @var PlatformWrapper[] */
-	private $platforms = [];
+	private array $platforms = [];
+	private ?PlatformWrapper $platform = null;
+	private bool $platformsLoaded = false;
 
-	/** @var PlatformWrapper */
-	private $platform;
-
-	/** @var bool */
-	private $platformsLoaded = false;
-
-	/**
-	 * ProviderService constructor.
-	 *
-	 * @param AppManager $appManager
-	 * @param ConfigService $configService
-	 * @param LoggerInterface $logger
-	 */
 	public function __construct(
-		AppManager $appManager, ConfigService $configService, LoggerInterface $logger
+		private AppManager $appManager,
+		private readonly IAppConfig $appConfig,
+		private LoggerInterface $logger,
 	) {
-		$this->appManager = $appManager;
-		$this->configService = $configService;
-		$this->logger = $logger;
 	}
 
 
@@ -98,7 +77,7 @@ class PlatformService {
 					$this->logger->warning($class . ' does not implement ' . IFullTextSearchPlatform::class);
 					continue;
 				}
-				
+
 				$wrapper->setPlatform($platform);
 				$platforms[] = $wrapper;
 			} catch (ContainerExceptionInterface $e) {
@@ -170,8 +149,7 @@ class PlatformService {
 	 * @throws PlatformNotSelectedException
 	 */
 	private function getSelectedPlatform(): PlatformWrapper {
-		$selected = $this->configService->getAppValue(ConfigService::SEARCH_PLATFORM);
-
+		$selected = $this->appConfig->getAppValueString(ConfigLexicon::SEARCH_PLATFORM);
 		if ($selected === '') {
 			throw new PlatformNotSelectedException(
 				'Admin have not selected any IFullTextSearchPlatform'
@@ -209,7 +187,7 @@ class PlatformService {
 		$wrappers = [];
 		foreach ($platforms as $class) {
 			$wrapper = new PlatformWrapper($appId, $class);
-			$wrapper->setVersion($this->configService->getAppVersion($appId));
+			$wrapper->setVersion($this->appConfig->getAppValueString('installed_version'));
 			$wrappers[] = $wrapper;
 		}
 

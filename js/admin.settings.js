@@ -31,7 +31,7 @@ var fts_admin_settings = {
 
 	updateSettingPage: function (result) {
 
-		fts_admin_elements.fts_navigation.prop('checked', (result.app_navigation === '1'));
+		fts_admin_elements.fts_navigation.prop('checked', (result.app_navigation === true));
 
 		fts_admin_settings.updateSettingPagePlatforms(result);
 

@@ -482,10 +482,6 @@ class IndexService implements IIndexService {
 		bool $reset = false
 	) {
 		$indexes = $this->indexesRequest->getIndexes($providerId, $documentId);
-		if (empty($indexes)) {
-			$indexes = $this->indexesRequest->migrateIndex24($providerId, $documentId);
-		}
-
 		foreach ($indexes as $index) {
 			$index->setStatus($status);
 			$this->updateIndex($index);

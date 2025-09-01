@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Cron;
 
 use Exception;
+use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Model\Runner;
@@ -19,6 +20,7 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCP\AppFramework\QueryException;
+use OCP\AppFramework\Services\IAppConfig;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\IJob;
 use OCP\BackgroundJob\TimedJob;
@@ -36,7 +38,7 @@ class Index extends TimedJob {
 		private IndexService $indexService,
 		private PlatformService $platformService,
 		private ProviderService $providerService,
-		private ConfigService $configService,
+		private IAppConfig $appConfig,
 		private LoggerInterface $logger,
 	) {
 		parent::__construct($timeFactory);
@@ -109,8 +111,7 @@ class Index extends TimedJob {
 	 * @return bool
 	 */
 	private function shouldWeGetAllIndex(): bool {
-		$lastErrReset = (int)$this->configService->getAppValue(ConfigService::CRON_LAST_ERR_RESET);
-
+		$lastErrReset = $this->appConfig->getAppValueInt(ConfigLexicon::CRON_LAST_ERR_RESET);
 		if ($lastErrReset === 0) {
 			$this->setLastErrReset();
 
@@ -130,6 +131,6 @@ class Index extends TimedJob {
 	 *
 	 */
 	private function setLastErrReset() {
-		$this->configService->setAppValue(ConfigService::CRON_LAST_ERR_RESET, (string)time());
+		$this->appConfig->setAppValueInt(ConfigLexicon::CRON_LAST_ERR_RESET, time());
 	}
 }

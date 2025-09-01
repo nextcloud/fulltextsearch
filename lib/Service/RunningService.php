@@ -10,16 +10,18 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 use Exception;
+use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Db\TickRequest;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullTextSearch\Model\Tick;
+use OCP\AppFramework\Services\IAppConfig;
 
 class RunningService {
 	public function __construct(
 		private TickRequest $tickRequest,
-		private ConfigService $configService
+		private readonly IAppConfig $appConfig,
 	) {
 	}
 
@@ -131,7 +133,7 @@ class RunningService {
 	 * @return bool
 	 */
 	public function isAlreadyRunning(): bool {
-		$ttl = (int) $this->configService->getAppValue(ConfigService::TICK_TTL);
+		$ttl = $this->appConfig->getAppValueInt(ConfigLexicon::TICK_TTL);
 		$ticks = $this->tickRequest->getTicksByStatus('run');
 
 		$isAlreadyRunning = false;
@@ -165,7 +167,7 @@ class RunningService {
 	 * @param Tick $tick
 	 * @param string $action
 	 */
-	private function assignActionToTick(Tick &$tick, string $action) {
+	private function assignActionToTick(Tick $tick, string $action) {
 		$now = microtime(true);
 		$preAction = $tick->getAction();
 
