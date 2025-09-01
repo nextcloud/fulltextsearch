@@ -10,6 +10,7 @@ namespace OCA\FullTextSearch\Service;
 
 
 use OCA\FullTextSearch\AppInfo\Application;
+use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\CollectionArgumentException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
@@ -17,10 +18,10 @@ use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
+use OCP\AppFramework\Services\IAppConfig;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\FullTextSearch\Model\IIndexDocument;
-use OCP\IAppConfig;
 use OCP\IURLGenerator;
 
 class CollectionService {
@@ -112,7 +113,7 @@ class CollectionService {
 	 */
 	public function getQueue(string $collection, int $length = 0): array {
 		if ($length === 0) {
-			$length = $this->configService->getAppValueInt(ConfigService::COLLECTION_INDEXING_LIST);
+			$length = $this->appConfig->getAppValueInt(ConfigLexicon::COLLECTION_INDEXING_LIST);
 		}
 
 		return array_map(
@@ -245,14 +246,14 @@ class CollectionService {
 	 * @return array
 	 */
 	public function getLinks(): array {
-		return $this->appConfig->getValueArray(Application::APP_ID, ConfigService::COLLECTION_LINKS, lazy: true);
+		return $this->appConfig->getAppValueArray(ConfigLexicon::COLLECTION_LINKS);
 	}
 
 	/**
 	 * @param array $links
 	 */
 	public function saveLinks(array $links): void {
-		$this->appConfig->setValueArray(Application::APP_ID, ConfigService::COLLECTION_LINKS, $links, lazy: true);
+		$this->appConfig->setAppValueArray(ConfigLexicon::COLLECTION_LINKS, $links);
 	}
 
 	/**

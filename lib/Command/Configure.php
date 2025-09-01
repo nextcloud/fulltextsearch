@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\ConfigService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,49 +22,21 @@ class Configure extends Base {
 		parent::__construct();
 	}
 
-
-	/**
-	 *
-	 */
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:configure')
-			 ->addArgument('json', InputArgument::REQUIRED, 'set config')
+			 ->addArgument('json', InputArgument::OPTIONAL, 'set config')
 			 ->setDescription('Configure the installation');
 	}
 
-
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
-	 * @throws Exception
-	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$json = $input->getArgument('json');
-
-		$config = json_decode($json, true);
-
-		if ($config === null) {
-			$output->writeln('Invalid JSON');
-
-			return 0;
-		}
-
-		$ak = array_keys($config);
-		foreach ($ak as $k) {
-			if (array_key_exists($k, $this->configService->defaults)) {
-				$this->configService->setAppValue($k, $config[$k]);
-			}
+		if ($input->getArgument('json')) {
+			$this->configService->setConfig(json_decode($input->getArgument('json') ?? '', true) ?? []);
 		}
 
 		$output->writeln(json_encode($this->configService->getConfig(), JSON_PRETTY_PRINT));
-
-		return 0;
+		return self::SUCCESS;
 	}
-
-
 }
 
 

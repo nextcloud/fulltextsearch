@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 use Exception;
+use OCA\FullTextSearch\ConfigLexicon;
 
 class SettingsService {
 	public function __construct(
@@ -23,7 +24,12 @@ class SettingsService {
 	 *
 	 * @return bool
 	 */
-	public function checkConfig(array $data): bool {
+	public function checkConfig(array &$data): bool {
+		// convert to bool
+		if (is_string($data[ConfigLexicon::APP_NAVIGATION])) {
+			$data[ConfigLexicon::APP_NAVIGATION] = in_array($data[ConfigLexicon::APP_NAVIGATION], ['1', 'yes', 'on', 'true']);
+		}
+
 		return true;
 	}
 

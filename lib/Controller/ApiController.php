@@ -12,11 +12,11 @@ namespace OCA\FullTextSearch\Controller;
 use Exception;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Model\SearchRequest;
-use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Services\IAppConfig;
 use OCP\IRequest;
 use OCP\IUserSession;
 
@@ -25,7 +25,7 @@ class ApiController extends Controller {
 	public function __construct(
 		IRequest $request,
 		private IUserSession $userSession,
-		private ConfigService $configService,
+		private readonly IAppConfig $appConfig,
 		private SearchService $searchService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
@@ -72,7 +72,7 @@ class ApiController extends Controller {
 				'result' => $this->searchService->search($user->getUID(), $request),
 				'status' => 1,
 				'request' => $request,
-				'version' => $this->configService->getAppValue('installed_version')
+				'version' => $this->appConfig->getAppValueString('installed_version')
 			], Http::STATUS_OK);
 		} catch (Exception $e) {
 			return new DataResponse(
@@ -81,7 +81,7 @@ class ApiController extends Controller {
 					'exception' => get_class($e),
 					'message' => $e->getMessage(),
 					'request' => $request,
-					'version' => $this->configService->getAppValue('installed_version')
+					'version' => $this->appConfig->getAppValueString('installed_version')
 				],
 				Http::STATUS_INTERNAL_SERVER_ERROR
 			);

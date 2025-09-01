@@ -6,7 +6,6 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2016 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-
 namespace OCA\FullTextSearch\Controller;
 
 use Exception;
@@ -27,11 +26,6 @@ class SettingsController extends Controller {
 		parent::__construct(Application::APP_ID, $request);
 	}
 
-
-	/**
-	 * @return DataResponse
-	 * @throws Exception
-	 */
 	public function getSettingsAdmin(): DataResponse {
 		$data = $this->configService->getConfig();
 		$this->settingsService->completeSettings($data);
@@ -39,14 +33,7 @@ class SettingsController extends Controller {
 		return new DataResponse($data, Http::STATUS_OK);
 	}
 
-	/**
-	 * @param $data
-	 *
-	 * @return DataResponse
-	 * @throws Exception
-	 */
-	public function setSettingsAdmin($data) {
-
+	public function setSettingsAdmin(array $data): DataResponse {
 		if ($this->settingsService->checkConfig($data)) {
 			$this->configService->setConfig($data);
 		}

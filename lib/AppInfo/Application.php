@@ -13,6 +13,7 @@ namespace OCA\FullTextSearch\AppInfo;
 use Closure;
 use OC;
 use OCA\FullTextSearch\Capabilities;
+use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Search\UnifiedSearchProvider;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
@@ -23,6 +24,7 @@ use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\FullTextSearch\IFullTextSearchManager;
+use OCP\IAppConfig;
 use OCP\INavigationManager;
 use OCP\IServerContainer;
 use OCP\IURLGenerator;
@@ -55,6 +57,7 @@ class Application extends App implements IBootstrap {
 	public function register(IRegistrationContext $context): void {
 		$context->registerCapability(Capabilities::class);
 		$context->registerSearchProvider(UnifiedSearchProvider::class);
+		$context->registerConfigLexicon(ConfigLexicon::class);
 		$this->registerServices($this->getContainer());
 	}
 
@@ -93,9 +96,9 @@ class Application extends App implements IBootstrap {
 	 * @param IServerContainer $container
 	 */
 	protected function registerNavigation(IServerContainer $container) {
-		/** @var ConfigService $configService */
-		$configService = $container->get(ConfigService::class);
-		if ($configService->getAppValue(ConfigService::APP_NAVIGATION) !== '1') {
+		/** @var IAppConfig $appConfig */
+		$appConfig = $container->get(IAppConfig::class);
+		if (!$appConfig->getValueBool(self::APP_ID, ConfigLexicon::APP_NAVIGATION)) {
 			return;
 		}
 

@@ -18,8 +18,10 @@ use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotUniqueException;
 use OCA\FullTextSearch\Model\ProviderWrapper;
 use OCP\AppFramework\QueryException;
+use OCP\AppFramework\Services\IAppConfig;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Service\IProviderService;
+use OCP\ServerVersion;
 use OCP\Util;
 use Psr\Log\LoggerInterface;
 
@@ -30,8 +32,9 @@ class ProviderService implements IProviderService {
 
 	public function __construct(
 		private AppManager $appManager,
-		private ConfigService $configService,
-		private LoggerInterface $logger
+		private readonly IAppConfig $appConfig,
+		private readonly ServerVersion $serverVersion,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -68,25 +71,20 @@ class ProviderService implements IProviderService {
 	 * @throws QueryException
 	 */
 	public function loadProvider(string $appId, string $providerId) {
-
 		$provider = OC::$server->query((string)$providerId);
 		if (!($provider instanceof IFullTextSearchProvider)) {
-			throw new ProviderIsNotCompatibleException(
-				$providerId . ' is not a compatible IFullTextSearchProvider'
-			);
+			throw new ProviderIsNotCompatibleException($providerId . ' is not a compatible IFullTextSearchProvider');
 		}
 
 		$this->providerIdMustBeUnique($provider);
-
 		try {
 			$provider->loadProvider();
 			$wrapper = new ProviderWrapper($appId, $provider);
-			$wrapper->setVersion($this->configService->getAppVersion($appId));
+			$wrapper->setVersion($this->appConfig->getAppValueString('installed_version'));
 			$this->providers[] = $wrapper;
 		} catch (Exception $e) {
 		}
 	}
-
 
 	/**
 	 * @return ProviderWrapper[]
@@ -195,7 +193,6 @@ class ProviderService implements IProviderService {
 	 * @param array $providers
 	 */
 	private function loadProvidersFromList(string $appId, array $providers) {
-		$version = $this->configService->getCloudVersion();
 		if (array_key_exists('@attributes', $providers)) {
 			$providers = [$providers];
 		}
@@ -203,11 +200,11 @@ class ProviderService implements IProviderService {
 			if (is_array($provider)) {
 				$attributes = $provider['@attributes'];
 				if (array_key_exists('min-version', $attributes)
-					&& $version < (int)$attributes['min-version']) {
+					&& $this->serverVersion->getMajorVersion() < (int)$attributes['min-version']) {
 					continue;
 				}
 				if (array_key_exists('max-version', $attributes)
-					&& $version > (int)$attributes['max-version']) {
+					&& $this->serverVersion->getMajorVersion() > (int)$attributes['max-version']) {
 					continue;
 				}
 

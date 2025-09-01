@@ -14,7 +14,7 @@ Core App of the full-text search framework for your Nextcloud.
 
 ]]>
 	</description>
-	<version>31.0.0</version>
+	<version>32.0.0</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullTextSearch</namespace>
@@ -27,12 +27,11 @@ Core App of the full-text search framework for your Nextcloud.
 	<repository>https://github.com/nextcloud/fulltextsearch.git</repository>
 	<screenshot>https://raw.githubusercontent.com/nextcloud/fulltextsearch/master/screenshots/0.3.0.png</screenshot>
 	<dependencies>
-		<nextcloud min-version="31" max-version="31"/>
+		<nextcloud min-version="32" max-version="33"/>
 	</dependencies>
 
 	<background-jobs>
 		<job>OCA\FullTextSearch\Cron\Index</job>
-		<job>OCA\FullTextSearch\Cron\Maintenance</job>
 	</background-jobs>
 
 	<commands>
@@ -48,7 +47,6 @@ Core App of the full-text search framework for your Nextcloud.
 		<command>OCA\FullTextSearch\Command\DocumentStatus</command>
 		<command>OCA\FullTextSearch\Command\Index</command>
 		<command>OCA\FullTextSearch\Command\Live</command>
-		<command>OCA\FullTextSearch\Command\Migration24</command>
 		<command>OCA\FullTextSearch\Command\Reset</command>
 		<command>OCA\FullTextSearch\Command\Search</command>
 		<command>OCA\FullTextSearch\Command\Stop</command>

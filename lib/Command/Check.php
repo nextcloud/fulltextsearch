@@ -11,9 +11,11 @@ namespace OCA\FullTextSearch\Command;
 
 use Exception;
 use OC\Core\Command\Base;
+use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
+use OCP\AppFramework\Services\IAppConfig;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +24,8 @@ class Check extends Base {
 	public function __construct(
 		private ConfigService $configService,
 		private PlatformService $platformService,
-		private ProviderService $providerService
+		private ProviderService $providerService,
+		private readonly IAppConfig $appConfig,
 	) {
 		parent::__construct();
 	}
@@ -53,9 +56,7 @@ class Check extends Base {
 			return 0;
 		}
 
-		$output->writeln(
-			'Full text search ' . $this->configService->getAppValue('installed_version')
-		);
+		$output->writeln('Full text search ' . $this->appConfig->getAppValueString('installed_version'));
 		$output->writeln(json_encode($this->configService->getConfig(), JSON_PRETTY_PRINT));
 		$output->writeln('');
 
@@ -105,7 +106,7 @@ class Check extends Base {
 
 		return [
 			'fulltextsearch' => [
-				'version' => $this->configService->getAppValue('installed_version'),
+				'version' => $this->appConfig->getAppValueString('installed_version'),
 				'config'  => $this->configService->getConfig()
 			],
 
@@ -130,7 +131,7 @@ class Check extends Base {
 			return;
 		}
 
-		$select = $this->configService->getAppValue(ConfigService::SEARCH_PLATFORM);
+		$select = $this->appConfig->getAppValueString(ConfigLexicon::SEARCH_PLATFORM);
 		$output->writeln('- Search Platform:' . (($select === '') ? ' (none selected)' : ''));
 
 		foreach ($platforms as $platformWrapper) {

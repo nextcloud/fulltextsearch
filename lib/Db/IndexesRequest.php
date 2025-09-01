@@ -433,49 +433,4 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		return array_merge([$internal], $collections);
 	}
-
-
-	/**
-	 * TODO: remove this in NC30+
-	 *
-	 * @param string $providerId
-	 * @param string $documentId
-	 */
-	public function migrateIndex24(string $providerId, string $documentId): array {
-		try {
-			$this->configService->requireMigration24();
-
-			return [];
-		} catch (DatabaseException $e) {
-		}
-
-		// check data from old table.
-		/** @var IDBConnection $dbConnection */
-		$dbConnection = \OC::$server->get(IDBConnection::class);
-
-		$query = $dbConnection->getQueryBuilder();
-		$query->select('*')
-			  ->from('fulltextsearch_indexes')
-			  ->where($query->expr()->eq('provider_id', $query->createNamedParameter($providerId)))
-			  ->andWhere($query->expr()->eq('document_id', $query->createNamedParameter($documentId)));
-
-		$result = $query->executeQuery();
-		if ($result->rowCount() === 0) {
-			return [];
-		}
-
-		$data = $result->fetch();
-		$index = $this->parseIndexesSelectSql($data);
-		$result->closeCursor();
-
-		$query = $dbConnection->getQueryBuilder();
-		$query->delete('fulltextsearch_indexes')
-			  ->where($query->expr()->eq('provider_id', $query->createNamedParameter($providerId)))
-			  ->andWhere($query->expr()->eq('document_id', $query->createNamedParameter($documentId)));
-		$query->executeStatement();
-
-		$this->create($index);
-
-		return $this->getIndexes($providerId, $documentId);
-	}
 }

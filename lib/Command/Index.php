@@ -141,8 +141,6 @@ class Index extends ACommandBase {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$this->configService->requireMigration24();
-
 		$options = $this->generateIndexOptions($input);
 
 		if ($options->getOptionBool(self::INDEX_OPTION_NO_READLINE, false) === false) {

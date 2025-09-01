@@ -138,30 +138,4 @@ class Version2400Date202201301329 extends SimpleMigrationStep {
 
 		return $schema;
 	}
-
-	/**
-	 * @param IOutput $output
-	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
-	 * @param array $options
-	 *
-	 * @throws Exception
-	 */
-	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options) {
-		/** @var ISchemaWrapper $schema */
-		$schema = $schemaClosure();
-		if (!$schema->hasTable('fulltextsearch_indexes')) {
-			return;
-		}
-
-		$query = $this->dbConnection->getQueryBuilder();
-		$query->select($query->func()->count('*', 'index_count'))
-			  ->from('fulltextsearch_indexes');
-		$result = $query->executeQuery();
-		$row = $result->fetch();
-		$result->closeCursor();
-
-		if ((int)$row['index_count'] > 0) {
-			$this->configService->setAppValue(ConfigService::MIGRATION_24, '0');
-		}
-	}
 }
