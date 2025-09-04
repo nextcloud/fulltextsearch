@@ -4,6 +4,8 @@ OC.L10N.register(
     "the search returned {total} results in {time} ms" : "Пронајдени се {total} резултати за време од {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "пребарувањето во {title} за \"{search}\" пронајде {total} резултати за време од {time} ms",
     "Search" : "Барај",
+    "Full Text Search" : "Пребарување на целосен текст",
+    "Full text search" : "Пребарување на целосен текст",
     "Search on %s" : "Барај во %s",
     "General" : "Општо"
 },
