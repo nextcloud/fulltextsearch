@@ -1,21 +1,21 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "the search returned {total} results in {time} ms" : "la recherche a retourné {total} résultats en {time} ms",
-    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "la recherche dans {title} pour les mots clés « {search} » a retourné {total} résultats en {time} ms",
+    "the search returned {total} results in {time} ms" : "la recherche a retourné {total} résultat(s) en {time} ms",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "la recherche dans {title} pour les mots clés \"{search}\" a retourné {total} résultat(s) en {time} ms",
     "Search" : "Recherche",
     "Index not found" : "Index non trouvé",
     "Process timed out" : "Processus expiré",
     "Full Text Search" : "Recherche plein texte",
-    "Full text search" : "Recherche de texte intégrale",
-    "Core of the full-text search framework for Nextcloud" : "Noyau du framework de la recherche de texte intégrale pour Nextcloud",
-    "Core App of the full-text search framework for your Nextcloud." : "Noyau de l'application du framework de la recherche de texte intégrale pour votre Nextcloud",
+    "Full text search" : "Recherche de texte intégral",
+    "Core of the full-text search framework for Nextcloud" : "Noyau du module de recherche de texte intégral pour Nextcloud",
+    "Core App of the full-text search framework for your Nextcloud." : "Noyau de l'application du module de recherche de texte intégral pour votre Nextcloud",
     "Search on %s" : "Recherche sur %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Merci de consulter le wiki pour la documentation sur l'installation et la configuration de la recherche en texte intégral dans votre instance Nextcloud",
     "General" : "Général",
     "Search Platform" : "Plateforme de recherche",
     "Select the app to index content and answer search queries." : "Sélectionner l'application pour indexer le contenu et répondre à des recherches.",
     "Navigation Icon" : "Icône de navigation",
-    "Enable global search within all your content." : "Activer la recherche dans tous votre contenu."
+    "Enable global search within all your content." : "Activer la recherche dans tout votre contenu."
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
