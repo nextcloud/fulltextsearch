@@ -4,6 +4,27 @@
 -->
 # Changelog
 
+### 32.0.0
+
+- compat nc32
+- manage 'since' search filter
+- manage 'until' search filter
+- search via occ returned as JSON
+- migration to config lexicon
+- cleaning some code
+- reconnect to database on lost connection
+
+### 31.0.0
+
+- improved index on live index
+- improved code logic on index update
+- reset collection endpoint
+- compat nc31
+
+### 30.0.0
+
+- compat nc30
+
 ### 29.0.0
 
 - compat nc29
