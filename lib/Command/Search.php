@@ -12,10 +12,7 @@ namespace OCA\FullTextSearch\Command;
 use Exception;
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\SearchRequest;
-use OCA\FullTextSearch\Model\SearchResult;
 use OCA\FullTextSearch\Service\SearchService;
-use OCP\FullTextSearch\Model\IIndexDocument;
-use OCP\FullTextSearch\Model\ISearchResult;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -50,47 +47,29 @@ class Search extends Base {
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$output->writeln('search');
-
 		$searchRequest = new SearchRequest();
 		$searchRequest->importFromArray(
 			[
 				'providers' => 'all',
-				'search'    => $input->getArgument('string')
+				'search' => $input->getArgument('string')
 			]
 		);
 
-		try {
-			$result = $this->searchService->search($input->getArgument('user'), $searchRequest);
+		$searchResult = $this->searchService->search($input->getArgument('user'), $searchRequest);
 
-			foreach ($result as $searchResult) {
-				$this->displaySearchResult($searchResult);
+		$results = [];
+		foreach ($searchResult as $entry) {
+			$list = [];
+			foreach ($entry->getDocuments() as $document) {
+				$list[] = json_decode(json_encode($document, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
 			}
 
-		} catch (Exception $e) {
-			throw $e;
+			$results[$entry->getProvider()->getId()] = array_values($list);
 		}
 
+		$this->writeArrayInOutputFormat($input, $output, $results, ' * ');
 		return 0;
 	}
-
-
-	/**
-	 * @param ISearchResult $searchResult
-	 */
-	private function displaySearchResult(ISearchResult $searchResult) {
-		/** @var SearchResult $searchResult */
-		echo '> ' . $searchResult->getProvider()
-								 ->getName() . "\n";
-
-		/** @var IIndexDocument[] $result */
-		$result = $searchResult->getDocuments();
-		foreach ($result as $document) {
-			echo ' - ' . $document->getId() . ' score:' . $document->getScore() . "\n";
-		}
-	}
-
-
 }
 
 
