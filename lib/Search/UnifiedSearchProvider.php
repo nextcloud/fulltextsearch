@@ -31,7 +31,6 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Search;
 
 
-use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use Exception;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Service\ConfigService;
@@ -52,9 +51,8 @@ use OCP\Search\SearchResult;
  *
  * @package OCA\FullTextSearch\Search
  */
-class UnifiedSearchProvider implements IProvider {
-
-
+class UnifiedSearchProvider implements IFilteringProvider {
+	
 	const PROVIDER_ID = 'fulltextsearch';
 	const ORDER = 1;
 
