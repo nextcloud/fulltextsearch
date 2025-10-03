@@ -31,18 +31,18 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Search;
 
 
-use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use Exception;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\MiscService;
 use OCA\FullTextSearch\Service\SearchService;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
-use OCP\Search\IProvider;
+use OCP\Search\IFilteringProvider;
 use OCP\Search\ISearchQuery;
 use OCP\Search\SearchResult;
 
@@ -51,9 +51,8 @@ use OCP\Search\SearchResult;
  *
  * @package OCA\FullTextSearch\Search
  */
-class UnifiedSearchProvider implements IProvider {
-
-
+class UnifiedSearchProvider implements IFilteringProvider {
+	
 	const PROVIDER_ID = 'fulltextsearch';
 	const ORDER = 1;
 
@@ -155,17 +154,16 @@ class UnifiedSearchProvider implements IProvider {
 	private function generateSearchRequest(ISearchQuery $query): ISearchRequest {
 		$searchRequest = new SearchRequest();
 
-//		$app = 'abc';
-//		if (($pos = strpos($app, '.')) !== false) {
-//			$app = substr($app, 0, $pos);
-//		}
+		$since = $query->getFilter('since')?->get();
+		if ($since instanceof \DateTimeImmutable) {
+			$searchRequest->addOption('since', (string)$since->getTimestamp());
+		}
 
 		$searchRequest->setProviders(['all']);
 		$searchRequest->setSearch($query->getTerm());
 		$searchRequest->setPage((int)floor(($query->getCursor() ?? 0) / $query->getLimit()) + 1);
 		$searchRequest->setParts([]);
 		$searchRequest->setSize($query->getLimit());
-		$searchRequest->setOptions([]);
 		$searchRequest->setTags([]);
 		$searchRequest->setSubTags([]);
 		$searchRequest->setSize($query->getLimit());
@@ -207,5 +205,19 @@ class UnifiedSearchProvider implements IProvider {
 		return $result;
 	}
 
+	public function getSupportedFilters(): array {
+		return [
+			'term',
+			'since',
+		];
+	}
+
+	public function getAlternateIds(): array {
+		return [];
+	}
+
+	public function getCustomFilters(): array {
+		return [];
+	}
 }
 
