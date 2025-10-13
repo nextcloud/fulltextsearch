@@ -13,6 +13,7 @@ use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\ConfigService;
+use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use OCP\IL10N;
@@ -33,7 +34,7 @@ class CoreRequestBuilder {
 	) {
 	}
 
-	protected function reconnect(ConnectionException $ex): void {
+	protected function reconnect(Exception $ex): void {
 		if ($this->lastReconnect > time() - 2) {
 			// in case we just reconnected a second ago
 			throw $ex;

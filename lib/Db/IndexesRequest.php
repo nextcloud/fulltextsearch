@@ -9,13 +9,11 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Db;
 
 
-use OCA\FullTextSearch\Exceptions\DatabaseException;
-use Doctrine\DBAL\Exception\ConnectionException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
+use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\FullTextSearch\Model\IIndex;
-use OCP\IDBConnection;
 
 
 /**
@@ -48,10 +46,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 		   ->setValue('indexed', $qb->createNamedParameter($index->getLastIndex()));
 
 		try {
-			 $qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->create($index);
+			 $qb->executeStatement();
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->create($index);
+			}
+			throw $e;
 		}
 
 		return true;
@@ -77,7 +78,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
 		$this->limitToCollection($qb, $index->getCollection());
-		$qb->execute();
+		$qb->executeStatement();
 
 		return true;
 	}
@@ -91,7 +92,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$qb->set('message', $qb->createNamedParameter(json_encode([])));
 		$qb->set('err', $qb->createNamedParameter(0));
 
-		$qb->execute();
+		$qb->executeStatement();
 	}
 
 
@@ -104,10 +105,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		$indexes = [];
 		try {
-			$cursor = $qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->getErrorIndexes();
+			$cursor = $qb->executeQuery();
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->getErrorIndexes();
+			}
+			throw $e;
 		}
 
 		while ($data = $cursor->fetch()) {
@@ -149,9 +153,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		try {
 			$qb->executeStatement();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			$this->update($index, $statusOnly);
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				$this->update($index, $statusOnly);
+				return;
+			}
+			throw $e;
 		}
 	}
 
@@ -170,10 +178,14 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToCollection($qb, $collection);
 
 		try {
-			$qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			$this->updateStatus($collection, $providerId, $documentId, $status);
+			$qb->executeStatement();
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				$this->updateStatus($collection, $providerId, $documentId, $status);
+				return;
+			}
+			throw $e;
 		}
 	}
 
@@ -194,10 +206,14 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToCollection($qb, $collection);
 
 		try {
-			$qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			$this->updateStatuses($collection, $providerId, $indexes, $status);
+			$qb->executeStatement();
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				$this->updateStatuses($collection, $providerId, $indexes, $status);
+				return;
+			}
+			throw $e;
 		}
 	}
 
@@ -214,7 +230,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$qb->set('status', $qb->createNamedParameter(IIndex::INDEX_FULL));
 		$this->limitToCollection($qb, $collection);
 
-		$qb->execute();
+		$qb->executeStatement();
 	}
 
 	/**
@@ -228,9 +244,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		try {
 			$qb->executeStatement();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->deleteIndex($index);
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->deleteIndex($index);
+			}
+			throw $e;
 		}
 	}
 
@@ -253,7 +272,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToProviderId($qb, $providerId);
 
-		$qb->execute();
+		$qb->executeStatement();
 	}
 
 
@@ -288,10 +307,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$this->limitToCollection($qb, $collection);
 
 		try {
-			$cursor = $qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->getIndex($providerId, $documentId, $collection);
+			$cursor = $qb->executeQuery();
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->getIndex($providerId, $documentId, $collection);
+			}
+			throw $e;
 		}
 
 		$data = $cursor->fetch();
@@ -320,10 +342,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		$indexes = [];
 		try {
-			$cursor = $qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->getIndexes($providerId, $documentId);
+			$cursor = $qb->executeQuery();
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->getIndexes($providerId, $documentId);
+			}
+			throw $e;
 		}
 
 		while ($data = $cursor->fetch()) {
@@ -356,10 +381,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		$indexes = [];
 		try {
-			$cursor = $qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->getQueuedIndexes($collection, $all, $length);
+			$cursor = $qb->executeQuery();
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->getQueuedIndexes($collection, $all, $length);
+			}
+			throw $e;
 		}
 
 		while ($data = $cursor->fetch()) {
@@ -384,10 +412,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		$indexes = [];
 		try {
-			$cursor = $qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->getIndexesFromProvider($providerId);
+			$cursor = $qb->executeQuery();
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->getIndexesFromProvider($providerId);
+			}
+			throw $e;
 		}
 
 		while ($data = $cursor->fetch()) {
@@ -417,9 +448,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		try {
 			$cursor = $qb->executeQuery();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->getCollections(true);
+		} catch (Exception $e) {
+			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->getCollections(true);
+			}
+			throw $e;
 		}
 
 		while ($data = $cursor->fetch()) {

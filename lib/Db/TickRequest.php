@@ -9,10 +9,8 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Db;
 
 use Exception;
-use Doctrine\DBAL\Exception\ConnectionException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\Tick;
-use OCP\Server;
 
 /**
  * Class TickRequest
@@ -38,10 +36,13 @@ class TickRequest extends TickRequestBuilder {
 			   ->setValue('status', $qb->createNamedParameter($tick->getStatus()));
 
 			try {
-				$qb->execute();
-			} catch (ConnectionException $e) {
-				$this->reconnect($e);
-				return $this->create($tick);
+				$qb->executeStatement();
+			} catch (\OCP\DB\Exception $e) {
+				if ($e->getReason() === \OCP\DB\Exception::REASON_CONNECTION_LOST) {
+					$this->reconnect($e);
+					return $this->create($tick);
+				}
+				throw $e;
 			}
 
 			return $qb->getLastInsertId();
@@ -71,10 +72,13 @@ class TickRequest extends TickRequestBuilder {
 		$this->limitToId($qb, $tick->getId());
 
 		try {
-			$qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->update($tick);
+			$qb->executeStatement();
+		} catch (\OCP\DB\Exception $e) {
+			if ($e->getReason() === \OCP\DB\Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->update($tick);
+			}
+			throw $e;
 		}
 
 		return true;
@@ -93,10 +97,13 @@ class TickRequest extends TickRequestBuilder {
 		$this->limitToId($qb, $id);
 
 		try {
-			$cursor = $qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->getTickById($id);
+			$cursor = $qb->executeQuery();
+		} catch (\OCP\DB\Exception $e) {
+			if ($e->getReason() === \OCP\DB\Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->getTickById($id);
+			}
+			throw $e;
 		}
 
 		$data = $cursor->fetch();
@@ -123,10 +130,13 @@ class TickRequest extends TickRequestBuilder {
 		$this->limitToStatus($qb, $status);
 
 		try {
-			$cursor = $qb->execute();
-		} catch (ConnectionException $e) {
-			$this->reconnect($e);
-			return $this->getTicksByStatus($status);
+			$cursor = $qb->executeQuery();
+		} catch (\OCP\DB\Exception $e) {
+			if ($e->getReason() === \OCP\DB\Exception::REASON_CONNECTION_LOST) {
+				$this->reconnect($e);
+				return $this->getTicksByStatus($status);
+			}
+			throw $e;
 		}
 
 		while ($data = $cursor->fetch()) {
