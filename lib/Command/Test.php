@@ -373,7 +373,7 @@ class Test extends ACommandBase {
 			[TestService::DOCUMENT_TYPE_SIMPLE]
 		);
 		$this->search(
-			$output, $testPlatform, $testProvider, $access, 'document is a simple test',
+			$output, $testPlatform, $testProvider, $access, 'document',
 //			[TestService::DOCUMENT_TYPE_SIMPLE]
 			[TestService::DOCUMENT_TYPE_SIMPLE, TestService::DOCUMENT_TYPE_LICENSE]
 		);
@@ -386,7 +386,7 @@ class Test extends ACommandBase {
 			[TestService::DOCUMENT_TYPE_SIMPLE]
 		);
 		$this->search(
-			$output, $testPlatform, $testProvider, $access, 'document is a simple -test',
+			$output, $testPlatform, $testProvider, $access, 'document -test',
 			[TestService::DOCUMENT_TYPE_LICENSE]
 		);
 		$this->search(
@@ -410,7 +410,7 @@ class Test extends ACommandBase {
 			[]
 		);
 		$this->search(
-			$output, $testPlatform, $testProvider, $access, '+document is a simple -test -testing',
+			$output, $testPlatform, $testProvider, $access, '+document -test -testing',
 			[TestService::DOCUMENT_TYPE_LICENSE]
 		);
 		$this->search(
