@@ -250,6 +250,20 @@ class SearchResult implements ISearchResult, JsonSerializable {
 		return $this;
 	}
 
+	private $aggregations = [];
+
+	public function addAggregation($category, $value, $count) {
+		if (!array_key_exists($category, $this->aggregations)) {
+			$this->aggregations[$category] = [];
+		}
+		if (!array_key_exists($value, $this->aggregations[$category])) {
+			$this->aggregations[$category][$value] = $count;
+		}
+	}
+
+	public function getAggregation($category) {
+		return $this->aggregations[$category];
+	}
 
 	/**
 	 * @param string $category
