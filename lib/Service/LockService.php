@@ -64,16 +64,32 @@ class LockService {
 
 	public function update(): void {
 		if ($this->nextPing === -1) {
-			throw new LockException('lock service not initiated on this process');
+			throw new LockException('Lock service not initiated on this process');
 		}
 
 		$time = time();
 
-		// update ping
-		if ($this->nextPing < $time) {
-			$this->nextPing = $time + self::LOCK_PING_DELAY;
-			$this->appConfig->setValueInt(Application::APP_ID, ConfigLexicon::LOCK_PING, $this->nextPing + self::LOCK_TIMEOUT);
+		// do not flood database
+		if ($this->nextPing > $time) {
+			return;
 		}
+
+		$this->appConfig->clearCache(true);
+		$currentLockId = $this->appConfig->getValueString(Application::APP_ID, ConfigLexicon::LOCK_ID);
+
+		// new lock; enforce ping on new lock
+		if ($currentLockId === '') {
+			throw new LockException('Index not locked');
+		}
+
+		// confirm the lock belongs to the current process
+		if ($currentLockId !== $this->lockId) {
+			throw new LockException('Index locked by another process');
+		}
+
+		// update ping
+		$this->nextPing = $time + self::LOCK_PING_DELAY;
+		$this->appConfig->setValueInt(Application::APP_ID, ConfigLexicon::LOCK_PING, $this->nextPing + self::LOCK_TIMEOUT);
 	}
 
 	public function unlock(): void {
