@@ -11,10 +11,14 @@ namespace OCA\FullTextSearch\AppInfo;
 
 
 use Closure;
+use NCU\FullTextSearch\IManager;
 use OC;
+use OC\FullTextSearch\FullTextSearchManager;
 use OCA\FullTextSearch\Capabilities;
 use OCA\FullTextSearch\ConfigLexicon;
+use OCA\FullTextSearch\Provider\FilesContentProvider;
 use OCA\FullTextSearch\Search\UnifiedSearchProvider;
+use OCA\FullTextSearch\Service\FullTextSearchService;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\SearchService;
@@ -41,6 +45,9 @@ class Application extends App implements IBootstrap {
 		$context->registerCapability(Capabilities::class);
 		$context->registerSearchProvider(UnifiedSearchProvider::class);
 		$context->registerConfigLexicon(ConfigLexicon::class);
+
+		$context->registerFullTextSearchService(FullTextSearchService::class);
+
 		$this->registerServices($this->getContainer());
 	}
 
@@ -53,11 +60,8 @@ class Application extends App implements IBootstrap {
 		$context->injectFn(Closure::fromCallable([$this, 'registerNavigation']));
 	}
 
-
 	/**
-	 * Register Navigation Tab
-	 *
-	 * @param ContainerInterface $container
+	 * @deprecated
 	 */
 	protected function registerServices(ContainerInterface $container) {
 		/** @var IFullTextSearchManager $fullTextSearchManager */

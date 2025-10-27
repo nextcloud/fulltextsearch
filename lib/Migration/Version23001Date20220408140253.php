@@ -28,11 +28,11 @@ class Version23001Date20220408140253 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		if (!$schema->hasTable('fulltextsearch_indexes')) {
+		if (!$schema->hasTable('fulltextsearch_sync')) {
 			return null;
 		}
 
-		$table = $schema->getTable('fulltextsearch_indexes');
+		$table = $schema->getTable('fulltextsearch_sync');
 		$column = $table->getColumn('message');
 
 		if ($column->getType()->getName() === Types::TEXT) {

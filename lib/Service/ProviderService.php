@@ -269,5 +269,4 @@ class ProviderService implements IProviderService {
 		Util::addScript(Application::APP_ID, 'fulltextsearch.v1');
 	}
 
-
 }
