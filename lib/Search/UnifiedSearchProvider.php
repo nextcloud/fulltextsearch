@@ -158,6 +158,10 @@ class UnifiedSearchProvider implements IFilteringProvider {
 		if ($since instanceof \DateTimeImmutable) {
 			$searchRequest->addOption('since', (string)$since->getTimestamp());
 		}
+		$until = $query->getFilter('until')?->get();
+		if ($until instanceof \DateTimeImmutable) {
+			$searchRequest->addOption('until', (string)$until->getTimestamp());
+		}
 
 		$searchRequest->setProviders(['all']);
 		$searchRequest->setSearch($query->getTerm());
@@ -209,6 +213,7 @@ class UnifiedSearchProvider implements IFilteringProvider {
 		return [
 			'term',
 			'since',
+			'until',
 		];
 	}
 
