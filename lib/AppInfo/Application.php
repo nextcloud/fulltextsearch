@@ -47,7 +47,8 @@ class Application extends App implements IBootstrap {
 		$context->registerConfigLexicon(ConfigLexicon::class);
 
 		$context->registerFullTextSearchService(FullTextSearchService::class);
-
+		$context->registerFullTextSearchContentProvider(FilesContentProvider::class);
+		
 		$this->registerServices($this->getContainer());
 	}
 
