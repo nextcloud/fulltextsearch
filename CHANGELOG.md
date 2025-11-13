@@ -1,5 +1,11 @@
 # Changelog
 
+### 30.0.2
+
+- manage 'since' search filter
+- manage 'until' search filter
+- search via occ returned as JSON
+
 ### 30.0.1
 
 - improved index on live index
