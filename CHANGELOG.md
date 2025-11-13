@@ -4,6 +4,13 @@
 -->
 # Changelog
 
+### 31.0.1
+
+- manage 'since' search filter
+- manage 'until' search filter
+- search via occ returned as JSON
+- reconnect to database on lost connection
+
 ### 31.0.0
 
 - improved index on live index
