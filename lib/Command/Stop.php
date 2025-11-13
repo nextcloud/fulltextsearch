@@ -41,7 +41,7 @@ class Stop extends Base {
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$output->writeln('stopping all running indexes');
 
-		$this->runningService->forceStop();
+		$this->runningService->stop();
 
 		return 0;
 	}

@@ -25,7 +25,7 @@ class RunningService {
 	/**
 	 * @deprecated
 	 */
-	public function start(string $source): int {
+	public function start(string $source = ''): int {
 		try {
 			$this->lockService->lock();
 		} catch (LockException $e) {
@@ -37,7 +37,7 @@ class RunningService {
 	/**
 	 * @deprecated
 	 */
-	public function update(int $runId, string $action = '') {
+	public function update(int $runId = 0, string $action = '') {
 		try {
 			$this->lockService->update();
 		} catch (LockException $e) {
@@ -48,7 +48,7 @@ class RunningService {
 	/**
 	 * @deprecated
 	 */
-	public function stop(int $runId, string $reason = '') {
+	public function stop(int $runId = 0, string $reason = '') {
 		$this->lockService->unlock();
 	}
 }
