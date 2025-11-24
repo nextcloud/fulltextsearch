@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Enum;
 
 enum SessionType: string {
-	case UNKNOWN = '';
-	case FORCED = 'forced';
+	case CLOSED = '';
+	case REQUESTED = 'requested';
 	case SYNC = 'sync';
 	case RESYNC = 'sync_recent';
 }

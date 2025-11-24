@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class LoggerService implements ILoggerService {
 	private ?OutputInterface $output = null;
 	private bool $verbose = false;
-	private SessionType $currentSessionType = SessionType::UNKNOWN;
+	private SessionType $currentSessionType = SessionType::CLOSED;
 
 	public function __construct(
 		private ?LoggerInterface $logger,
@@ -56,7 +56,7 @@ class LoggerService implements ILoggerService {
 		$this->loggerError->warning('[' . $this->currentSessionType->value . '] ' . $entry, $data);
 	}
 
-	public function session(SessionType $sessionType = SessionType::UNKNOWN): void {
+	public function session(SessionType $sessionType = SessionType::CLOSED): void {
 		$this->currentSessionType = $sessionType;
 	}
 
@@ -66,7 +66,7 @@ class LoggerService implements ILoggerService {
 
 	private function prepEntry(string $entry, string $tag = ''): string {
 		$entry = ($tag !== '') ? '<' . $tag . '>' . $entry . '</>' : $entry;
-		$prefix = '<fg=gray>(' . str_pad($this->currentSessionType->value . ')', 14, ' ') . '</>';
+		$prefix = '<fg=gray>' . str_pad(($this->currentSessionType === SessionType::CLOSED) ? '' : '(' . $this->currentSessionType->value . ')', 14, ' ') . '</>';
 		return $prefix . $entry;
 	}
 }

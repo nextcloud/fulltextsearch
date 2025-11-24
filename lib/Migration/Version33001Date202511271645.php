@@ -44,7 +44,7 @@ class Version33001Date202511271645 extends SimpleMigrationStep {
 		]);
 		$table->addColumn('checksum', Types::STRING, [
 			'length' => 16,
-			'notnull' => true,
+			'default' => '',
 		]);
 
 		$table->setPrimaryKey(['provider_id', 'document_id'], 'fts_i_pd');

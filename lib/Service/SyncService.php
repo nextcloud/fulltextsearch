@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
+use NCU\FullTextSearch\IContentProvider;
 use NCU\FullTextSearch\IManager as IFullTextSearchManager;
 use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Db\SyncMapper;
 use OCA\FullTextSearch\Enum\SessionType;
 use OCA\FullTextSearch\Model\DocumentSync;
-use NCU\FullTextSearch\IContentProvider;
 use OCP\AppFramework\Services\IAppConfig;
 use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
@@ -31,6 +31,7 @@ class SyncService {
 		private readonly IFullTextSearchManager $manager,
 		private readonly SyncMapper $mapper,
 		private readonly ProcessService $processService,
+		private readonly IndexService $indexService,
 		private readonly ProviderService $providerService,
 		private readonly LoggerService $logger,
 		private readonly LoggerInterface $coreLogger,
@@ -54,16 +55,20 @@ class SyncService {
 	 */
 	public function smartSync(): bool {
 		// TODO: test link with ES
-		return ($this->syncForcedIndexes()
-				|| $this->syncContentProviders()
-				|| $this->resyncRecentDocuments()
-				|| $this->syncOlderDocuments(6 * 30 * 24 * 3600)
-				|| $this->syncOlderDocuments(3 * 30 * 24 * 3600)
-				|| $this->syncOlderDocuments(4 * 7 * 24 * 3600)
-				|| $this->syncOlderDocuments(2 * 7 * 24 * 3600)
-				|| $this->syncOlderDocuments(7 * 24 * 3600)
-				|| $this->syncOlderDocuments()
-		);
+		$result = $this->syncRequestedIndexes()
+				  || $this->syncContentProviders()
+				  || $this->resyncRecentDocuments()
+				  || $this->syncOlderDocuments(6 * 30 * 24 * 3600)
+				  || $this->syncOlderDocuments(3 * 30 * 24 * 3600)
+				  || $this->syncOlderDocuments(4 * 7 * 24 * 3600)
+				  || $this->syncOlderDocuments(2 * 7 * 24 * 3600)
+				  || $this->syncOlderDocuments(7 * 24 * 3600)
+				  || $this->syncOlderDocuments();
+
+		// ending session
+		$this->logger->session();
+
+		return $result;
 	}
 
 	/**
@@ -71,9 +76,9 @@ class SyncService {
 	 *
 	 * @return bool FALSE if no out-of-sync documents were found
 	 */
-	public function syncForcedIndexes(int $limit = 100): bool {
-		$this->logger->session(SessionType::FORCED);
-		$syncDocuments = $this->mapper->getForcedSyncs($limit);
+	public function syncRequestedIndexes(int $limit = 100): bool {
+		$this->logger->session(SessionType::REQUESTED);
+		$syncDocuments = $this->mapper->getRequestedSyncs($limit);
 		if (empty($syncDocuments)) {
 			return false;
 		}
@@ -88,7 +93,7 @@ class SyncService {
 	 */
 	public function syncContentProviders(): bool {
 		$this->logger->session(SessionType::SYNC);
-		foreach ($this->manager->getContentProviders() as $provider) {
+		foreach ($this->manager->getContentProviders() as $appId => $provider) {
 			$this->syncContentProvider($provider);
 		}
 
@@ -100,7 +105,7 @@ class SyncService {
 	}
 
 	private function resyncRecentDocuments(): bool {
-		$this->logger->session(SessionType::FORCED);
+		$this->logger->session(SessionType::REQUESTED);
 		return false;
 	}
 
@@ -118,13 +123,13 @@ class SyncService {
 	public function syncDocument(DocumentSync $sync): void {
 		$time = time();
 		$this->logger->action('indexing document ' . $sync->definition());
-		$this->indexDocument($sync);
+		$this->indexDocumentSync($sync);
 		$sync->setIndexed($time);
 
 //		$this->mapper->insertOrUpdate($sync);
 	}
 
-	private function indexDocument(DocumentSync $sync): void {
+	private function indexDocumentSync(DocumentSync $sync): void {
 		$provider = $this->getContentProvider($sync->getProviderId());
 		if ($provider === null) {
 			$this->logger->error('provider ' . $sync->getProviderId() . ' not found');
@@ -137,6 +142,7 @@ class SyncService {
 			return;
 		}
 
+		$document->setDocumentId($sync->getProviderId() . ':' . $sync->getDocumentId());
 		$checksum = $document->getChecksum();
 		if (($sync->getChecksum() === $checksum) && ($this->appConfig->getAppValueString(ConfigLexicon::SYNC_REQUIREMENT_LEVEL) >= self::SYNC_LEVEL_CHECKSUM)) {
 			$this->logger->logger('document ' . $sync->definition() . ' seems to be identical to the indexed version');
@@ -146,7 +152,8 @@ class SyncService {
 		$sync->setChecksum($checksum);
 
 		echo json_encode($document->getFlags()) . '  ' . json_encode($document->getContent()) . "\n";
-		// get document
+		$this->indexService->syncDocument($sync, $document);
+
 		// send document to ES
 		// confirm it is done
 		sleep(rand(1, 15));
