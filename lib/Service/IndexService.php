@@ -10,11 +10,15 @@ namespace OCA\FullTextSearch\Service;
 
 
 use Exception;
+use NCU\FullTextSearch\Model\Document;
+use OC\FullTextSearch\Model\DocumentAccess;
+use OC\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\NotIndexableDocumentException;
 use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
+use OCA\FullTextSearch\Model\DocumentSync;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
@@ -25,7 +29,6 @@ use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IIndexOptions;
 use OCP\FullTextSearch\Model\IRunner;
 use OCP\FullTextSearch\Service\IIndexService;
-
 
 /**
  * Class IndexService
@@ -643,4 +646,56 @@ class IndexService implements IIndexService {
 		return $index;
 	}
 
+
+
+	/**
+	 * convert to API v1 to send a document to the full text search platform for indexing
+	 */
+	public function syncDocument(DocumentSync $sync, Document $document): void {
+		$wrapper = $this->platformService->getPlatform();
+		$platform = $wrapper->getPlatform();
+
+		$platform->initializeIndex();
+
+		// confirm current document is different from the one indexed on platform
+		$indexedDocument = $this->convertPreviousIndexDocumentToNewDocument($platform->getDocument($sync->getProviderId(), $sync->getDocumentId()));
+		if ($document->getChecksum() === $indexedDocument?->getChecksum()) {
+			return;
+		}
+
+		try {
+			$platform->indexDocumentDeprecated($this->convertNewDocumentToPreviousIndexDocument($document));
+		} catch (PlatformTemporaryException $e) {
+			throw $e;
+//		} catch (Exception $e) {
+//			throw new IndexDoesNotExistException();
+		}
+
+
+	}
+
+	/**
+	 * convert Document to deprecated IndexDocument compatible with API v1
+	 */
+	private function convertNewDocumentToPreviousIndexDocument(Document $document): IIndexDocument {
+		$indexDocument = new IndexDocument($sync->getProviderId(), $sync->getDocumentId());
+
+		$access = $document->getAccess();
+		if ($access !== null) {
+			$deprecatedAccess = new DocumentAccess($access->getOwnerId());
+			$deprecatedAccess->setCircles($access->getCircles())
+							 ->setGroups($access->getGroups())
+							 ->setUsers($access->getUsers())
+							 ->setLinks($access->getLinks())
+							 ->setViewerId($access->getViewerId());
+			$indexDocument->setAccess($deprecatedAccess);
+		}
+
+		return $indexDocument;
+	}
+
+	private function convertPreviousIndexDocumentToNewDocument(IIndexDocument $document): Document {
+
+
+	}
 }

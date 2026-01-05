@@ -6,12 +6,9 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
+namespace OCA\FullTextSearch\Files\Exceptions;
 
-namespace OCA\FullTextSearch\Enum;
+use \Exception;
 
-enum SessionType: string {
-	case CLOSED = '';
-	case REQUESTED = 'requested';
-	case SYNC = 'sync';
-	case RESYNC = 'sync_recent';
+class NodeNotFoundException extends Exception {
 }

@@ -12,6 +12,7 @@ use OCP\Config\Lexicon\Entry;
 use OCP\Config\Lexicon\ILexicon;
 use OCP\Config\Lexicon\Strictness;
 use OCP\Config\ValueType;
+use OCP\IAppConfig;
 
 /**
  * Config Lexicon for fulltextsearch.

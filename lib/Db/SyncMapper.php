@@ -29,7 +29,7 @@ class SyncMapper extends QBMapper {
 	/**
 	 * @return DocumentSync[]
 	 */
-	public function getForcedSyncs(int $limit = 100): array {
+	public function getRequestedSyncs(int $limit = 100): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 		   ->from($this->getTableName())

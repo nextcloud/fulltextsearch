@@ -14,8 +14,15 @@ use Closure;
 use NCU\FullTextSearch\IManager;
 use OC;
 use OC\FullTextSearch\FullTextSearchManager;
+use OCA\Files_FullTextSearch\Listeners\FileChanged;
+use OCA\Files_FullTextSearch\Listeners\FileCreated;
+use OCA\Files_FullTextSearch\Listeners\FileDeleted;
+use OCA\Files_FullTextSearch\Listeners\FileRenamed;
+use OCA\Files_FullTextSearch\Listeners\ShareCreated;
+use OCA\Files_FullTextSearch\Listeners\ShareDeleted;
 use OCA\FullTextSearch\Capabilities;
 use OCA\FullTextSearch\ConfigLexicon;
+use OCA\FullTextSearch\Files\FileEvents;
 use OCA\FullTextSearch\Provider\FilesContentProvider;
 use OCA\FullTextSearch\Search\UnifiedSearchProvider;
 use OCA\FullTextSearch\Service\FullTextSearchService;
@@ -26,11 +33,17 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\Files\Events\Node\NodeCreatedEvent;
+use OCP\Files\Events\Node\NodeDeletedEvent;
+use OCP\Files\Events\Node\NodeRenamedEvent;
+use OCP\Files\Events\Node\NodeWrittenEvent;
 use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\IAppConfig;
 use OCP\INavigationManager;
 use OCP\IServerContainer;
 use OCP\IURLGenerator;
+use OCP\Share\Events\ShareCreatedEvent;
+use OCP\Share\Events\ShareDeletedEvent;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Psr\Container\ContainerInterface;
 use Throwable;
@@ -47,6 +60,15 @@ class Application extends App implements IBootstrap {
 		$context->registerConfigLexicon(ConfigLexicon::class);
 
 		$context->registerFullTextSearchService(FullTextSearchService::class);
+		$context->registerFullTextSearchContentProvider(FilesContentProvider::class);
+
+		// files life cycle events
+		$context->registerEventListener(NodeCreatedEvent::class, FileEvents::class);
+		$context->registerEventListener(NodeWrittenEvent::class, FileEvents::class);
+		$context->registerEventListener(NodeRenamedEvent::class, FileEvents::class);
+		$context->registerEventListener(NodeDeletedEvent::class, FileEvents::class);
+		$context->registerEventListener(ShareCreatedEvent::class, FileEvents::class);
+		$context->registerEventListener(ShareDeletedEvent::class, FileEvents::class);
 
 		$this->registerServices($this->getContainer());
 	}

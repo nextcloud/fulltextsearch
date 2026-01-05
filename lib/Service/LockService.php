@@ -17,7 +17,7 @@ use OCP\Security\ISecureRandom;
 
 class LockService {
 	private const LOCK_TIMEOUT = 300;     // the final value will be LOCK_TIMEOUT+LOCK_PING_DELAY
-	private const LOCK_PING_DELAY = 10;
+	private const LOCK_PING_DELAY = 8;
 
 	private string $lockId;
 	private int $nextPing = -1;
@@ -79,7 +79,7 @@ class LockService {
 
 		// new lock; enforce ping on new lock
 		if ($currentLockId === '') {
-			throw new LockException('Index not locked');
+			throw new LockException('Forced stop');
 		}
 
 		// confirm the lock belongs to the current process
@@ -94,6 +94,7 @@ class LockService {
 
 	public function unlock(): void {
 		$this->appConfig->deleteKey(Application::APP_ID, ConfigLexicon::LOCK_PING);
+		$this->appConfig->deleteKey(Application::APP_ID, ConfigLexicon::LOCK_ID);
 		$this->nextPing = -1;
 	}
 }

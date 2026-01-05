@@ -9,34 +9,16 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
+use Exception;
 use OC\Core\Command\Base;
-use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
+use OCA\FullTextSearch\Exceptions\LockException;
 use OCA\FullTextSearch\Service\FullTextSearchService;
 use OCA\FullTextSearch\Service\LockService;
 use OCA\FullTextSearch\Service\LoggerService;
 use OCA\FullTextSearch\Service\SyncService;
-use OCA\FullTextSearch\Tools\Traits\TArrayTools;
-use Exception;
-use OC\Core\Command\InterruptedException;
-use OCA\FullTextSearch\ACommandBase;
-use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
-use OCA\FullTextSearch\Model\Index as ModelIndex;
-use OCA\FullTextSearch\Model\Runner;
-use OCA\FullTextSearch\Service\CliService;
-use OCA\FullTextSearch\Service\ConfigService;
-use OCA\FullTextSearch\Service\IndexService;
-use OCA\FullTextSearch\Service\PlatformService;
-use OCA\FullTextSearch\Service\ProviderService;
-use OCA\FullTextSearch\Service\RunningService;
-use OCP\IUserManager;
-use OutOfBoundsException;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Terminal;
-use Throwable;
 
 class Sync extends Base {
 	public function __construct(
@@ -52,7 +34,7 @@ class Sync extends Base {
 		parent::configure();
 		$this->setName('fulltextsearch:sync')
 			 ->setDescription('Index files')
-			->addOption('info', '', InputOption::VALUE_NONE, 'display info entries')
+			 ->addOption('info', '', InputOption::VALUE_NONE, 'display info entries')
 			 ->addOption('no-output', '', InputOption::VALUE_NONE, 'no output, use nextcloud logs');
 	}
 
@@ -67,10 +49,12 @@ class Sync extends Base {
 			try {
 				$this->lockService->update();
 				$this->syncProcess();
+			} catch (LockException $e) {
+				throw $e;
 			} catch (Exception $e) {
 				$this->loggerService->error('Exception while running fulltextsearch:sync', ['exception' => $e]);
 			}
-			sleep(10);
+			sleep(15);
 		}
 
 		return 0;
