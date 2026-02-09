@@ -4,6 +4,10 @@
 -->
 # Changelog
 
+### 33.0.0
+
+- compat nc33
+
 ### 32.0.0
 
 - compat nc32
