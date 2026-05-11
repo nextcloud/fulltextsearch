@@ -1,10 +1,10 @@
 # SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 parameters:
-	level: 3
+	level: 4
 	phpVersion:
 		min: 80100
-		max: 80500
+		max: 80400
 	paths:
 		- lib
 		- templates

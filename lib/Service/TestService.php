@@ -56,10 +56,6 @@ class TestService {
 		$content = file_get_contents(__DIR__ . '/../../LICENSE');
 		$indexDocument->setContent($content);
 
-		if ($options === null) {
-			return $indexDocument;
-		}
-
 		if ($options->getOption(self::DOCUMENT_INDEXING_OPTION, '')
 			=== self::DOCUMENT_INDEXING_ACCESS) {
 			$indexDocument->getAccess()

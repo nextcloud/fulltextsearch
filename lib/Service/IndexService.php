@@ -300,7 +300,7 @@ class IndexService implements IIndexService {
 		$index = $document->getIndex();
 		$access = $document->getAccess();
 
-		if ($access === null || $index->isStatus(Index::INDEX_IGNORE)) {
+		if ($index->isStatus(Index::INDEX_IGNORE)) {
 			throw new NotIndexableDocumentException();
 		}
 
@@ -409,9 +409,7 @@ class IndexService implements IIndexService {
 	 */
 	public function updateIndex(IIndex $index) {
 		/** @var Index $index */
-		$this->updateIndexError($index);
 		if ($index->isStatus(IIndex::INDEX_REMOVE)) {
-
 			if ($index->isStatus(IIndex::INDEX_DONE)) {
 				$this->indexesRequest->deleteIndex($index);
 
@@ -434,15 +432,6 @@ class IndexService implements IIndexService {
 			$this->indexesRequest->create($index);
 		}
 	}
-
-
-	/**
-	 * @param IIndex $index
-	 */
-	private function updateIndexError(IIndex $index) {
-
-	}
-
 
 	/**
 	 * @param string $providerId

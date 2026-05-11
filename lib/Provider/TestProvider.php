@@ -32,7 +32,6 @@ use OCP\FullTextSearch\Model\ISearchTemplate;
 class TestProvider implements IFullTextSearchProvider {
 	const TEST_PROVIDER_ID = 'test_provider';
 
-	private IRunner $runner;
 	private IIndexOptions $indexOptions;
 
 
@@ -74,7 +73,6 @@ class TestProvider implements IFullTextSearchProvider {
 
 
 	public function setRunner(IRunner $runner) {
-		$this->runner = $runner;
 	}
 
 

@@ -67,10 +67,7 @@ class CollectionInit extends Base {
 	}
 
 
-	/**
-	 *
-	 */
-	protected function configure() {
+	protected function configure(): void {
 		parent::configure();
 		$this->setName('fulltextsearch:collection:init')
 			 ->setDescription('Initiate a collection')
@@ -79,13 +76,9 @@ class CollectionInit extends Base {
 
 
 	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$collection = $input->getArgument('name');
 		$this->collectionService->confirmCollectionString($collection);
 
@@ -155,10 +148,6 @@ class CollectionInit extends Base {
 		}
 
 		foreach ($users as $user) {
-			if ($user === null) {
-				continue;
-			}
-
 			$runner->setInfo('userId', $user->getUID());
 
 			try {

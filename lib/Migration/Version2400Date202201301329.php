@@ -10,10 +10,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Migration;
 
 use Closure;
-use OCA\FullTextSearch\Service\ConfigService;
-use OCP\DB\Exception;
 use OCP\DB\ISchemaWrapper;
-use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
@@ -21,24 +18,6 @@ use OCP\Migration\SimpleMigrationStep;
  * Auto-generated migration step: Please modify to your needs!
  */
 class Version2400Date202201301329 extends SimpleMigrationStep {
-
-
-	/** @var IDBConnection */
-	private $dbConnection;
-
-	/** @var ConfigService */
-	private $configService;
-
-
-	/**
-	 * @param IDBConnection $dbConnection
-	 * @param ConfigService $configService
-	 */
-	public function __construct(IDBConnection $dbConnection, ConfigService $configService) {
-		$this->dbConnection = $dbConnection;
-		$this->configService = $configService;
-	}
-
 	/**
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`

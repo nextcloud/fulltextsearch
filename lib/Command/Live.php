@@ -92,33 +92,16 @@ class Live extends ACommandBase {
 	/** @var Terminal */
 	private $terminal;
 
-	/** @var array */
-	private $errors = [];
-
-	/** @var bool */
-	private $navigateLastError = true;
-
-	/** @var array */
-	private $results = [];
-
-	/** @var bool */
-	private $navigateLastResult = true;
+	private array $errors = [];
+	private bool $navigateLastError = true;
+	private array $results = [];
+	private bool $navigateLastResult = true;
 
 	/**
 	 * Live constructor.
-	 *
-	 * @param IUserManager $userManager
-	 * @param RunningService $runningService
-	 * @param ConfigService $configService
-	 * @param CliService $cliService
-	 * @param IndexService $indexService
-	 * @param PlatformService $platformService
-	 * @param ProviderService $providerService
 	 */
 	public function __construct(
-		private IUserManager $userManager,
 		private RunningService $runningService,
-		private ConfigService $configService,
 		private CliService $cliService,
 		private IndexService $indexService,
 		private PlatformService $platformService,
@@ -129,11 +112,7 @@ class Live extends ACommandBase {
 		$this->runner = new Runner($runningService, 'commandLive');
 	}
 
-
-	/**
-	 *
-	 */
-	protected function configure() {
+	protected function configure(): void {
 		parent::configure();
 		$this->setName('fulltextsearch:live')
 			 ->setDescription('Index files')
@@ -226,12 +205,16 @@ class Live extends ACommandBase {
 	 * @throws Exception
 	 * @throws TickDoesNotExistException
 	 */
-	private function liveCycle() {
+	private function liveCycle(): void {
 		$wrapper = $this->platformService->getPlatform();
 		$platform = $wrapper->getPlatform();
 		$platform->setRunner($this->runner);
 		$connected = true;
 
+		pcntl_async_signals(true);
+		pcntl_signal(SIGTERM, fn (int $signo) => $this->runner->stop());
+
+		/** @phpstan-ignore while.alwaysTrue */
 		while (true) {
 
 			if (!$connected) {
@@ -263,15 +246,8 @@ class Live extends ACommandBase {
 
 			usleep(self::CYCLE_DELAY);
 		}
-
-		$this->runner->stop();
-
 	}
 
-
-	/**
-	 * @param string $key
-	 */
 	public function onKeyPressed(string $key) {
 		$key = strtolower($key);
 		if ($key === 'q') {
@@ -505,7 +481,7 @@ class Live extends ACommandBase {
 			return;
 		}
 
-		/** @var ModelIndex $index */
+		/** @var ?ModelIndex $index */
 		$index = $result['index'];
 		$resultIndex = '';
 		if ($index !== null) {
@@ -563,7 +539,7 @@ class Live extends ACommandBase {
 			return;
 		}
 
-		/** @var ModelIndex $index */
+		/** @var ?ModelIndex $index */
 		$index = $error['index'];
 		$errorIndex = '';
 		if ($index !== null) {

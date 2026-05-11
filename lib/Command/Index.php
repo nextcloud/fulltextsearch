@@ -18,7 +18,6 @@ use OCA\FullTextSearch\Model\Index as ModelIndex;
 use OCA\FullTextSearch\Model\IndexOptions;
 use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\CliService;
-use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
@@ -112,15 +111,10 @@ class Index extends ACommandBase {
 		private IndexService $indexService,
 		private PlatformService $platformService,
 		private ProviderService $providerService,
-		private ConfigService $configService
 	) {
 		parent::__construct();
 	}
 
-
-	/**
-	 *
-	 */
 	protected function configure(): void {
 		parent::configure();
 		$this->setName('fulltextsearch:index')
@@ -134,9 +128,6 @@ class Index extends ACommandBase {
 
 
 	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
 	 * @throws Exception
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
@@ -546,7 +537,7 @@ class Index extends ACommandBase {
 			return;
 		}
 
-		/** @var ModelIndex $index */
+		/** @var ?ModelIndex $index */
 		$index = $error['index'];
 		$errorIndex = '';
 		if ($index !== null) {
@@ -573,10 +564,7 @@ class Index extends ACommandBase {
 	}
 
 
-	/**
-	 * @param int $pos
-	 */
-	private function displayResult(int $pos = 0) {
+	private function displayResult(int $pos = 0): void {
 		$total = sizeof($this->results);
 
 		if ($total === 0) {
@@ -598,7 +586,7 @@ class Index extends ACommandBase {
 			return;
 		}
 
-		/** @var ModelIndex $index */
+		/** @var ?ModelIndex $index */
 		$index = $result['index'];
 		$resultIndex = '';
 		if ($index !== null) {

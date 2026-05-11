@@ -38,11 +38,7 @@ class CliService {
 	public function __construct() {
 	}
 
-
-	/**
-	 * @param Runner $runner
-	 */
-	public function setRunner(Runner $runner) {
+	public function setRunner(Runner $runner): void {
 		$this->runner = $runner;
 
 		$this->runner->onInfoUpdate([$this, 'onInfoUpdated']);
@@ -53,11 +49,7 @@ class CliService {
 	 * @param string $panelId
 	 * @param array $lines
 	 */
-	public function createPanel(string $panelId, array $lines) {
-		if (!is_array($lines)) {
-			$lines = [$lines];
-		}
-
+	public function createPanel(string $panelId, array $lines): void {
 		$this->panels[$panelId] = $lines;
 	}
 
@@ -65,7 +57,7 @@ class CliService {
 	/**
 	 *
 	 */
-	public function initDisplay() {
+	public function initDisplay(): void {
 		$this->displayedPanel = [];
 	}
 

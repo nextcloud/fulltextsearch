@@ -211,10 +211,6 @@ class CoreRequestBuilder {
 		$pf = ($qb->getType() === QueryBuilder::SELECT) ? $this->defaultSelectAlias . '.' : '';
 		$field = $pf . $field;
 
-		if (!is_array($values)) {
-			$values = [$values];
-		}
-
 		$orX = $expr->orX();
 		foreach ($values as $value) {
 			$orX->add($expr->eq($field, $qb->createNamedParameter($value)));

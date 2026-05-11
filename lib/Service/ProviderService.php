@@ -70,7 +70,7 @@ class ProviderService implements IProviderService {
 	 * @throws ProviderIsNotUniqueException
 	 * @throws ContainerExceptionInterface
 	 */
-	public function loadProvider(string $appId, string $providerId) {
+	public function loadProvider(string $appId, string $providerId): void {
 		$provider = Server::get($providerId);
 		if (!($provider instanceof IFullTextSearchProvider)) {
 			throw new ProviderIsNotCompatibleException($providerId . ' is not a compatible IFullTextSearchProvider');
