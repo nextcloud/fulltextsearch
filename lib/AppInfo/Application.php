@@ -11,11 +11,9 @@ namespace OCA\FullTextSearch\AppInfo;
 
 
 use Closure;
-use OC;
 use OCA\FullTextSearch\Capabilities;
 use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Search\UnifiedSearchProvider;
-use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\SearchService;
@@ -28,6 +26,8 @@ use OCP\IAppConfig;
 use OCP\INavigationManager;
 use OCP\IServerContainer;
 use OCP\IURLGenerator;
+use OCP\L10N\IFactory;
+use OCP\Server;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Psr\Container\ContainerInterface;
 use Throwable;
@@ -73,8 +73,6 @@ class Application extends App implements IBootstrap {
 
 	/**
 	 * Register Navigation Tab
-	 *
-	 * @param ContainerInterface $container
 	 */
 	protected function registerServices(ContainerInterface $container) {
 		/** @var IFullTextSearchManager $fullTextSearchManager */
@@ -92,10 +90,8 @@ class Application extends App implements IBootstrap {
 
 	/**
 	 * Register Navigation Tab
-	 *
-	 * @param IServerContainer $container
 	 */
-	protected function registerNavigation(IServerContainer $container) {
+	protected function registerNavigation(ContainerInterface $container) {
 		/** @var IAppConfig $appConfig */
 		$appConfig = $container->get(IAppConfig::class);
 		if (!$appConfig->getValueBool(self::APP_ID, ConfigLexicon::APP_NAVIGATION)) {
@@ -105,7 +101,7 @@ class Application extends App implements IBootstrap {
 		try {
 			$container->get(INavigationManager::class)
 					  ->add(fn () => $this->fullTextSearchNavigation());
-		} catch (RouteNotFoundException $e) {
+		} catch (\Exception) {
 		}
 	}
 
@@ -114,15 +110,14 @@ class Application extends App implements IBootstrap {
 	 * @return array
 	 */
 	private function fullTextSearchNavigation(): array {
-		/** @var IURLGenerator $urlGen */
-		$urlGen = OC::$server->get(IURLGenerator::class);
+		$urlGen = Server::get(IURLGenerator::class);
 
 		return [
 			'id'    => self::APP_ID,
 			'order' => 5,
 			'href'  => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
 			'icon'  => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),
-			'name'  => \OC::$server->getL10NFactory()->get('fulltextsearch')->t('Search')
+			'name'  => Server::get(IFactory::class)->get('fulltextsearch')->t('Search')
 		];
 	}
 

@@ -10,15 +10,15 @@ namespace OCA\FullTextSearch\Service;
 
 
 use Exception;
-use OC;
-use OC\App\AppManager;
 use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Exceptions\PlatformDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\PlatformIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\PlatformNotSelectedException;
 use OCA\FullTextSearch\Model\PlatformWrapper;
+use OCP\App\IAppManager;
 use OCP\AppFramework\Services\IAppConfig;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
+use OCP\Server;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -34,7 +34,7 @@ class PlatformService {
 	private bool $platformsLoaded = false;
 
 	public function __construct(
-		private AppManager $appManager,
+		private IAppManager $appManager,
 		private readonly IAppConfig $appConfig,
 		private LoggerInterface $logger,
 	) {
@@ -72,7 +72,7 @@ class PlatformService {
 		foreach ($this->platforms as $wrapper) {
 			$class = $wrapper->getClass();
 			try {
-				$platform = \OCP\Server::get((string)$class);
+				$platform = Server::get((string)$class);
 				if (!($platform instanceof IFullTextSearchPlatform)) {
 					$this->logger->warning($class . ' does not implement ' . IFullTextSearchPlatform::class);
 					continue;
@@ -119,7 +119,7 @@ class PlatformService {
 	 * @throws PlatformDoesNotExistException
 	 * @throws PlatformIsNotCompatibleException
 	 * @throws PlatformNotSelectedException
-	 * @throws QueryException
+	 * @throws ContainerExceptionInterface
 	 */
 	private function loadPlatform() {
 		if ($this->platform !== null) {
@@ -129,7 +129,7 @@ class PlatformService {
 		$this->loadPlatforms();
 
 		$selected = $this->getSelectedPlatform();
-		$platform = OC::$server->query((string)$selected->getClass());
+		$platform = Server::get((string)$selected->getClass());
 		if (!($platform instanceof IFullTextSearchPlatform)) {
 			throw new PlatformIsNotCompatibleException(
 				$selected->getClass() . ' is not a compatible FullTextSearchPlatform'
@@ -167,11 +167,7 @@ class PlatformService {
 		);
 	}
 
-
-	/**
-	 * @param string $appId
-	 */
-	private function loadPlatformsFromApp(string $appId) {
+	private function loadPlatformsFromApp(string $appId): void {
 		$appInfo = $this->appManager->getAppInfo($appId);
 		if (!is_array($appInfo) || !key_exists('fulltextsearch', $appInfo)
 			|| !is_array($appInfo['fulltextsearch'])
@@ -193,6 +189,4 @@ class PlatformService {
 
 		$this->platforms = array_merge($this->platforms, $wrappers);
 	}
-
-
 }

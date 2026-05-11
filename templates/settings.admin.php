@@ -16,14 +16,18 @@ Util::addScript(Application::APP_ID, 'admin');
 
 Util::addStyle(Application::APP_ID, 'admin');
 
+/** @var \OCP\IL10N $l */
+/** @var array $_ */
+
 ?>
 
 
 <div id="fns" class="section">
 	<span>
 		<a href="https://github.com/nextcloud/fulltextsearch/wiki" target="_blank">
-			<?php p(
-				$l->t(
+			<?php
+				/** @phpstan-ignore function.notFound */
+				p($l->t(
 					'Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud'
 				)
 			); ?></a>
@@ -31,14 +35,20 @@ Util::addStyle(Application::APP_ID, 'admin');
 	</span>
 	&nbsp;<br/>
 	&nbsp;<br/>
-	<h2><?php p($l->t('General')) ?></h2>
+	<h2><?php
+		/** @phpstan-ignore function.notFound */
+		p($l->t('General')) ?></h2>
 	<div class="div-table">
 
 		<div class="div-table-row">
 			<div class="div-table-col div-table-col-left">
-				<span class="leftcol"><?php p($l->t('Search Platform')); ?>:</span>
+				<span class="leftcol"><?php
+					/** @phpstan-ignore function.notFound */
+					p($l->t('Search Platform')); ?>:</span>
 				<br/>
-				<em><?php p(
+				<em><?php
+					/** @phpstan-ignore function.notFound */
+					p(
 						$l->t('Select the app to index content and answer search queries.')
 					); ?></em>
 			</div>
@@ -51,16 +61,17 @@ Util::addStyle(Application::APP_ID, 'admin');
 
 		<div class="div-table-row">
 			<div class="div-table-col div-table-col-left">
-				<span class="leftcol"><?php p($l->t('Navigation Icon')); ?>:</span>
+				<span class="leftcol"><?php
+					/** @phpstan-ignore function.notFound */
+					p($l->t('Navigation Icon')); ?>:</span>
 				<br/>
-				<em><?php p($l->t('Enable global search within all your content.')); ?></em>
+				<em><?php
+					/** @phpstan-ignore function.notFound */
+					p($l->t('Enable global search within all your content.')); ?></em>
 			</div>
 			<div class="div-table-col">
 				<input type="checkbox" id="fts_navigation" value="1"/>
 			</div>
 		</div>
-
 	</div>
-
-
 </div>

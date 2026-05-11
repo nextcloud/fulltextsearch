@@ -12,7 +12,7 @@ SPDX-FileCopyrightText = "2016 Nextcloud translators"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-path = ["composer.json", "composer.lock"]
+path = ["composer.json", "composer.lock", "vendor-bin/*/composer.json", "vendor-bin/*/composer.lock"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2016 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
@@ -34,3 +34,27 @@ path = ["img/fulltextsearch.svg", "img/fulltextsearch_black.svg", "img/options.s
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2018-2024 Google LLC"
 SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["tests/stubs/oc_**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2018 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["tests/stubs/doctrine_dbal_**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "none"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["tests/stubs/symfony_component_**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "none"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = ["tests/stubs/stecman_component_**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "none"
+SPDX-License-Identifier = "MIT"

@@ -121,7 +121,7 @@ class Index extends ACommandBase {
 	/**
 	 *
 	 */
-	protected function configure() {
+	protected function configure(): void {
 		parent::configure();
 		$this->setName('fulltextsearch:index')
 			 ->setDescription('Index files')
@@ -137,10 +137,9 @@ class Index extends ACommandBase {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return int|null|void
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$options = $this->generateIndexOptions($input);
 
 		if ($options->getOptionBool(self::INDEX_OPTION_NO_READLINE, false) === false) {
@@ -210,14 +209,14 @@ class Index extends ACommandBase {
 		$this->runner->setInfo('documentCurrent', 'all');
 		$this->runner->stop();
 
-		return 0;
+		return self::SUCCESS;
 	}
 
 
 	/**
 	 * @param string $key
 	 */
-	public function onKeyPressed(string $key) {
+	public function onKeyPressed(string $key): void {
 		$key = strtolower($key);
 		if ($key === 'q') {
 			try {
@@ -785,7 +784,7 @@ class Index extends ACommandBase {
 	/**
 	 * @throws TickDoesNotExistException
 	 */
-	public function abort() {
+	public function abort(): void {
 		try {
 			$this->abortIfInterrupted();
 		} catch (InterruptedException $e) {
@@ -793,7 +792,5 @@ class Index extends ACommandBase {
 			exit();
 		}
 	}
-
-
 }
 

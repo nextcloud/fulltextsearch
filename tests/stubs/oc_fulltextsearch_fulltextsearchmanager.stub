@@ -1,0 +1,105 @@
+<?php
+
+namespace OC\FullTextSearch;
+
+/**
+ * Class FullTextSearchManager
+ *
+ * @package OC\FullTextSearch
+ */
+class FullTextSearchManager implements \OCP\FullTextSearch\IFullTextSearchManager
+{
+    /**
+     * @since 15.0.0
+     */
+    #[\Override]
+    public function registerProviderService(\OCP\FullTextSearch\Service\IProviderService $providerService): void
+    {
+    }
+    /**
+     * @since 15.0.0
+     */
+    #[\Override]
+    public function registerIndexService(\OCP\FullTextSearch\Service\IIndexService $indexService): void
+    {
+    }
+    /**
+     * @since 15.0.0
+     */
+    #[\Override]
+    public function registerSearchService(\OCP\FullTextSearch\Service\ISearchService $searchService): void
+    {
+    }
+    /**
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function isAvailable(): bool
+    {
+    }
+    /**
+     * @throws FullTextSearchAppNotAvailableException
+     */
+    #[\Override]
+    public function addJavascriptAPI(): void
+    {
+    }
+    /**
+     * @throws FullTextSearchAppNotAvailableException
+     */
+    #[\Override]
+    public function isProviderIndexed(string $providerId): bool
+    {
+    }
+    /**
+     * @throws FullTextSearchAppNotAvailableException
+     */
+    #[\Override]
+    public function getIndex(string $providerId, string $documentId): \OCP\FullTextSearch\Model\IIndex
+    {
+    }
+    /**
+     * @see IIndex for available value for $status.
+     *
+     * @throws FullTextSearchAppNotAvailableException
+     */
+    #[\Override]
+    public function createIndex(string $providerId, string $documentId, string $userId, int $status = 0): \OCP\FullTextSearch\Model\IIndex
+    {
+    }
+    /**
+     * @see IIndex for available value for $status.
+     *
+     * @throws FullTextSearchAppNotAvailableException
+     */
+    #[\Override]
+    public function updateIndexStatus(string $providerId, string $documentId, int $status, bool $reset = false): void
+    {
+    }
+    /**
+     * @see IIndex for available value for $status.
+     *
+     * @throws FullTextSearchAppNotAvailableException
+     */
+    #[\Override]
+    public function updateIndexesStatus(string $providerId, array $documentIds, int $status, bool $reset = false): void
+    {
+    }
+    /**
+     * @param IIndex[] $indexes
+     *
+     * @throws FullTextSearchAppNotAvailableException
+     */
+    #[\Override]
+    public function updateIndexes(array $indexes): void
+    {
+    }
+    /**
+     * @return ISearchResult[]
+     * @throws FullTextSearchAppNotAvailableException
+     */
+    #[\Override]
+    public function search(array $request, string $userId = ''): array
+    {
+    }
+}

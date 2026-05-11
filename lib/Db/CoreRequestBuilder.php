@@ -11,6 +11,7 @@ namespace OCA\FullTextSearch\Db;
 
 use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use OC\DB\ConnectionAdapter;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCP\DB\Exception;
@@ -41,14 +42,18 @@ class CoreRequestBuilder {
 		}
 
 		try {
-			$this->dbConnection->getInner()->close();
+			/** @var ConnectionAdapter $dbConnection */
+			$dbConnection = $this->dbConnection;
+			$dbConnection->getInner()->close();
 		} catch (\Exception) {
 		}
 
 		for ($i = 0; $i < 30; $i++) {
 			sleep(10);
 			try {
-				$this->dbConnection->getInner()->connect();
+				/** @var ConnectionAdapter $dbConnection */
+				$dbConnection = $this->dbConnection;
+				$dbConnection->getInner()->connect();
 				$this->lastReconnect = time();
 				return;
 			} catch (\Exception $e) {
@@ -199,7 +204,7 @@ class CoreRequestBuilder {
 	/**
 	 * @param IQueryBuilder $qb
 	 * @param string $field
-	 * @param string|integer|array $values
+	 * @param array $values
 	 */
 	private function limitToDBFieldArray(IQueryBuilder $qb, string $field, array $values) {
 		$expr = $qb->expr();

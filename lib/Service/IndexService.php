@@ -34,42 +34,18 @@ use OCP\FullTextSearch\Service\IIndexService;
  */
 class IndexService implements IIndexService {
 
-
-	/** @var IndexesRequest */
-	private $indexesRequest;
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var PlatformService */
-	private $platformService;
-
-
-	/** @var Runner */
-	private $runner = null;
-
-	/** @var array */
-	private $queuedDeleteIndex = [];
-
-	/** @var int */
-	private $currentTotalDocuments = 0;
-
+	private ?Runner $runner = null;
+	private array $queuedDeleteIndex = [];
+	private int $currentTotalDocuments = 0;
 
 	/**
 	 * IndexService constructor.
-	 *
-	 * @param IndexesRequest $indexesRequest
-	 * @param ProviderService $providerService
-	 * @param PlatformService $platformService
 	 */
 	public function __construct(
-		IndexesRequest $indexesRequest,
-		ProviderService $providerService,
-		PlatformService $platformService
+		private IndexesRequest $indexesRequest,
+		private ProviderService $providerService,
+		private PlatformService $platformService
 	) {
-		$this->indexesRequest = $indexesRequest;
-		$this->providerService = $providerService;
-		$this->platformService = $platformService;
 	}
 
 
@@ -307,6 +283,7 @@ class IndexService implements IIndexService {
 			} catch (Exception $e) {
 			}
 
+			/** @phpstan-ignore method.notFound */
 			$document->__destruct();
 			unset($document);
 		}

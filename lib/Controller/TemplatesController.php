@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Controller;
 
 use Exception;
-use OC\AppFramework\Http;
+use OCP\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Service\ProviderService;
