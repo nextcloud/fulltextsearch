@@ -28,7 +28,6 @@ use OCP\FullTextSearch\Service\ISearchService;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
-use Psr\Log\LoggerInterface;
 
 class SearchService implements ISearchService {
 
@@ -56,32 +55,31 @@ class SearchService implements ISearchService {
 
 	/**
 	 * @param string $userId
-	 * @param ISearchRequest $request
 	 *
 	 * @return ISearchResult[]
 	 * @throws EmptySearchException
 	 * @throws Exception
 	 * @throws ProviderDoesNotExistException
 	 */
-	public function search(string $userId, ISearchRequest $request): array {
-		$this->searchRequestCannotBeEmpty($request);
+	public function search(string $userId, ISearchRequest $searchRequest): array {
+		$this->searchRequestCannotBeEmpty($searchRequest);
 
 		$user = $this->userManager->get($userId);
 		if ($user === null) {
 			throw new NoUserException('User does not exist');
 		}
 
-		/** @var $request SearchRequest */
-		$request->setAuthor($user->getUID());
-		$request->cleanSearch();
+		/** @var SearchRequest $searchRequest */
+		$searchRequest->setAuthor($user->getUID());
+		$searchRequest->cleanSearch();
 
-		$providers = $this->providerService->getFilteredProviders($request->getProviders());
+		$providers = $this->providerService->getFilteredProviders($searchRequest->getProviders());
 		$wrapper = $this->platformService->getPlatform();
 		$platform = $wrapper->getPlatform();
 
 		$access = $this->getDocumentAccessFromUser($user);
 
-		return $this->searchFromProviders($platform, $providers, $access, $request);
+		return $this->searchFromProviders($platform, $providers, $access, $searchRequest);
 	}
 
 
@@ -91,7 +89,8 @@ class SearchService implements ISearchService {
 	 * @throws EmptySearchException
 	 */
 	private function searchRequestCannotBeEmpty(ISearchRequest $request) {
-		if ($request === null || (strlen($request->getSearch()) < 1 && !$request->isEmptySearch())) {
+		/** @var SearchRequest $request */
+		if (strlen($request->getSearch()) < 1 && !$request->isEmptySearch()) {
 			throw new EmptySearchException('search cannot be empty');
 		}
 	}
@@ -141,8 +140,7 @@ class SearchService implements ISearchService {
 		$rights->setGroups($this->groupManager->getUserGroupIds($user));
 
 		try {
-			/** @var CirclesManager $circleManager */
-			$circleManager = OC::$server->get(CirclesManager::class);
+			$circleManager = \OCP\Server::get(CirclesManager::class);
 			$circleManager->startsession();
 			$circleIds = array_map(
 				function (Circle $circle): string {

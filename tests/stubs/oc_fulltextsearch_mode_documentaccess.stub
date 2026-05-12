@@ -1,0 +1,209 @@
+<?php
+
+namespace OC\FullTextSearch\Model;
+
+/**
+ * Class IDocumentAccess
+ *
+ * This object is used as a data transfer object when
+ *
+ * - indexing a document,
+ * - generating a search request.
+ *
+ * During the index, it is used to define which users, groups, circles, ...
+ * have access to the IndexDocument
+ *
+ * During the search, it is internally use to define to which group, circles, ...
+ * a user that perform the search belongs to.
+ *
+ * @see IIndexDocument::setAccess
+ *
+ * @since 16.0.0
+ *
+ * @package OC\FullTextSearch\Model
+ */
+final class DocumentAccess implements \OCP\FullTextSearch\Model\IDocumentAccess, \JsonSerializable
+{
+    /**
+     * Owner of the document can be set at the init of the object.
+     *
+     * @since 16.0.0
+     *
+     * IDocumentAccess constructor.
+     */
+    public function __construct(string $ownerId = '')
+    {
+    }
+    /**
+     * Set the Owner of the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function setOwnerId(string $ownerId): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Get the Owner of the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function getOwnerId(): string
+    {
+    }
+    /**
+     * Set the viewer of the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function setViewerId(string $viewerId): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Get the viewer of the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function getViewerId(): string
+    {
+    }
+    /**
+     * Set the list of users that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function setUsers(array $users): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Add an entry to the list of users that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function addUser(string $user): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Add multiple entries to the list of users that have read access to the
+     * document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function addUsers($users): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Get the complete list of users that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function getUsers(): array
+    {
+    }
+    /**
+     * Set the list of groups that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function setGroups(array $groups): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Add an entry to the list of groups that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function addGroup(string $group): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Add multiple entries to the list of groups that have read access to the
+     * document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function addGroups(array $groups): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Get the complete list of groups that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function getGroups(): array
+    {
+    }
+    /**
+     * Set the list of circles that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function setCircles(array $circles): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Add an entry to the list of circles that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function addCircle(string $circle): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Add multiple entries to the list of groups that have read access to the
+     * document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function addCircles(array $circles): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Get the complete list of circles that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function getCircles(): array
+    {
+    }
+    /**
+     * Set the list of links that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function setLinks(array $links): \OCP\FullTextSearch\Model\IDocumentAccess
+    {
+    }
+    /**
+     * Get the list of links that have read access to the document.
+     *
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function getLinks(): array
+    {
+    }
+    /**
+     * @since 16.0.0
+     */
+    #[\Override]
+    public function jsonSerialize(): array
+    {
+    }
+}

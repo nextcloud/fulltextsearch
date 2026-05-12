@@ -43,8 +43,6 @@ class Test extends ACommandBase {
 
 	private Runner $runner;
 
-	/** @var boolean */
-	private $isJson = false;
 	public function __construct(
 		private RunningService $runningService,
 		private PlatformService $platformService,
@@ -55,11 +53,7 @@ class Test extends ACommandBase {
 		parent::__construct();
 	}
 
-
-	/**
-	 *
-	 */
-	protected function configure() {
+	protected function configure(): void {
 		parent::configure();
 		$this->setName('fulltextsearch:test')
 			 ->setDescription('Testing the platform setup')
@@ -72,14 +66,9 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
-		$this->isJson = ($input->getOption('json') === true);
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$platformDelay = ($input->getOption('platform_delay') > 0) ? (int)$input->getOption(
 			'platform_delay'
 		) : self::DELAY_STABILIZE_PLATFORM;

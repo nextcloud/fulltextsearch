@@ -286,22 +286,16 @@ class SearchResult implements ISearchResult, JsonSerializable {
 	public function jsonSerialize(): array {
 
 		$providerObj = $this->getProvider();
-		$provider = [];
-		if ($providerObj !== null) {
-			$provider = [
-				'id'   => $providerObj->getId(),
-				'name' => $providerObj->getName()
-			];
-		}
+		$provider = [
+			'id'   => $providerObj->getId(),
+			'name' => $providerObj->getName()
+		];
 
 		$platformObj = $this->getPlatform();
-		$platform = [];
-		if ($platformObj !== null) {
-			$platform = [
-				'id'   => $platformObj->getId(),
-				'name' => $platformObj->getName()
-			];
-		}
+		$platform = [
+			'id'   => $platformObj->getId(),
+			'name' => $platformObj->getName()
+		];
 
 		return [
 			'provider'  => $provider,

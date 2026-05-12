@@ -12,6 +12,9 @@ use OCP\Util;
 Util::addScript(Application::APP_ID, 'navigate');
 Util::addStyle(Application::APP_ID, 'navigate');
 
+/** @var \OCP\IL10N $l */
+/** @var array $_ */
+
 ?>
 
 <div id="app-navigation">
@@ -20,9 +23,9 @@ Util::addStyle(Application::APP_ID, 'navigate');
 			<div id="search_header">
 				<div>
 					<input id="search_input"
-						   placeholder="<?php p(
-							   $l->t('Search on %s', [$_['themingName']])
-						   ); ?>">
+						   placeholder="<?php
+						   /** @phpstan-ignore function.notFound */
+						   p($l->t('Search on %s', [$_['themingName']])); ?>">
 				</div>
 			</div>
 		</li>

@@ -97,8 +97,8 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 		$index->setStatus($this->getInt('status', $data))
 			  ->setSource($this->get('source', $data, ''))
 			  ->setOwnerId($this->get('owner_id', $data, ''))
-			  ->setLastIndex($this->getInt('indexed', $data, 0))
-			  ->setCollection($this->get('collection', $data));
+			  ->setLastIndex($this->getInt('indexed', $data, 0));
+		$index->setCollection($this->get('collection', $data));
 		$index->setOptions($this->getArray('options', $data, []));
 		$index->setErrorCount($this->getInt('err', $data, 0));
 		$index->setErrors($this->getArray('message', $data, []));

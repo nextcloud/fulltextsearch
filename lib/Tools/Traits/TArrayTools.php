@@ -173,8 +173,6 @@ trait TArrayTools {
 	 * @param string $k
 	 * @param array $arr
 	 * @param JsonSerializable|null $default
-	 *
-	 * @return mixed
 	 */
 	protected function getObj(string $k, array $arr, ?JsonSerializable $default = null): ?JsonSerializable {
 		if (!array_key_exists($k, $arr)) {

@@ -10,19 +10,19 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 use Exception;
-use OC;
-use OC\App\AppManager;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotUniqueException;
 use OCA\FullTextSearch\Model\ProviderWrapper;
-use OCP\AppFramework\QueryException;
+use OCP\App\IAppManager;
 use OCP\AppFramework\Services\IAppConfig;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Service\IProviderService;
+use OCP\Server;
 use OCP\ServerVersion;
 use OCP\Util;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 class ProviderService implements IProviderService {
@@ -31,7 +31,7 @@ class ProviderService implements IProviderService {
 	private bool $providersLoaded = false;
 
 	public function __construct(
-		private AppManager $appManager,
+		private IAppManager $appManager,
 		private readonly IAppConfig $appConfig,
 		private readonly ServerVersion $serverVersion,
 		private LoggerInterface $logger,
@@ -68,10 +68,10 @@ class ProviderService implements IProviderService {
 	 *
 	 * @throws ProviderIsNotCompatibleException
 	 * @throws ProviderIsNotUniqueException
-	 * @throws QueryException
+	 * @throws ContainerExceptionInterface
 	 */
-	public function loadProvider(string $appId, string $providerId) {
-		$provider = OC::$server->query((string)$providerId);
+	public function loadProvider(string $appId, string $providerId): void {
+		$provider = Server::get($providerId);
 		if (!($provider instanceof IFullTextSearchProvider)) {
 			throw new ProviderIsNotCompatibleException($providerId . ' is not a compatible IFullTextSearchProvider');
 		}

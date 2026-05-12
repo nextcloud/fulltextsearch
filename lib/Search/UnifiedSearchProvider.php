@@ -11,13 +11,11 @@ namespace OCA\FullTextSearch\Search;
 
 use Exception;
 use OCA\FullTextSearch\Model\SearchRequest;
-use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\SearchService;
 use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
 use OCP\IL10N;
-use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\Search\IFilteringProvider;
 use OCP\Search\ISearchQuery;
@@ -36,9 +34,7 @@ class UnifiedSearchProvider implements IFilteringProvider {
 
 	public function __construct(
 		private IL10N $l10n,
-		private IURLGenerator $urlGenerator,
 		private SearchService $searchService,
-		private ConfigService $configService
 	) {
 	}
 
@@ -137,7 +133,7 @@ class UnifiedSearchProvider implements IFilteringProvider {
 					$title .= $document->getTitle();
 					$subline = '';
 				} else {
-					$title .= (sizeof($excerpts) > 0) ? $excerpts[0]['excerpt'] : '';
+					$title .= $excerpts[0]['excerpt'];
 					$subline = $document->getTitle();
 				}
 

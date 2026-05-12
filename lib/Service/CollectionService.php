@@ -25,47 +25,16 @@ use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\IURLGenerator;
 
 class CollectionService {
+	private ?Runner $runner = null;
 
-	/** @var IURLGenerator */
-	private $urlGenerator;
-
-	/** @var IndexesRequest */
-	private $indexesRequest;
-
-	/** @var ProviderService */
-	private $providerService;
-
-	/** @var IndexService */
-	private $indexService;
-
-	/** @var ConfigService */
-	private $configService;
-
-
-	/** @var Runner */
-	private $runner;
-
-
-	/**
-	 * @param IURLGenerator $urlGenerator
-	 * @param IndexesRequest $indexesRequest
-	 * @param ProviderService $providerService
-	 * @param IndexService $indexService
-	 * @param ConfigService $configService
-	 */
 	public function __construct(
 		private IAppConfig $appConfig,
-		IURLGenerator $urlGenerator,
-		IndexesRequest $indexesRequest,
-		ProviderService $providerService,
-		IndexService $indexService,
-		ConfigService $configService
+		private IURLGenerator $urlGenerator,
+		private IndexesRequest $indexesRequest,
+		private ProviderService $providerService,
+		private IndexService $indexService,
+		private ConfigService $configService
 	) {
-		$this->urlGenerator = $urlGenerator;
-		$this->indexesRequest = $indexesRequest;
-		$this->providerService = $providerService;
-		$this->indexService = $indexService;
-		$this->configService = $configService;
 	}
 
 

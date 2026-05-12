@@ -13,6 +13,7 @@ use OC\ForbiddenException;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\CollectionArgumentException;
 use OCA\FullTextSearch\Service\CollectionService;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCSController;
@@ -32,14 +33,13 @@ class CollectionController extends OCSController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param string $collection
 	 * @param int $length
 	 *
 	 * @return DataResponse
 	 * @throws OCSException
 	 */
+	#[NoAdminRequired]
 	public function getQueue(string $collection, int $length = 0): DataResponse {
 		try {
 			$this->collectionService->confirmCollection($collection);
@@ -53,14 +53,12 @@ class CollectionController extends OCSController {
 
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param string $collection
-	 * @param int $length
 	 *
 	 * @return DataResponse
 	 * @throws OCSException
 	 */
+	#[NoAdminRequired]
 	public function resetCollection(string $collection): DataResponse {
 		try {
 			$this->collectionService->confirmCollection($collection);
@@ -75,8 +73,6 @@ class CollectionController extends OCSController {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param string $collection
 	 * @param string $providerId
 	 * @param string $documentId
@@ -84,6 +80,7 @@ class CollectionController extends OCSController {
 	 * @return DataResponse
 	 * @throws OCSException
 	 */
+	#[NoAdminRequired]
 	public function indexDocument(string $collection, string $providerId, string $documentId): DataResponse {
 		try {
 			$this->collectionService->confirmCollection($collection);
@@ -103,8 +100,6 @@ class CollectionController extends OCSController {
 
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param string $collection
 	 * @param string $providerId
 	 * @param string $documentId
@@ -112,6 +107,7 @@ class CollectionController extends OCSController {
 	 * @return DataResponse
 	 * @throws OCSException
 	 */
+	#[NoAdminRequired]
 	public function updateStatusDone(
 		string $collection,
 		string $providerId,

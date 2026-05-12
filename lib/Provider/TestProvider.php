@@ -11,8 +11,6 @@ namespace OCA\FullTextSearch\Provider;
 
 use OC\FullTextSearch\Model\IndexDocument;
 use OC\FullTextSearch\Model\SearchTemplate;
-use OCA\FullTextSearch\Model\IndexOptions;
-use OCA\FullTextSearch\Model\Runner;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\TestService;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
@@ -34,8 +32,7 @@ use OCP\FullTextSearch\Model\ISearchTemplate;
 class TestProvider implements IFullTextSearchProvider {
 	const TEST_PROVIDER_ID = 'test_provider';
 
-	private IRunner $runner;
-	private IndexOptions $indexOptions;
+	private IIndexOptions $indexOptions;
 
 
 	/**
@@ -76,7 +73,6 @@ class TestProvider implements IFullTextSearchProvider {
 
 
 	public function setRunner(IRunner $runner) {
-		$this->runner = $runner;
 	}
 
 
@@ -183,10 +179,8 @@ class TestProvider implements IFullTextSearchProvider {
 
 	/**
 	 * before a search, improve the request
-	 *
-	 * @param ISearchRequest $request
 	 */
-	public function improveSearchRequest(ISearchRequest $request) {
+	public function improveSearchRequest(ISearchRequest $searchRequest) {
 	}
 
 

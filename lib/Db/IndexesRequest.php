@@ -87,7 +87,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	/**
 	 *
 	 */
-	public function resetAllErrors() {
+	public function resetAllErrors(): void {
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('message', $qb->createNamedParameter(json_encode([])));
 		$qb->set('err', $qb->createNamedParameter(0));
@@ -169,7 +169,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param string $documentId
 	 * @param int $status
 	 */
-	public function updateStatus(string $collection, string $providerId, string $documentId, int $status) {
+	public function updateStatus(string $collection, string $providerId, string $documentId, int $status): void {
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('status', $qb->createNamedParameter($status));
 
@@ -195,7 +195,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 * @param array $indexes
 	 * @param int $status
 	 */
-	public function updateStatuses(string $collection, string $providerId, array $indexes, int $status) {
+	public function updateStatuses(string $collection, string $providerId, array $indexes, int $status): void {
 		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesUpdateSql();
@@ -217,13 +217,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 	}
 
-	/**
-	 * @param string $collection
-	 * @param string $providerId
-	 * @param array $indexes
-	 * @param int $status
-	 */
-	public function resetCollection(string $collection) {
+	public function resetCollection(string $collection): void {
 		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesUpdateSql();
@@ -236,7 +230,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	/**
 	 * @param IIndex $index
 	 */
-	public function deleteIndex(IIndex $index) {
+	public function deleteIndex(IIndex $index): void {
 		$qb = $this->getIndexesDeleteSql();
 		$this->limitToProviderId($qb, $index->getProviderId());
 		$this->limitToDocumentId($qb, $index->getDocumentId());
@@ -247,7 +241,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 		} catch (Exception $e) {
 			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
 				$this->reconnect($e);
-				return $this->deleteIndex($index);
+				$this->deleteIndex($index);
 			}
 			throw $e;
 		}

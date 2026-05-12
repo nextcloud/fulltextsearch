@@ -39,7 +39,7 @@ class SettingsService {
 	 *
 	 * @throws Exception
 	 */
-	public function completeSettings(array &$data) {
+	public function completeSettings(array &$data): void {
 		$data = array_merge(
 			$data, [
 					 'platforms_all' => $this->completeSettingsPlatforms(),

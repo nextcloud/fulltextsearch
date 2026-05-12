@@ -93,7 +93,7 @@ class Index extends TimedJob {
 			} catch (PlatformTemporaryException $e) {
 				$this->logger->warning('platform seems down. we will update index next cron tick');
 				return;
-			} catch (Throwable|Exception $e) {
+			} catch (Throwable $e) {
 				$this->runner->exception(get_class($e) . ' - ' . $e->getMessage(), false);
 				$this->logger->notice(
 					'exception encountered while running fulltextsearch/lib/Cron/Index.php',

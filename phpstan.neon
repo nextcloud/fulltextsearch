@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+parameters:
+	level: 4
+	phpVersion:
+		min: 80100
+		max: 80400
+	paths:
+		- lib
+		- templates
+		- tests
+	excludePaths:
+		- tests/stubs
+	scanDirectories:
+		- vendor-bin/phpstan/vendor/nextcloud/ocp
+	scanFiles:
+		- tests/stubs/oc_fulltextsearch_fulltextsearchmanager.stub
+		- tests/stubs/oc_fulltextsearch_mode_documentaccess.stub
+		- tests/stubs/oc_fulltextsearch_mode_indexdocument.stub
+		- tests/stubs/oc_fulltextsearch_mode_searchtemplate.stub
+		- tests/stubs/oc_core_command_base.php
+		- tests/stubs/oc_core_interruptedexception.stub
+		- tests/stubs/oc_user_nouserexception.stub
+		- tests/stubs/oc_forbiddenexception.stub
+		- tests/stubs/oc_db_connectionadapter.php
+		- tests/stubs/oca_circles_circlesmanager.php
+		- tests/stubs/oca_circles_model_circle.php
+		- tests/stubs/doctrine_dbal_types_type.php
+		- tests/stubs/doctrine_dbal_arrayparametertype.php
+		- tests/stubs/doctrine_dbal_schema_abstractasset.php
+		- tests/stubs/doctrine_dbal_schema_column.php
+		- tests/stubs/doctrine_dbal_schema_schema.php
+		- tests/stubs/doctrine_dbal_schema_table.php
+		- tests/stubs/doctrine_dbal_query_querybuilder.php
+		- tests/stubs/doctrine_dbal_connection.php
+		- tests/stubs/stecman_component_symfony_console_bashcompletion_completion_completionawareinterface.php
+		- tests/stubs/symfony_component_console_command_command.php
+		- tests/stubs/symfony_component_console_exception_invalidargumentexception.php
+		- tests/stubs/symfony_component_console_helper_questionhelper.php
+		- tests/stubs/symfony_component_console_helper_table.php
+		- tests/stubs/symfony_component_console_input_inputargument.php
+		- tests/stubs/symfony_component_console_input_inputinterface.php
+		- tests/stubs/symfony_component_console_input_inputoption.php
+		- tests/stubs/symfony_component_console_output_outputinterface.php
+		- tests/stubs/symfony_component_console_question_confirmationquestion.php
+		- tests/stubs/symfony_component_console_question_question.php
+		- tests/stubs/symfony_component_console_helper_progressbar.php
+		- tests/stubs/symfony_component_console_helper_helperinterface.php
+		- tests/stubs/symfony_component_console_terminal.php
+		- tests/stubs/symfony_component_console_formatter_outputformatterstyle_interface.php
+		- tests/stubs/symfony_component_console_formatter_outputformatterstyle.php
+		- tests/stubs/symfony_component_console_formatter_outputformatterinterface.php
+
