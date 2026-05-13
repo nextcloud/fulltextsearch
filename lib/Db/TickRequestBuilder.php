@@ -21,14 +21,8 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
  */
 class TickRequestBuilder extends CoreRequestBuilder {
 
-
-	use TArrayTools;
-
-
 	/**
 	 * Base of the Sql Insert request
-	 *
-	 * @return IQueryBuilder
 	 */
 	protected function getTickInsertSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
@@ -52,14 +46,13 @@ class TickRequestBuilder extends CoreRequestBuilder {
 
 
 	/**
-	 * Base of the Sql Select request for Shares
+	 * Base of the Sql Select request for ticks
 	 *
 	 * @return IQueryBuilder
 	 */
 	protected function getTickSelectSql(): IQueryBuilder {
 		$qb = $this->dbConnection->getQueryBuilder();
 
-		/** @noinspection PhpMethodParametersCountMismatchInspection */
 		$qb->select(
 			't.id', 't.source', 't.data', 't.first_tick', 't.tick', 't.status', 't.action'
 		)
@@ -70,34 +63,14 @@ class TickRequestBuilder extends CoreRequestBuilder {
 		return $qb;
 	}
 
-
-	/**
-	 * Base of the Sql Delete request
-	 *
-	 * @return IQueryBuilder
-	 */
-	protected function getTickDeleteSql(): IQueryBuilder {
-		$qb = $this->dbConnection->getQueryBuilder();
-		$qb->delete(self::TABLE_TICKS);
-
-		return $qb;
-	}
-
-
-	/**
-	 * @param array $data
-	 *
-	 * @return Tick
-	 */
 	protected function parseTickSelectSql(array $data): Tick {
-		$tick = new Tick($this->get('source', $data, ''), $this->getInt('id', $data, 0));
-		$tick->setData($this->getArray('data', $data, []))
-			 ->setTick($this->getInt('tick', $data, 0))
-			 ->setFirstTick($this->getInt('first_tick', $data, 0))
-			 ->setStatus($this->get('status', $data, ''))
-			 ->setAction($this->get('action', $data, ''));
+		$tick = new Tick($data['t.source'], (int)$data['t.id']);
+		$tick->setData(json_decode($data['t.data'], flags: JSON_THROW_ON_ERROR))
+			 ->setTick((int)$data['t.tick'])
+			 ->setFirstTick((int)$data['t.first_tick'])
+			 ->setStatus($data['t.status'])
+			 ->setAction($data['t.action']);
 
 		return $tick;
 	}
-
 }
