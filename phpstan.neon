@@ -11,9 +11,12 @@ parameters:
 		- tests
 	excludePaths:
 		- tests/stubs
+		- tests/bootstrap.php
 	scanDirectories:
 		- vendor-bin/phpstan/vendor/nextcloud/ocp
+		- vendor-bin/phpunit/vendor/phpunit/phpunit
 	scanFiles:
+		- tests/stubs/test_testcase.php
 		- tests/stubs/oc_fulltextsearch_fulltextsearchmanager.stub
 		- tests/stubs/oc_fulltextsearch_mode_documentaccess.stub
 		- tests/stubs/oc_fulltextsearch_mode_indexdocument.stub
