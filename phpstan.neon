@@ -31,7 +31,6 @@ parameters:
 		- tests/stubs/doctrine_dbal_schema_column.php
 		- tests/stubs/doctrine_dbal_schema_schema.php
 		- tests/stubs/doctrine_dbal_schema_table.php
-		- tests/stubs/doctrine_dbal_query_querybuilder.php
 		- tests/stubs/doctrine_dbal_connection.php
 		- tests/stubs/stecman_component_symfony_console_bashcompletion_completion_completionawareinterface.php
 		- tests/stubs/symfony_component_console_command_command.php

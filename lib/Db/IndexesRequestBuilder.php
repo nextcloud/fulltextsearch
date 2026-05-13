@@ -20,10 +20,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
  * @package OCA\FullTextSearch\Db
  */
 class IndexesRequestBuilder extends CoreRequestBuilder {
-
-
 	use TArrayTools;
-
 
 	/**
 	 * Base of the Sql Insert request
@@ -105,6 +102,5 @@ class IndexesRequestBuilder extends CoreRequestBuilder {
 
 		return $index;
 	}
-
 }
 

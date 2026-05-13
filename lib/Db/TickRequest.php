@@ -65,11 +65,10 @@ class TickRequest extends TickRequestBuilder {
 
 		$qb = $this->getTickUpdateSql();
 		$qb->set('data', $qb->createNamedParameter(json_encode($tick->getData())))
-		   ->set('tick', $qb->createNamedParameter($tick->getTick()))
-		   ->set('action', $qb->createNamedParameter($tick->getAction()))
-		   ->set('status', $qb->createNamedParameter($tick->getStatus()));
-
-		$this->limitToId($qb, $tick->getId());
+			->set('tick', $qb->createNamedParameter($tick->getTick()))
+			->set('action', $qb->createNamedParameter($tick->getAction()))
+			->set('status', $qb->createNamedParameter($tick->getStatus()))
+			->andWhere($qb->expr()->eq('id', $qb->createNamedParameter($tick->getId())));
 
 		try {
 			$qb->executeStatement();
@@ -94,7 +93,7 @@ class TickRequest extends TickRequestBuilder {
 	 */
 	public function getTickById(int $id): Tick {
 		$qb = $this->getTickSelectSql();
-		$this->limitToId($qb, $id);
+		$qb->andWhere($qb->expr()->eq('t.id', $qb->createNamedParameter($id)));
 
 		try {
 			$cursor = $qb->executeQuery();
@@ -127,7 +126,7 @@ class TickRequest extends TickRequestBuilder {
 		$ticks = [];
 
 		$qb = $this->getTickSelectSql();
-		$this->limitToStatus($qb, $status);
+		$qb->andWhere($qb->expr()->eq('t.status', $qb->createNamedParameter($status)));
 
 		try {
 			$cursor = $qb->executeQuery();

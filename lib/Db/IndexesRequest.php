@@ -72,12 +72,11 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 
 		$qb = $this->getIndexesUpdateSql();
-		$qb->set('message', $qb->createNamedParameter(json_encode([])));
-		$qb->set('err', $qb->createNamedParameter(0));
-
-		$this->limitToProviderId($qb, $index->getProviderId());
-		$this->limitToDocumentId($qb, $index->getDocumentId());
-		$this->limitToCollection($qb, $index->getCollection());
+		$qb->set('message', $qb->createNamedParameter(json_encode([])))
+			->set('err', $qb->createNamedParameter(0))
+			->where($qb->expr()->eq('provider_id', $qb->createNamedParameter($index->getProviderId())))
+			->andWhere($qb->expr()->eq('document_id', $qb->createNamedParameter($index->getDocumentId())))
+			->andWhere($qb->expr()->eq('collection', $qb->createNamedParameter($index->getCollection())));
 		$qb->executeStatement();
 
 		return true;
@@ -101,7 +100,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 */
 	public function getErrorIndexes(): array {
 		$qb = $this->getIndexesSelectSql();
-		$this->limitToErr($qb);
+		$qb->andWhere($qb->expr()->gte('err', $qb->createNamedParameter(1)));
 
 		$indexes = [];
 		try {
@@ -147,9 +146,9 @@ class IndexesRequest extends IndexesRequestBuilder {
 			$qb->set('err', $qb->createNamedParameter($index->getErrorCount()));
 		}
 
-		$this->limitToProviderId($qb, $index->getProviderId());
-		$this->limitToDocumentId($qb, $index->getDocumentId());
-		$this->limitToCollection($qb, $index->getCollection());
+		$qb->where($qb->expr()->eq('provider_id', $qb->createNamedParameter($index->getProviderId())))
+			->andWhere($qb->expr()->eq('document_id', $qb->createNamedParameter($index->getDocumentId())))
+			->andWhere($qb->expr()->eq('collection', $qb->createNamedParameter($index->getCollection())));
 
 		try {
 			$qb->executeStatement();
@@ -173,9 +172,9 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('status', $qb->createNamedParameter($status));
 
-		$this->limitToProviderId($qb, $providerId);
-		$this->limitToDocumentId($qb, $documentId);
-		$this->limitToCollection($qb, $collection);
+		$qb->where($qb->expr()->eq('provider_id', $qb->createNamedParameter($providerId)))
+			->andWhere($qb->expr()->eq('document_id', $qb->createNamedParameter($documentId)))
+			->andWhere($qb->expr()->eq('collection', $qb->createNamedParameter($collection)));
 
 		try {
 			$qb->executeStatement();
@@ -189,40 +188,13 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 	}
 
-	/**
-	 * @param string $collection
-	 * @param string $providerId
-	 * @param array $indexes
-	 * @param int $status
-	 */
-	public function updateStatuses(string $collection, string $providerId, array $indexes, int $status): void {
-		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
-
-		$qb = $this->getIndexesUpdateSql();
-		$qb->set('status', $qb->createNamedParameter($status));
-
-		$this->limitToProviderId($qb, $providerId);
-		$this->limitToDocumentIds($qb, $indexes);
-		$this->limitToCollection($qb, $collection);
-
-		try {
-			$qb->executeStatement();
-		} catch (Exception $e) {
-			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
-				$this->reconnect($e);
-				$this->updateStatuses($collection, $providerId, $indexes, $status);
-				return;
-			}
-			throw $e;
-		}
-	}
-
 	public function resetCollection(string $collection): void {
 		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesUpdateSql();
-		$qb->set('status', $qb->createNamedParameter(IIndex::INDEX_FULL));
-		$this->limitToCollection($qb, $collection);
+		$qb->set('status', $qb->createNamedParameter(IIndex::INDEX_FULL))
+			->where($qb->expr()->eq('document_id', $qb->createNamedParameter($collection)))
+			->andWhere($qb->expr()->eq('collection', $qb->createNamedParameter($collection)));
 
 		$qb->executeStatement();
 	}
@@ -232,9 +204,9 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 */
 	public function deleteIndex(IIndex $index): void {
 		$qb = $this->getIndexesDeleteSql();
-		$this->limitToProviderId($qb, $index->getProviderId());
-		$this->limitToDocumentId($qb, $index->getDocumentId());
-		$this->limitToCollection($qb, $index->getCollection());
+		$qb->where($qb->expr()->eq('provider_id', $qb->createNamedParameter($index->getProviderId())))
+			->andWhere($qb->expr()->eq('document_id', $qb->createNamedParameter($index->getDocumentId())))
+			->andWhere($qb->expr()->eq('collection', $qb->createNamedParameter($index->getCollection())));
 
 		try {
 			$qb->executeStatement();
@@ -253,30 +225,22 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 */
 	public function deleteCollection(string $collection): void {
 		$qb = $this->getIndexesDeleteSql();
-		$this->limitToCollection($qb, $collection);
+		$qb->where($qb->expr()->eq('collection', $qb->createNamedParameter($collection)));
 
 		$qb->executeStatement();
 	}
 
-
-	/**
-	 * @param string $providerId
-	 */
-	public function deleteFromProviderId(string $providerId, string $collection = '') {
+	public function deleteFromProviderId(string $providerId): void {
 		$qb = $this->getIndexesDeleteSql();
-		$this->limitToProviderId($qb, $providerId);
+		$qb->where($qb->expr()->eq('provider_id', $qb->createNamedParameter($providerId)));
 
 		$qb->executeStatement();
 	}
 
-
-	/**
-	 *
-	 */
 	public function reset(string $collection = ''): void {
 		$qb = $this->getIndexesDeleteSql();
 		if ($collection !== '') {
-			$this->limitToCollection($qb, $collection);
+			$qb->where($qb->expr()->eq('collection', $qb->createNamedParameter($collection)));
 		}
 
 		$qb->executeStatement();
@@ -296,9 +260,9 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesSelectSql();
-		$this->limitToProviderId($qb, $providerId);
-		$this->limitToDocumentId($qb, $documentId);
-		$this->limitToCollection($qb, $collection);
+		$qb->where($qb->expr()->eq('li.provider_id', $qb->createNamedParameter($providerId)))
+			->andWhere($qb->expr()->eq('li.document_id', $qb->createNamedParameter($documentId)))
+			->andWhere($qb->expr()->eq('li.collection', $qb->createNamedParameter($collection)));
 
 		try {
 			$cursor = $qb->executeQuery();
@@ -331,8 +295,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 	 */
 	public function getIndexes(string $providerId, string $documentId): array {
 		$qb = $this->getIndexesSelectSql();
-		$this->limitToProviderId($qb, $providerId);
-		$this->limitToDocumentId($qb, $documentId);
+		$qb->where($qb->expr()->eq('li.provider_id', $qb->createNamedParameter($providerId)))
+			->andWhere($qb->expr()->eq('li.document_id', $qb->createNamedParameter($documentId)));
 
 		$indexes = [];
 		try {
@@ -363,12 +327,12 @@ class IndexesRequest extends IndexesRequestBuilder {
 		$collection = ($collection === '') ? $this->configService->getInternalCollection() : $collection;
 
 		$qb = $this->getIndexesSelectSql();
-		$this->limitToQueuedIndexes($qb);
+		$qb->andWhere($qb->expr()->neq('li.status', $qb->createNamedParameter(Index::INDEX_OK)));
 		if ($all === false) {
-			$this->limitToNoErr($qb);
+			$qb->andWhere($qb->expr()->eq('err', $qb->createNamedParameter(0)));
 		}
+		$qb->andWhere($qb->expr()->eq('li.collection', $qb->createNamedParameter($collection)));
 
-		$this->limitToCollection($qb, $collection);
 		if ($length > 0) {
 			$qb->setMaxResults($length);
 		}
@@ -391,39 +355,6 @@ class IndexesRequest extends IndexesRequestBuilder {
 
 		return $indexes;
 	}
-
-
-	/**
-	 * return list of last indexes from a providerId.
-	 *
-	 * @param string $providerId
-	 *
-	 * @return Index[]
-	 */
-	public function getIndexesFromProvider(string $providerId): array {
-		$qb = $this->getIndexesSelectSql();
-		$this->limitToProviderId($qb, $providerId);
-
-		$indexes = [];
-		try {
-			$cursor = $qb->executeQuery();
-		} catch (Exception $e) {
-			if ($e->getReason() === Exception::REASON_CONNECTION_LOST) {
-				$this->reconnect($e);
-				return $this->getIndexesFromProvider($providerId);
-			}
-			throw $e;
-		}
-
-		while ($data = $cursor->fetch()) {
-			$index = $this->parseIndexesSelectSql($data);
-			$indexes[$index->getDocumentId()] = $index;
-		}
-		$cursor->closeCursor();
-
-		return $indexes;
-	}
-
 
 	/**
 	 * @return string[]
