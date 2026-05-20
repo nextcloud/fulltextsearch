@@ -22,10 +22,6 @@ use OCP\Server;
 use Psr\Log\LoggerInterface;
 
 class CoreRequestBuilder {
-	const TABLE_INDEXES = 'fulltextsearch_index';
-	const TABLE_TICKS = 'fulltextsearch_ticks';
-
-	protected string $defaultSelectAlias;
 	private int $lastReconnect = 0;
 
 	public function __construct(

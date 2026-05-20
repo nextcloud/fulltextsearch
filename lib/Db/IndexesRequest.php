@@ -21,7 +21,8 @@ use OCP\FullTextSearch\Model\IIndex;
  *
  * @package OCA\FullTextSearch\Db
  */
-class IndexesRequest extends IndexesRequestBuilder {
+class IndexesRequest extends CoreRequestBuilder {
+	const TABLE_INDEXES = 'fulltextsearch_index';
 
 	/**
 	 * @param Index $index
@@ -33,7 +34,8 @@ class IndexesRequest extends IndexesRequestBuilder {
 			$index->setCollection($this->configService->getInternalCollection());
 		}
 
-		$qb = $this->getIndexesInsertSql();
+		$qb = $this->dbConnection->getQueryBuilder();
+		$qb->insert(self::TABLE_INDEXES);
 		$qb->setValue('owner_id', $qb->createNamedParameter($index->getOwnerId()))
 		   ->setValue('provider_id', $qb->createNamedParameter($index->getProviderId()))
 		   ->setValue('collection', $qb->createNamedParameter($index->getCollection()))
@@ -382,7 +384,7 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 
 		while ($data = $cursor->fetch()) {
-			$collections[] = $this->get('collection', $data);
+			$collections[] = $data['collection'];
 		}
 		$cursor->closeCursor();
 
@@ -391,5 +393,52 @@ class IndexesRequest extends IndexesRequestBuilder {
 		}
 
 		return array_merge([$internal], $collections);
+	}
+
+	private function getIndexesUpdateSql(): IQueryBuilder {
+		$qb = $this->dbConnection->getQueryBuilder();
+        $qb->update(self::TABLE_INDEXES);
+
+        return $qb;
+	}
+
+	private function getIndexesDeleteSql(): IQueryBuilder {
+		$qb = $this->dbConnection->getQueryBuilder();
+		$qb->delete(self::TABLE_INDEXES);
+
+        return $qb;
+	}
+
+
+	/**
+	 * Base of the Sql Select request for Shares
+	 *
+	 * @return IQueryBuilder
+	 */
+	private function getIndexesSelectSql(): IQueryBuilder {
+		$qb = $this->dbConnection->getQueryBuilder();
+
+		$qb->select(
+			'li.owner_id', 'li.provider_id', 'li.document_id', 'li.collection', 'li.source',
+			'li.status', 'li.options', 'li.err', 'li.message', 'li.indexed'
+		)
+		   ->from(self::TABLE_INDEXES, 'li');
+
+		return $qb;
+	}
+
+	private function parseIndexesSelectSql(array $data): Index {
+		$index = new Index((string)$data['provider_id'], (string)$data['document_id']);
+
+		$index->setStatus((int)$data['status'])
+			->setSource($data['source'] ?? '')
+			->setOwnerId($data['owner_id'] ?? '')
+			->setLastIndex((int)$data['indexed']);
+		$index->setCollection($data['collection']);
+		$index->setOptions(json_decode($data['options'] ?? [], true, JSON_THROW_ON_ERROR));
+		$index->setErrorCount((int)$data['err']);
+		$index->setErrors(json_decode($data['message'] ?? [], true, JSON_THROW_ON_ERROR));
+
+		return $index;
 	}
 }
