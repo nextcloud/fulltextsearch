@@ -555,7 +555,7 @@ class IndexService implements IIndexService {
 //			$provider->onResettingIndex($platform);
 
 		$platform->resetIndex($provider->getId());
-		$this->indexesRequest->deleteFromProviderId($provider->getId(), $collection);
+		$this->indexesRequest->deleteFromProviderId($provider->getId());
 	}
 
 

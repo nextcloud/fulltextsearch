@@ -21,6 +21,8 @@
     "post-install-cmd": [
       "@composer bin all install --ansi"
     ],
+    "test:unit": "phpunit -c tests/phpunit.xml",
+	"test:unit:coverage": "XDEBUG_MODE=coverage phpunit -c tests/phpunit.xml",
     "phpstan": "phpstan analyse -c phpstan.neon"
   },
   "autoload": {
