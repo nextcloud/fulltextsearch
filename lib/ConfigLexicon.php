@@ -26,6 +26,8 @@ class ConfigLexicon implements ILexicon {
 	public const COLLECTION_INDEXING_LIST = 'collection_indexing_list';
 	public const COLLECTION_INTERNAL = 'collection_internal';
 	public const COLLECTION_LINKS = 'collection_links';
+	public const LOCK_ID = 'lock_id';
+	public const LOCK_PING = 'lock_ping';
 
 	public function getStrictness(): Strictness {
 		return Strictness::NOTICE;
@@ -40,6 +42,9 @@ class ConfigLexicon implements ILexicon {
 			new Entry(key: self::COLLECTION_INDEXING_LIST, type: ValueType::INT, defaultRaw: 50, definition: 'size of chunks of async documents on collection queue request'),
 			new Entry(key: self::COLLECTION_INTERNAL, type: ValueType::STRING, defaultRaw: 'local', definition: 'name of the local collection'),
 			new Entry(key: self::COLLECTION_LINKS, type: ValueType::ARRAY, defaultRaw: [], definition: '(internal) data relative to collections'),
+			// IAppConfig::FLAG_INTERNAL)
+			new Entry(key: self::LOCK_ID, type: ValueType::STRING, defaultRaw: '', definition: 'internal lock id', lazy: true),
+			new Entry(key: self::LOCK_PING, type: ValueType::INT, defaultRaw: 0, definition: 'internal lock time', lazy: true),
 		];
 	}
 
