@@ -250,14 +250,7 @@ class Tick {
 		return $this->getInt($info, $this->data, $default);
 	}
 
-	/**
-	 * @param string $info
-	 * @param float $default
-	 *
-	 * @return float
-	 */
 	public function getInfoFloat(string $info, float $default = 0): float {
-		return $this->getFloat($info, $this->data, $default);
+		return $this->data[$info] ?? $default;
 	}
-
 }

@@ -142,6 +142,7 @@ class TickServiceTest extends TestCase {
 		$tick->setInfo('label', 'hello');
 		$tick->setInfoInt('count', 7);
 		$tick->setInfoFloat('ratio', 0.5);
+		$this->assertEqualsWithDelta(0.5, $tick->getInfoFloat('ratio'), 0.001);
 
 		$id = $this->tickService->create($tick);
 		$this->createdIds[] = $id;

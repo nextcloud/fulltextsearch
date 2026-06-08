@@ -122,11 +122,11 @@ class TickService {
 
 	protected function parseTickSelectSql(array $data): Tick {
 		$tick = new Tick($data['source'], (int)$data['id']);
-		$tick->setData(json_decode($data['data'], true, JSON_THROW_ON_ERROR))
+		$tick->setData(json_decode($data['data'], true, flags: JSON_THROW_ON_ERROR))
 			->setTick((int)$data['tick'])
 			->setFirstTick((int)$data['first_tick'])
 			->setStatus($data['status'])
-			->setAction($data['action']);
+			->setAction((string)$data['action']);
 
 		return $tick;
 	}
