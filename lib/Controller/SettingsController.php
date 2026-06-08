@@ -8,7 +8,6 @@ declare(strict_types=1);
  */
 namespace OCA\FullTextSearch\Controller;
 
-use Exception;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\SettingsService;

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -7,7 +8,6 @@ declare(strict_types=1);
  */
 
 namespace OCA\FullTextSearch\Model;
-
 
 use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 
@@ -261,4 +261,3 @@ class Tick {
 	}
 
 }
-

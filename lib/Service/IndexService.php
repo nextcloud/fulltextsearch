@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -8,9 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use Exception;
-use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\NotIndexableDocumentException;
 use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
@@ -25,7 +24,6 @@ use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IIndexOptions;
 use OCP\FullTextSearch\Model\IRunner;
 use OCP\FullTextSearch\Service\IIndexService;
-
 
 /**
  * Class IndexService
@@ -42,9 +40,9 @@ class IndexService implements IIndexService {
 	 * IndexService constructor.
 	 */
 	public function __construct(
-		private IndexesRequest $indexesRequest,
+		private IndexesService $indexesService,
 		private ProviderService $providerService,
-		private PlatformService $platformService
+		private PlatformService $platformService,
 	) {
 	}
 
@@ -77,7 +75,7 @@ class IndexService implements IIndexService {
 	 * @param int $color
 	 */
 	private function updateRunnerInfo(
-		string $info, string $value, int $color = IRunner::RESULT_TYPE_SUCCESS
+		string $info, string $value, int $color = IRunner::RESULT_TYPE_SUCCESS,
 	) {
 		if ($this->runner === null) {
 			return;
@@ -108,7 +106,7 @@ class IndexService implements IIndexService {
 	 */
 	public function indexProviderContentFromUser(
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, string $userId,
-		IndexOptions $options
+		IndexOptions $options,
 	) {
 		$this->updateRunnerAction('generateIndex' . $provider->getName());
 		$this->updateRunnerInfoArray(
@@ -164,7 +162,7 @@ class IndexService implements IIndexService {
 		IFullTextSearchProvider $provider,
 		string $collection,
 		array $documents,
-		IIndexOptions $options
+		IIndexOptions $options,
 	): array {
 
 		$result = [];
@@ -177,7 +175,7 @@ class IndexService implements IIndexService {
 			$count++;
 
 			try {
-				$index = $this->indexesRequest->getIndex(
+				$index = $this->indexesService->getIndex(
 					$document->getProviderId(),
 					$document->getId(),
 					$collection
@@ -220,7 +218,7 @@ class IndexService implements IIndexService {
 	 */
 	private function isDocumentUpToDate(
 		IFullTextSearchProvider $provider,
-		IIndexDocument $document
+		IIndexDocument $document,
 	): bool {
 		$index = $document->getIndex();
 		if (!$index->isStatus(Index::INDEX_OK)) {
@@ -245,7 +243,7 @@ class IndexService implements IIndexService {
 	 */
 	private function indexDocuments(
 		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, array $documents,
-		IndexOptions $options
+		IndexOptions $options,
 	) {
 		while ($document = array_shift($documents)) {
 			try {
@@ -315,7 +313,7 @@ class IndexService implements IIndexService {
 	 * @return IIndex
 	 * @throws Exception
 	 */
-	public function indexDocument(IFullTextSearchPlatform $platform, IIndexDocument $document
+	public function indexDocument(IFullTextSearchPlatform $platform, IIndexDocument $document,
 	): IIndex {
 		$this->updateRunnerAction('indexDocument', true);
 		$this->updateRunnerInfoArray(
@@ -345,7 +343,7 @@ class IndexService implements IIndexService {
 	 * @throws Exception
 	 */
 	public function updateDocument(
-		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, Index $index
+		IFullTextSearchPlatform $platform, IFullTextSearchProvider $provider, Index $index,
 	) {
 		$document = null;
 		$this->updateRunnerInfoArray(
@@ -372,7 +370,7 @@ class IndexService implements IIndexService {
 
 		if ($document === null) {
 			$platform->deleteIndexes([$index]);
-			$this->indexesRequest->deleteIndex($index);
+			$this->indexesService->deleteIndex($index);
 
 			return;
 		}
@@ -387,7 +385,7 @@ class IndexService implements IIndexService {
 		);
 
 		$document->getIndex()
-				 ->resetErrors();
+			->resetErrors();
 		$index = $platform->indexDocument($document);
 		$this->updateIndex($index);
 	}
@@ -411,12 +409,12 @@ class IndexService implements IIndexService {
 		/** @var Index $index */
 		if ($index->isStatus(IIndex::INDEX_REMOVE)) {
 			if ($index->isStatus(IIndex::INDEX_DONE)) {
-				$this->indexesRequest->deleteIndex($index);
+				$this->indexesService->deleteIndex($index);
 
 				return;
 			}
 
-			$this->indexesRequest->update($index);
+			$this->indexesService->update($index);
 
 			return;
 		}
@@ -426,10 +424,10 @@ class IndexService implements IIndexService {
 		}
 
 		try {
-			$this->indexesRequest->getIndex($index->getProviderId(), $index->getDocumentId(), $index->getCollection());
-			$this->indexesRequest->update($index);
+			$this->indexesService->getIndex($index->getProviderId(), $index->getDocumentId(), $index->getCollection());
+			$this->indexesService->update($index);
 		} catch (IndexDoesNotExistException $e) {
-			$this->indexesRequest->create($index);
+			$this->indexesService->create($index);
 		}
 	}
 
@@ -445,9 +443,9 @@ class IndexService implements IIndexService {
 		string $providerId,
 		string $documentId,
 		int $status,
-		bool $reset = false
+		bool $reset = false,
 	) {
-		$indexes = $this->indexesRequest->getIndexes($providerId, $documentId);
+		$indexes = $this->indexesService->getIndexes($providerId, $documentId);
 		foreach ($indexes as $index) {
 			$index->setStatus($status);
 			$this->updateIndex($index);
@@ -465,7 +463,7 @@ class IndexService implements IIndexService {
 		string $providerId,
 		array $documentIds,
 		int $status,
-		bool $reset = false
+		bool $reset = false,
 	) {
 		foreach ($documentIds as $documentId) {
 			try {
@@ -480,7 +478,7 @@ class IndexService implements IIndexService {
 	 * @param Index $index
 	 */
 	public function resetErrorFromIndex(Index $index) {
-		if (!$this->indexesRequest->resetError($index)) {
+		if (!$this->indexesService->resetError($index)) {
 			$this->queuedDeleteIndex[] = $index;
 		}
 	}
@@ -491,7 +489,7 @@ class IndexService implements IIndexService {
 	 */
 	private function resetErrorFromQueue() {
 		foreach ($this->queuedDeleteIndex as $index) {
-			$this->indexesRequest->resetError($index);
+			$this->indexesService->resetError($index);
 		}
 	}
 
@@ -499,7 +497,7 @@ class IndexService implements IIndexService {
 	 *
 	 */
 	public function resetErrorsAll() {
-		$this->indexesRequest->resetAllErrors();
+		$this->indexesService->resetAllErrors();
 	}
 
 
@@ -507,7 +505,7 @@ class IndexService implements IIndexService {
 	 * @return Index[]
 	 */
 	public function getErrorIndexes(): array {
-		return $this->indexesRequest->getErrorIndexes();
+		return $this->indexesService->getErrorIndexes();
 	}
 
 
@@ -518,7 +516,7 @@ class IndexService implements IIndexService {
 	 * @return Index[]
 	 */
 	public function getIndexes(string $providerId, string $documentId): array {
-		return $this->indexesRequest->getIndexes($providerId, $documentId);
+		return $this->indexesService->getIndexes($providerId, $documentId);
 	}
 
 
@@ -530,7 +528,7 @@ class IndexService implements IIndexService {
 	 * @return Index[]
 	 */
 	public function getQueuedIndexes(string $collection = '', bool $all = false, int $length = -1): array {
-		return $this->indexesRequest->getQueuedIndexes($collection, $all, $length);
+		return $this->indexesService->getQueuedIndexes($collection, $all, $length);
 	}
 
 
@@ -545,17 +543,17 @@ class IndexService implements IIndexService {
 		$platform = $wrapper->getPlatform();
 		if ($providerId === '') {
 			$platform->resetIndex('all');
-			$this->indexesRequest->reset($collection);
+			$this->indexesService->reset($collection);
 
 			return;
 		}
 
 		$providerWrapper = $this->providerService->getProvider($providerId);
 		$provider = $providerWrapper->getProvider();
-//			$provider->onResettingIndex($platform);
+		//			$provider->onResettingIndex($platform);
 
 		$platform->resetIndex($provider->getId());
-		$this->indexesRequest->deleteFromProviderId($provider->getId());
+		$this->indexesService->deleteFromProviderId($provider->getId());
 	}
 
 
@@ -567,7 +565,7 @@ class IndexService implements IIndexService {
 	 * @throws IndexDoesNotExistException
 	 */
 	public function getIndex(string $providerId, string $documentId, string $collection = ''): IIndex {
-		return $this->indexesRequest->getIndex($providerId, $documentId, $collection);
+		return $this->indexesService->getIndex($providerId, $documentId, $collection);
 	}
 
 
@@ -584,19 +582,19 @@ class IndexService implements IIndexService {
 		string $providerId,
 		string $documentId,
 		string $userId,
-		int $status
+		int $status,
 	): IIndex {
 		$index = null;
-		foreach ($this->indexesRequest->getCollections() as $collection) {
+		foreach ($this->indexesService->getCollections() as $collection) {
 			try {
-				$index = $this->indexesRequest->getIndex($providerId, $documentId, $collection);
+				$index = $this->indexesService->getIndex($providerId, $documentId, $collection);
 				$index->setStatus($status, true);
-				$this->indexesRequest->update($index, true);
+				$this->indexesService->update($index, true);
 			} catch (IndexDoesNotExistException $e) {
 				$index = new Index($providerId, $documentId, $collection);
 				$index->setOwnerId($userId);
 				$index->setStatus($status);
-				$this->indexesRequest->create($index);
+				$this->indexesService->create($index);
 			}
 		}
 

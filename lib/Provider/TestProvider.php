@@ -23,14 +23,13 @@ use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchResult;
 use OCP\FullTextSearch\Model\ISearchTemplate;
 
-
 /**
  * Class TestProvider
  *
  * @package OCA\FullTextSearch\Provider
  */
 class TestProvider implements IFullTextSearchProvider {
-	const TEST_PROVIDER_ID = 'test_provider';
+	public const TEST_PROVIDER_ID = 'test_provider';
 
 	private IIndexOptions $indexOptions;
 
@@ -43,7 +42,7 @@ class TestProvider implements IFullTextSearchProvider {
 	 */
 	public function __construct(
 		private ConfigService $configService,
-		private TestService $testService
+		private TestService $testService,
 	) {
 	}
 
@@ -193,4 +192,3 @@ class TestProvider implements IFullTextSearchProvider {
 	}
 
 }
-

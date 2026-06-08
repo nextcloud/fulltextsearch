@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -8,9 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Model;
 
-
 use OCP\FullTextSearch\IFullTextSearchPlatform;
-
 
 /**
  * Class PlatformWrapper

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -7,7 +8,6 @@ declare(strict_types=1);
  */
 
 namespace OCA\FullTextSearch\Command;
-
 
 use Exception;
 use OC\Core\Command\InterruptedException;
@@ -22,7 +22,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-
 /**
  * Class Reset
  *
@@ -34,7 +33,7 @@ class Reset extends ACommandBase {
 
 	public function __construct(
 		RunningService $runningService,
-		private IndexService $indexService
+		private IndexService $indexService,
 	) {
 		parent::__construct();
 
@@ -130,6 +129,3 @@ class Reset extends ACommandBase {
 		}
 	}
 }
-
-
-

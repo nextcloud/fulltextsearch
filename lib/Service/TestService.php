@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -8,14 +9,12 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
 use Exception;
 use OC\FullTextSearch\Model\DocumentAccess;
 use OC\FullTextSearch\Model\IndexDocument;
 use OCA\FullTextSearch\Provider\TestProvider;
 use OCP\FullTextSearch\Model\IIndexDocument;
 use OCP\FullTextSearch\Model\IIndexOptions;
-
 
 /**
  * Class TestService
@@ -24,23 +23,23 @@ use OCP\FullTextSearch\Model\IIndexOptions;
  */
 class TestService {
 
-	const DOCUMENT_USER1 = 'user1';
-	const DOCUMENT_USER2 = 'User number_2';
-	const DOCUMENT_USER3 = 'User3';
-	const DOCUMENT_USER4 = 'User@4';
-	const DOCUMENT_NOTUSER = 'notuser';
+	public const DOCUMENT_USER1 = 'user1';
+	public const DOCUMENT_USER2 = 'User number_2';
+	public const DOCUMENT_USER3 = 'User3';
+	public const DOCUMENT_USER4 = 'User@4';
+	public const DOCUMENT_NOTUSER = 'notuser';
 
-	const DOCUMENT_GROUP1 = 'group_1';
-	const DOCUMENT_GROUP2 = 'Group_2';
-	const DOCUMENT_NOTGROUP = 'group_3';
+	public const DOCUMENT_GROUP1 = 'group_1';
+	public const DOCUMENT_GROUP2 = 'Group_2';
+	public const DOCUMENT_NOTGROUP = 'group_3';
 
-	const DOCUMENT_TYPE_LICENSE = 'license';
-	const DOCUMENT_TYPE_SIMPLE = 'simple';
+	public const DOCUMENT_TYPE_LICENSE = 'license';
+	public const DOCUMENT_TYPE_SIMPLE = 'simple';
 
-	const DOCUMENT_INDEXING_OPTION = 'indexing';
-	const DOCUMENT_INDEXING_ACCESS = 'access';
+	public const DOCUMENT_INDEXING_OPTION = 'indexing';
+	public const DOCUMENT_INDEXING_ACCESS = 'access';
 
-	const LICENSE_HASH = '108322602bb857915803a84e23a2cc2f';
+	public const LICENSE_HASH = '108322602bb857915803a84e23a2cc2f';
 
 	public function __construct() {
 	}
@@ -59,9 +58,9 @@ class TestService {
 		if ($options->getOption(self::DOCUMENT_INDEXING_OPTION, '')
 			=== self::DOCUMENT_INDEXING_ACCESS) {
 			$indexDocument->getAccess()
-						  ->setGroups([self::DOCUMENT_GROUP1, self::DOCUMENT_GROUP2]);
+				->setGroups([self::DOCUMENT_GROUP1, self::DOCUMENT_GROUP2]);
 			$indexDocument->getAccess()
-						  ->setUsers([self::DOCUMENT_USER2, self::DOCUMENT_USER3, self::DOCUMENT_USER4]);
+				->setUsers([self::DOCUMENT_USER2, self::DOCUMENT_USER3, self::DOCUMENT_USER4]);
 		}
 
 		return $indexDocument;
@@ -90,8 +89,8 @@ class TestService {
 	 */
 	public function compareIndexDocument(IIndexDocument $origIndex, IIndexDocument $compareIndex) {
 		if ($origIndex->getAccess()
-					  ->getOwnerId() !== $compareIndex->getAccess()
-													  ->getOwnerId()) {
+			->getOwnerId() !== $compareIndex->getAccess()
+			->getOwnerId()) {
 			throw new Exception('issue with AccessDocument');
 		}
 

@@ -11,7 +11,6 @@ namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OCA\FullTextSearch\ConfigLexicon;
-use OCA\FullTextSearch\Db\TickRequest;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
@@ -20,7 +19,7 @@ use OCP\AppFramework\Services\IAppConfig;
 
 class RunningService {
 	public function __construct(
-		private TickRequest $tickRequest,
+		private TickService $tickRequest,
 		private readonly IAppConfig $appConfig,
 	) {
 	}
@@ -40,9 +39,9 @@ class RunningService {
 
 		$tick = new Tick($source);
 		$tick->setStatus('run')
-			 ->setTick()
-			 ->setFirstTick()
-			 ->setInfoInt('runStart ', time());
+			->setTick()
+			->setFirstTick()
+			->setInfoInt('runStart ', time());
 
 		return $this->tickRequest->create($tick);
 	}
@@ -78,9 +77,9 @@ class RunningService {
 	public function stop(int $runId, string $reason = '') {
 		$tick = $this->tickRequest->getTickById($runId);
 		$tick->setStatus('stop')
-			 ->setTick()
-			 ->setInfoInt('runStop', time())
-			 ->setInfoInt('totalDocuments', 42);
+			->setTick()
+			->setInfoInt('runStop', time())
+			->setInfoInt('totalDocuments', 42);
 
 		if ($reason !== '') {
 			$tick->setStatus('exception');
@@ -183,7 +182,7 @@ class RunningService {
 			}
 		}
 		$tick->setAction($action)
-			 ->setInfoFloat($action . 'Init', $now);
+			->setInfoFloat($action . 'Init', $now);
 	}
 
 

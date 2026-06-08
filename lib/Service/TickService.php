@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -6,15 +7,24 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\FullTextSearch\Db;
+namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\Tick;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\IDBConnection;
+use OCP\IL10N;
 
-class TickRequest extends CoreRequestBuilder {
-	const TABLE_TICKS = 'fulltextsearch_ticks';
+class TickService {
+	public const TABLE_TICKS = 'fulltextsearch_ticks';
+
+	public function __construct(
+		protected readonly IL10N $l10n,
+		protected readonly IDBConnection $dbConnection,
+		protected readonly ConfigService $configService,
+	) {
+	}
 
 	public function create(Tick $tick): int {
 		try {
@@ -22,20 +32,12 @@ class TickRequest extends CoreRequestBuilder {
 			$qb->insert(self::TABLE_TICKS)
 				->setValue('source', $qb->createNamedParameter($tick->getSource()))
 				->setValue('data', $qb->createNamedParameter(json_encode($tick->getData())))
-			   	->setValue('action', $qb->createNamedParameter($tick->getAction()))
-			   	->setValue('first_tick', $qb->createNamedParameter($tick->getFirstTick()))
-			   	->setValue('tick', $qb->createNamedParameter($tick->getTick()))
-			   	->setValue('status', $qb->createNamedParameter($tick->getStatus()));
+				->setValue('action', $qb->createNamedParameter($tick->getAction()))
+				->setValue('first_tick', $qb->createNamedParameter($tick->getFirstTick()))
+				->setValue('tick', $qb->createNamedParameter($tick->getTick()))
+				->setValue('status', $qb->createNamedParameter($tick->getStatus()));
 
-			try {
-				$qb->executeStatement();
-			} catch (\OCP\DB\Exception $e) {
-				if ($e->getReason() === \OCP\DB\Exception::REASON_CONNECTION_LOST) {
-					$this->reconnect($e);
-					return $this->create($tick);
-				}
-				throw $e;
-			}
+			$qb->executeStatement();
 
 			return $qb->getLastInsertId();
 		} catch (Exception $e) {
@@ -58,15 +60,7 @@ class TickRequest extends CoreRequestBuilder {
 			->set('status', $qb->createNamedParameter($tick->getStatus()))
 			->andWhere($qb->expr()->eq('id', $qb->createNamedParameter($tick->getId())));
 
-		try {
-			$qb->executeStatement();
-		} catch (\OCP\DB\Exception $e) {
-			if ($e->getReason() === \OCP\DB\Exception::REASON_CONNECTION_LOST) {
-				$this->reconnect($e);
-				return $this->update($tick);
-			}
-			throw $e;
-		}
+		$qb->executeStatement();
 
 		return true;
 	}
@@ -80,16 +74,7 @@ class TickRequest extends CoreRequestBuilder {
 		$qb = $this->getTickSelectSql();
 		$qb->andWhere($qb->expr()->eq('t.id', $qb->createNamedParameter($id)));
 
-		try {
-			$cursor = $qb->executeQuery();
-		} catch (\OCP\DB\Exception $e) {
-			if ($e->getReason() === \OCP\DB\Exception::REASON_CONNECTION_LOST) {
-				$this->reconnect($e);
-				return $this->getTickById($id);
-			}
-			throw $e;
-		}
-
+		$cursor = $qb->executeQuery();
 		$data = $cursor->fetch();
 		$cursor->closeCursor();
 
@@ -111,15 +96,7 @@ class TickRequest extends CoreRequestBuilder {
 		$qb = $this->getTickSelectSql();
 		$qb->andWhere($qb->expr()->eq('t.status', $qb->createNamedParameter($status)));
 
-		try {
-			$cursor = $qb->executeQuery();
-		} catch (\OCP\DB\Exception $e) {
-			if ($e->getReason() === \OCP\DB\Exception::REASON_CONNECTION_LOST) {
-				$this->reconnect($e);
-				return $this->getTicksByStatus($status);
-			}
-			throw $e;
-		}
+		$cursor = $qb->executeQuery();
 
 		while ($data = $cursor->fetch()) {
 			$ticks[] = $this->parseTickSelectSql($data);
@@ -138,7 +115,7 @@ class TickRequest extends CoreRequestBuilder {
 		$qb->select(
 			't.id', 't.source', 't.data', 't.first_tick', 't.tick', 't.status', 't.action'
 		)
-		   ->from(self::TABLE_TICKS, 't');
+			->from(self::TABLE_TICKS, 't');
 
 		return $qb;
 	}
