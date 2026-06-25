@@ -15,16 +15,15 @@ var fts_admin_elements = {
 	fts_providers: null,
 
 	init: function () {
-		fts_admin_elements.fts_div = $('#fns');
-		fts_admin_elements.fts_navigation = $('#fts_navigation');
-		fts_admin_elements.fts_platforms = $('#fts_platforms');
+		fts_admin_elements.fts_div = document.getElementById('fns');
+		fts_admin_elements.fts_navigation = document.getElementById('fts_navigation');
+		fts_admin_elements.fts_platforms = document.getElementById('fts_platforms');
 
-		fts_admin_elements.fts_navigation.on('change', fts_admin_settings.saveSettings);
-		fts_admin_elements.fts_platforms.on('change', function () {
-			fts_admin_settings.tagSettingsAsNotSaved($(this));
+		fts_admin_elements.fts_navigation.addEventListener('change', fts_admin_settings.saveSettings);
+		fts_admin_elements.fts_platforms.addEventListener('change', function () {
+			fts_admin_settings.tagSettingsAsNotSaved(this);
 			fts_admin_settings.saveSettings();
 		});
 	}
 };
-
 
