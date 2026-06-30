@@ -19,10 +19,7 @@ var fts_admin_settings = {
 
 	refreshSettingPage: function () {
 
-		$.ajax({
-			method: 'GET',
-			url: OC.generateUrl('/apps/fulltextsearch/admin/settings')
-		}).done(function (res) {
+		fts_admin_settings.request('GET', '/apps/fulltextsearch/admin/settings').then(function (res) {
 			fts_admin_settings.updateSettingPage(res);
 		});
 
@@ -31,7 +28,7 @@ var fts_admin_settings = {
 
 	updateSettingPage: function (result) {
 
-		fts_admin_elements.fts_navigation.prop('checked', (result.app_navigation === true));
+		fts_admin_elements.fts_navigation.checked = (result.app_navigation === true);
 
 		fts_admin_settings.updateSettingPagePlatforms(result);
 
@@ -43,27 +40,19 @@ var fts_admin_settings = {
 
 
 	updateSettingPagePlatforms: function (result) {
-		fts_admin_elements.fts_platforms.empty();
-		fts_admin_elements.fts_platforms.append($('<option>', {
-			value: '',
-			text: ''
-		}));
+		fts_admin_elements.fts_platforms.replaceChildren(new Option('', ''));
 
 		var platforms = result.platforms_all;
 		var classes = Object.keys(platforms);
 		for (var i = 0; i < classes.length; i++) {
 			var platformClass = classes[i];
-			fts_admin_elements.fts_platforms.append($('<option>', {
-				value: platformClass,
-				selected: (result.search_platform === platformClass),
-				text: platforms[platformClass].name
-			}));
-			$('#' + platforms[platformClass].id).fadeTo(300, 0, function () {
-				$(this).hide();
-			});
+			var option = new Option(platforms[platformClass].name, platformClass);
+			option.selected = (result.search_platform === platformClass);
+			fts_admin_elements.fts_platforms.appendChild(option);
+			fts_admin_settings.hideElement(document.getElementById(platforms[platformClass].id));
 		}
 
-		fts_admin_elements.fts_platforms.fadeTo(300, 1);
+		fts_admin_elements.fts_platforms.style.opacity = '1';
 	},
 
 
@@ -72,7 +61,7 @@ var fts_admin_settings = {
 			return;
 		}
 
-		$('#' + result.platforms_all[result.search_platform].id).stop().show().fadeTo(300, 1);
+		fts_admin_settings.showElement(document.getElementById(result.platforms_all[result.search_platform].id));
 	},
 
 
@@ -81,10 +70,12 @@ var fts_admin_settings = {
 		var providers = result.providers_all;
 		var providerIds = Object.keys(providers);
 		for (var i = 0; i < providerIds.length; i++) {
-			$('#' + providerIds[i]).stop().fadeTo(300, 0);
+			fts_admin_settings.fadeElement(document.getElementById(providerIds[i]), 0);
 		}
 
-		$('.subprovider').stop().fadeTo(300, 0);
+		document.querySelectorAll('.subprovider').forEach(function (element) {
+			fts_admin_settings.fadeElement(element, 0);
+		});
 
 		// we only check that a search_platform is valid. we don't manage a list of enabled provider as
 		// of right now
@@ -93,39 +84,46 @@ var fts_admin_settings = {
 		}
 
 		for (i = 0; i < providerIds.length; i++) {
-			$('#' + providerIds[i]).stop().fadeTo(300, 1);
+			fts_admin_settings.showElement(document.getElementById(providerIds[i]));
 		}
 	},
 
 
 	updateEnabledSubProviders: function () {
-		$('body').find('.subprovider').each(function () {
-			var top = $(this).attr('id').split('-', 2);
+		document.querySelectorAll('body .subprovider').forEach(function (element) {
+			var top = element.id.split('-', 2);
 
 			if (top.length < 2) {
 				return;
 			}
 
 			var topOption = top[0];
-			if ($('#' + topOption).is(':checked')) {
-				$(this).stop().fadeTo(300, 1).slideDown();
+			var topOptionElement = document.getElementById(topOption);
+			if (topOptionElement && topOptionElement.checked) {
+				fts_admin_settings.showElement(element);
 			} else {
-				$(this).stop().fadeTo(300, 0).slideUp();
+				fts_admin_settings.hideElement(element);
 			}
 		});
 	},
 
 
 	tagSettingsAsNotSaved: function (div) {
-		div.animate({
-			'backgroundColor': 'rgba(255, 180, 0, 0.18)'
-		}, 300);
+		fts_admin_settings.toElements(div).forEach(function (element) {
+			element.style.backgroundColor = 'rgba(255, 180, 0, 0.18)';
+		});
 	},
 
 
 	tagSettingsAsSaved: function (div) {
-		div.find('INPUT').animate({'backgroundColor': 'rgba(255, 255, 255, 0.18)'}, 300);
-		div.find('SELECT').animate({'backgroundColor': '#fff'}, 300);
+		fts_admin_settings.toElements(div).forEach(function (element) {
+			element.querySelectorAll('input').forEach(function (input) {
+				input.style.backgroundColor = 'rgba(255, 255, 255, 0.18)';
+			});
+			element.querySelectorAll('select').forEach(function (select) {
+				select.style.backgroundColor = '#fff';
+			});
+		});
 
 		fts_admin_settings.updateEnabledSubProviders();
 	},
@@ -134,20 +132,90 @@ var fts_admin_settings = {
 	saveSettings: function () {
 
 		var data = {
-			app_navigation: (fts_admin_elements.fts_navigation.is(':checked')) ? 1 : 0,
-			search_platform: fts_admin_elements.fts_platforms.val()
+			app_navigation: fts_admin_elements.fts_navigation.checked ? 1 : 0,
+			search_platform: fts_admin_elements.fts_platforms.value
 		};
 
-		$.ajax({
-			method: 'POST',
-			url: OC.generateUrl('/apps/fulltextsearch/admin/settings'),
-			data: {
-				data: data
-			}
-		}).done(function (res) {
+		fts_admin_settings.request('POST', '/apps/fulltextsearch/admin/settings', data).then(function (res) {
 			fts_admin_settings.updateSettingPage(res);
 		});
 
+	},
+
+
+	request: function (method, route, data) {
+		var options = {
+			method: method,
+			credentials: 'same-origin',
+			headers: {
+				'Accept': 'application/json',
+				'requesttoken': window.OC ? window.OC.requestToken : ''
+			}
+		};
+
+		if (method === 'POST') {
+			options.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
+			options.body = fts_admin_settings.encodeData(data);
+		}
+
+		return fetch(window.OC.generateUrl(route), options).then(function (response) {
+			if (!response.ok) {
+				throw new Error('Request failed: ' + response.status);
+			}
+
+			return response.json();
+		});
+	},
+
+
+	encodeData: function (data) {
+		var params = new URLSearchParams();
+		Object.keys(data).forEach(function (key) {
+			params.append('data[' + key + ']', data[key]);
+		});
+
+		return params.toString();
+	},
+
+
+	toElements: function (value) {
+		if (!value) {
+			return [];
+		}
+		if (value instanceof Element) {
+			return [value];
+		}
+		if (value instanceof NodeList || Array.isArray(value)) {
+			return Array.prototype.slice.call(value);
+		}
+
+		return [];
+	},
+
+
+	fadeElement: function (element, opacity) {
+		if (!element) {
+			return;
+		}
+		element.style.opacity = opacity;
+	},
+
+
+	hideElement: function (element) {
+		if (!element) {
+			return;
+		}
+		element.style.opacity = '0';
+		element.style.display = 'none';
+	},
+
+
+	showElement: function (element) {
+		if (!element) {
+			return;
+		}
+		element.style.display = '';
+		element.style.opacity = '1';
 	}
 
 
