@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -7,7 +8,6 @@ declare(strict_types=1);
  */
 
 namespace OCA\FullTextSearch\Controller;
-
 
 use OC\ForbiddenException;
 use OCA\FullTextSearch\AppInfo\Application;
@@ -27,7 +27,7 @@ class CollectionController extends OCSController {
 		IRequest $request,
 		private IUserSession $userSession,
 		private IGroupManager $groupManager,
-		private CollectionService $collectionService
+		private CollectionService $collectionService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -111,7 +111,7 @@ class CollectionController extends OCSController {
 	public function updateStatusDone(
 		string $collection,
 		string $providerId,
-		string $documentId
+		string $documentId,
 	): DataResponse {
 		try {
 			$this->collectionService->confirmCollection($collection);
@@ -182,4 +182,3 @@ class CollectionController extends OCSController {
 	}
 
 }
-

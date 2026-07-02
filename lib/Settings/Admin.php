@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -8,13 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Settings;
 
-
 use Exception;
 use OCA\FullTextSearch\AppInfo\Application;
-use OCA\FullTextSearch\Service\ConfigService;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\IL10N;
-use OCP\IURLGenerator;
 use OCP\Settings\ISettings;
 
 /**
@@ -47,8 +44,8 @@ class Admin implements ISettings {
 
 	/**
 	 * @return int whether the form should be rather on the top or bottom of
-	 * the admin section. The forms are arranged in ascending order of the
-	 * priority values. It is required to return a value between 0 and 100.
+	 *             the admin section. The forms are arranged in ascending order of the
+	 *             priority values. It is required to return a value between 0 and 100.
 	 *
 	 * keep the server setting at the top, right after "server settings"
 	 */

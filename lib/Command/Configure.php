@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Configure extends Base {
 	public function __construct(
-		private ConfigService $configService
+		private ConfigService $configService,
 	) {
 		parent::__construct();
 	}
@@ -25,8 +25,8 @@ class Configure extends Base {
 	protected function configure(): void {
 		parent::configure();
 		$this->setName('fulltextsearch:configure')
-			 ->addArgument('json', InputArgument::OPTIONAL, 'set config')
-			 ->setDescription('Configure the installation');
+			->addArgument('json', InputArgument::OPTIONAL, 'set config')
+			->setDescription('Configure the installation');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {

@@ -9,21 +9,21 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Tools\Traits;
 
+use Exception;
+use JsonSerializable;
 use OCA\FullTextSearch\Tools\Exceptions\ArrayNotFoundException;
 use OCA\FullTextSearch\Tools\Exceptions\ItemNotFoundException;
 use OCA\FullTextSearch\Tools\Exceptions\MalformedArrayException;
 use OCA\FullTextSearch\Tools\Exceptions\UnknownTypeException;
-use Exception;
-use JsonSerializable;
 
 trait TArrayTools {
 
-	static string $TYPE_NULL = 'Null';
-	static  string $TYPE_STRING = 'String';
-	static  string $TYPE_ARRAY = 'Array';
-	static string $TYPE_BOOLEAN = 'Boolean';
-	static string $TYPE_INTEGER = 'Integer';
-	static string $TYPE_SERIALIZABLE = 'Serializable';
+	public static string $TYPE_NULL = 'Null';
+	public static string $TYPE_STRING = 'String';
+	public static string $TYPE_ARRAY = 'Array';
+	public static string $TYPE_BOOLEAN = 'Boolean';
+	public static string $TYPE_INTEGER = 'Integer';
+	public static string $TYPE_SERIALIZABLE = 'Serializable';
 
 	/**
 	 * @param string $k
@@ -276,7 +276,7 @@ trait TArrayTools {
 		$list = $this->getArray($k, $arr, $default);
 
 		$r = [];
-		list ($obj, $method) = $import;
+		[$obj, $method] = $import;
 		foreach ($list as $item) {
 			try {
 				$o = new $obj();
@@ -393,7 +393,7 @@ trait TArrayTools {
 	protected function cleanArray(array &$arr) {
 		$arr = array_filter(
 			$arr,
-			function($v) {
+			function ($v) {
 				if (is_string($v)) {
 					return ($v !== '');
 				}
@@ -406,4 +406,3 @@ trait TArrayTools {
 		);
 	}
 }
-
