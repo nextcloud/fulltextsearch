@@ -50,4 +50,5 @@ parameters:
 		- tests/stubs/symfony_component_console_formatter_outputformatterstyle_interface.php
 		- tests/stubs/symfony_component_console_formatter_outputformatterstyle.php
 		- tests/stubs/symfony_component_console_formatter_outputformatterinterface.php
+		- tests/stubs/symfony_component_routing_exception_routenotfoundexception.php
 

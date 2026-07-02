@@ -6,24 +6,30 @@
 /** global: OCA */
 /** global: fts_admin_settings */
 /** global: fts_admin_elements */
+function ready(callback) {
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', callback);
+	} else {
+		callback();
+	}
+}
 
 
-
-$(document).ready(function () {
+ready(function () {
 
 
 	/**
 	 * @constructs FullTextSearchAdmin
 	 */
 	var FullTextSearchAdmin = function () {
-		$.extend(FullTextSearchAdmin.prototype, fts_admin_elements);
-		$.extend(FullTextSearchAdmin.prototype, fts_admin_settings);
+		Object.assign(FullTextSearchAdmin.prototype, fts_admin_elements, fts_admin_settings);
 
 		fts_admin_elements.init();
 		fts_admin_settings.refreshSettingPage();
 	};
 
-	OCA.FullTextSearchAdmin = FullTextSearchAdmin;
-	OCA.FullTextSearchAdmin.settings = new FullTextSearchAdmin();
+	window.OCA = window.OCA || {};
+	window.OCA.FullTextSearchAdmin = FullTextSearchAdmin;
+	window.OCA.FullTextSearchAdmin.settings = new FullTextSearchAdmin();
 
 });
