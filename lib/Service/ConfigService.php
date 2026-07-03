@@ -16,7 +16,6 @@ use OCP\IConfig;
 class ConfigService {
 	public function __construct(
 		private readonly IAppConfig $appConfig,
-		private readonly IConfig $config,
 	) {
 	}
 
@@ -55,12 +54,6 @@ class ConfigService {
 					break;
 			}
 		}
-	}
-
-	public function getAppValue(string $key): string {
-		return $this->config->getSystemValueString(Application::APP_ID . '.' . $key,
-			(string)$this->appConfig->getAppValueString($key)
-		);
 	}
 
 	public function getInternalCollection(): string {

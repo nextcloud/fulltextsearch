@@ -32,28 +32,12 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Psr\Container\ContainerInterface;
 use Throwable;
 
-if (file_exists($autoLoad = __DIR__ . '/../../vendor/autoload.php')) {
-	include_once $autoLoad;
-}
-
 class Application extends App implements IBootstrap {
-	const APP_ID = 'fulltextsearch';
-	const APP_NAME = 'FullTextSearch';
-
-
-	/**
-	 * Application constructor.
-	 *
-	 * @param array $params
-	 */
+	public const APP_ID = 'fulltextsearch';
 	public function __construct(array $params = []) {
 		parent::__construct(self::APP_ID, $params);
 	}
 
-
-	/**
-	 * @param IRegistrationContext $context
-	 */
 	public function register(IRegistrationContext $context): void {
 		$context->registerCapability(Capabilities::class);
 		$context->registerSearchProvider(UnifiedSearchProvider::class);
