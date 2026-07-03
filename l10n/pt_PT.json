@@ -7,6 +7,7 @@
     "Full Text Search" : "Pesquisa por Texto Completo",
     "Full text search" : "Pesquisa de texto completo ",
     "Core of the full-text search framework for Nextcloud" : "Núcleo da estrutura de pesquisa de texto completo para Nextcloud",
+    "Core App of the full-text search framework for your Nextcloud." : "Aplicativo principal da estrutura de pesquisa de texto completo para Nextcloud.",
     "Search on %s" : "Pesquisar em %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Verifique o wiki para documentação relacionada com a instalação e configuração da pesquisa de texto completo dentro do seu Nextcloud.",
     "General" : "Geral",
