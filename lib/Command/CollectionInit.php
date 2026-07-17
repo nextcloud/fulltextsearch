@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -7,7 +8,6 @@ declare(strict_types=1);
  */
 
 namespace OCA\FullTextSearch\Command;
-
 
 use Exception;
 use OC\Core\Command\Base;
@@ -22,7 +22,6 @@ use OCP\IUserManager;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 class CollectionInit extends Base {
 
@@ -55,7 +54,7 @@ class CollectionInit extends Base {
 		CollectionService $collectionService,
 		ProviderService $providerService,
 		RunningService $runningService,
-		CliService $cliService
+		CliService $cliService,
 	) {
 		parent::__construct();
 
@@ -70,8 +69,8 @@ class CollectionInit extends Base {
 	protected function configure(): void {
 		parent::configure();
 		$this->setName('fulltextsearch:collection:init')
-			 ->setDescription('Initiate a collection')
-			 ->addArgument('name', InputArgument::REQUIRED, 'name of the collection');
+			->setDescription('Initiate a collection')
+			->addArgument('name', InputArgument::REQUIRED, 'name of the collection');
 	}
 
 
@@ -83,33 +82,33 @@ class CollectionInit extends Base {
 		$this->collectionService->confirmCollectionString($collection);
 
 		$runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
-//		$runner->sourceIsCommandLine($this, $output);
+		//		$runner->sourceIsCommandLine($this, $output);
 		$this->collectionService->setRunner($runner);
 		$this->cliService->setRunner($runner);
 
 		$this->cliService->createPanel(
 			'collection', [
-							'┌─ Collection ' . $collection . ' ────',
-							'│ ProviderId, UserId: <info>%providerId%</info> / <info>%userId%</info>',
-							'│ Chunk: <info>%chunkCurr:3s%</info>/<info>%chunkTotal%</info>',
-							'│ Document: <info>%documentCurr:6s%</info>/<info>%documentChunk%</info>',
-							'│',
-							'│ Total Document: <info>%documentTotal%</info>',
-							'│ Index initiated: <info>%indexCount%</info>',
-							'└──'
-						]
+				'┌─ Collection ' . $collection . ' ────',
+				'│ ProviderId, UserId: <info>%providerId%</info> / <info>%userId%</info>',
+				'│ Chunk: <info>%chunkCurr:3s%</info>/<info>%chunkTotal%</info>',
+				'│ Document: <info>%documentCurr:6s%</info>/<info>%documentChunk%</info>',
+				'│',
+				'│ Total Document: <info>%documentTotal%</info>',
+				'│ Index initiated: <info>%indexCount%</info>',
+				'└──'
+			]
 		);
 
 		$runner->setInfoArray([
-								  'providerId' => '',
-								  'userId' => '',
-								  'chunkCurr' => '',
-								  'chunkTotal' => '',
-								  'documentCurr' => '',
-								  'documentChunk' => '',
-								  'documentTotal' => '',
-								  'indexCount' => 0
-							  ]);
+			'providerId' => '',
+			'userId' => '',
+			'chunkCurr' => '',
+			'chunkTotal' => '',
+			'documentCurr' => '',
+			'documentChunk' => '',
+			'documentTotal' => '',
+			'indexCount' => 0
+		]);
 
 		$this->cliService->initDisplay();
 		$this->cliService->displayPanel('run', 'collection');
@@ -135,7 +134,7 @@ class CollectionInit extends Base {
 		Runner $runner,
 		string $collection,
 		IFullTextSearchProvider $provider,
-		string $userId = ''
+		string $userId = '',
 	) {
 		$runner->setInfo('providerId', $provider->getId());
 		$options = new IndexOptions();

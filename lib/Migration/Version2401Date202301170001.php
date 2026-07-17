@@ -51,8 +51,8 @@ class Version2401Date202301170001 extends SimpleMigrationStep {
 		$orX->add($expr->isNull('collection'));
 
 		$qb->update('fulltextsearch_index')
-		   ->set('collection', $qb->createNamedParameter('local'))
-		   ->where($orX);
+			->set('collection', $qb->createNamedParameter('local'))
+			->where($orX);
 		$qb->executeStatement();
 	}
 

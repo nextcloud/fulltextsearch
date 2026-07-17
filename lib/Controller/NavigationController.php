@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Controller;
 
 use OCA\FullTextSearch\AppInfo\Application;
-use OCA\FullTextSearch\Service\ConfigService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\FullTextSearch\IFullTextSearchManager;
@@ -44,4 +43,3 @@ class NavigationController extends Controller {
 	}
 
 }
-

@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DocumentPlatform extends Base {
 	public function __construct(
-		private PlatformService $platformService
+		private PlatformService $platformService,
 	) {
 		parent::__construct();
 	}
@@ -31,10 +31,10 @@ class DocumentPlatform extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:document:platform')
-			 ->setDescription('Get document from index')
-			 ->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
-			 ->addArgument('documentId', InputArgument::REQUIRED, 'documentId')
-			 ->addOption('content', 'c', InputOption::VALUE_NONE, 'return some content');
+			->setDescription('Get document from index')
+			->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
+			->addArgument('documentId', InputArgument::REQUIRED, 'documentId')
+			->addOption('content', 'c', InputOption::VALUE_NONE, 'return some content');
 	}
 
 
@@ -66,6 +66,3 @@ class DocumentPlatform extends Base {
 
 
 }
-
-
-

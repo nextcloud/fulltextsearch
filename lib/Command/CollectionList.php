@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CollectionList extends Base {
 	public function __construct(
 		private CollectionService $collectionService,
-		private ConfigService $configService
+		private ConfigService $configService,
 	) {
 		parent::__construct();
 	}

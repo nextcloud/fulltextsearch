@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Stop extends Base {
 	public function __construct(
-		private RunningService $runningService
+		private RunningService $runningService,
 	) {
 		parent::__construct();
 	}
@@ -28,7 +28,7 @@ class Stop extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:stop')
-			 ->setDescription('Stop all indexing');
+			->setDescription('Stop all indexing');
 	}
 
 
@@ -48,6 +48,3 @@ class Stop extends Base {
 
 
 }
-
-
-

@@ -39,7 +39,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Test extends ACommandBase {
 
-	const DELAY_STABILIZE_PLATFORM = 3;
+	public const DELAY_STABILIZE_PLATFORM = 3;
 
 	private Runner $runner;
 
@@ -56,12 +56,12 @@ class Test extends ACommandBase {
 	protected function configure(): void {
 		parent::configure();
 		$this->setName('fulltextsearch:test')
-			 ->setDescription('Testing the platform setup')
-			 ->addOption('json', 'j', InputOption::VALUE_NONE, 'return result as JSON')
-			 ->addOption(
-				 'platform_delay', 'd', InputOption::VALUE_REQUIRED,
-				 'change DELAY_STABILIZE_PLATFORM'
-			 );
+			->setDescription('Testing the platform setup')
+			->addOption('json', 'j', InputOption::VALUE_NONE, 'return result as JSON')
+			->addOption(
+				'platform_delay', 'd', InputOption::VALUE_REQUIRED,
+				'change DELAY_STABILIZE_PLATFORM'
+			);
 	}
 
 
@@ -197,12 +197,12 @@ class Test extends ACommandBase {
 	 * @param IFullTextSearchProvider $testProvider
 	 */
 	private function testMockedProvider(
-		OutputInterface $output, IFullTextSearchProvider $testProvider
+		OutputInterface $output, IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Testing mocked provider: get indexable documents.');
 		$testProvider->setIndexOptions(new IndexOptions());
-		$indexableDocuments =
-			$testProvider->generateIndexableDocuments(TestService::DOCUMENT_USER1, '');
+		$indexableDocuments
+			= $testProvider->generateIndexableDocuments(TestService::DOCUMENT_USER1, '');
 		$this->output($output, '(' . sizeof($indexableDocuments) . ' items)', false);
 		$this->outputResult($output, true);
 	}
@@ -224,7 +224,7 @@ class Test extends ACommandBase {
 
 		$this->output($output, 'Testing search platform.');
 		if (!$testPlatform->testPlatform()) {
-			throw new Exception ('Search platform (' . $testPlatform->getName() . ') down ?');
+			throw new Exception('Search platform (' . $testPlatform->getName() . ') down ?');
 		}
 		$this->outputResult($output, true);
 
@@ -241,7 +241,7 @@ class Test extends ACommandBase {
 	 */
 	private function testLockingProcess(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
-		IFullTextSearchProvider $testProvider
+		IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Locking process');
 		$this->runner = new Runner($this->runningService, 'test');
@@ -260,7 +260,7 @@ class Test extends ACommandBase {
 	 *
 	 * @throws Exception
 	 */
-	private function testResetTest(OutputInterface $output, IFullTextSearchProvider $testProvider
+	private function testResetTest(OutputInterface $output, IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Removing test.');
 		$this->indexService->resetIndex($testProvider->getId());
@@ -272,7 +272,7 @@ class Test extends ACommandBase {
 	 * @param OutputInterface $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 */
-	private function testInitIndexing(OutputInterface $output, IFullTextSearchPlatform $testPlatform
+	private function testInitIndexing(OutputInterface $output, IFullTextSearchPlatform $testPlatform,
 	) {
 		$this->output($output, 'Initializing index mapping.');
 		$testPlatform->initializeIndex();
@@ -289,7 +289,7 @@ class Test extends ACommandBase {
 	 */
 	private function testIndexingDocuments(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
-		IFullTextSearchProvider $testProvider
+		IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Indexing generated documents.');
 		$options = new IndexOptions(
@@ -311,7 +311,7 @@ class Test extends ACommandBase {
 	 * @throws Exception
 	 */
 	private function testContentLicense(
-		OutputInterface $output, IFullTextSearchPlatform $testPlatform
+		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
 	) {
 
 		try {
@@ -349,7 +349,7 @@ class Test extends ACommandBase {
 	 */
 	private function testSearchSimple(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
-		IFullTextSearchProvider $testProvider
+		IFullTextSearchProvider $testProvider,
 	) {
 
 		$this->output($output, 'Searching basic keywords:');
@@ -363,7 +363,7 @@ class Test extends ACommandBase {
 		);
 		$this->search(
 			$output, $testPlatform, $testProvider, $access, 'document is a simple test',
-//			[TestService::DOCUMENT_TYPE_SIMPLE]
+			//			[TestService::DOCUMENT_TYPE_SIMPLE]
 			[TestService::DOCUMENT_TYPE_SIMPLE, TestService::DOCUMENT_TYPE_LICENSE]
 		);
 		$this->search(
@@ -418,12 +418,12 @@ class Test extends ACommandBase {
 	 */
 	private function testUpdatingDocumentsAccess(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
-		IFullTextSearchProvider $testProvider
+		IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Updating documents access.');
 		$options = new IndexOptions(
 			[
-				'provider'                            => TestProvider::TEST_PROVIDER_ID,
+				'provider' => TestProvider::TEST_PROVIDER_ID,
 				TestService::DOCUMENT_INDEXING_OPTION => TestService::DOCUMENT_INDEXING_ACCESS
 			]
 		);
@@ -444,7 +444,7 @@ class Test extends ACommandBase {
 	 */
 	private function testSearchAccess(
 		OutputInterface $output, IFullTextSearchPlatform $platform,
-		IFullTextSearchProvider $provider
+		IFullTextSearchProvider $provider,
 	) {
 		$this->output($output, 'Searching with group access rights:');
 
@@ -476,7 +476,7 @@ class Test extends ACommandBase {
 	 */
 	private function testSearchShare(
 		OutputInterface $output, IFullTextSearchPlatform $platform,
-		IFullTextSearchProvider $provider
+		IFullTextSearchProvider $provider,
 	) {
 
 		$this->output($output, 'Searching with share rights:');
@@ -514,7 +514,7 @@ class Test extends ACommandBase {
 	private function search(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider,
-		IDocumentAccess $access, string $search, array $expected, string $moreOutput = ''
+		IDocumentAccess $access, string $search, array $expected, string $moreOutput = '',
 	) {
 		$this->output(
 			$output,
@@ -551,7 +551,7 @@ class Test extends ACommandBase {
 	 */
 	private function searchGroups(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
-		IFullTextSearchProvider $testProvider, array $groups, array $expected
+		IFullTextSearchProvider $testProvider, array $groups, array $expected,
 	) {
 
 		$access = new DocumentAccess();
@@ -576,7 +576,7 @@ class Test extends ACommandBase {
 	 */
 	private function searchUsers(
 		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
-		IFullTextSearchProvider $testProvider, string $user, array $expected
+		IFullTextSearchProvider $testProvider, string $user, array $expected,
 	) {
 		$access = new DocumentAccess();
 		$access->setViewerId($user);
@@ -641,4 +641,3 @@ class Test extends ACommandBase {
 	}
 
 }
-

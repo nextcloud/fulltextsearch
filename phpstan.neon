@@ -11,9 +11,12 @@ parameters:
 		- tests
 	excludePaths:
 		- tests/stubs
+		- tests/bootstrap.php
 	scanDirectories:
 		- vendor-bin/phpstan/vendor/nextcloud/ocp
+		- vendor-bin/phpunit/vendor/phpunit/phpunit
 	scanFiles:
+		- tests/stubs/test_testcase.php
 		- tests/stubs/oc_fulltextsearch_fulltextsearchmanager.stub
 		- tests/stubs/oc_fulltextsearch_mode_documentaccess.stub
 		- tests/stubs/oc_fulltextsearch_mode_indexdocument.stub
@@ -31,7 +34,6 @@ parameters:
 		- tests/stubs/doctrine_dbal_schema_column.php
 		- tests/stubs/doctrine_dbal_schema_schema.php
 		- tests/stubs/doctrine_dbal_schema_table.php
-		- tests/stubs/doctrine_dbal_query_querybuilder.php
 		- tests/stubs/doctrine_dbal_connection.php
 		- tests/stubs/stecman_component_symfony_console_bashcompletion_completion_completionawareinterface.php
 		- tests/stubs/symfony_component_console_command_command.php

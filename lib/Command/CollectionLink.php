@@ -10,11 +10,8 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use OC\Core\Command\Base;
-use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\CollectionArgumentException;
 use OCA\FullTextSearch\Service\CollectionService;
-use OCA\FullTextSearch\Service\ConfigService;
-use OCP\IAppConfig;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -31,8 +28,8 @@ class CollectionLink extends Base {
 		parent::configure();
 		$this->setName('fulltextsearch:collection:link')
 			->setDescription('Link collection to a user')
-		    ->addArgument('collection', InputArgument::OPTIONAL, 'collection' , '')
-		    ->addArgument('userId', InputArgument::OPTIONAL, 'user to link a collection to', '')
+			->addArgument('collection', InputArgument::OPTIONAL, 'collection', '')
+			->addArgument('userId', InputArgument::OPTIONAL, 'user to link a collection to', '')
 			->addOption('unlink', '', InputOption::VALUE_NONE, 'unlink collection');
 	}
 
@@ -52,7 +49,7 @@ class CollectionLink extends Base {
 				$output->writeln('no collection linked to any user');
 			}
 
-			foreach($links as $name => $userId) {
+			foreach ($links as $name => $userId) {
 				$output->writeln('- Collection <info>' . $name . '</info> linked to user <info>' . $userId . '</info>');
 			}
 

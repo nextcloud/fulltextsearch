@@ -37,8 +37,8 @@ class Check extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:check')
-			 ->addOption('json', 'j', InputOption::VALUE_NONE, 'return result as JSON')
-			 ->setDescription('Check the installation');
+			->addOption('json', 'j', InputOption::VALUE_NONE, 'return result as JSON')
+			->setDescription('Check the installation');
 	}
 
 
@@ -80,9 +80,9 @@ class Check extends Base {
 				$platform = $platformWrapper->getPlatform();
 				$platform->loadPlatform();
 				$resultPlatform[] = [
-					'class'   => $platformWrapper->getClass(),
+					'class' => $platformWrapper->getClass(),
 					'version' => $platformWrapper->getVersion(),
-					'config'  => $platform->getConfiguration()
+					'config' => $platform->getConfiguration()
 				];
 			}
 
@@ -97,7 +97,7 @@ class Check extends Base {
 				$provider = $providerWrapper->getProvider();
 				$resultProviders[$provider->getId()] = [
 					'version' => $providerWrapper->getVersion(),
-					'config'  => $provider->getConfiguration()
+					'config' => $provider->getConfiguration()
 				];
 			}
 		} catch (Exception $e) {
@@ -107,10 +107,10 @@ class Check extends Base {
 		return [
 			'fulltextsearch' => [
 				'version' => $this->appConfig->getAppValueString('installed_version'),
-				'config'  => $this->configService->getConfig()
+				'config' => $this->configService->getConfig()
 			],
 
-			'platform'  => $resultPlatform,
+			'platform' => $resultPlatform,
 			'providers' => $resultProviders
 		];
 
@@ -175,4 +175,3 @@ class Check extends Base {
 	}
 
 }
-

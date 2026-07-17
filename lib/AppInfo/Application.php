@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\AppInfo;
 
-
 use Closure;
 use OCA\FullTextSearch\Capabilities;
 use OCA\FullTextSearch\ConfigLexicon;
@@ -35,8 +34,8 @@ if (file_exists($autoLoad = __DIR__ . '/../../vendor/autoload.php')) {
 }
 
 class Application extends App implements IBootstrap {
-	const APP_ID = 'fulltextsearch';
-	const APP_NAME = 'FullTextSearch';
+	public const APP_ID = 'fulltextsearch';
+	public const APP_NAME = 'FullTextSearch';
 
 
 	/**
@@ -114,7 +113,7 @@ class Application extends App implements IBootstrap {
 	 */
 	private function fullTextSearchNavigation(IURLGenerator $urlGen, IFactory $l10nFactory): array {
 		return [
-			'id'    => self::APP_ID,
+			'id' => self::APP_ID,
 			'order' => 5,
 			'href'  => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
 			'icon'  => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),

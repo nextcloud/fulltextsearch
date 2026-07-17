@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DocumentProvider extends Base {
 	public function __construct(
-		private ProviderService $providerService
+		private ProviderService $providerService,
 	) {
 		parent::__construct();
 	}
@@ -33,11 +33,11 @@ class DocumentProvider extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:document:provider')
-			 ->setDescription('Get document from index')
-			 ->addArgument('userId', InputArgument::REQUIRED, 'userId')
-			 ->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
-			 ->addArgument('documentId', InputArgument::REQUIRED, 'documentId')
-			 ->addOption('content', 'c', InputOption::VALUE_NONE, 'return some content');
+			->setDescription('Get document from index')
+			->addArgument('userId', InputArgument::REQUIRED, 'userId')
+			->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
+			->addArgument('documentId', InputArgument::REQUIRED, 'documentId')
+			->addOption('content', 'c', InputOption::VALUE_NONE, 'return some content');
 	}
 
 
@@ -67,7 +67,7 @@ class DocumentProvider extends Base {
 		}
 
 		if ($indexDocument->getIndex()
-						  ->isStatus(Index::INDEX_REMOVE)) {
+			->isStatus(Index::INDEX_REMOVE)) {
 			throw new Exception('Unknown document');
 		}
 
@@ -101,6 +101,3 @@ class DocumentProvider extends Base {
 
 
 }
-
-
-

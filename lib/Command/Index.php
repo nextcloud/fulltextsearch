@@ -36,54 +36,54 @@ use Throwable;
 class Index extends ACommandBase {
 	use TArrayTools;
 
-	const INDEX_OPTION_NO_READLINE = '_no-readline';
+	public const INDEX_OPTION_NO_READLINE = '_no-readline';
 
-//			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
-	const PANEL_RUN = 'run';
-	const PANEL_RUN_LINE_OPTIONS = 'Options: %options%';
-	const PANEL_RUN_LINE_MEMORY = 'Memory: %_memory%';
+	//			'%job:1s%%message:-40s%%current:6s%/%max:6s% [%bar%] %percent:3s%% \n %duration% %infos:-12s% %jvm:-30s%      '
+	public const PANEL_RUN = 'run';
+	public const PANEL_RUN_LINE_OPTIONS = 'Options: %options%';
+	public const PANEL_RUN_LINE_MEMORY = 'Memory: %_memory%';
 
-	const PANEL_INDEX = 'indexing';
-	const PANEL_INDEX_LINE_HEADER = '┌─ Indexing %_paused% ────';
-	const PANEL_INDEX_LINE_ACCOUNT = '│ Provider: <info>%providerName:-20s%</info> Account: <info>%userId%</info>';
-	const PANEL_INDEX_LINE_ACTION = '│ Action: <info>%action%</info>';
-	const PANEL_INDEX_LINE_DOCUMENT = '│ Document: <info>%documentId%</info>';
-	const PANEL_INDEX_LINE_INFO = '│ Info: <info>%info%</info>';
-	const PANEL_INDEX_LINE_TITLE = '│ Title: <info>%title%</info>';
-	const PANEL_INDEX_LINE_CONTENT = '│ Content size: <info>%content%</info>';
-	const PANEL_INDEX_LINE_CHUNK = '│ Chunk: %chunkCurrent:6s%/%chunkTotal%';
-	const PANEL_INDEX_LINE_PROGRESS = '│ Progress: %documentCurrent:6s%/%documentTotal%';
-	const PANEL_INDEX_LINE_FOOTER = '└──';
+	public const PANEL_INDEX = 'indexing';
+	public const PANEL_INDEX_LINE_HEADER = '┌─ Indexing %_paused% ────';
+	public const PANEL_INDEX_LINE_ACCOUNT = '│ Provider: <info>%providerName:-20s%</info> Account: <info>%userId%</info>';
+	public const PANEL_INDEX_LINE_ACTION = '│ Action: <info>%action%</info>';
+	public const PANEL_INDEX_LINE_DOCUMENT = '│ Document: <info>%documentId%</info>';
+	public const PANEL_INDEX_LINE_INFO = '│ Info: <info>%info%</info>';
+	public const PANEL_INDEX_LINE_TITLE = '│ Title: <info>%title%</info>';
+	public const PANEL_INDEX_LINE_CONTENT = '│ Content size: <info>%content%</info>';
+	public const PANEL_INDEX_LINE_CHUNK = '│ Chunk: %chunkCurrent:6s%/%chunkTotal%';
+	public const PANEL_INDEX_LINE_PROGRESS = '│ Progress: %documentCurrent:6s%/%documentTotal%';
+	public const PANEL_INDEX_LINE_FOOTER = '└──';
 
-	const PANEL_RESULT = 'result';
-	const PANEL_RESULT_LINE_HEADER = '┌─ Results ────';
-	const PANEL_RESULT_LINE_RESULT = '│ Result: <info>%resultCurrent:6s%</info>/<info>%resultTotal%</info>';
-	const PANEL_RESULT_LINE_INDEX = '│ Index: <info>%resultIndex%</info>';
-	const PANEL_RESULT_LINE_STATUS = '│ Status: %resultStatusColored%';
-	const PANEL_RESULT_LINE_MESSAGE1 = '│ Message: <info>%resultMessageA%</info>';
-	const PANEL_RESULT_LINE_MESSAGE2 = '│ <info>%resultMessageB%</info>';
-	const PANEL_RESULT_LINE_MESSAGE3 = '│ <info>%resultMessageC%</info>';
-	const PANEL_RESULT_LINE_FOOTER = '└──';
+	public const PANEL_RESULT = 'result';
+	public const PANEL_RESULT_LINE_HEADER = '┌─ Results ────';
+	public const PANEL_RESULT_LINE_RESULT = '│ Result: <info>%resultCurrent:6s%</info>/<info>%resultTotal%</info>';
+	public const PANEL_RESULT_LINE_INDEX = '│ Index: <info>%resultIndex%</info>';
+	public const PANEL_RESULT_LINE_STATUS = '│ Status: %resultStatusColored%';
+	public const PANEL_RESULT_LINE_MESSAGE1 = '│ Message: <info>%resultMessageA%</info>';
+	public const PANEL_RESULT_LINE_MESSAGE2 = '│ <info>%resultMessageB%</info>';
+	public const PANEL_RESULT_LINE_MESSAGE3 = '│ <info>%resultMessageC%</info>';
+	public const PANEL_RESULT_LINE_FOOTER = '└──';
 
-	const PANEL_ERRORS = 'errors';
-	const PANEL_ERRORS_LINE_HEADER = '┌─ Errors ────';
-	const PANEL_ERRORS_LINE_ERRORS = '│ Error: <comment>%errorCurrent:6s%</comment>/<comment>%errorTotal%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_INDEX = '│ Index: <comment>%errorIndex%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_EXCEPTION = '│ Exception: <comment>%errorException%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_MESSAGE1 = '│ Message: <comment>%errorMessageA%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_MESSAGE2 = '│ <comment>%errorMessageB%</comment>';
-	const PANEL_ERRORS_LINE_ERROR_MESSAGE3 = '│ <comment>%errorMessageC%</comment>';
-	const PANEL_ERRORS_LINE_FOOTER = '└──';
+	public const PANEL_ERRORS = 'errors';
+	public const PANEL_ERRORS_LINE_HEADER = '┌─ Errors ────';
+	public const PANEL_ERRORS_LINE_ERRORS = '│ Error: <comment>%errorCurrent:6s%</comment>/<comment>%errorTotal%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_INDEX = '│ Index: <comment>%errorIndex%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_EXCEPTION = '│ Exception: <comment>%errorException%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_MESSAGE1 = '│ Message: <comment>%errorMessageA%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_MESSAGE2 = '│ <comment>%errorMessageB%</comment>';
+	public const PANEL_ERRORS_LINE_ERROR_MESSAGE3 = '│ <comment>%errorMessageC%</comment>';
+	public const PANEL_ERRORS_LINE_FOOTER = '└──';
 
-	const PANEL_COMMANDS_ROOT = 'root';
-	const PANEL_COMMANDS_ROOT_LINE = '## q:quit ## p:pause ';
-	const PANEL_COMMANDS_PAUSED = 'paused';
-	const PANEL_COMMANDS_PAUSED_LINE = '## q:quit ## u:unpause ## n:next step';
-	const PANEL_COMMANDS_DONE = 'done';
-	const PANEL_COMMANDS_DONE_LINE = '## q:quit';
-	const PANEL_COMMANDS_NAVIGATION = 'navigation';
-	const PANEL_COMMANDS_ERRORS_LINE = '## f:first error ## h/j:prec/next error ## d:delete error ## l:last error';
-	const PANEL_COMMANDS_RESULTS_LINE = '## x:first result ## c/v:prec/next result ## b:last result';
+	public const PANEL_COMMANDS_ROOT = 'root';
+	public const PANEL_COMMANDS_ROOT_LINE = '## q:quit ## p:pause ';
+	public const PANEL_COMMANDS_PAUSED = 'paused';
+	public const PANEL_COMMANDS_PAUSED_LINE = '## q:quit ## u:unpause ## n:next step';
+	public const PANEL_COMMANDS_DONE = 'done';
+	public const PANEL_COMMANDS_DONE_LINE = '## q:quit';
+	public const PANEL_COMMANDS_NAVIGATION = 'navigation';
+	public const PANEL_COMMANDS_ERRORS_LINE = '## f:first error ## h/j:prec/next error ## d:delete error ## l:last error';
+	public const PANEL_COMMANDS_RESULTS_LINE = '## x:first result ## c/v:prec/next result ## b:last result';
 
 
 	/** @var Runner */
@@ -118,12 +118,12 @@ class Index extends ACommandBase {
 	protected function configure(): void {
 		parent::configure();
 		$this->setName('fulltextsearch:index')
-			 ->setDescription('Index files')
-			 ->addArgument('options', InputArgument::OPTIONAL, 'options')
-			 ->addOption(
-				 'no-readline', 'r', InputOption::VALUE_NONE,
-				 'disable readline - non interactive mode'
-			 );
+			->setDescription('Index files')
+			->addArgument('options', InputArgument::OPTIONAL, 'options')
+			->addOption(
+				'no-readline', 'r', InputOption::VALUE_NONE,
+				'disable readline - non interactive mode'
+			);
 	}
 
 
@@ -138,7 +138,7 @@ class Index extends ACommandBase {
 			try {
 				readline_callback_handler_install(
 					'', function () {
-				}
+					}
 				);
 			} catch (Throwable $t) {
 				throw new Exception('Please install php-readline, or use --no-readline');
@@ -149,9 +149,9 @@ class Index extends ACommandBase {
 
 		$this->terminal = new Terminal();
 
-//		$outputStyle = new OutputFormatterStyle('white', 'black', ['bold']);
-//		$output->getFormatter()
-//			   ->setStyle('char', $outputStyle);
+		//		$outputStyle = new OutputFormatterStyle('white', 'black', ['bold']);
+		//		$output->getFormatter()
+		//			   ->setStyle('char', $outputStyle);
 
 		$this->runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
 		$this->runner->onKeyPress([$this, 'onKeyPressed']);
@@ -400,62 +400,62 @@ class Index extends ACommandBase {
 
 		$this->cliService->createPanel(
 			self::PANEL_INDEX, [
-								 self::PANEL_INDEX_LINE_HEADER,
-								 self::PANEL_INDEX_LINE_ACTION,
-								 self::PANEL_INDEX_LINE_ACCOUNT,
-								 self::PANEL_INDEX_LINE_DOCUMENT,
-								 self::PANEL_INDEX_LINE_INFO,
-								 self::PANEL_INDEX_LINE_TITLE,
-								 self::PANEL_INDEX_LINE_CONTENT,
-								 self::PANEL_INDEX_LINE_CHUNK,
-								 self::PANEL_INDEX_LINE_PROGRESS,
-								 self::PANEL_INDEX_LINE_FOOTER,
-							 ]
+				self::PANEL_INDEX_LINE_HEADER,
+				self::PANEL_INDEX_LINE_ACTION,
+				self::PANEL_INDEX_LINE_ACCOUNT,
+				self::PANEL_INDEX_LINE_DOCUMENT,
+				self::PANEL_INDEX_LINE_INFO,
+				self::PANEL_INDEX_LINE_TITLE,
+				self::PANEL_INDEX_LINE_CONTENT,
+				self::PANEL_INDEX_LINE_CHUNK,
+				self::PANEL_INDEX_LINE_PROGRESS,
+				self::PANEL_INDEX_LINE_FOOTER,
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_RESULT, [
-								  self::PANEL_RESULT_LINE_HEADER,
-								  self::PANEL_RESULT_LINE_RESULT,
-								  self::PANEL_RESULT_LINE_INDEX,
-								  self::PANEL_RESULT_LINE_STATUS,
-								  self::PANEL_RESULT_LINE_MESSAGE1,
-								  self::PANEL_RESULT_LINE_MESSAGE2,
-								  self::PANEL_RESULT_LINE_MESSAGE3,
-								  self::PANEL_RESULT_LINE_FOOTER,
-							  ]
+				self::PANEL_RESULT_LINE_HEADER,
+				self::PANEL_RESULT_LINE_RESULT,
+				self::PANEL_RESULT_LINE_INDEX,
+				self::PANEL_RESULT_LINE_STATUS,
+				self::PANEL_RESULT_LINE_MESSAGE1,
+				self::PANEL_RESULT_LINE_MESSAGE2,
+				self::PANEL_RESULT_LINE_MESSAGE3,
+				self::PANEL_RESULT_LINE_FOOTER,
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_ERRORS, [
-								  self::PANEL_ERRORS_LINE_HEADER,
-								  self::PANEL_ERRORS_LINE_ERRORS,
-								  self::PANEL_ERRORS_LINE_ERROR_INDEX,
-								  self::PANEL_ERRORS_LINE_ERROR_EXCEPTION,
-								  self::PANEL_ERRORS_LINE_ERROR_MESSAGE1,
-								  self::PANEL_ERRORS_LINE_ERROR_MESSAGE2,
-								  self::PANEL_ERRORS_LINE_ERROR_MESSAGE3,
-								  self::PANEL_ERRORS_LINE_FOOTER,
-							  ]
+				self::PANEL_ERRORS_LINE_HEADER,
+				self::PANEL_ERRORS_LINE_ERRORS,
+				self::PANEL_ERRORS_LINE_ERROR_INDEX,
+				self::PANEL_ERRORS_LINE_ERROR_EXCEPTION,
+				self::PANEL_ERRORS_LINE_ERROR_MESSAGE1,
+				self::PANEL_ERRORS_LINE_ERROR_MESSAGE2,
+				self::PANEL_ERRORS_LINE_ERROR_MESSAGE3,
+				self::PANEL_ERRORS_LINE_FOOTER,
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_COMMANDS_PAUSED, [
-										   self::PANEL_COMMANDS_PAUSED_LINE
-									   ]
+				self::PANEL_COMMANDS_PAUSED_LINE
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_COMMANDS_ROOT, [
-										 self::PANEL_COMMANDS_ROOT_LINE
-									 ]
+				self::PANEL_COMMANDS_ROOT_LINE
+			]
 		);
 
 		$this->cliService->createPanel(
 			self::PANEL_COMMANDS_NAVIGATION, [
-											   self::PANEL_COMMANDS_RESULTS_LINE,
-											   self::PANEL_COMMANDS_ERRORS_LINE
-										   ]
+				self::PANEL_COMMANDS_RESULTS_LINE,
+				self::PANEL_COMMANDS_ERRORS_LINE
+			]
 		);
 
 		$this->cliService->initDisplay();
@@ -781,4 +781,3 @@ class Index extends ACommandBase {
 		}
 	}
 }
-

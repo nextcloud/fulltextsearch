@@ -22,14 +22,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class DocumentStatus extends Base {
 	private array $statusAvailable = [
 		'IGNORE' => 'document will never be indexed',
-		'INDEX'  => 'document will be indexed',
-		'DONE'   => 'document is well indexed',
+		'INDEX' => 'document will be indexed',
+		'DONE' => 'document is well indexed',
 		'REMOVE' => 'document will be removed',
 		'FAILED' => 'index had fail'
 	];
 
 	public function __construct(
-		private IndexService $indexService
+		private IndexService $indexService,
 	) {
 		parent::__construct();
 	}
@@ -41,12 +41,12 @@ class DocumentStatus extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:document:status')
-			 ->setDescription('change the status on one specific document')
-			 ->addArgument('provider', InputArgument::REQUIRED, 'Id of the provider')
-			 ->addArgument('document', InputArgument::REQUIRED, 'If of the document')
-			 ->addOption('value', '', InputOption::VALUE_REQUIRED, 'new status', '')
-			 ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'specify the owner of the document', '')
-			 ->addOption('json', 'j', InputOption::VALUE_NONE, 'return status in JSON');
+			->setDescription('change the status on one specific document')
+			->addArgument('provider', InputArgument::REQUIRED, 'Id of the provider')
+			->addArgument('document', InputArgument::REQUIRED, 'If of the document')
+			->addOption('value', '', InputOption::VALUE_REQUIRED, 'new status', '')
+			->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'specify the owner of the document', '')
+			->addOption('json', 'j', InputOption::VALUE_NONE, 'return status in JSON');
 	}
 
 
@@ -112,11 +112,11 @@ class DocumentStatus extends Base {
 
 			case IIndex::INDEX_META:
 			case IIndex::INDEX_CONTENT:
-			case IIndex:: INDEX_PARTS:
-			case IIndex:: INDEX_FULL:
+			case IIndex::INDEX_PARTS:
+			case IIndex::INDEX_FULL:
 				return 'INDEX';
 
-			case IIndex:: INDEX_REMOVE:
+			case IIndex::INDEX_REMOVE:
 				return 'REMOVE';
 
 			case IIndex::INDEX_FAILED:
@@ -142,17 +142,16 @@ class DocumentStatus extends Base {
 				return IIndex::INDEX_IGNORE;
 
 			case 'INDEX':
-				return IIndex:: INDEX_FULL;
+				return IIndex::INDEX_FULL;
 
 			case 'REMOVE':
-				return IIndex:: INDEX_REMOVE;
+				return IIndex::INDEX_REMOVE;
 
 			case 'FAILED':
 				return IIndex::INDEX_FAILED;
 		}
 
-		throw new Exception("Specify a valid status: " . implode(', ', array_keys($this->statusAvailable)));
+		throw new Exception('Specify a valid status: ' . implode(', ', array_keys($this->statusAvailable)));
 	}
 
 }
-

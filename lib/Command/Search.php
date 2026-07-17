@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Search extends Base {
 	public function __construct(
-		private SearchService $searchService
+		private SearchService $searchService,
 	) {
 		parent::__construct();
 	}
@@ -31,9 +31,9 @@ class Search extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:search')
-			 ->setDescription('Search something')
-			 ->addArgument('user', InputArgument::OPTIONAL, 'user')
-			 ->addArgument('string', InputArgument::OPTIONAL, 'needle');
+			->setDescription('Search something')
+			->addArgument('user', InputArgument::OPTIONAL, 'user')
+			->addArgument('string', InputArgument::OPTIONAL, 'needle');
 
 	}
 
@@ -71,6 +71,3 @@ class Search extends Base {
 		return 0;
 	}
 }
-
-
-
