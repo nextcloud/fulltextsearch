@@ -34,5 +34,3 @@ return [
 		['name' => 'Templates#getNavigationPanels', 'url' => '/navigation/panels', 'verb' => 'GET']
 	]
 ];
-
-

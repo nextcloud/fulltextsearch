@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class DocumentIndex extends Base {
 	public function __construct(
 		private ProviderService $providerService,
-		private PlatformService $platformService
+		private PlatformService $platformService,
 	) {
 		parent::__construct();
 	}
@@ -33,10 +33,10 @@ class DocumentIndex extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:document:index')
-			 ->setDescription('index one specific document')
-			 ->addArgument('userId', InputArgument::REQUIRED, 'userId')
-			 ->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
-			 ->addArgument('documentId', InputArgument::REQUIRED, 'documentId');
+			->setDescription('index one specific document')
+			->addArgument('userId', InputArgument::REQUIRED, 'userId')
+			->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
+			->addArgument('documentId', InputArgument::REQUIRED, 'documentId');
 	}
 
 	/**
@@ -63,7 +63,7 @@ class DocumentIndex extends Base {
 		}
 
 		if ($indexDocument->getIndex()
-						  ->isStatus(Index::INDEX_REMOVE)) {
+			->isStatus(Index::INDEX_REMOVE)) {
 			throw new Exception('Unknown document');
 		}
 
@@ -71,7 +71,7 @@ class DocumentIndex extends Base {
 		$platform = $platformWrapper->getPlatform();
 
 		$indexDocument->getIndex()
-					  ->setStatus(Index::INDEX_FULL);
+			->setStatus(Index::INDEX_FULL);
 		$platform->indexDocument($indexDocument);
 
 		return 0;
@@ -79,6 +79,3 @@ class DocumentIndex extends Base {
 
 
 }
-
-
-

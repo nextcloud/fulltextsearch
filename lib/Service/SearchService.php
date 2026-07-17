@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Service;
 
 use Exception;
-use OC;
 use OC\FullTextSearch\Model\DocumentAccess;
 use OC\User\NoUserException;
 use OCA\Circles\CirclesManager;
@@ -108,7 +107,7 @@ class SearchService implements ISearchService {
 		IFullTextSearchPlatform $platform,
 		array $providers,
 		IDocumentAccess $access,
-		SearchRequest $request
+		SearchRequest $request,
 	): array {
 		$result = [];
 		foreach ($providers as $provider) {

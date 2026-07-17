@@ -27,8 +27,8 @@ use OCP\Search\SearchResult;
  * @package OCA\FullTextSearch\Search
  */
 class UnifiedSearchProvider implements IFilteringProvider {
-	const PROVIDER_ID = 'fulltextsearch';
-	const ORDER = 1;
+	public const PROVIDER_ID = 'fulltextsearch';
+	public const ORDER = 1;
 
 	use TArrayTools;
 
@@ -167,4 +167,3 @@ class UnifiedSearchProvider implements IFilteringProvider {
 		return [];
 	}
 }
-

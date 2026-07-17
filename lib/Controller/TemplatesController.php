@@ -10,15 +10,14 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Controller;
 
 use Exception;
-use OCP\AppFramework\Http;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
-
 
 /**
  * Class TemplatesController
@@ -28,7 +27,7 @@ use OCP\IRequest;
 class TemplatesController extends Controller {
 	public function __construct(
 		IRequest $request,
-		private ProviderService $providerService
+		private ProviderService $providerService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -51,16 +50,16 @@ class TemplatesController extends Controller {
 
 		$template = '';
 		if ($searchTemplate->getTemplate() !== '') {
-			$tmpl =
-				new TemplateResponse(
+			$tmpl
+				= new TemplateResponse(
 					$providerWrapper->getAppId(), $searchTemplate->getTemplate(), [], 'blank'
 				);
 			$template = $tmpl->render();
 		}
 
-		$ret[$providerId] =
-			[
-				'options'  => $searchTemplate->getPanelOptions(),
+		$ret[$providerId]
+			= [
+				'options' => $searchTemplate->getPanelOptions(),
 				'template' => $template
 			];
 
@@ -84,13 +83,13 @@ class TemplatesController extends Controller {
 			$providerAppId = $providerWrapper->getAppId();
 
 			$searchTemplate = $provider->getSearchTemplate();
-			$ret[$providerAppId] =
-				[
+			$ret[$providerAppId]
+				= [
 					'provider' => $provider->getId(),
-					'title'    => $provider->getName(),
-					'options'  => $searchTemplate->getNavigationOptions(),
-					'css'      => $searchTemplate->getCss(),
-					'icon'     => $searchTemplate->getIcon()
+					'title' => $provider->getName(),
+					'options' => $searchTemplate->getNavigationOptions(),
+					'css' => $searchTemplate->getCss(),
+					'icon' => $searchTemplate->getIcon()
 				];
 		}
 

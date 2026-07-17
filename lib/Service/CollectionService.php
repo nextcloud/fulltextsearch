@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -8,10 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Service;
 
-
-use OCA\FullTextSearch\AppInfo\Application;
 use OCA\FullTextSearch\ConfigLexicon;
-use OCA\FullTextSearch\Db\IndexesRequest;
 use OCA\FullTextSearch\Exceptions\CollectionArgumentException;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
@@ -30,10 +28,10 @@ class CollectionService {
 	public function __construct(
 		private IAppConfig $appConfig,
 		private IURLGenerator $urlGenerator,
-		private IndexesRequest $indexesRequest,
+		private IndexesService $indexesService,
 		private ProviderService $providerService,
 		private IndexService $indexService,
-		private ConfigService $configService
+		private ConfigService $configService,
 	) {
 	}
 
@@ -47,7 +45,7 @@ class CollectionService {
 	 * @param string $collection
 	 */
 	public function deleteCollection(string $collection): void {
-		$this->indexesRequest->deleteCollection($collection);
+		$this->indexesService->deleteCollection($collection);
 	}
 
 
@@ -70,7 +68,7 @@ class CollectionService {
 	 * @return string[]
 	 */
 	public function getCollections(bool $local = true): array {
-		return $this->indexesRequest->getCollections($local);
+		return $this->indexesService->getCollections($local);
 	}
 
 
@@ -89,12 +87,12 @@ class CollectionService {
 			function (Index $index): array {
 				return $index->asSitemap($this->urlGenerator);
 			},
-			$this->indexesRequest->getQueuedIndexes($collection, false, $length)
+			$this->indexesService->getQueuedIndexes($collection, false, $length)
 		);
 	}
 
 	public function resetCollection(string $collection): void {
-		$this->indexesRequest->resetCollection($collection);
+		$this->indexesService->resetCollection($collection);
 	}
 
 	/**
@@ -105,7 +103,7 @@ class CollectionService {
 	 * @throws IndexDoesNotExistException
 	 */
 	public function setAsDone(string $collection, string $providerId, string $documentId): void {
-		$index = $this->indexesRequest->getIndex($providerId, $documentId, $collection);
+		$index = $this->indexesService->getIndex($providerId, $documentId, $collection);
 		$index->setStatus(IIndex::INDEX_DONE);
 		$this->indexService->updateIndex($index);
 	}
@@ -121,7 +119,7 @@ class CollectionService {
 		IFullTextSearchProvider $provider,
 		string $collection,
 		string $userId,
-		IndexOptions $options
+		IndexOptions $options,
 	) {
 		$chunks = $provider->generateChunks($userId);
 		if (empty($chunks)) {
@@ -146,7 +144,7 @@ class CollectionService {
 				$this->runner->setInfoInt('documentTotal', ++$curr);
 
 				try {
-					$this->indexesRequest->getIndex(
+					$this->indexesService->getIndex(
 						$document->getProviderId(),
 						$document->getId(),
 						$collection
@@ -157,7 +155,7 @@ class CollectionService {
 					$index->setOwnerId($document->getAccess()->getOwnerId());
 					$index->setSource($document->getSource());
 					$index->setLastIndex();
-					$this->indexesRequest->create($index);
+					$this->indexesService->create($index);
 
 					$curr = $this->runner->getInfoInt('indexCount');
 					$this->runner->setInfoInt('indexCount', ++$curr);

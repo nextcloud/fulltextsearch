@@ -10,9 +10,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Migration;
 
 use Closure;
-use Doctrine\DBAL\Types\Type;
 use OCP\DB\ISchemaWrapper;
-use OCP\DB\Types;
 use OCP\Migration\Attributes\AddIndex;
 use OCP\Migration\Attributes\IndexType;
 use OCP\Migration\IOutput;

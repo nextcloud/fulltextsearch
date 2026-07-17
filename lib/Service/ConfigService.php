@@ -33,8 +33,8 @@ class ConfigService {
 	}
 
 	public function setConfig(array $save): void {
-		foreach(array_keys($save) as $k) {
-			switch($k) {
+		foreach (array_keys($save) as $k) {
+			switch ($k) {
 				case ConfigLexicon::APP_NAVIGATION:
 					$this->appConfig->setAppValueBool($k, $save[$k]);
 					break;

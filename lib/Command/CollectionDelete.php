@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -8,14 +9,12 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-
 use OC\Core\Command\Base;
 use OCA\FullTextSearch\Exceptions\CollectionArgumentException;
 use OCA\FullTextSearch\Service\CollectionService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
 
 class CollectionDelete extends Base {
 
@@ -40,8 +39,8 @@ class CollectionDelete extends Base {
 	protected function configure() {
 		parent::configure();
 		$this->setName('fulltextsearch:collection:delete')
-			 ->setDescription('Delete collection')
-			 ->addArgument('name', InputArgument::REQUIRED, 'name of the collection to delete');
+			->setDescription('Delete collection')
+			->addArgument('name', InputArgument::REQUIRED, 'name of the collection to delete');
 	}
 
 
@@ -62,6 +61,3 @@ class CollectionDelete extends Base {
 		return 0;
 	}
 }
-
-
-

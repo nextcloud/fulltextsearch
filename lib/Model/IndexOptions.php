@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -8,11 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Model;
 
-
-use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use JsonSerializable;
+use OCA\FullTextSearch\Tools\Traits\TArrayTools;
 use OCP\FullTextSearch\Model\IIndexOptions;
-
 
 /**
  * Class IndexOptions
@@ -135,4 +134,3 @@ class IndexOptions implements IIndexOptions, JsonSerializable {
 		return $this->options;
 	}
 }
-

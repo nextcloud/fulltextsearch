@@ -14,7 +14,6 @@ use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Model\Runner;
-use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
@@ -28,7 +27,7 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 class Index extends TimedJob {
-	const HOUR_ERR_RESET = 240;
+	public const HOUR_ERR_RESET = 240;
 
 	private Runner $runner;
 
