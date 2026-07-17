@@ -25,8 +25,8 @@ use OCP\IAppConfig;
 use OCP\INavigationManager;
 use OCP\IURLGenerator;
 use OCP\L10N\IFactory;
-use OCP\Server;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Throwable;
 
 if (file_exists($autoLoad = __DIR__ . '/../../vendor/autoload.php')) {
@@ -88,17 +88,22 @@ class Application extends App implements IBootstrap {
 	/**
 	 * Register Navigation Tab
 	 */
-	protected function registerNavigation(ContainerInterface $container) {
-		/** @var IAppConfig $appConfig */
-		$appConfig = $container->get(IAppConfig::class);
+	protected function registerNavigation(
+		IAppConfig $appConfig,
+		INavigationManager $navigationManager,
+		IURLGenerator $urlGen,
+		IFactory $l10nFactory
+	): void {
 		if (!$appConfig->getValueBool(self::APP_ID, ConfigLexicon::APP_NAVIGATION)) {
 			return;
 		}
 
 		try {
-			$container->get(INavigationManager::class)
-				->add(fn () => $this->fullTextSearchNavigation());
-		} catch (\Exception) {
+			$navigationManager->add(
+				fn () => $this->fullTextSearchNavigation($urlGen, $l10nFactory)
+			);
+		} catch (RouteNotFoundException) {
+            // Navigation route not found, do not add navigation entry
 		}
 	}
 
@@ -106,16 +111,13 @@ class Application extends App implements IBootstrap {
 	/**
 	 * @return array
 	 */
-	private function fullTextSearchNavigation(): array {
-		$urlGen = Server::get(IURLGenerator::class);
-
+	private function fullTextSearchNavigation(IURLGenerator $urlGen, IFactory $l10nFactory): array {
 		return [
 			'id' => self::APP_ID,
 			'order' => 5,
-			'href' => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
-			'icon' => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),
-			'name' => Server::get(IFactory::class)->get('fulltextsearch')->t('Search')
+			'href'  => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
+			'icon'  => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),
+			'name'  => $l10nFactory->get(self::APP_ID)->t('Search')
 		];
 	}
-
 }
