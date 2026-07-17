@@ -14,7 +14,7 @@ Core App of the full-text search framework for your Nextcloud.
 
 ]]>
 	</description>
-	<version>32.0.0</version>
+	<version>34.0.0</version>
 	<licence>agpl</licence>
 	<author>Maxence Lange</author>
 	<namespace>FullTextSearch</namespace>
@@ -27,7 +27,7 @@ Core App of the full-text search framework for your Nextcloud.
 	<repository>https://github.com/nextcloud/fulltextsearch.git</repository>
 	<screenshot>https://raw.githubusercontent.com/nextcloud/fulltextsearch/master/screenshots/0.3.0.png</screenshot>
 	<dependencies>
-		<nextcloud min-version="32" max-version="34"/>
+		<nextcloud min-version="34" max-version="34"/>
 	</dependencies>
 
 	<background-jobs>
