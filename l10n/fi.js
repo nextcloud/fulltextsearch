@@ -3,9 +3,9 @@ OC.L10N.register(
     {
     "the search returned {total} results in {time} ms" : "haku palautti {total} tulosta ajassa {time} ms",
     "Search" : "Haku",
+    "Full Text Search" : "Kokotekstihaku",
     "Index not found" : "Indeksiä ei löydy",
     "Process timed out" : "Toiminto aikakatkaistiin",
-    "Full Text Search" : "Kokotekstihaku",
     "Full text search" : "Kokotekstihaku",
     "Search on %s" : "Etsi kohteesta %s",
     "General" : "Yleiset",

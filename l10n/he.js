@@ -3,9 +3,9 @@ OC.L10N.register(
     {
     "the search returned {total} results in {time} ms" : "החיפוש החזיר {total} תוצאות תוך {time} מילישניות",
     "Search" : "חיפוש",
+    "Full Text Search" : "חיפוש טקסט מלא",
     "Index not found" : "המפתח לא נמצא",
     "Process timed out" : "עבר הזמן שהוקצב לתהליך",
-    "Full Text Search" : "חיפוש טקסט מלא",
     "Full text search" : "חיפוש טקסט מלא",
     "Core of the full-text search framework for Nextcloud" : "ליבת סביבת עבודת חיפוש טקסט מלא עבור Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "יישומון ליבה של סביבת עבודה לחיפוש טקסט מלא עבור ה־Nextcloud שלך.",
