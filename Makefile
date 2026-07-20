@@ -76,7 +76,13 @@ composer:
 	composer install --prefer-dist
 	composer upgrade --prefer-dist
 
-appstore: clean composer
+node-modules:
+	$(NPM) ci
+
+build-js-production:
+	$(NPM) run build
+
+appstore: clean node-modules build-js-production composer
 	mkdir -p $(sign_dir)
 	rsync -a \
 	--exclude=/build \
