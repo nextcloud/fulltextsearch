@@ -3,11 +3,6 @@
   "description": "Full text search framework for Nextcloud",
   "minimum-stability": "stable",
   "license": "agpl",
-  "config": {
-    "optimize-autoloader": true,
-    "classmap-authoritative": true,
-    "autoloader-suffix": "FullTextSearch"
-  },
   "authors": [
     {
       "name": "Maxence Lange",
@@ -33,6 +28,9 @@
     }
   },
   "config": {
+    "optimize-autoloader": true,
+    "classmap-authoritative": true,
+    "autoloader-suffix": "FullTextSearch",
     "allow-plugins": {
       "composer/package-versions-deprecated": true,
       "bamarni/composer-bin-plugin": true
