@@ -92,7 +92,7 @@ class Application extends App implements IBootstrap {
 		IAppConfig $appConfig,
 		INavigationManager $navigationManager,
 		IURLGenerator $urlGen,
-		IFactory $l10nFactory
+		IFactory $l10nFactory,
 	): void {
 		if (!$appConfig->getValueBool(self::APP_ID, ConfigLexicon::APP_NAVIGATION)) {
 			return;
@@ -103,7 +103,7 @@ class Application extends App implements IBootstrap {
 				fn () => $this->fullTextSearchNavigation($urlGen, $l10nFactory)
 			);
 		} catch (RouteNotFoundException) {
-            // Navigation route not found, do not add navigation entry
+			// Navigation route not found, do not add navigation entry
 		}
 	}
 
@@ -115,9 +115,9 @@ class Application extends App implements IBootstrap {
 		return [
 			'id' => self::APP_ID,
 			'order' => 5,
-			'href'  => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
-			'icon'  => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),
-			'name'  => $l10nFactory->get(self::APP_ID)->t('Search')
+			'href' => $urlGen->linkToRoute(self::APP_ID . '.Navigation.navigate'),
+			'icon' => $urlGen->imagePath(self::APP_ID, 'fulltextsearch.svg'),
+			'name' => $l10nFactory->get(self::APP_ID)->t('Search')
 		];
 	}
 }
