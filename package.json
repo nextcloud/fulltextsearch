@@ -1,0 +1,51 @@
+{
+  "name": "fulltextsearch",
+  "version": "32.0.0",
+  "private": true,
+  "description": "Full text search framework for Nextcloud",
+  "homepage": "https://github.com/nextcloud/fulltextsearch#readme",
+  "bugs": {
+    "url": "https://github.com/nextcloud/fulltextsearch/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nextcloud/fulltextsearch.git"
+  },
+  "license": "AGPL-3.0-or-later",
+  "author": "Nextcloud GmbH and Nextcloud contributors",
+  "type": "module",
+  "scripts": {
+    "build": "vite --mode production build",
+    "dev": "vite --mode development build",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "stylelint": "stylelint src/**/*.scss src/**/*.vue",
+    "stylelint:fix": "stylelint src/**/*.scss src/**/*.vue --fix",
+    "watch": "vite --mode development build --watch"
+  },
+  "dependencies": {
+    "@nextcloud/axios": "^2.5.1",
+    "@nextcloud/initial-state": "^3.0.0",
+    "@nextcloud/l10n": "^3.4.1",
+    "@nextcloud/logger": "^3.0.3",
+    "@nextcloud/router": "^3.1.0",
+    "@nextcloud/vue": "^9.8.2",
+    "vue": "^3.5.39"
+  },
+  "devDependencies": {
+    "@nextcloud/browserslist-config": "^3.1.2",
+    "@nextcloud/eslint-config": "^9.0.1",
+    "@nextcloud/stylelint-config": "^3.1.1",
+    "@nextcloud/typings": "^1.9.1",
+    "@nextcloud/vite-config": "^2.5.4",
+    "@vue/tsconfig": "^0.9.1",
+    "eslint": "^10.6.0",
+    "sass": "^1.99.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6"
+  },
+  "engines": {
+    "node": "^24.0.0",
+    "npm": "^11.3.0"
+  }
+}

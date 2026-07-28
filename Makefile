@@ -10,6 +10,7 @@ package_name=$(shell echo $(app_name) | tr '[:upper:]' '[:lower:]')
 cert_dir=$(HOME)/.nextcloud/certificates
 github_account=nextcloud
 release_account=nextcloud-releases
+NPM?=npm
 branch=stable29
 version=29.0.0
 since_tag=
@@ -76,7 +77,13 @@ composer:
 	composer install --prefer-dist
 	composer upgrade --prefer-dist
 
-appstore: clean composer
+node-modules:
+	$(NPM) ci
+
+build-js-production:
+	$(NPM) run build
+
+appstore: clean node-modules build-js-production composer
 	mkdir -p $(sign_dir)
 	rsync -a \
 	--exclude=/build \
