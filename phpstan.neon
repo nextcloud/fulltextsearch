@@ -3,7 +3,7 @@
 parameters:
 	level: 4
 	phpVersion:
-		min: 80100
+		min: 80200
 		max: 80400
 	paths:
 		- lib

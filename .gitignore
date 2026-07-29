@@ -4,3 +4,8 @@
 build/
 vendor/
 tests/.phpunit.result.cache
+
+node_modules/
+
+js
+css
