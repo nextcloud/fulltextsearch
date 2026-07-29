@@ -1,8 +1,6 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "the search returned {total} results in {time} ms" : "aramada {time} ms sürede {total} sonuç bulundu",
-    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "{title} başlığındaki \"{search}\" aramasında {time} ms sürede {total} sonuç bulundu",
     "Search" : "Arama",
     "Full Text Search" : "Tam yazı arama",
     "Index not found" : "Dizin bulunamadı",
@@ -10,12 +8,14 @@ OC.L10N.register(
     "Full text search" : "Tam yazı arama",
     "Core of the full-text search framework for Nextcloud" : "Nextcloud tam yazı arama çatısının çekirdek uygulaması",
     "Core App of the full-text search framework for your Nextcloud." : "Nextcloud tam yazı arama çatısının çekirdek uygulaması.",
-    "Search on %s" : "%s üzerine arama",
-    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Nextcloud tam yazı arama özelliğinin kurulması ve yapılandırılması için wiki belgelerine bakabilirsiniz",
     "General" : "Genel",
     "Search Platform" : "Arama platformu",
-    "Select the app to index content and answer search queries." : "İçeriği dizine ekleyecek ve arama sorgularını yanıtlayacak uygulamayı seçin",
     "Navigation Icon" : "Gezinme simgesi",
-    "Enable global search within all your content." : "Tüm içeriğiniz üzerinde genel aramayı açın."
+    "Enable global search within all your content." : "Tüm içeriğiniz üzerinde genel aramayı açın.",
+    "Search on %s" : "%s üzerine arama",
+    "the search returned {total} results in {time} ms" : "aramada {time} ms sürede {total} sonuç bulundu",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "{title} başlığındaki \"{search}\" aramasında {time} ms sürede {total} sonuç bulundu",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Nextcloud tam yazı arama özelliğinin kurulması ve yapılandırılması için wiki belgelerine bakabilirsiniz",
+    "Select the app to index content and answer search queries." : "İçeriği dizine ekleyecek ve arama sorgularını yanıtlayacak uygulamayı seçin"
 },
 "nplurals=2; plural=(n > 1);");

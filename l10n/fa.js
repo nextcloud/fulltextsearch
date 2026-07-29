@@ -1,8 +1,6 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "the search returned {total} results in {time} ms" : "جستجو {total} نتیجه را در {time} میلی‌ثانیه برگرداند",
-    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "جستجو در {title} برای \"{search}\"، {total} نتیجه را در {time} میلی‌ثانیه برگرداند",
     "Search" : "جستجو",
     "Full Text Search" : "جستجوی تمام‌متن",
     "Index not found" : "ایندکس یافت نشد",
@@ -10,12 +8,14 @@ OC.L10N.register(
     "Full text search" : "جستجوی تمام متن",
     "Core of the full-text search framework for Nextcloud" : "هستهٔ چارچوب جستجوی تمام‌متن برای نکست‌کلود",
     "Core App of the full-text search framework for your Nextcloud." : "اپلیکیشن اصلی چارچوب جستجوی تمام‌متن برای نکست‌کلود شما",
-    "Search on %s" : "جستجو در %s",
-    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "لطفاً برای مستندات مربوط به نصب و پیکربندی جستجوی تمام متن در نکست‌کلود خود، ویکی را بررسی کنید",
     "General" : "عمومی",
     "Search Platform" : "پلتفرم جستجو",
-    "Select the app to index content and answer search queries." : "اپلیکیشنی را برای ایندکس کردن محتوا و پاسخ به پرس‌وجوهای جستجو انتخاب کنید",
     "Navigation Icon" : "آیکون ناوبری",
-    "Enable global search within all your content." : "جستجوی سراسری را در تمام محتوای خود فعال کنید"
+    "Enable global search within all your content." : "جستجوی سراسری را در تمام محتوای خود فعال کنید",
+    "Search on %s" : "جستجو در %s",
+    "the search returned {total} results in {time} ms" : "جستجو {total} نتیجه را در {time} میلی‌ثانیه برگرداند",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "جستجو در {title} برای \"{search}\"، {total} نتیجه را در {time} میلی‌ثانیه برگرداند",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "لطفاً برای مستندات مربوط به نصب و پیکربندی جستجوی تمام متن در نکست‌کلود خود، ویکی را بررسی کنید",
+    "Select the app to index content and answer search queries." : "اپلیکیشنی را برای ایندکس کردن محتوا و پاسخ به پرس‌وجوهای جستجو انتخاب کنید"
 },
 "nplurals=2; plural=(n > 1);");
