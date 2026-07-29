@@ -1,8 +1,6 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "the search returned {total} results in {time} ms" : "sökningen gav {total} resultat på {time} ms",
-    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "sökningen på {title} för \"{search}\" gav {total} resultat på {time} ms",
     "Search" : "Sök",
     "Full Text Search" : "Fulltextsökning",
     "Index not found" : "Index hittades inte",
@@ -10,12 +8,14 @@ OC.L10N.register(
     "Full text search" : "Fulltextsökning",
     "Core of the full-text search framework for Nextcloud" : "Kärnan i ramverket för fulltextsökning i Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Kärnapp för ramverket för fulltextsökning i din Nextcloud.",
-    "Search on %s" : "Sök på %s",
-    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Läs dokumentationen i wikin om installation och konfiguration av fulltextsökning i din Nextcloud",
     "General" : "Allmänt",
     "Search Platform" : "Sökplattform",
-    "Select the app to index content and answer search queries." : "Välj app för att indexera innehåll och svara på sökfrågor.",
     "Navigation Icon" : "Navigeringsikon",
-    "Enable global search within all your content." : "Aktivera global sökning i allt ditt innehåll."
+    "Enable global search within all your content." : "Aktivera global sökning i allt ditt innehåll.",
+    "Search on %s" : "Sök på %s",
+    "the search returned {total} results in {time} ms" : "sökningen gav {total} resultat på {time} ms",
+    "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "sökningen på {title} för \"{search}\" gav {total} resultat på {time} ms",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Läs dokumentationen i wikin om installation och konfiguration av fulltextsökning i din Nextcloud",
+    "Select the app to index content and answer search queries." : "Välj app för att indexera innehåll och svara på sökfrågor."
 },
 "nplurals=2; plural=(n != 1);");
