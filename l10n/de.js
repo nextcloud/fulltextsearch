@@ -9,6 +9,7 @@ OC.L10N.register(
     "Core of the full-text search framework for Nextcloud" : "Kernstück des Volltextsuche-Frameworks für Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Haupt-App des Volltextsuche-Frameworks für Nextcloud.",
     "General" : "Allgemein",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud." : "Informationen zur Installation und Konfiguration der Volltextsuche unter Nextcloud finden Sie im Wiki",
     "Search Platform" : "Suchplattform",
     "Navigation Icon" : "Navigations-Symbol",
     "Enable global search within all your content." : "Globale Suche über alle Inhalte aktivieren.",
