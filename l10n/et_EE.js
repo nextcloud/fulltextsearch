@@ -9,6 +9,7 @@ OC.L10N.register(
     "Core of the full-text search framework for Nextcloud" : "Nextcloudi täistekstotsingu raamistiku tuum",
     "Core App of the full-text search framework for your Nextcloud." : "Sinu Nextcloudi serveri täistekstotsingu raamistiku tuumikrakendus.",
     "General" : "Üldine",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud." : "Täistekstotsingu paigaldamise ja seadistamise kohta oma Nextcloudi serveris leiad lisateavet vikist.",
     "Search Platform" : "Otsinguplatvorm",
     "Navigation Icon" : "Menüüikoon",
     "Enable global search within all your content." : "Kasuta üldist otsingut kogu oma sisust.",

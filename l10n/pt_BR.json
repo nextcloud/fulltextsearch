@@ -7,6 +7,7 @@
     "Core of the full-text search framework for Nextcloud" : "Núcleo da estrutura de pesquisa de texto completo para Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Aplicativo principal da estrutura de pesquisa de texto completo para Nextcloud.",
     "General" : "Geral",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud." : "Por favor, consulte a wiki para obter a documentação relacionada à instalação e à configuração da pesquisa de texto completo no seu Nextcloud.",
     "Search Platform" : "Plataforma de Pesquisa",
     "Navigation Icon" : "Ícone de Navegação",
     "Enable global search within all your content." : "Ativar a pesquisa global em todo o seu conteúdo.",
