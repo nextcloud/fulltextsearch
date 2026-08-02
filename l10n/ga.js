@@ -9,6 +9,7 @@ OC.L10N.register(
     "Core of the full-text search framework for Nextcloud" : "Croílár an chreata cuardaigh téacs iomlán do Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Aip lárnach den chreat cuardaigh téacs iomlán do do Nextcloud.",
     "General" : "Ginearálta",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud." : "Seiceáil an vicí le haghaidh doiciméadacht a bhaineann le suiteáil agus cumraíocht an chuardaigh téacs iomláin laistigh de do Nextcloud.",
     "Search Platform" : "Ardán Cuardaigh",
     "Navigation Icon" : "Deilbhín Nascleanúna",
     "Enable global search within all your content." : "Cumasaigh cuardach domhanda laistigh d'ábhar go léir.",
