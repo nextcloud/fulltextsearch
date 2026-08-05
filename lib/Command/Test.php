@@ -29,10 +29,10 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCA\FullTextSearch\Service\TestService;
-use OCP\AppFramework\QueryException;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IDocumentAccess;
+use Psr\Container\ContainerExceptionInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -118,7 +118,7 @@ class Test extends ACommandBase {
 	/**
 	 * @return IFullTextSearchProvider
 	 * @throws ProviderIsNotCompatibleException
-	 * @throws QueryException
+	 * @throws ContainerExceptionInterface
 	 * @throws ProviderDoesNotExistException
 	 * @throws ProviderIsNotUniqueException
 	 */
@@ -181,7 +181,7 @@ class Test extends ACommandBase {
 	 * @throws ProviderDoesNotExistException
 	 * @throws ProviderIsNotCompatibleException
 	 * @throws ProviderIsNotUniqueException
-	 * @throws QueryException
+	 * @throws ContainerExceptionInterface
 	 */
 	private function testCreatingProvider(OutputInterface $output): IFullTextSearchProvider {
 		$this->output($output, 'Creating mocked content provider.');

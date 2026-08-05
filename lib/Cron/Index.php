@@ -18,11 +18,11 @@ use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
-use OCP\AppFramework\QueryException;
 use OCP\AppFramework\Services\IAppConfig;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\IJob;
 use OCP\BackgroundJob\TimedJob;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -49,7 +49,7 @@ class Index extends TimedJob {
 	/**
 	 * @param mixed $argument
 	 *
-	 * @throws QueryException
+	 * @throws ContainerExceptionInterface
 	 */
 	protected function run($argument) {
 		$this->runner = new Runner($this->runningService, 'cronIndex');
