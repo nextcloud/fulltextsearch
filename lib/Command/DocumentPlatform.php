@@ -44,7 +44,7 @@ class DocumentPlatform extends Base {
 	 *
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$providerId = $input->getArgument('providerId');
 		$documentId = $input->getArgument('documentId');
 

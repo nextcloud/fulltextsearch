@@ -56,7 +56,7 @@ class DocumentStatus extends Base {
 	 *
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$providerId = $input->getArgument('provider');
 		$documentId = $input->getArgument('document');
 		$value = $input->getOption('value');
