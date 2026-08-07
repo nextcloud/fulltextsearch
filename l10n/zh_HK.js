@@ -9,6 +9,7 @@ OC.L10N.register(
     "Core of the full-text search framework for Nextcloud" : "Nextcloud 全文搜尋框架的核心",
     "Core App of the full-text search framework for your Nextcloud." : "您 Nextcloud 全文搜尋框架的核心應用程式。",
     "General" : "一般",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud." : "請檢視關於在您 Nextcloud 中安裝與設定全文搜尋的 wiki 文件。",
     "Search Platform" : "搜尋平台",
     "Navigation Icon" : "導覽圖示",
     "Enable global search within all your content." : "在您所有的內容中啟用全域搜尋。",
