@@ -187,7 +187,7 @@ input.options_small {
 }
 
 .result_title {
-	color: #000;
+	color: -1 * var(--color-main-background);
 }
 
 .result_extract {
