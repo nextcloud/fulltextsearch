@@ -129,10 +129,9 @@ class Live extends ACommandBase {
 	 * @param InputInterface $input
 	 * @param OutputInterface $output
 	 *
-	 * @return int|null|void
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		if (!$input->getOption('service') && !$input->getOption('no-readline')) {
 			try {
 				/** do not get stuck while waiting interactive input */

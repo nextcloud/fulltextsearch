@@ -46,7 +46,7 @@ class Search extends Base {
 	 * @return int
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$searchRequest = new SearchRequest();
 		$searchRequest->importFromArray(
 			[

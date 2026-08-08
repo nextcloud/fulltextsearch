@@ -40,7 +40,7 @@ class CollectionList extends Base {
 	 *
 	 * @return int
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$collections = $this->collectionService->getCollections();
 		$output->writeln('found ' . sizeof($collections) . ' collection(s)');
 
