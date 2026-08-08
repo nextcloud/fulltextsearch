@@ -7,6 +7,7 @@
     "Core of the full-text search framework for Nextcloud" : "NextCloudの全文検索フレームワークのコア",
     "Core App of the full-text search framework for your Nextcloud." : "NextCloudの全文検索フレームワークのコアアプリケーション",
     "General" : "一般",
+    "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud." : "Nextcloud 内の全文検索のインストールおよび設定に関するドキュメントについては、Wiki をご確認ください。",
     "Search Platform" : "検索プラットフォーム",
     "Navigation Icon" : "ナビゲーションアイコン",
     "Enable global search within all your content." : "すべてのコンテンツ内でグローバル検索を有効にする。",
