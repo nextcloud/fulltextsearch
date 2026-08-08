@@ -36,7 +36,7 @@ class ConfigService {
 		foreach (array_keys($save) as $k) {
 			switch ($k) {
 				case ConfigLexicon::APP_NAVIGATION:
-					$this->appConfig->setAppValueBool($k, $save[$k]);
+					$this->appConfig->setAppValueBool($k, (bool)$save[$k]);
 					break;
 
 				case ConfigLexicon::SEARCH_PLATFORM:
