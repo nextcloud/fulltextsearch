@@ -57,6 +57,11 @@ class DocumentIndex extends Base {
 		$index = new Index($providerId, $documentId);
 		$index->setOwnerId($userId);
 		$index->setStatus(Index::INDEX_FULL);
+		try {
+			$index = \OC::$server->get(\OCA\FullTextSearch\Service\IndexService::class)->getIndex($providerId, $documentId);
+		} catch (\Throwable $t) {
+			$output->writeln("<error>Index not found : index attribute has been set to default values</error>");
+		}
 		$indexDocument = $provider->updateDocument($index);
 		if (!$indexDocument->hasIndex()) {
 			$indexDocument->setIndex($index);
