@@ -27,3 +27,71 @@ export interface ISettingsUpdatedEventDetail {
 	/** `IFullTextSearchProvider::getId()` of every registered provider, only populated once a platform is selected. */
 	providers: string[]
 }
+
+/**
+ * One `ISearchOption` as serialized by `OC\FullTextSearch\Model\SearchOption`, describing a
+ * single filter control a Content Provider wants displayed in the navigation panel.
+ */
+export interface ISearchOption {
+	name: string
+	title: string
+	type: 'checkbox' | 'input'
+	size: string
+	placeholder: string
+}
+
+/** One entry of the `GET /navigation/panels` response, keyed by the provider's app id. */
+export interface INavigationPanel {
+	provider: string
+	title: string
+	options: ISearchOption[]
+	css: string
+	icon: string
+}
+
+export type INavigationPanels = Record<string, INavigationPanel>
+
+export interface ISearchExcerpt {
+	source: string
+	excerpt: string
+}
+
+/** `OC\FullTextSearch\Model\IndexDocument::jsonSerialize()`, trimmed to the fields the UI uses. */
+export interface ISearchDocument {
+	id: string
+	providerId: string
+	title: string
+	link: string
+	source: string
+	hash: string
+	tags: string[]
+	excerpts: ISearchExcerpt[] | null
+	score: string
+}
+
+export interface ISearchResultMeta {
+	timedOut: boolean
+	time: number
+	count: number
+	total: number
+	maxScore: number
+}
+
+/** One entry of the `result` array, i.e. one provider's contribution to a search. */
+export interface ISearchResult {
+	provider: { id: string, name: string }
+	documents: ISearchDocument[]
+	meta: ISearchResultMeta
+}
+
+export interface ISearchResponse {
+	result: ISearchResult[]
+	status: number
+	version: string
+}
+
+export interface ISearchErrorResponse {
+	status: number
+	exception: string
+	message: string
+}
