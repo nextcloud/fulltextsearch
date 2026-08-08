@@ -6,6 +6,7 @@ import { createAppConfig } from '@nextcloud/vite-config'
 
 export default createAppConfig({
 	'settings-admin': 'src/settings-admin.ts',
+	'navigate': 'src/navigate.ts',
 }, {
 	// Setup REUSE information extraction
 	extractLicenseInformation: {
