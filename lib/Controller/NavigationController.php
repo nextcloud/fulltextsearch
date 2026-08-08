@@ -12,15 +12,16 @@ namespace OCA\FullTextSearch\Controller;
 use OCA\FullTextSearch\AppInfo\Application;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\FullTextSearch\IFullTextSearchManager;
+use OCP\AppFramework\Services\IInitialState;
 use OCP\IConfig;
 use OCP\IRequest;
+use OCP\Util;
 
 class NavigationController extends Controller {
 	public function __construct(
 		IRequest $request,
 		private IConfig $config,
-		private IFullTextSearchManager $fullTextSearchManager,
+		private IInitialState $initialStateService,
 	) {
 		parent::__construct(Application::APP_ID, $request);
 	}
@@ -35,11 +36,12 @@ class NavigationController extends Controller {
 	 */
 	public function navigate(): TemplateResponse {
 		$themingName = $this->config->getAppValue('theming', 'name', 'Nextcloud');
-		$data = ['themingName' => $themingName];
+		$this->initialStateService->provideInitialState('themingName', $themingName);
 
-		$this->fullTextSearchManager->addJavascriptAPI();
+		Util::addScript(Application::APP_ID, 'fulltextsearch-navigate');
+		Util::addStyle(Application::APP_ID, 'fulltextsearch-navigate');
 
-		return new TemplateResponse(Application::APP_ID, 'navigate', $data);
+		return new TemplateResponse(Application::APP_ID, 'navigate');
 	}
 
 }
