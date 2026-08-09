@@ -18,5 +18,8 @@
     "psr-4": {
       "OCA\\FullTextSearch\\": "lib/"
     }
+  },
+  "require-dev": {
+    "nextcloud/ocp": "dev-stable33"
   }
 }
