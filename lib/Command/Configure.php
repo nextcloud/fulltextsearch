@@ -9,32 +9,33 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\ConfigService;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use OCP\Console\Attribute\Argument;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
 
-class Configure extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:configure',
+	description: 'Configure the installation',
+)]
+class Configure {
 	public function __construct(
 		private ConfigService $configService,
 	) {
-		parent::__construct();
 	}
 
-	protected function configure(): void {
-		parent::configure();
-		$this->setName('fulltextsearch:configure')
-			->addArgument('json', InputArgument::OPTIONAL, 'set config')
-			->setDescription('Configure the installation');
-	}
-
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		if ($input->getArgument('json')) {
-			$this->configService->setConfig(json_decode($input->getArgument('json'), true) ?? []);
+	public function __invoke(
+		IOutput $output,
+		#[Argument(description: 'set config')]
+		string $json = '',
+	): ExitCode {
+		if ($json !== '') {
+			$this->configService->setConfig(json_decode($json, true) ?? []);
 		}
 
 		$output->writeln(json_encode($this->configService->getConfig(), JSON_PRETTY_PRINT));
-		return self::SUCCESS;
+
+		return ExitCode::Success;
 	}
 }

@@ -10,47 +10,35 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use OCP\Console\Attribute\Argument;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\ExitCode;
 
-class DocumentIndex extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:document:index',
+	description: 'index one specific document',
+)]
+class DocumentIndex {
 	public function __construct(
 		private ProviderService $providerService,
 		private PlatformService $platformService,
 	) {
-		parent::__construct();
-	}
-
-
-	/**
-	 *
-	 */
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:document:index')
-			->setDescription('index one specific document')
-			->addArgument('userId', InputArgument::REQUIRED, 'userId')
-			->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
-			->addArgument('documentId', InputArgument::REQUIRED, 'documentId');
 	}
 
 	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$providerId = $input->getArgument('providerId');
-		$documentId = $input->getArgument('documentId');
-		$userId = $input->getArgument('userId');
-
+	public function __invoke(
+		#[Argument(description: 'userId')]
+		string $userId,
+		#[Argument(description: 'providerId')]
+		string $providerId,
+		#[Argument(description: 'documentId')]
+		string $documentId,
+	): ExitCode {
 		$providerWrapper = $this->providerService->getProvider($providerId);
 		$provider = $providerWrapper->getProvider();
 
@@ -74,7 +62,7 @@ class DocumentIndex extends Base {
 			->setStatus(Index::INDEX_FULL);
 		$platform->indexDocument($indexDocument);
 
-		return 0;
+		return ExitCode::Success;
 	}
 
 

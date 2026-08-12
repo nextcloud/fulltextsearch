@@ -10,12 +10,14 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Model;
 
 use Exception;
-use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\RunnerAlreadyUpException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\TickIsNotAliveException;
 use OCA\FullTextSearch\Service\RunningService;
 use OCA\FullTextSearch\Tools\Traits\TArrayTools;
+use OCP\Console\Exception\InterruptedException;
+use OCP\Console\IOutput;
+use OCP\Console\ISignalHandler;
 use OCP\FullTextSearch\Model\IIndex;
 use OCP\FullTextSearch\Model\IRunner;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,10 +46,10 @@ class Runner implements IRunner {
 	/** @var int */
 	private $tickId = 0;
 
-	/** @var ACommandBase */
-	private $base = null;
+	/** @var ISignalHandler */
+	private $signalHandler = null;
 
-	/** @var OutputInterface */
+	/** @var OutputInterface|IOutput */
 	private $outputInterface = null;
 
 	/** @var array */
@@ -121,9 +123,7 @@ class Runner implements IRunner {
 	 */
 	public function updateAction(string $action = '', bool $force = false): string {
 
-		if ($this->base !== null) {
-			$this->base->abort();
-		}
+		$this->abortIfInterrupted();
 
 		$n = '';
 		if (sizeof($this->methodOnKeyPress) > 0) {
@@ -152,9 +152,7 @@ class Runner implements IRunner {
 				}
 
 				usleep(300000);
-				if ($this->base !== null) {
-					$this->base->abort();
-				}
+				$this->abortIfInterrupted();
 			}
 
 			$this->pauseRunning(false);
@@ -422,12 +420,29 @@ class Runner implements IRunner {
 
 
 	/**
-	 * @param ACommandBase $base
-	 * @param OutputInterface $output
+	 * @param ISignalHandler $signalHandler
+	 * @param OutputInterface|IOutput $output
 	 */
-	public function sourceIsCommandLine(ACommandBase $base, OutputInterface $output) {
-		$this->base = $base;
+	public function sourceIsCommandLine(ISignalHandler $signalHandler, OutputInterface|IOutput $output) {
+		$this->signalHandler = $signalHandler;
 		$this->outputInterface = $output;
+	}
+
+
+	/**
+	 * Stops the runner and exits the process when the user interrupted the command (Ctrl-C/SIGTERM).
+	 */
+	private function abortIfInterrupted(): void {
+		if ($this->signalHandler === null) {
+			return;
+		}
+
+		try {
+			$this->signalHandler->abortIfInterrupted();
+		} catch (InterruptedException $e) {
+			$this->stop();
+			exit();
+		}
 	}
 
 

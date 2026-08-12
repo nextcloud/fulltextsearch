@@ -9,41 +9,27 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\RunningService;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
 
-class Stop extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:stop',
+	description: 'Stop all indexing',
+)]
+class Stop {
 	public function __construct(
 		private RunningService $runningService,
 	) {
-		parent::__construct();
 	}
 
-
-	/**
-	 *
-	 */
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:stop')
-			->setDescription('Stop all indexing');
-	}
-
-
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
+	public function __invoke(IOutput $output): ExitCode {
 		$output->writeln('stopping all running indexes');
 
 		$this->runningService->forceStop();
 
-		return 0;
+		return ExitCode::Success;
 	}
 
 

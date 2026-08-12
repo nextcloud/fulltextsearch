@@ -9,45 +9,31 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\CollectionService;
 use OCA\FullTextSearch\Service\ConfigService;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
 
-class CollectionList extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:collection:list',
+	description: 'List collections',
+)]
+class CollectionList {
 	public function __construct(
 		private CollectionService $collectionService,
 		private ConfigService $configService,
 	) {
-		parent::__construct();
 	}
 
-
-	/**
-	 *
-	 */
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:collection:list')
-			->setDescription('List collections');
-	}
-
-
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
+	public function __invoke(IOutput $output): ExitCode {
 		$collections = $this->collectionService->getCollections();
 		$output->writeln('found ' . sizeof($collections) . ' collection(s)');
 
-		foreach ($this->collectionService->getCollections() as $collection) {
+		foreach ($collections as $collection) {
 			$output->writeln('- ' . (($collection === $this->configService->getInternalCollection()) ? '*' : '') . $collection);
 		}
 
-		return 0;
+		return ExitCode::Success;
 	}
 }

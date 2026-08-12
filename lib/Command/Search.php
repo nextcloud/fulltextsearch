@@ -10,52 +10,44 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\SearchRequest;
 use OCA\FullTextSearch\Service\SearchService;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use OCP\Console\Attribute\Argument;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
 
-class Search extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:search',
+	description: 'Search something',
+	supportsOutputFormat: true,
+)]
+class Search {
 	public function __construct(
 		private SearchService $searchService,
 	) {
-		parent::__construct();
 	}
 
 
 	/**
-	 *
-	 */
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:search')
-			->setDescription('Search something')
-			->addArgument('user', InputArgument::OPTIONAL, 'user')
-			->addArgument('string', InputArgument::OPTIONAL, 'needle');
-
-	}
-
-
-	/**
-	 *
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
+	public function __invoke(
+		IOutput $output,
+		#[Argument(description: 'user')]
+		string $user = '',
+		#[Argument(description: 'needle')]
+		string $string = '',
+	): ExitCode {
 		$searchRequest = new SearchRequest();
 		$searchRequest->importFromArray(
 			[
 				'providers' => 'all',
-				'search' => $input->getArgument('string')
+				'search' => $string
 			]
 		);
 
-		$searchResult = $this->searchService->search($input->getArgument('user'), $searchRequest);
+		$searchResult = $this->searchService->search($user, $searchRequest);
 
 		$results = [];
 		foreach ($searchResult as $entry) {
@@ -67,7 +59,8 @@ class Search extends Base {
 			$results[$entry->getProvider()->getId()] = array_values($list);
 		}
 
-		$this->writeArrayInOutputFormat($input, $output, $results, ' * ');
-		return 0;
+		$output->writeArrayInOutputFormat($results, ' * ');
+
+		return ExitCode::Success;
 	}
 }
