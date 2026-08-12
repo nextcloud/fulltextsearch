@@ -12,6 +12,7 @@ namespace OCA\FullTextSearch\Migration;
 use Closure;
 use Doctrine\DBAL\Types\Type;
 use OCP\DB\ISchemaWrapper;
+use OCP\DB\Schema\ColumnType;
 use OCP\DB\Types;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
@@ -35,11 +36,11 @@ class Version23001Date20220408140253 extends SimpleMigrationStep {
 		$table = $schema->getTable('fulltextsearch_indexes');
 		$column = $table->getColumn('message');
 
-		if ($column->getType()->getName() === Types::TEXT) {
+		if ($column->getType() === ColumnType::Text) {
 			return null;
 		}
 
-		$column->setType(Type::getType(Types::TEXT));
+		$column->setType(ColumnType::Text);
 
 		return $schema;
 	}
