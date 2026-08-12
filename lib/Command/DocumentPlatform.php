@@ -10,44 +10,36 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Service\PlatformService;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use OCP\Console\Attribute\Argument;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\Attribute\Option;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
 
-class DocumentPlatform extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:document:platform',
+	description: 'Get document from index',
+)]
+class DocumentPlatform {
 	public function __construct(
 		private PlatformService $platformService,
 	) {
-		parent::__construct();
 	}
 
 
 	/**
-	 *
-	 */
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:document:platform')
-			->setDescription('Get document from index')
-			->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
-			->addArgument('documentId', InputArgument::REQUIRED, 'documentId')
-			->addOption('content', 'c', InputOption::VALUE_NONE, 'return some content');
-	}
-
-
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$providerId = $input->getArgument('providerId');
-		$documentId = $input->getArgument('documentId');
-
+	public function __invoke(
+		IOutput $output,
+		#[Argument(description: 'providerId')]
+		string $providerId,
+		#[Argument(description: 'documentId')]
+		string $documentId,
+		#[Option(description: 'return some content', shortcut: 'c')]
+		bool $content = false,
+	): ExitCode {
 		$wrapper = $this->platformService->getPlatform();
 		$platform = $wrapper->getPlatform();
 
@@ -55,13 +47,13 @@ class DocumentPlatform extends Base {
 		$result = [
 			'document' => $indexDocument
 		];
-		if ($input->getOption('content') === true) {
+		if ($content === true) {
 			$result['content'] = substr($indexDocument->getContent(), 0, 200);
 		}
 
 		$output->writeln(json_encode($result, JSON_PRETTY_PRINT));
 
-		return 0;
+		return ExitCode::Success;
 	}
 
 

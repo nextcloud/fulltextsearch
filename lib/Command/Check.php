@@ -10,50 +10,38 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\ConfigLexicon;
 use OCA\FullTextSearch\Service\ConfigService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCP\AppFramework\Services\IAppConfig;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
+use OCP\Console\OutputFormat;
 
-class Check extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:check',
+	description: 'Check the installation',
+	supportsOutputFormat: true,
+)]
+class Check {
 	public function __construct(
 		private ConfigService $configService,
 		private PlatformService $platformService,
 		private ProviderService $providerService,
 		private readonly IAppConfig $appConfig,
 	) {
-		parent::__construct();
 	}
 
-
 	/**
-	 *
-	 */
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:check')
-			->addOption('json', 'j', InputOption::VALUE_NONE, 'return result as JSON')
-			->setDescription('Check the installation');
-	}
-
-
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		if ($input->getOption('json') === true) {
-			$output->writeln(json_encode($this->displayAsJson(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+	public function __invoke(IOutput $output, OutputFormat $outputFormat): ExitCode {
+		if ($outputFormat !== OutputFormat::Plain) {
+			$output->writeArrayInOutputFormat($this->displayAsJson());
 
-			return 0;
+			return ExitCode::Success;
 		}
 
 		$output->writeln('Full text search ' . $this->appConfig->getAppValueString('installed_version'));
@@ -63,7 +51,7 @@ class Check extends Base {
 		$this->displayPlatform($output);
 		$this->displayProviders($output);
 
-		return 0;
+		return ExitCode::Success;
 	}
 
 
@@ -118,11 +106,9 @@ class Check extends Base {
 
 
 	/**
-	 * @param OutputInterface $output
-	 *
 	 * @throws Exception
 	 */
-	private function displayPlatform(OutputInterface $output) {
+	private function displayPlatform(IOutput $output): void {
 		$platforms = $this->platformService->getPlatforms();
 
 		if (empty($platforms)) {
@@ -151,11 +137,9 @@ class Check extends Base {
 
 
 	/**
-	 * @param OutputInterface $output
-	 *
 	 * @throws Exception
 	 */
-	private function displayProviders(OutputInterface $output) {
+	private function displayProviders(IOutput $output): void {
 		$providers = $this->providerService->getProviders();
 
 		if (sizeof($providers) === 0) {

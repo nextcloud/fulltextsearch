@@ -10,9 +10,7 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\InterruptedException;
 use OC\FullTextSearch\Model\DocumentAccess;
-use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\InterruptException;
 use OCA\FullTextSearch\Exceptions\ProviderDoesNotExistException;
 use OCA\FullTextSearch\Exceptions\ProviderIsNotCompatibleException;
@@ -29,15 +27,21 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCA\FullTextSearch\Service\TestService;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\Attribute\Option;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
+use OCP\Console\ISignalHandler;
 use OCP\FullTextSearch\IFullTextSearchPlatform;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\FullTextSearch\Model\IDocumentAccess;
 use Psr\Container\ContainerExceptionInterface;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
-class Test extends ACommandBase {
+#[AsCommand(
+	name: 'fulltextsearch:test',
+	description: 'Testing the platform setup',
+)]
+class Test {
 
 	public const DELAY_STABILIZE_PLATFORM = 3;
 
@@ -50,36 +54,25 @@ class Test extends ACommandBase {
 		private IndexService $indexService,
 		private TestService $testService,
 	) {
-		parent::__construct();
-	}
-
-	protected function configure(): void {
-		parent::configure();
-		$this->setName('fulltextsearch:test')
-			->setDescription('Testing the platform setup')
-			->addOption('json', 'j', InputOption::VALUE_NONE, 'return result as JSON')
-			->addOption(
-				'platform_delay', 'd', InputOption::VALUE_REQUIRED,
-				'change DELAY_STABILIZE_PLATFORM'
-			);
 	}
 
 
 	/**
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$platformDelay = ($input->getOption('platform_delay') > 0) ? (int)$input->getOption(
-			'platform_delay'
-		) : self::DELAY_STABILIZE_PLATFORM;
-
+	public function __invoke(
+		IOutput $output,
+		ISignalHandler $signalHandler,
+		#[Option(description: 'change DELAY_STABILIZE_PLATFORM')]
+		int $platformDelay = self::DELAY_STABILIZE_PLATFORM,
+	): ExitCode {
 		$this->output($output, '.Testing your current setup:');
 
 		try {
 			$testProvider = $this->testCreatingProvider($output);
 			$this->testMockedProvider($output, $testProvider);
 			$testPlatform = $this->testLoadingPlatform($output);
-			$this->testLockingProcess($output, $testPlatform, $testProvider);
+			$this->testLockingProcess($output, $signalHandler, $testPlatform, $testProvider);
 		} catch (Exception $e) {
 			$this->outputResult($output, false);
 			throw $e;
@@ -111,7 +104,7 @@ class Test extends ACommandBase {
 
 		$this->output($output, '', true);
 
-		return 0;
+		return ExitCode::Success;
 	}
 
 
@@ -133,11 +126,11 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param string $line
 	 * @param bool $isNewLine
 	 */
-	private function output(OutputInterface $output, string $line, bool $isNewLine = true) {
+	private function output(IOutput $output, string $line, bool $isNewLine = true) {
 		if ($isNewLine) {
 			$output->write(' ', true);
 		}
@@ -147,10 +140,10 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param bool $result
 	 */
-	private function outputResult(OutputInterface $output, bool $result) {
+	private function outputResult(IOutput $output, bool $result) {
 		$isNewLine = false;
 		$line = $this->convertBoolToLine($result, $isNewLine);
 
@@ -175,7 +168,7 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 *
 	 * @return IFullTextSearchProvider
 	 * @throws ProviderDoesNotExistException
@@ -183,7 +176,7 @@ class Test extends ACommandBase {
 	 * @throws ProviderIsNotUniqueException
 	 * @throws ContainerExceptionInterface
 	 */
-	private function testCreatingProvider(OutputInterface $output): IFullTextSearchProvider {
+	private function testCreatingProvider(IOutput $output): IFullTextSearchProvider {
 		$this->output($output, 'Creating mocked content provider.');
 		$testProvider = $this->generateMockProvider();
 		$this->outputResult($output, true);
@@ -193,11 +186,11 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchProvider $testProvider
 	 */
 	private function testMockedProvider(
-		OutputInterface $output, IFullTextSearchProvider $testProvider,
+		IOutput $output, IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Testing mocked provider: get indexable documents.');
 		$testProvider->setIndexOptions(new IndexOptions());
@@ -209,12 +202,12 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 *
 	 * @return IFullTextSearchPlatform
 	 * @throws Exception
 	 */
-	private function testLoadingPlatform(OutputInterface $output): IFullTextSearchPlatform {
+	private function testLoadingPlatform(IOutput $output): IFullTextSearchPlatform {
 		$this->output($output, 'Loading search platform.');
 		$wrapper = $this->platformService->getPlatform();
 		$testPlatform = $wrapper->getPlatform();
@@ -233,19 +226,20 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
+	 * @param ISignalHandler $signalHandler
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
 	 *
 	 * @throws RunnerAlreadyUpException
 	 */
 	private function testLockingProcess(
-		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IOutput $output, ISignalHandler $signalHandler, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Locking process');
 		$this->runner = new Runner($this->runningService, 'test');
-		$this->runner->sourceIsCommandLine($this, $output);
+		$this->runner->sourceIsCommandLine($signalHandler, $output);
 		$this->runner->start();
 		$this->indexService->setRunner($this->runner);
 		$testPlatform->setRunner($this->runner);
@@ -255,12 +249,12 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchProvider $testProvider
 	 *
 	 * @throws Exception
 	 */
-	private function testResetTest(OutputInterface $output, IFullTextSearchProvider $testProvider,
+	private function testResetTest(IOutput $output, IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Removing test.');
 		$this->indexService->resetIndex($testProvider->getId());
@@ -269,10 +263,10 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 */
-	private function testInitIndexing(OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+	private function testInitIndexing(IOutput $output, IFullTextSearchPlatform $testPlatform,
 	) {
 		$this->output($output, 'Initializing index mapping.');
 		$testPlatform->initializeIndex();
@@ -281,14 +275,14 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
 	 *
 	 * @throws Exception
 	 */
 	private function testIndexingDocuments(
-		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IOutput $output, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Indexing generated documents.');
@@ -305,13 +299,13 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 *
 	 * @throws Exception
 	 */
 	private function testContentLicense(
-		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IOutput $output, IFullTextSearchPlatform $testPlatform,
 	) {
 
 		try {
@@ -341,14 +335,14 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
 	 *
 	 * @throws Exception
 	 */
 	private function testSearchSimple(
-		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IOutput $output, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider,
 	) {
 
@@ -410,14 +404,14 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
 	 *
 	 * @throws Exception
 	 */
 	private function testUpdatingDocumentsAccess(
-		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IOutput $output, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider,
 	) {
 		$this->output($output, 'Updating documents access.');
@@ -436,14 +430,14 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $platform
 	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @throws Exception
 	 */
 	private function testSearchAccess(
-		OutputInterface $output, IFullTextSearchPlatform $platform,
+		IOutput $output, IFullTextSearchPlatform $platform,
 		IFullTextSearchProvider $provider,
 	) {
 		$this->output($output, 'Searching with group access rights:');
@@ -468,14 +462,14 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $platform
 	 * @param IFullTextSearchProvider $provider
 	 *
 	 * @throws Exception
 	 */
 	private function testSearchShare(
-		OutputInterface $output, IFullTextSearchPlatform $platform,
+		IOutput $output, IFullTextSearchPlatform $platform,
 		IFullTextSearchProvider $provider,
 	) {
 
@@ -489,11 +483,11 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 *
 	 * @throws TickDoesNotExistException
 	 */
-	private function testUnlockingProcess(OutputInterface $output) {
+	private function testUnlockingProcess(IOutput $output) {
 		$this->output($output, 'Unlocking process');
 		$this->runner->stop();
 		$this->outputResult($output, true);
@@ -501,7 +495,7 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
 	 * @param IDocumentAccess $access
@@ -512,7 +506,7 @@ class Test extends ACommandBase {
 	 * @throws Exception
 	 */
 	private function search(
-		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IOutput $output, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider,
 		IDocumentAccess $access, string $search, array $expected, string $moreOutput = '',
 	) {
@@ -541,7 +535,7 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
 	 * @param array $groups
@@ -550,7 +544,7 @@ class Test extends ACommandBase {
 	 * @throws Exception
 	 */
 	private function searchGroups(
-		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IOutput $output, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider, array $groups, array $expected,
 	) {
 
@@ -566,7 +560,7 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param IFullTextSearchPlatform $testPlatform
 	 * @param IFullTextSearchProvider $testProvider
 	 * @param string $user
@@ -575,7 +569,7 @@ class Test extends ACommandBase {
 	 * @throws Exception
 	 */
 	private function searchUsers(
-		OutputInterface $output, IFullTextSearchPlatform $testPlatform,
+		IOutput $output, IFullTextSearchPlatform $testPlatform,
 		IFullTextSearchProvider $testProvider, string $user, array $expected,
 	) {
 		$access = new DocumentAccess();
@@ -608,12 +602,12 @@ class Test extends ACommandBase {
 
 
 	/**
-	 * @param OutputInterface $output
+	 * @param IOutput $output
 	 * @param int $s
 	 *
 	 * @throws InterruptException
 	 */
-	private function pause(OutputInterface $output, int $s) {
+	private function pause(IOutput $output, int $s) {
 		$this->output($output, 'Pausing ' . $s . ' seconds');
 
 		for ($i = 1; $i <= $s; $i++) {
@@ -625,19 +619,6 @@ class Test extends ACommandBase {
 		}
 
 		$this->outputResult($output, true);
-	}
-
-
-	/**
-	 * @throws TickDoesNotExistException
-	 */
-	public function abort() {
-		try {
-			$this->abortIfInterrupted();
-		} catch (InterruptedException $e) {
-			$this->runner->stop();
-			exit();
-		}
 	}
 
 }

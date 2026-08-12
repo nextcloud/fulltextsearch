@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\InterruptedException;
-use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\Index as ModelIndex;
@@ -22,16 +20,22 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCA\FullTextSearch\Tools\Traits\TArrayTools;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\Attribute\Option;
+use OCP\Console\ExitCode;
+use OCP\Console\ISignalHandler;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 use Throwable;
 
-class Live extends ACommandBase {
+#[AsCommand(
+	name: 'fulltextsearch:live',
+	description: 'Index files',
+)]
+class Live {
 
 
 	use TArrayTools;
@@ -106,33 +110,21 @@ class Live extends ACommandBase {
 		private ProviderService $providerService,
 		private LoggerInterface $logger,
 	) {
-		parent::__construct();
 		$this->runner = new Runner($runningService, 'commandLive');
 	}
 
-	protected function configure(): void {
-		parent::configure();
-		$this->setName('fulltextsearch:live')
-			->setDescription('Index files')
-			->addOption(
-				'no-readline', 'r', InputOption::VALUE_NONE,
-				'disable readline - non interactive mode'
-			)
-			->addOption(
-				'service', 's', InputOption::VALUE_NONE,
-				'disable interface'
-			);
-	}
-
-
 	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		if (!$input->getOption('service') && !$input->getOption('no-readline')) {
+	public function __invoke(
+		OutputInterface $output,
+		ISignalHandler $signalHandler,
+		#[Option(name: 'no-readline', description: 'disable readline - non interactive mode', shortcut: 'r')]
+		bool $noReadline = false,
+		#[Option(name: 'service', description: 'disable interface', shortcut: 's')]
+		bool $service = false,
+	): ExitCode {
+		if (!$service && !$noReadline) {
 			try {
 				/** do not get stuck while waiting interactive input */
 				readline_callback_handler_install(
@@ -153,13 +145,13 @@ class Live extends ACommandBase {
 
 		$this->runner = new Runner($this->runningService, 'commandIndex', ['nextStep' => 'n']);
 
-		if (!$input->getOption('service')) {
+		if (!$service) {
 			$this->runner->onKeyPress([$this, 'onKeyPressed']);
 			$this->runner->onNewIndexError([$this, 'onNewIndexError']);
 			$this->runner->onNewIndexResult([$this, 'onNewIndexResult']);
-			$this->runner->sourceIsCommandLine($this, $output);
+			$this->runner->sourceIsCommandLine($signalHandler, $output);
 
-			$this->generatePanels(!$input->getOption('no-readline'));
+			$this->generatePanels(!$noReadline);
 		}
 
 		$this->indexService->setRunner($this->runner);
@@ -169,7 +161,7 @@ class Live extends ACommandBase {
 			try {
 				$this->runner->start();
 
-				if (!$input->getOption('service')) {
+				if (!$service) {
 					$this->cliService->runDisplay($output);
 					$this->generateIndexErrors();
 					$this->displayError();
@@ -180,12 +172,12 @@ class Live extends ACommandBase {
 
 			} catch (Exception $e) {
 				$this->logger->warning('Exception while live index', ['exception' => $e]);
-				if (!$input->getOption('service')) {
+				if (!$service) {
 					throw $e;
 				}
 			}
 
-			if (!$input->getOption('service')) {
+			if (!$service) {
 				break;
 			}
 
@@ -194,7 +186,7 @@ class Live extends ACommandBase {
 
 		$this->runner->stop();
 
-		return 0;
+		return ExitCode::Success;
 	}
 
 
@@ -690,19 +682,6 @@ class Live extends ACommandBase {
 		}
 
 		$this->displayError();
-	}
-
-
-	/**
-	 * @throws TickDoesNotExistException
-	 */
-	public function abort() {
-		try {
-			$this->abortIfInterrupted();
-		} catch (InterruptedException $e) {
-			$this->runner->stop();
-			exit();
-		}
 	}
 
 

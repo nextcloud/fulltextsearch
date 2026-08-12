@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\InterruptedException;
-use OCA\FullTextSearch\ACommandBase;
 use OCA\FullTextSearch\Exceptions\PlatformTemporaryException;
 use OCA\FullTextSearch\Exceptions\TickDoesNotExistException;
 use OCA\FullTextSearch\Model\Index as ModelIndex;
@@ -23,17 +21,23 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCA\FullTextSearch\Service\RunningService;
 use OCA\FullTextSearch\Tools\Traits\TArrayTools;
+use OCP\Console\Attribute\Argument;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\Attribute\Option;
+use OCP\Console\ExitCode;
+use OCP\Console\ISignalHandler;
 use OCP\FullTextSearch\IFullTextSearchProvider;
 use OCP\IUserManager;
 use OutOfBoundsException;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Terminal;
 use Throwable;
 
-class Index extends ACommandBase {
+#[AsCommand(
+	name: 'fulltextsearch:index',
+	description: 'Index files',
+)]
+class Index {
 	use TArrayTools;
 
 	public const INDEX_OPTION_NO_READLINE = '_no-readline';
@@ -112,26 +116,21 @@ class Index extends ACommandBase {
 		private PlatformService $platformService,
 		private ProviderService $providerService,
 	) {
-		parent::__construct();
-	}
-
-	protected function configure(): void {
-		parent::configure();
-		$this->setName('fulltextsearch:index')
-			->setDescription('Index files')
-			->addArgument('options', InputArgument::OPTIONAL, 'options')
-			->addOption(
-				'no-readline', 'r', InputOption::VALUE_NONE,
-				'disable readline - non interactive mode'
-			);
 	}
 
 
 	/**
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$options = $this->generateIndexOptions($input);
+	public function __invoke(
+		OutputInterface $output,
+		ISignalHandler $signalHandler,
+		#[Argument(name: 'options', description: 'options')]
+		string $optionsJson = '',
+		#[Option(name: 'no-readline', description: 'disable readline - non interactive mode', shortcut: 'r')]
+		bool $noReadline = false,
+	): ExitCode {
+		$options = $this->generateIndexOptions($optionsJson, $noReadline);
 
 		if ($options->getOptionBool(self::INDEX_OPTION_NO_READLINE, false) === false) {
 			/** do not get stuck while waiting interactive input */
@@ -166,7 +165,7 @@ class Index extends ACommandBase {
 		$this->runner->setInfo('options', json_encode($options));
 
 		try {
-			$this->runner->sourceIsCommandLine($this, $output);
+			$this->runner->sourceIsCommandLine($signalHandler, $output);
 			$this->runner->start();
 
 			if ($options->getOption('errors') === 'reset') {
@@ -200,7 +199,7 @@ class Index extends ACommandBase {
 		$this->runner->setInfo('documentCurrent', 'all');
 		$this->runner->stop();
 
-		return self::SUCCESS;
+		return ExitCode::Success;
 	}
 
 
@@ -323,15 +322,14 @@ class Index extends ACommandBase {
 
 
 	/**
-	 * @param InputInterface $input
+	 * @param string $jsonOptions
+	 * @param bool $noReadline
 	 *
 	 * @return IndexOptions
 	 */
-	private function generateIndexOptions(InputInterface $input): IndexOptions {
-		$jsonOptions = $input->getArgument('options');
-
+	private function generateIndexOptions(string $jsonOptions, bool $noReadline): IndexOptions {
 		$options = [];
-		if (is_string($jsonOptions)) {
+		if ($jsonOptions !== '') {
 			$options = json_decode($jsonOptions, true);
 		}
 
@@ -339,7 +337,7 @@ class Index extends ACommandBase {
 			$options = [];
 		}
 
-		if ($input->getOption('no-readline')) {
+		if ($noReadline) {
 			$options['_no-readline'] = true;
 		}
 
@@ -766,18 +764,5 @@ class Index extends ACommandBase {
 		}
 
 		$this->displayError();
-	}
-
-
-	/**
-	 * @throws TickDoesNotExistException
-	 */
-	public function abort(): void {
-		try {
-			$this->abortIfInterrupted();
-		} catch (InterruptedException $e) {
-			$this->runner->stop();
-			exit();
-		}
 	}
 }

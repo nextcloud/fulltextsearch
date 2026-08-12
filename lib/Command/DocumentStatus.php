@@ -10,16 +10,22 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Service\IndexService;
+use OCP\Console\Attribute\Argument;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\Attribute\Option;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
+use OCP\Console\OutputFormat;
 use OCP\FullTextSearch\Model\IIndex;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
-class DocumentStatus extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:document:status',
+	description: 'change the status on one specific document',
+	supportsOutputFormat: true,
+)]
+class DocumentStatus {
 	private array $statusAvailable = [
 		'IGNORE' => 'document will never be indexed',
 		'INDEX' => 'document will be indexed',
@@ -31,68 +37,54 @@ class DocumentStatus extends Base {
 	public function __construct(
 		private IndexService $indexService,
 	) {
-		parent::__construct();
 	}
 
 
 	/**
-	 *
-	 */
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:document:status')
-			->setDescription('change the status on one specific document')
-			->addArgument('provider', InputArgument::REQUIRED, 'Id of the provider')
-			->addArgument('document', InputArgument::REQUIRED, 'If of the document')
-			->addOption('value', '', InputOption::VALUE_REQUIRED, 'new status', '')
-			->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'specify the owner of the document', '')
-			->addOption('json', 'j', InputOption::VALUE_NONE, 'return status in JSON');
-	}
-
-
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$providerId = $input->getArgument('provider');
-		$documentId = $input->getArgument('document');
-		$value = $input->getOption('value');
-		$userId = $input->getOption('user');
-		$json = $input->getOption('json');
-
+	public function __invoke(
+		IOutput $output,
+		OutputFormat $outputFormat,
+		#[Argument(description: 'Id of the provider')]
+		string $provider,
+		#[Argument(description: 'If of the document')]
+		string $document,
+		#[Option(description: 'new status')]
+		string $value = '',
+		#[Option(description: 'specify the owner of the document', shortcut: 'u')]
+		string $user = '',
+	): ExitCode {
 		try {
-			$index = $this->indexService->getIndex($providerId, $documentId);
+			$index = $this->indexService->getIndex($provider, $document);
 			if ($value !== '') {
 				$status = $this->statusConvertFromString($value);
 				$index->setStatus($status, true);
 				$this->indexService->updateIndex($index);
 			}
 		} catch (IndexDoesNotExistException $e) {
-			if ($userId === '') {
+			if ($user === '') {
 				throw new Exception(
 					"Index is not known.\nIf you want to generate the entry, please specify the owner of the document using --user <userId>"
 				);
 			}
 
 			$status = $this->statusConvertFromString($value);
-			$index = $this->indexService->createIndex($providerId, $documentId, $userId, $status);
+			$index = $this->indexService->createIndex($provider, $document, $user, $status);
 		}
 
 
-		if ($json) {
-			echo json_encode($index, JSON_PRETTY_PRINT) . "\n";
+		if ($outputFormat !== OutputFormat::Plain) {
+			$output->writeArrayInOutputFormat(json_decode(json_encode($index), true));
 
-			return 0;
+			return ExitCode::Success;
 		}
 
 		$status = $this->statusConvertToString($index->getStatus());
 		$desc = $this->statusAvailable[$status];
 		$output->writeln('current status: <info>' . $status . '</info> (' . $desc . ')');
 
-		return 0;
+		return ExitCode::Success;
 	}
 
 

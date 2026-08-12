@@ -9,64 +9,61 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Exceptions\CollectionArgumentException;
 use OCA\FullTextSearch\Service\CollectionService;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use OCP\Console\Attribute\Argument;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\Attribute\Option;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
 
-class CollectionLink extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:collection:link',
+	description: 'Link collection to a user',
+)]
+class CollectionLink {
 	public function __construct(
 		private CollectionService $collectionService,
 	) {
-		parent::__construct();
-	}
-
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:collection:link')
-			->setDescription('Link collection to a user')
-			->addArgument('collection', InputArgument::OPTIONAL, 'collection', '')
-			->addArgument('userId', InputArgument::OPTIONAL, 'user to link a collection to', '')
-			->addOption('unlink', '', InputOption::VALUE_NONE, 'unlink collection');
 	}
 
 	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
 	 * @throws CollectionArgumentException
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
+	public function __invoke(
+		IOutput $output,
+		#[Argument(description: 'collection')]
+		string $collection = '',
+		#[Argument(description: 'user to link a collection to')]
+		string $userId = '',
+		#[Option(description: 'unlink collection')]
+		bool $unlink = false,
+	): ExitCode {
 		$links = $this->collectionService->getLinks();
-		$collection = $input->getArgument('collection');
 
 		if ($collection === '') {
 			if (empty($links)) {
 				$output->writeln('no collection linked to any user');
 			}
 
-			foreach ($links as $name => $userId) {
-				$output->writeln('- Collection <info>' . $name . '</info> linked to user <info>' . $userId . '</info>');
+			foreach ($links as $name => $linkedUserId) {
+				$output->writeln('- Collection <info>' . $name . '</info> linked to user <info>' . $linkedUserId . '</info>');
 			}
 
-			return 0;
+			return ExitCode::Success;
 		}
 
 		if (!$this->collectionService->hasCollection($collection)) {
 			throw new CollectionArgumentException('unknown collection');
 		}
 
-		if ($input->getOption('unlink')) {
+		if ($unlink) {
 			$this->collectionService->removeLink($collection);
 			$output->writeln('unlinked collection');
-			return 0;
+
+			return ExitCode::Success;
 		}
 
-		$userId = $input->getArgument('userId');
 		if ($userId === '') {
 			throw new CollectionArgumentException('missing userId');
 		}
@@ -74,6 +71,6 @@ class CollectionLink extends Base {
 		$this->collectionService->addLink($collection, $userId);
 		$output->writeln('linked collection');
 
-		return 0;
+		return ExitCode::Success;
 	}
 }

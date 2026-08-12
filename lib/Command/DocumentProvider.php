@@ -10,48 +10,40 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Model\Index;
 use OCA\FullTextSearch\Service\ProviderService;
+use OCP\Console\Attribute\Argument;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\Attribute\Option;
+use OCP\Console\ExitCode;
+use OCP\Console\IOutput;
 use OCP\FullTextSearch\Model\IIndexDocument;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
-class DocumentProvider extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:document:provider',
+	description: 'Get document from index',
+)]
+class DocumentProvider {
 	public function __construct(
 		private ProviderService $providerService,
 	) {
-		parent::__construct();
 	}
 
 
 	/**
-	 *
-	 */
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:document:provider')
-			->setDescription('Get document from index')
-			->addArgument('userId', InputArgument::REQUIRED, 'userId')
-			->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
-			->addArgument('documentId', InputArgument::REQUIRED, 'documentId')
-			->addOption('content', 'c', InputOption::VALUE_NONE, 'return some content');
-	}
-
-
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
 	 * @throws Exception
 	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$providerId = $input->getArgument('providerId');
-		$documentId = $input->getArgument('documentId');
-		$userId = $input->getArgument('userId');
-
+	public function __invoke(
+		IOutput $output,
+		#[Argument(description: 'userId')]
+		string $userId,
+		#[Argument(description: 'providerId')]
+		string $providerId,
+		#[Argument(description: 'documentId')]
+		string $documentId,
+		#[Option(description: 'return some content', shortcut: 'c')]
+		bool $content = false,
+	): ExitCode {
 		$providerWrapper = $this->providerService->getProvider($providerId);
 		$provider = $providerWrapper->getProvider();
 
@@ -74,17 +66,17 @@ class DocumentProvider extends Base {
 		$output->writeln('Document: ');
 		$output->writeln(json_encode($indexDocument, JSON_PRETTY_PRINT));
 
-		if ($input->getOption('content') !== true) {
-			return 0;
+		if ($content !== true) {
+			return ExitCode::Success;
 		}
 
 		$output->writeln('Content: ');
-		$content = $indexDocument->getContent();
+		$documentContent = $indexDocument->getContent();
 		if ($indexDocument->isContentEncoded() === IIndexDocument::ENCODED_BASE64) {
-			$content = base64_decode($content, true);
+			$documentContent = base64_decode($documentContent, true);
 		}
 
-		$output->writeln(substr($content, 0, 80));
+		$output->writeln(substr($documentContent, 0, 80));
 
 		$parts = $indexDocument->getParts();
 		$output->writeln(sizeof($parts) . ' Part(s)');
@@ -96,7 +88,7 @@ class DocumentProvider extends Base {
 			);
 		}
 
-		return 0;
+		return ExitCode::Success;
 	}
 
 

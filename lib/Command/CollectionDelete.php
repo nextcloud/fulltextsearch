@@ -9,14 +9,17 @@ declare(strict_types=1);
 
 namespace OCA\FullTextSearch\Command;
 
-use OC\Core\Command\Base;
 use OCA\FullTextSearch\Exceptions\CollectionArgumentException;
 use OCA\FullTextSearch\Service\CollectionService;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use OCP\Console\Attribute\Argument;
+use OCP\Console\Attribute\AsCommand;
+use OCP\Console\ExitCode;
 
-class CollectionDelete extends Base {
+#[AsCommand(
+	name: 'fulltextsearch:collection:delete',
+	description: 'Delete collection',
+)]
+class CollectionDelete {
 
 
 	/** @var CollectionService */
@@ -27,37 +30,23 @@ class CollectionDelete extends Base {
 	 * @param CollectionService $collectionService
 	 */
 	public function __construct(CollectionService $collectionService) {
-		parent::__construct();
-
 		$this->collectionService = $collectionService;
 	}
 
 
 	/**
-	 *
+	 * @throws CollectionArgumentException
 	 */
-	protected function configure() {
-		parent::configure();
-		$this->setName('fulltextsearch:collection:delete')
-			->setDescription('Delete collection')
-			->addArgument('name', InputArgument::REQUIRED, 'name of the collection to delete');
-	}
-
-
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 *
-	 * @return int
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$collection = $input->getArgument('name');
-		if (!$this->collectionService->hasCollection($collection)) {
+	public function __invoke(
+		#[Argument(description: 'name of the collection to delete')]
+		string $name,
+	): ExitCode {
+		if (!$this->collectionService->hasCollection($name)) {
 			throw new CollectionArgumentException('unknown collection');
 		}
 
-		$this->collectionService->deleteCollection($collection);
+		$this->collectionService->deleteCollection($name);
 
-		return 0;
+		return ExitCode::Success;
 	}
 }
