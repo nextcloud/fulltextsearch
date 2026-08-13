@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Search" : "Kërko",
     "General" : "Të përgjithshme",
+    "Error" : "Gabim",
+    "No results" : "Asnjë rezultat",
     "Search on %s" : "Kërkoni në %s"
 },
 "nplurals=2; plural=(n != 1);");

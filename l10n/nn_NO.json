@@ -1,5 +1,6 @@
 { "translations": {
     "Search" : "Search",
-    "General" : "Generelt"
+    "General" : "Generelt",
+    "Error" : "Feil"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

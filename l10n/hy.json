@@ -1,5 +1,6 @@
 { "translations": {
     "Search" : "Search",
-    "General" : "Ընդհանուր"
+    "General" : "Ընդհանուր",
+    "Error" : "Սխալ"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

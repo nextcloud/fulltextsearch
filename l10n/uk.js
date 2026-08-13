@@ -13,9 +13,12 @@ OC.L10N.register(
     "Search Platform" : "Пошукова платформа",
     "Navigation Icon" : "Значок на панелі інструментів",
     "Enable global search within all your content." : "Увімкнути глобальний пошук по всьому вашому вмісту.",
-    "Search on %s" : "Шукати у %s",
+    "Error" : "Помилка",
+    "Searching …" : "Шукаю...",
+    "No results" : "Нічого не знайдено",
     "the search returned {total} results in {time} ms" : "Знайдено {total} за {time} мс",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "В результаті пошуку у {title} за \"{search}\" знайдено {total} за {time} мс",
+    "Search on %s" : "Шукати у %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Будь ласка, ознайомтеся з документацією щодо встановлення та налаштування контекстного пошуку у Nextcloud.",
     "Select the app to index content and answer search queries." : "Виберіть застосунок для індексування вмісту та відповіді на пошукові запити"
 },

@@ -1,5 +1,6 @@
 { "translations": {
     "Search" : "Search",
-    "General" : "ទូទៅ"
+    "General" : "ទូទៅ",
+    "Error" : "កំហុស"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

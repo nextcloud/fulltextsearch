@@ -1,5 +1,7 @@
 { "translations": {
     "Search" : "Tìm",
-    "General" : "Tổng hợp"
+    "General" : "Tổng hợp",
+    "Error" : "Lỗi",
+    "No results" : "Không có kết quả"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

@@ -12,9 +12,11 @@ OC.L10N.register(
     "Search Platform" : "Prataforma de chirca",
     "Navigation Icon" : "Icona de navigatzione",
     "Enable global search within all your content." : "Ativa sa chirca globale in totu su cuntenutu tuo.",
-    "Search on %s" : "Chirca in %s",
+    "Error" : "Errore",
+    "No results" : "Perunu resurtadu",
     "the search returned {total} results in {time} ms" : "sa chirca at torradu {total} resurtados in {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "sa chirca in {title} pro \"{search}\" at torradu {total} resurtados in {time} ms",
+    "Search on %s" : "Chirca in %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Controlla sa documentatzione de sa wiki pro cantu tocat a s'installatzione e sa cunfiguratzione de sa chirca de testu cumpletu a intro de su Nextcloud tuo.",
     "Select the app to index content and answer search queries." : "Sèbera s'aplicatzione pro inditzizare is cuntenutos e rispòndere a is chircas."
 },

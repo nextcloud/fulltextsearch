@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Search" : "Recercar",
     "Full text search" : "Recèrca tèxt brut",
-    "General" : "Generals"
+    "General" : "Generals",
+    "Error" : "Error",
+    "Searching …" : "Recèrca…",
+    "No results" : "Cap de resultat"
 },
 "nplurals=2; plural=(n > 1);");

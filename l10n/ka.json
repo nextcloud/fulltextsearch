@@ -1,5 +1,8 @@
 { "translations": {
     "Search" : "Search",
-    "General" : "General"
+    "General" : "General",
+    "Error" : "შეცდომა",
+    "Searching …" : "ძებნა …",
+    "No results" : "No results"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"
 }

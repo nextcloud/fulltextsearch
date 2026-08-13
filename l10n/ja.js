@@ -13,9 +13,12 @@ OC.L10N.register(
     "Search Platform" : "検索プラットフォーム",
     "Navigation Icon" : "ナビゲーションアイコン",
     "Enable global search within all your content." : "すべてのコンテンツ内でグローバル検索を有効にする。",
-    "Search on %s" : "%s で検索",
+    "Error" : "エラー",
+    "Searching …" : "検索しています…",
+    "No results" : "該当なし",
     "the search returned {total} results in {time} ms" : "検索結果{total}件{time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "\"{search}\" を 「{title}」 で検索すると、{time} ms で {total} 件返却されます",
+    "Search on %s" : "%s で検索",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "あなたのNextcloud内での全文検索のインストールと設定に関連するドキュメントはwikiで確認してください",
     "Select the app to index content and answer search queries." : "コンテンツをインデックス化して検索クエリに答えるアプリを選択します。"
 },
