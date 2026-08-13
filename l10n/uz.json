@@ -1,5 +1,7 @@
 { "translations": {
     "Search" : "Qidirish",
-    "General" : "Umumiy"
+    "General" : "Umumiy",
+    "Error" : "Xatolik",
+    "No results" : "Natija yo'q"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

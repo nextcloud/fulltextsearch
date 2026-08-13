@@ -10,9 +10,14 @@
     "Search Platform" : "Vyhľadávacia platforma",
     "Navigation Icon" : "Ikona navigácie",
     "Enable global search within all your content." : "Povoliť globálne vyhľadávanie v celom obsahu.",
-    "Search on %s" : "Hľadať v %s",
+    "Error" : "Chyba",
+    "Searching …" : "Vyhľadáva sa …",
+    "No results" : "Žiadne výsledky",
+    "Previous page" : "Predchodzia strana",
+    "Next page" : "Ďalšia strana",
     "the search returned {total} results in {time} ms" : "Vyhľadávanie našlo {total} výsledkov za {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "Vyhľadávanie \"{search}\" v {title} našlo {total} výsledkov za {time} ms",
+    "Search on %s" : "Hľadať v %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Skontroluj dokumentáciu vo wiki súvisiacu s inštaláciou a nastavením fulltextového hľadania v Nextcloud",
     "Select the app to index content and answer search queries." : "Vyber aplikáciu pre indexovanie obsahu a odpoveď na dotazy."
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);"

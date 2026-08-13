@@ -1,5 +1,7 @@
 { "translations": {
     "Search" : "Axtarış",
-    "General" : "Ümumi"
+    "General" : "Ümumi",
+    "Error" : "Səhv",
+    "No results" : "Nəticə yoxdur"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

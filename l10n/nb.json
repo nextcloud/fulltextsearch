@@ -10,9 +10,13 @@
     "Search Platform" : "Søk plattform",
     "Navigation Icon" : "Navigasjonsikon",
     "Enable global search within all your content." : "Aktiver globalt søk i alt innholdet ditt.",
-    "Search on %s" : "Søk etter %s",
+    "Error" : "Feil",
+    "No results" : "Ingen resultater",
+    "Previous page" : "Forrige side",
+    "Next page" : "Neste side",
     "the search returned {total} results in {time} ms" : "søket ga {total} resultater på {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "søket i {title} for \"{search}\" ga {total} resultater på {time} ms",
+    "Search on %s" : "Søk etter %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Vennligst sjekk wikien for dokumentasjon relatert til installasjonen og konfigurasjonen av fulltekstsøket i din Nextcloud",
     "Select the app to index content and answer search queries." : "Velg appen for å indeksere innhold og svare på søk."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

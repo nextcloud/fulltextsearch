@@ -10,9 +10,14 @@
     "Search Platform" : "Platform Pencarian",
     "Navigation Icon" : "Ikon Navigasi",
     "Enable global search within all your content." : "Aktifkan pencarian global di seluruh konten Anda.",
-    "Search on %s" : "Cari di %s",
+    "Error" : "Kesalahan",
+    "Searching …" : "Mencari …",
+    "No results" : "Tidak ada hasil",
+    "Previous page" : "Halaman sebelumnya",
+    "Next page" : "Halaman berikutnya",
     "the search returned {total} results in {time} ms" : "pencarian mengembalikan {total} hasil dalam {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "pencarian di {title} untuk \"{search}\" mengembalikan {total} hasil dalam {time} ms",
+    "Search on %s" : "Cari di %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Silakan periksa wiki untuk dokumentasi terkait instalasi dan konfigurasi pencarian teks penuh di Nextcloud Anda",
     "Select the app to index content and answer search queries." : "Pilih aplikasi untuk mengindeks konten dan menjawab kueri pencarian."
 },"pluralForm" :"nplurals=1; plural=0;"

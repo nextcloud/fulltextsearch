@@ -10,9 +10,14 @@
     "Search Platform" : "Platforma wyszukiwania",
     "Navigation Icon" : "Ikona nawigacji",
     "Enable global search within all your content." : "Włącz globalne wyszukiwanie we wszystkich swoich treściach.",
-    "Search on %s" : "Szukaj w %s",
+    "Error" : "Błąd",
+    "Searching …" : "Wyszukiwanie …",
+    "No results" : "Brak wyników",
+    "Previous page" : "Poprzednia strona",
+    "Next page" : "Następna strona",
     "the search returned {total} results in {time} ms" : "wyszukiwanie zwróciło {total} wyników w {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "wyszukiwanie dla \"{search}\" w {title} zwróciło {total} wyników w {time} ms",
+    "Search on %s" : "Szukaj w %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Sprawdź wiki na temat dokumentacji związanej z instalacją i konfiguracją wyszukiwania pełnotekstowego w swoim Nextcloud",
     "Select the app to index content and answer search queries." : "Wybierz aplikację, aby indeksować treść i odpowiadać na wyszukiwane hasła."
 },"pluralForm" :"nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);"

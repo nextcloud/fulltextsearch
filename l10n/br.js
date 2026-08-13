@@ -11,8 +11,10 @@ OC.L10N.register(
     "Search Platform" : "Klask pladenn",
     "Navigation Icon" : "Skeudennig Merdeiñ",
     "Enable global search within all your content." : "Aotreañ an enklask hollek e-barzh pep tra.",
-    "Search on %s" : "Klask war %s",
+    "Error" : "Fazi",
+    "No results" : "Disoc'h ebet",
     "the search returned {total} results in {time} ms" : "an enklask en deus roet {total} disoc'h e {time} ms",
+    "Search on %s" : "Klask war %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Gwiriit er wiki evit an dielvadur liammet d'ar staliadur  hag an arventennañ eit ar c'hlasker e tout an destenn e barzh ho Nextcloud",
     "Select the app to index content and answer search queries." : "Choazit ur meziant da lakaat er roll-gerioù ha respontit d'ar goulennoù enklask"
 },

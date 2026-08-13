@@ -10,9 +10,13 @@
     "Search Platform" : "Платформа за търсене",
     "Navigation Icon" : "Икона за навигация",
     "Enable global search within all your content." : "Активиране на глобално търсене в цялото ви съдържание.",
-    "Search on %s" : "Търси в %s",
+    "Error" : "Грешка",
+    "No results" : "Няма резултат",
+    "Previous page" : "Предишна страница",
+    "Next page" : "Следваща страница",
     "the search returned {total} results in {time} ms" : "търсенето докладва {total} резултата за {time} мс",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "търсенето в {title} за „{search}“ докладва {total} резултата за {time} мс",
+    "Search on %s" : "Търси в %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Моля, проверете wiki за документация, свързана с инсталацията и конфигурацията на пълнотекстово търсене във вашият Nextcloud",
     "Select the app to index content and answer search queries." : "Изберете приложението, за да индексирате съдържание и да отговорите на заявки за търсене."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

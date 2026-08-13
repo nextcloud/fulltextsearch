@@ -1,5 +1,6 @@
 { "translations": {
     "Search" : "Search",
-    "General" : "সাধারণ"
+    "General" : "সাধারণ",
+    "Error" : "সমস্যা"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

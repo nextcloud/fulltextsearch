@@ -9,9 +9,14 @@
     "General" : "Geral",
     "Navigation Icon" : "Ícone de Navegação",
     "Enable global search within all your content." : "Ativar a pesquisa global em todo o seu conteúdo.",
-    "Search on %s" : "Pesquisar em %s",
+    "Error" : "Erro",
+    "Searching …" : "A procurar…",
+    "No results" : "Sem resultados",
+    "Previous page" : "Página anterior",
+    "Next page" : "Próxima página",
     "the search returned {total} results in {time} ms" : "a procura encontrou {total} resultados em {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "a pesquisa em {title} por \"{search}\" retornou {total} resultados em {time} ms",
+    "Search on %s" : "Pesquisar em %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Verifique o wiki para documentação relacionada com a instalação e configuração da pesquisa de texto completo dentro do seu Nextcloud.",
     "Select the app to index content and answer search queries." : "Selecione o aplicativo para indexar conteúdo e responder a consultas de pesquisa."
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
