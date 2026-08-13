@@ -1,6 +1,7 @@
 OC.L10N.register(
     "fulltextsearch",
     {
-    "Search" : "Search"
+    "Search" : "Search",
+    "Error" : "ایرر"
 },
 "nplurals=2; plural=(n != 1);");

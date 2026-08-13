@@ -1,5 +1,6 @@
 { "translations": {
     "Search" : "Search",
-    "General" : "பொதுவான"
+    "General" : "பொதுவான",
+    "Error" : "வழு"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
