@@ -1,5 +1,7 @@
 { "translations": {
     "Search" : "Gözlemek",
-    "General" : "Esasy"
+    "General" : "Esasy",
+    "Error" : "ýalňyşlyk",
+    "No results" : " Netije ýok"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

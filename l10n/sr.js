@@ -12,9 +12,12 @@ OC.L10N.register(
     "Search Platform" : "Платформа претраге",
     "Navigation Icon" : "Икона навигације",
     "Enable global search within all your content." : "Укључите глобалну претраге кроз цео Ваш садржај.",
-    "Search on %s" : "Претражи %s",
+    "Error" : "Грешка",
+    "Searching …" : "Тражи се …",
+    "No results" : "Нема резултата",
     "the search returned {total} results in {time} ms" : "претрага је вратила укупно {total} резултата за {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "претрага {title} за „{search}” је вратила {total} резултата за {time} ms",
+    "Search on %s" : "Претражи %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Погледајте вики за документацију везану за инсталацију и подешавање претраге целог текста из Вашег Некстклауда",
     "Select the app to index content and answer search queries." : "Одаберите апликацију за индексирање садржаја и за одговарање на упите."
 },

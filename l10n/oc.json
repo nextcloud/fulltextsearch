@@ -1,6 +1,9 @@
 { "translations": {
     "Search" : "Recercar",
     "Full text search" : "Recèrca tèxt brut",
-    "General" : "Generals"
+    "General" : "Generals",
+    "Error" : "Error",
+    "Searching …" : "Recèrca…",
+    "No results" : "Cap de resultat"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

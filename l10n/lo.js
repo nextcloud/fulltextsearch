@@ -12,9 +12,12 @@ OC.L10N.register(
     "Search Platform" : "Search Platform",
     "Navigation Icon" : "Navigation Icon",
     "Enable global search within all your content." : "Enable global search within all your content.",
-    "Search on %s" : "Search on %s",
+    "Error" : "ຂໍ້ຜິດພາດ",
+    "Searching …" : "ກຳລັງຄົ້ນຫາ…",
+    "No results" : "ບໍ່ມີຜົນ",
     "the search returned {total} results in {time} ms" : "the search returned {total} results in {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "the search in {title} for \"{search}\" returned {total} results in {time} ms",
+    "Search on %s" : "Search on %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud",
     "Select the app to index content and answer search queries." : "Select the app to index content and answer search queries."
 },

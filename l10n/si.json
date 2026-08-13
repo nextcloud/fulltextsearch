@@ -1,5 +1,7 @@
 { "translations": {
     "Search" : "සොයන්න",
-    "General" : "සමාන්‍යය"
+    "General" : "සමාන්‍යය",
+    "Error" : "දෝෂය",
+    "No results" : "ප්‍රතිථල නැත"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

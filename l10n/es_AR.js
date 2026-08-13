@@ -10,6 +10,8 @@ OC.L10N.register(
     "Search Platform" : "Buscar Plataforma",
     "Navigation Icon" : "Icono de navegación",
     "Enable global search within all your content." : "Habilita la búsqueda global dentro de todo tu contenido.",
+    "Error" : "Error",
+    "No results" : "No hay resultados",
     "Search on %s" : "Busca en %s",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud" : "Consulte la wiki para obtener documentación relacionada con la instalación y la configuración de la búsqueda de texto completo en su Nextcloud",
     "Select the app to index content and answer search queries." : "Seleccione la aplicación para indexar contenido y responder consultas de búsqueda."

@@ -10,8 +10,13 @@ OC.L10N.register(
     "Search Platform" : "Hakualusta",
     "Navigation Icon" : "Valikon kuvake",
     "Enable global search within all your content." : "Ota käyttöön globaali haku sisällöstäsi.",
-    "Search on %s" : "Etsi kohteesta %s",
+    "Error" : "Virhe",
+    "Searching …" : "Haetaan …",
+    "No results" : "Ei tuloksia",
+    "Previous page" : "Edellinen sivu",
+    "Next page" : "Seuraava sivu",
     "the search returned {total} results in {time} ms" : "haku palautti {total} tulosta ajassa {time} ms",
+    "Search on %s" : "Etsi kohteesta %s",
     "Select the app to index content and answer search queries." : "Valitse sovellus, jota käytetään sisällön indeksointiin ja hakukyselyihin vastaamiseen."
 },
 "nplurals=2; plural=(n != 1);");

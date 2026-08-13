@@ -1,5 +1,6 @@
 { "translations": {
     "Search" : "Search",
-    "General" : "Umum"
+    "General" : "Umum",
+    "Error" : "Ralat"
 },"pluralForm" :"nplurals=1; plural=0;"
 }
