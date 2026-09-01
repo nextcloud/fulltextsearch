@@ -13,6 +13,7 @@ OC.L10N.register(
     "Navigation Icon" : "Navigasjonsikon",
     "Enable global search within all your content." : "Aktiver globalt søk i alt innholdet ditt.",
     "Error" : "Feil",
+    "Searching …" : "Søker ...",
     "No results" : "Ingen resultater",
     "Previous page" : "Forrige side",
     "Next page" : "Neste side",
