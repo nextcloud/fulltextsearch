@@ -155,7 +155,7 @@ input.options_small {
 .provider_navigation {
 	position: relative;
 	font-size: 13px;
-	color: #898989;
+	color: color-mix(in srgb, var(--color-main-text), var(--color-main-background) 20%);
 	padding-top: 13px;
 	padding-left: 20px;
 	padding-bottom: 13px;
@@ -183,16 +183,16 @@ input.options_small {
 .result_entry {
 	height: 50px;
 	position: relative;
-	border-bottom: solid 1px #efefef;
+	border-bottom: solid 1px color-mix(in srgb, var(--color-main-text), var(--color-main-background) 75%);
 }
 
 .result_title {
-	color: #000;
+    color: var(--color-main-text);
 }
 
 .result_extract {
 	font-size: 11px;
-	color: #999;
+	color: color-mix(in srgb, var(--color-main-text), var(--color-main-background) 15%);
 	margin-top: -5px;
 	margin-bottom: -5px;
 	margin-left: 5px;
