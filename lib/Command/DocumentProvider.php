@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace OCA\FullTextSearch\Command;
 
 use Exception;
+use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
+use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\ProviderService;
 use OCP\Console\Attribute\Argument;
 use OCP\Console\Attribute\AsCommand;
@@ -26,6 +28,7 @@ use OCP\FullTextSearch\Model\IIndexDocument;
 class DocumentProvider {
 	public function __construct(
 		private ProviderService $providerService,
+		private IndexService $indexService,
 	) {
 	}
 
@@ -43,6 +46,8 @@ class DocumentProvider {
 		string $documentId,
 		#[Option(description: 'return some content', shortcut: 'c')]
 		bool $content = false,
+		#[Option(description: 'collection to look the existing index up in, defaults to the internal collection')]
+		string $collection = '',
 	): ExitCode {
 		$providerWrapper = $this->providerService->getProvider($providerId);
 		$provider = $providerWrapper->getProvider();
@@ -51,9 +56,9 @@ class DocumentProvider {
 		$index->setOwnerId($userId);
 		$index->setStatus(Index::INDEX_FULL);
 		try {
-			$index = \OC::$server->get(\OCA\FullTextSearch\Service\IndexService::class)->getIndex($providerId, $documentId);
-		} catch (\Throwable $t) {
-			$output->writeln("<error>Index not found : index attribute has been set to default values</error>");
+			$index = $this->indexService->getIndex($providerId, $documentId, $collection);
+		} catch (IndexDoesNotExistException $e) {
+			$output->writeln('<error>Index not found: index attributes have been set to default values</error>');
 		}
 		$indexDocument = $provider->updateDocument($index);
 
