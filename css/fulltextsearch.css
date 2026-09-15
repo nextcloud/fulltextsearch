@@ -18,7 +18,7 @@ div.icon-fulltextsearch {
 }
 
 #fts-error {
-	color: #f00;
+	color: var(--color-error, #f00);
 	text-align: center;
 	margin: 20px;
 }
@@ -70,6 +70,7 @@ input.options_small {
 }
 
 .provider_navigation_right {
+	color: var(--color-text-light);
 	position: absolute;
 	right: 0;
 	top: 0;
@@ -107,7 +108,7 @@ input.options_small {
 .result_entry_default {
 	height: 55px;
 	width: 100%;
-	border-bottom: solid 1px #d1d1d1;
+	border-bottom: solid 1px var(--color-border, #d1d1d1);
 }
 
 .result_entry_left {
@@ -132,7 +133,7 @@ input.options_small {
 }
 
 .result_entry_default #line1, .result_entry_default #line2 {
-	color: #717171;
+	color: var(--color-text-maxcontrast, #717171);
 	font-size: 11px;
 	height: 12px;
 }
@@ -155,11 +156,11 @@ input.options_small {
 .provider_navigation {
 	position: relative;
 	font-size: 13px;
-	color: #898989;
+	color: var(--color-text-maxcontrast, #898989);
 	padding-top: 13px;
 	padding-left: 20px;
 	padding-bottom: 13px;
-	border-bottom: solid 1px #eaeaea;
+	border-bottom: solid 1px var(--color-border, #eaeaea);
 }
 
 .icon-page-prev {
@@ -183,16 +184,12 @@ input.options_small {
 .result_entry {
 	height: 50px;
 	position: relative;
-	border-bottom: solid 1px #efefef;
-}
-
-.result_title {
-	color: #000;
+	border-bottom: solid 1px var(--color-border, #efefef);
 }
 
 .result_extract {
 	font-size: 11px;
-	color: #999;
+	color: var(--color-text-maxcontrast, #999);
 	margin-top: -5px;
 	margin-bottom: -5px;
 	margin-left: 5px;
@@ -220,7 +217,7 @@ input.options_small {
 
 .result_div_right {
 	right: 20px;
-	color: #9a9a9a;
+	color: var(--color-text-maxcontrast, #9a9a9a);
 }
 
 .icon-more-fulltextsearch {
@@ -231,7 +228,7 @@ input.options_small {
 }
 
 #next_search_input {
-	background: #fffc;
+	background: var(--color-main-background-translucent, rgba(255, 255, 255, 0.8));
 	width: 212px;
 	height: 30px;
 	margin: 2px !important;
@@ -257,7 +254,7 @@ input.options_small {
 .div-table-col-left {
 	width: 170px;
 	margin-top: 8px;
-	color: #707070;
+	color: var(--color-text-maxcontrast, #707070);
 	margin-right: 15px;
 	text-align: right;
 }
