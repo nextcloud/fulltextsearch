@@ -89,8 +89,8 @@ class TemplatesController extends Controller {
 					'provider' => $provider->getId(),
 					'title'    => $provider->getName(),
 					'options'  => $searchTemplate->getNavigationOptions(),
-					'css'      => $searchTemplate->getCss(),
-					'icon'     => $searchTemplate->getIcon()
+					'css'      => $searchTemplate->getCss() . ".css",
+					'icon'     => $searchTemplate->getIcon() . ".svg"
 				];
 		}
 
