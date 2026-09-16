@@ -105,7 +105,7 @@ Navigate.prototype = {
 			var providerId = data[ak[i]]['provider'];
 
 			if (css !== '') {
-				OC.addStyle(providerAppId, css);
+				OCP.Loader.loadStylesheet(providerAppId, css);
 			}
 
 			var li = $('<li>', {class: (nav.options !== undefined) ? 'collapsible open' : ''});
