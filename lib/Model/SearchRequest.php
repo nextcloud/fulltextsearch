@@ -11,6 +11,7 @@ namespace OCA\FullTextSearch\Model;
 
 use JsonSerializable;
 use OCA\FullTextSearch\Tools\Traits\TArrayTools;
+use OCP\FullTextSearch\Model\BodyPortion;
 use OCP\FullTextSearch\Model\ISearchRequest;
 use OCP\FullTextSearch\Model\ISearchRequestSimpleQuery;
 
@@ -78,6 +79,9 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 
 	/** @var array */
 	private $simpleQueries = [];
+
+	/** @var list<string> */
+	private array $portions = [];
 
 
 	/**
@@ -688,6 +692,26 @@ class SearchRequest implements ISearchRequest, JsonSerializable {
 	 */
 	public function getSimpleQueries(): array {
 		return $this->simpleQueries;
+	}
+
+
+	/**
+	 * @param BodyPortion $portion
+	 *
+	 * @return ISearchRequest
+	 */
+	public function addPortion(BodyPortion $portion): ISearchRequest {
+		$this->portions[] = $portion->value;
+
+		return $this;
+	}
+
+
+	/**
+	 * @return list<string>
+	 */
+	public function getPortions(): array {
+		return $this->portions;
 	}
 
 
