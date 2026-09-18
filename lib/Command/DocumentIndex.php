@@ -11,7 +11,9 @@ namespace OCA\FullTextSearch\Command;
 
 use Exception;
 use OC\Core\Command\Base;
+use OCA\FullTextSearch\Exceptions\IndexDoesNotExistException;
 use OCA\FullTextSearch\Model\Index;
+use OCA\FullTextSearch\Service\IndexService;
 use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use Symfony\Component\Console\Input\InputArgument;
@@ -36,7 +38,8 @@ class DocumentIndex extends Base {
 			 ->setDescription('index one specific document')
 			 ->addArgument('userId', InputArgument::REQUIRED, 'userId')
 			 ->addArgument('providerId', InputArgument::REQUIRED, 'providerId')
-			 ->addArgument('documentId', InputArgument::REQUIRED, 'documentId');
+			 ->addArgument('documentId', InputArgument::REQUIRED, 'documentId')
+			 ->addOption('collection', null, InputOption::VALUE_OPTIONAL, 'collection to look the existing index up in, defaults to the internal collection');
 	}
 
 	/**
@@ -50,6 +53,7 @@ class DocumentIndex extends Base {
 		$providerId = $input->getArgument('providerId');
 		$documentId = $input->getArgument('documentId');
 		$userId = $input->getArgument('userId');
+		$collection = $input->getOption('collection');
 
 		$providerWrapper = $this->providerService->getProvider($providerId);
 		$provider = $providerWrapper->getProvider();
@@ -57,6 +61,11 @@ class DocumentIndex extends Base {
 		$index = new Index($providerId, $documentId);
 		$index->setOwnerId($userId);
 		$index->setStatus(Index::INDEX_FULL);
+		try {
+			$index = $this->indexService->getIndex($providerId, $documentId, $collection);
+		} catch (IndexDoesNotExistException $e) {
+			$output->writeln('<error>Index not found: index attributes have been set to default values</error>');
+		}
 		$indexDocument = $provider->updateDocument($index);
 		if (!$indexDocument->hasIndex()) {
 			$indexDocument->setIndex($index);
@@ -79,6 +88,3 @@ class DocumentIndex extends Base {
 
 
 }
-
-
-
