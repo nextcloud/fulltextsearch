@@ -23,7 +23,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DocumentProvider extends Base {
 	public function __construct(
-		private ProviderService $providerService
+		private ProviderService $providerService,
+		private IndexService $indexService,
 	) {
 		parent::__construct();
 	}
