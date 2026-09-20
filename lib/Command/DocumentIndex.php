@@ -18,12 +18,14 @@ use OCA\FullTextSearch\Service\PlatformService;
 use OCA\FullTextSearch\Service\ProviderService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DocumentIndex extends Base {
 	public function __construct(
 		private ProviderService $providerService,
-		private PlatformService $platformService
+		private PlatformService $platformService,
+		private IndexService $indexService,
 	) {
 		parent::__construct();
 	}
