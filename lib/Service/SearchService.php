@@ -11,7 +11,6 @@ namespace OCA\FullTextSearch\Service;
 
 use Exception;
 use OC\FullTextSearch\Model\DocumentAccess;
-use OC\User\NoUserException;
 use OCA\Circles\CirclesManager;
 use OCA\Circles\Model\Circle;
 use OCA\FullTextSearch\Exceptions\EmptySearchException;
@@ -27,6 +26,7 @@ use OCP\FullTextSearch\Service\ISearchService;
 use OCP\IGroupManager;
 use OCP\IUser;
 use OCP\IUserManager;
+use OCP\User\Exceptions\UserNotFoundException;
 
 class SearchService implements ISearchService {
 
@@ -65,7 +65,7 @@ class SearchService implements ISearchService {
 
 		$user = $this->userManager->get($userId);
 		if ($user === null) {
-			throw new NoUserException('User does not exist');
+			throw new UserNotFoundException('User does not exist');
 		}
 
 		/** @var SearchRequest $searchRequest */
