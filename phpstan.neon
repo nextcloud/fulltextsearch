@@ -23,7 +23,6 @@ parameters:
 		- tests/stubs/oc_fulltextsearch_mode_searchtemplate.stub
 		- tests/stubs/oc_core_command_base.php
 		- tests/stubs/oc_core_interruptedexception.stub
-		- tests/stubs/oc_user_nouserexception.stub
 		- tests/stubs/oc_forbiddenexception.stub
 		- tests/stubs/oc_db_connectionadapter.php
 		- tests/stubs/oca_circles_circlesmanager.php
