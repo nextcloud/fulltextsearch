@@ -8,6 +8,7 @@ OC.L10N.register(
     "Core App of the full-text search framework for your Nextcloud." : "Pilna teksta meklēšanas satvara kodola lietotne Tavam Nextcloud.",
     "General" : "Vispārīgs",
     "Error" : "Kļūda",
+    "Searching …" : "Meklē ",
     "No results" : "Nav iznākuma",
     "Search on %s" : "Meklēt %s"
 },
