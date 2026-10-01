@@ -21,7 +21,7 @@ OC.L10N.register(
     "Search for content" : "Vyhľadávať obsah",
     "Searching …" : "Vyhľadáva sa …",
     "No results" : "Žiadne výsledky",
-    "Previous page" : "Predchodzia strana",
+    "Previous page" : "Predchádzajúca strana",
     "Next page" : "Ďalšia strana",
     "the search returned {total} results in {time} ms" : "Vyhľadávanie našlo {total} výsledkov za {time} ms",
     "the search in {title} for \"{search}\" returned {total} results in {time} ms" : "Vyhľadávanie \"{search}\" v {title} našlo {total} výsledkov za {time} ms",
