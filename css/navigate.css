@@ -62,6 +62,19 @@ a.ulsub {
 	padding: 0px 12px 0 12px !important;
 }
 
+#search_navigation > li + li,
+#search_navigation li li {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	padding-inline: 12px;
+}
+
+#search_navigation li ul {
+	flex-basis: 100%;
+}
+
 /**
 
 */
