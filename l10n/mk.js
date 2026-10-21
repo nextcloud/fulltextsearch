@@ -6,6 +6,7 @@ OC.L10N.register(
     "Full text search" : "Пребарување на целосен текст",
     "General" : "Општо",
     "Error" : "Грешка",
+    "Search for content" : "Пребарана содржина",
     "Searching …" : "Пребарување …",
     "No results" : "Нема резултати",
     "the search returned {total} results in {time} ms" : "Пронајдени се {total} резултати за време од {time} ms",
