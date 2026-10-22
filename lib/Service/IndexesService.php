@@ -149,8 +149,7 @@ class IndexesService {
 
 		$qb = $this->getIndexesUpdateSql();
 		$qb->set('status', $qb->createNamedParameter(IIndex::INDEX_FULL))
-			->where($qb->expr()->eq('document_id', $qb->createNamedParameter($collection)))
-			->andWhere($qb->expr()->eq('collection', $qb->createNamedParameter($collection)));
+			->where($qb->expr()->eq('collection', $qb->createNamedParameter($collection)));
 
 		$qb->executeStatement();
 	}
