@@ -41,7 +41,7 @@
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.13.0",
     "sass": "^1.105.2",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vite": "^7.3.7"
   },
   "engines": {
