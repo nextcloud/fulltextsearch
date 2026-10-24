@@ -19,7 +19,7 @@ OC.L10N.register(
     "Search on {theme}" : "Caută în {theme}",
     "Error" : "Eroare",
     "Search for content" : "Caută conținut",
-    "Searching …" : "Se caută…",
+    "Searching …" : "Se caută …",
     "No results" : "Niciun rezultat",
     "Previous page" : "Pagina anterioară",
     "Next page" : "Pagina următoare",
