@@ -12,6 +12,7 @@ OC.L10N.register(
     "Search Platform" : "Vyhledávací platforma",
     "Navigation Icon" : "Ikona navigace",
     "Enable global search within all your content." : "Zapnout globální vyhledávání ve veškerém vašem obsahu.",
+    "Search filters" : "Hledat filtry",
     "Error" : "Error",
     "Searching …" : "Hledání …",
     "No results" : "Žádné výsledky",
