@@ -4,7 +4,7 @@
     "Index not found" : "Index nicht gefunden",
     "Process timed out" : "Zeitüberschreitung bei der Verarbeitung",
     "Full text search" : "Volltextsuche",
-    "Core of the full-text search framework for Nextcloud" : "Kern des Sytems für die Volltextsuche in Nextcloud",
+    "Core of the full-text search framework for Nextcloud" : "Kern des Systems für die Volltextsuche in Nextcloud",
     "Core App of the full-text search framework for your Nextcloud." : "Haupt-App für die Volltextsuche in Nextcloud",
     "General" : "Allgemein",
     "Please check the wiki for documentation related to the installation and the configuration of the full text search within your Nextcloud." : "Informationen zur Installation und Konfiguration der Volltextsuche unter Nextcloud finden Sie im Wiki",
